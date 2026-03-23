@@ -24,6 +24,10 @@ from vggt.models.vggt import VGGT
 from vggt.utils.geometry import unproject_depth_map_to_point_map
 from vggt.utils.load_fn import load_and_preprocess_images
 from vggt.utils.pose_enc import pose_encoding_to_extri_intri
+from scripts.zju_geometry_region_utils import (
+    compute_region_diagnostics,
+    write_region_markdown_report as write_region_markdown_report_extended,
+)
 
 
 DEFAULT_MODEL_URL = "https://huggingface.co/facebook/VGGT-1B/resolve/main/model.pt"
@@ -65,6 +69,16 @@ def parse_args():
         choices=["depth_unproject", "point_map", "auto"],
         help="Branch to materialize as the primary geometry output. 'auto' uses the branch decision winner and falls back to depth_unproject on ties.",
     )
+    parser.add_argument(
+        "--target_mask_source",
+        type=str,
+        default="mask",
+        choices=["none", "mask", "mask_cihp"],
+        help="Target-view mask source for region diagnostics.",
+    )
+    parser.add_argument("--region_edge_px", type=int, default=5)
+    parser.add_argument("--bottom_band_ratio", type=float, default=0.2)
+    parser.add_argument("--skip_region_diagnostics", action="store_true")
     parser.add_argument("--skip_save_predictions", action="store_true")
     return parser.parse_args()
 
@@ -782,6 +796,21 @@ def write_markdown_report(path, summary):
             "- Do not restore the legacy ghost stack before these source-only geometry baselines are understood.",
         ]
     )
+    region_diag = summary.get("region_diagnostics")
+    if region_diag:
+        lines.extend(
+            [
+                "",
+                "## Region Diagnostics",
+                "",
+                f"- target_mask_source: `{region_diag['config']['target_mask_source']}`",
+                f"- region_edge_px: `{region_diag['config']['region_edge_px']}`",
+                f"- bottom_band_ratio: `{region_diag['config']['bottom_band_ratio']}`",
+                f"- target_mask_overlay_png: `{summary['files'].get('target_mask_overlay_png', '')}`",
+                f"- region_metrics_json: `{summary['files'].get('region_metrics_json', '')}`",
+                f"- region_metrics_md: `{summary['files'].get('region_metrics_md', '')}`",
+            ]
+        )
     with open(path, "w", encoding="utf-8") as handle:
         handle.write("\n".join(lines) + "\n")
 
@@ -982,6 +1011,40 @@ def main():
     save_gray_png(depth_weight_png, depth_render["weight"])
     make_tiled_report(comparison_png, target_image, point_render["image"], depth_render["image"])
 
+    region_diagnostics = None
+    if not args.skip_region_diagnostics:
+        region_diagnostics = compute_region_diagnostics(
+            output_dir=output_dir,
+            seq_dir=seq_dir,
+            frame_id=frame_id,
+            target_camera=target_camera,
+            target_image=target_image,
+            target_extrinsic=target_extrinsic,
+            target_intrinsic=target_intrinsic,
+            source_colors=source_colors,
+            point_map_aligned=point_map_aligned,
+            point_conf=point_conf,
+            depth_points_aligned=depth_points_aligned,
+            depth_conf=depth_conf,
+            point_render=point_render,
+            depth_render=depth_render,
+            target_mask_source=args.target_mask_source,
+            region_edge_px=args.region_edge_px,
+            bottom_band_ratio=args.bottom_band_ratio,
+            min_conf=args.min_conf,
+            export_max_points=args.export_max_points,
+            case_meta={
+                "seq_name": meta["seq_name"],
+                "frame_id": frame_id,
+                "target_camera": target_camera,
+                "view_profile": view_profile,
+                "source_count": len(source_cameras),
+            },
+            legacy_reference_metrics=report_payload.get("metrics", {}).get("native", {}),
+        )
+        save_json(output_dir / "region_metrics.json", region_diagnostics)
+        write_region_markdown_report_extended(output_dir / "region_metrics.md", region_diagnostics)
+
     primary_branch, primary_reason = resolve_primary_branch(args.primary_branch, decision)
     primary_render_alias = render_dir / "primary_render.png"
     primary_weight_alias = render_dir / "primary_weight.png"
@@ -1023,6 +1086,10 @@ def main():
             "render_size": list(render_hw),
             "z_tolerance": float(args.z_tolerance),
             "min_conf": float(args.min_conf),
+            "target_mask_source": args.target_mask_source,
+            "region_edge_px": int(args.region_edge_px),
+            "bottom_band_ratio": float(args.bottom_band_ratio),
+            "skip_region_diagnostics": bool(args.skip_region_diagnostics),
             "save_predictions": not bool(args.skip_save_predictions),
         },
         "environment": {
@@ -1067,6 +1134,7 @@ def main():
         },
         "branch_delta": branch_delta,
         "decision": decision,
+        "region_diagnostics": region_diagnostics,
         "primary": {
             "requested_branch": args.primary_branch,
             "selected_branch": primary_branch,
@@ -1088,6 +1156,18 @@ def main():
         },
         "legacy_report_metrics": report_payload.get("metrics", {}).get("native", {}),
     }
+    if region_diagnostics:
+        summary["files"].update(
+            {
+                "target_mask_overlay_png": str(Path(region_diagnostics["files"]["target_mask_overlay_png"])),
+                "region_metrics_json": "region_metrics.json",
+                "region_metrics_md": "region_metrics.md",
+            }
+        )
+        for key, value in region_diagnostics["files"].items():
+            if key == "target_mask_overlay_png":
+                continue
+            summary["files"][key] = str(Path(value))
 
     save_json(output_dir / "summary.json", summary)
     write_markdown_report(output_dir / "summary.md", summary)

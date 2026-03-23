@@ -233,6 +233,8 @@ class ZjuAblationPairConfig:
     camera_source: str = "gt"
     mask_source: str = "mask"
     min_depth_conf: float = 0.0
+    baseline_min_depth_conf: float | None = None
+    candidate_min_depth_conf: float | None = None
     freeze_aggregator: bool = True
     extra_overrides: str = ""
 
@@ -500,7 +502,7 @@ def run_remote_zju_geometry_ablation_pair(cfg_json: str) -> None:
         holdout_stride=cfg.holdout_stride,
         camera_source=cfg.camera_source,
         mask_source=cfg.mask_source,
-        min_depth_conf=cfg.min_depth_conf,
+        min_depth_conf=cfg.min_depth_conf if cfg.baseline_min_depth_conf is None else cfg.baseline_min_depth_conf,
         freeze_aggregator=cfg.freeze_aggregator,
         extra_overrides=cfg.extra_overrides,
     )
@@ -522,7 +524,7 @@ def run_remote_zju_geometry_ablation_pair(cfg_json: str) -> None:
         holdout_stride=cfg.holdout_stride,
         camera_source=cfg.camera_source,
         mask_source=cfg.mask_source,
-        min_depth_conf=cfg.min_depth_conf,
+        min_depth_conf=cfg.min_depth_conf if cfg.candidate_min_depth_conf is None else cfg.candidate_min_depth_conf,
         freeze_aggregator=cfg.freeze_aggregator,
         extra_overrides=cfg.extra_overrides,
     )
