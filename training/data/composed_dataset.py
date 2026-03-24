@@ -118,6 +118,9 @@ class ComposedDataset(Dataset, ABC):
         world_points = torch.from_numpy(np.stack(batch["world_points"]).astype(np.float32))
         point_masks = torch.from_numpy(np.stack(batch["point_masks"])) # Mask indicating valid depths / world points / cam points per frame
         ids = torch.from_numpy(batch["ids"])    # Frame indices sampled from the original sequence
+        foreground_masks = None
+        if "foreground_masks" in batch and batch["foreground_masks"] is not None:
+            foreground_masks = torch.from_numpy(np.stack(batch["foreground_masks"]).astype(bool))
 
 
         # --- Apply Color Augmentation (training mode only) ---
@@ -143,6 +146,8 @@ class ComposedDataset(Dataset, ABC):
             "world_points": world_points,
             "point_masks": point_masks,
         }
+        if foreground_masks is not None:
+            sample["foreground_masks"] = foreground_masks
 
         # --- Track Processing (if enabled) ---
         if self.load_track:

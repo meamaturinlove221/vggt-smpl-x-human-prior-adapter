@@ -6,6 +6,7 @@ import sys
 from pathlib import Path
 
 import numpy as np
+from run_zju_custom_source_set_region_probe import detect_checkpoint
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -91,6 +92,12 @@ def parse_args():
         default=1e-6,
     )
     parser.add_argument(
+        "--python_exe",
+        type=str,
+        default="",
+        help="Python executable used to launch the per-case compare runner. Defaults to repo-local .venv5080 when available.",
+    )
+    parser.add_argument(
         "--skip_existing",
         action="store_true",
         help="Skip cases whose summary.json already exists.",
@@ -103,6 +110,12 @@ def parse_args():
         help="How to derive sparse source subsets for each target camera.",
     )
     parser.add_argument(
+        "--source_override_json",
+        type=str,
+        default="",
+        help="Optional JSON manifest with exact per-target source-camera overrides.",
+    )
+    parser.add_argument(
         "--limit_cases",
         type=int,
         default=0,
@@ -111,12 +124,82 @@ def parse_args():
     return parser.parse_args()
 
 
+def resolve_python_executable(requested):
+    requested = str(requested).strip()
+    if requested:
+        requested_path = Path(requested)
+        if requested_path.is_file():
+            return str(requested_path.resolve())
+        return requested
+
+    candidates = [
+        REPO_ROOT / ".venv5080" / "Scripts" / "python.exe",
+        REPO_ROOT / ".venv" / "Scripts" / "python.exe",
+        Path(sys.executable),
+    ]
+    for candidate in candidates:
+        if candidate.is_file():
+            return str(candidate.resolve())
+    return sys.executable
+
+
+def resolve_checkpoint_path(requested):
+    requested = str(requested).strip()
+    if requested:
+        requested_path = Path(requested)
+        if requested_path.is_file():
+            return requested_path.resolve()
+
+    # PowerShell can mangle non-ASCII checkpoint paths; fall back to the same local resolver used by probes.
+    checkpoint_path = detect_checkpoint()
+    if requested and str(checkpoint_path) != requested:
+        print(
+            f"[zju-view-sweep] checkpoint fallback: requested `{requested}` not found, using `{checkpoint_path}`",
+            flush=True,
+        )
+    return checkpoint_path
+
+
 def parse_csv_list(text):
     return [item.strip() for item in str(text).split(",") if item.strip()]
 
 
 def parse_frame_ids(text):
     return [int(item) for item in parse_csv_list(text)]
+
+
+def load_source_override_manifest(path):
+    if not path:
+        return {"label": "", "cases": {}}
+    # PowerShell-generated JSON often carries a UTF-8 BOM on Windows.
+    payload = json.loads(Path(path).read_text(encoding="utf-8-sig"))
+    items = payload.get("cases", payload)
+    if not isinstance(items, list):
+        raise ValueError(f"Override manifest must contain a list under 'cases': {path}")
+
+    override_cases = {}
+    for item in items:
+        seq_name = str(item.get("seq_name", "")).strip()
+        view_profile = str(item.get("view_profile", "")).strip()
+        frame_id_raw = item.get("frame_id", None)
+        frame_id = int(frame_id_raw) if frame_id_raw is not None else None
+        target_camera = str(item.get("target_camera", "")).strip()
+        source_cameras = [str(camera).strip() for camera in item.get("source_cameras", []) if str(camera).strip()]
+        override_name = str(item.get("override_name", "")).strip()
+        # `frame_id=0` is a valid ZJU frame and must not be rejected as falsy.
+        if not view_profile or frame_id is None or not target_camera or not source_cameras:
+            raise ValueError(f"Invalid override case in {path}: {item}")
+        key = (seq_name, view_profile, frame_id, target_camera)
+        if key in override_cases:
+            raise ValueError(f"Duplicate override case in {path}: {key}")
+        override_cases[key] = {
+            "source_cameras": source_cameras,
+            "override_name": override_name,
+        }
+    return {
+        "label": str(payload.get("label", "")).strip(),
+        "cases": override_cases,
+    }
 
 
 def load_template_profile(path):
@@ -166,6 +249,36 @@ def discover_camera_ring_order(seq_dir):
 
     rows.sort(key=lambda item: item[1])
     return [name for name, _ in rows]
+
+
+def resolve_source_override(override_manifest, seq_name, view_profile, frame_id, target_camera):
+    if not override_manifest:
+        return None
+    override_cases = override_manifest.get("cases", {})
+    keys = [
+        (str(seq_name), str(view_profile), int(frame_id), str(target_camera)),
+        ("", str(view_profile), int(frame_id), str(target_camera)),
+    ]
+    for key in keys:
+        if key in override_cases:
+            return override_cases[key]
+    return None
+
+
+def validate_source_cameras(source_cameras, target_camera, all_cameras, expected_count, context):
+    cleaned = [str(camera) for camera in source_cameras]
+    if len(cleaned) != len(set(cleaned)):
+        raise ValueError(f"Duplicate source cameras in {context}: {cleaned}")
+    if target_camera in cleaned:
+        raise ValueError(f"Target camera {target_camera} was included in {context}: {cleaned}")
+    missing = [camera for camera in cleaned if camera not in all_cameras]
+    if missing:
+        raise ValueError(f"Unknown cameras in {context}: {missing}")
+    if expected_count and len(cleaned) != expected_count:
+        raise ValueError(
+            f"Source count mismatch in {context}: expected {expected_count}, got {len(cleaned)}"
+        )
+    return cleaned
 
 
 def attach_template_offsets(profile, ring_order):
@@ -275,8 +388,18 @@ def resolve_source_cameras(profile, target_camera, all_cameras, source_policy, r
     raise ValueError(f"Unsupported source policy: {source_policy}")
 
 
-def build_case_meta(profile, frame_id, target_camera, seq_dir, all_cameras, source_policy, ring_order):
-    if profile["profile_kind"] == "full_rig_excluding_target":
+def build_case_meta(profile, frame_id, target_camera, seq_dir, all_cameras, source_policy, ring_order, override_manifest):
+    override_entry = resolve_source_override(
+        override_manifest,
+        profile["seq_name"],
+        profile["view_profile"],
+        frame_id,
+        target_camera,
+    )
+    override_applied = override_entry is not None
+    if override_applied:
+        source_cameras = list(override_entry["source_cameras"])
+    elif profile["profile_kind"] == "full_rig_excluding_target":
         source_cameras = [camera for camera in all_cameras if camera != target_camera]
     else:
         source_cameras = resolve_source_cameras(profile, target_camera, all_cameras, source_policy, ring_order)
@@ -286,6 +409,15 @@ def build_case_meta(profile, frame_id, target_camera, seq_dir, all_cameras, sour
     if not source_cameras:
         return None
 
+    expected_count = (len(all_cameras) - 1) if profile["profile_kind"] == "full_rig_excluding_target" else len(profile["source_cameras"])
+    source_cameras = validate_source_cameras(
+        source_cameras,
+        target_camera,
+        all_cameras,
+        expected_count,
+        context=f"{profile['view_profile']} / frame_{int(frame_id):06d} / {target_camera}",
+    )
+
     frame_stem = f"{int(frame_id):06d}"
     return {
         "time": "",
@@ -294,7 +426,10 @@ def build_case_meta(profile, frame_id, target_camera, seq_dir, all_cameras, sour
         "frame_id": int(frame_id),
         "view_profile": profile["view_profile"],
         "profile_kind": profile["profile_kind"],
-        "source_policy": source_policy,
+        "source_policy": f"{source_policy}+override" if override_applied else source_policy,
+        "source_policy_base": source_policy,
+        "source_override_applied": bool(override_applied),
+        "source_override_name": "" if not override_applied else str(override_entry.get("override_name", "")),
         "num_total_cams": int(len(source_cameras) + (0 if target_camera in source_cameras else 1)),
         "num_src_views_actual": int(len(source_cameras)),
         "src_cameras": source_cameras,
@@ -308,13 +443,22 @@ def build_case_meta(profile, frame_id, target_camera, seq_dir, all_cameras, sour
     }
 
 
-def build_case_list(profiles, seq_dir, frame_ids, target_cameras, source_policy, ring_order):
+def build_case_list(profiles, seq_dir, frame_ids, target_cameras, source_policy, ring_order, override_manifest):
     all_cameras = discover_all_cameras(seq_dir)
     cases = []
     for profile in profiles:
         for frame_id in frame_ids:
             for target_camera in target_cameras:
-                meta = build_case_meta(profile, frame_id, target_camera, seq_dir, all_cameras, source_policy, ring_order)
+                meta = build_case_meta(
+                    profile,
+                    frame_id,
+                    target_camera,
+                    seq_dir,
+                    all_cameras,
+                    source_policy,
+                    ring_order,
+                    override_manifest,
+                )
                 if meta is None:
                     continue
                 cases.append(
@@ -361,14 +505,14 @@ def run_case(args, case):
     write_synthetic_report(synthetic_report, case["meta"])
 
     cmd = [
-        sys.executable,
+        args.python_exe_resolved,
         str(RUNNER),
         "--report_json",
         str(synthetic_report),
         "--local_zju_root",
         str(args.local_zju_root),
         "--checkpoint",
-        str(args.checkpoint),
+        str(args.checkpoint_resolved),
         "--output_dir",
         str(out_dir),
         "--device",
@@ -541,7 +685,10 @@ def write_summary_csv(path, rows):
 
 def main():
     args = parse_args()
+    args.python_exe_resolved = resolve_python_executable(args.python_exe)
+    args.checkpoint_resolved = resolve_checkpoint_path(args.checkpoint)
     local_zju_root = Path(args.local_zju_root).resolve()
+    override_manifest = load_source_override_manifest(args.source_override_json)
     profiles = [load_template_profile(path) for path in args.template_reports]
     seq_names = sorted({profile["seq_name"] for profile in profiles})
     if len(seq_names) != 1:
@@ -551,7 +698,15 @@ def main():
     profiles = [attach_template_offsets(profile, ring_order) for profile in profiles]
     frame_ids = parse_frame_ids(args.frame_ids)
     target_cameras = resolve_target_cameras(seq_dir, args.target_cameras)
-    cases = build_case_list(profiles, seq_dir, frame_ids, target_cameras, args.source_policy, ring_order)
+    cases = build_case_list(
+        profiles,
+        seq_dir,
+        frame_ids,
+        target_cameras,
+        args.source_policy,
+        ring_order,
+        override_manifest,
+    )
     if args.limit_cases > 0:
         cases = cases[: args.limit_cases]
 
@@ -559,10 +714,14 @@ def main():
     output_root.mkdir(parents=True, exist_ok=True)
     manifest = {
         "local_zju_root": str(local_zju_root),
-        "checkpoint": str(Path(args.checkpoint).resolve()),
+        "checkpoint": str(args.checkpoint_resolved),
+        "python_exe": str(args.python_exe_resolved),
         "frame_ids": frame_ids,
         "target_cameras": target_cameras,
         "source_policy": args.source_policy,
+        "source_override_json": str(Path(args.source_override_json).resolve()) if args.source_override_json else "",
+        "source_override_label": override_manifest.get("label", ""),
+        "source_override_case_count": int(len(override_manifest.get("cases", {}))),
         "camera_ring_order": ring_order,
         "profiles": profiles,
         "case_count": len(cases),

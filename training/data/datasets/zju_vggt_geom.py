@@ -250,6 +250,7 @@ class ZjuVggtGeomDataset(BaseDataset):
         cam_points = []
         world_points = []
         point_masks = []
+        foreground_masks = []
         extrinsics = []
         intrinsics = []
         image_paths = []
@@ -275,6 +276,7 @@ class ZjuVggtGeomDataset(BaseDataset):
                 fg_mask = _load_mask(entry["seq_dir"], cam_name, entry["frame_id"], self.mask_source, target_hw)
             else:
                 fg_mask = np.ones(target_hw, dtype=bool)
+            raw_fg_mask = fg_mask.copy()
 
             if self.min_depth_conf > 0:
                 fg_mask = fg_mask & (depth_conf >= self.min_depth_conf)
@@ -298,6 +300,7 @@ class ZjuVggtGeomDataset(BaseDataset):
             cam_points.append(cam_coords_points.astype(np.float32))
             world_points.append(world_coords_points.astype(np.float32))
             point_masks.append(point_mask.astype(bool))
+            foreground_masks.append(raw_fg_mask.astype(bool))
             extrinsics.append(extri_opencv.astype(np.float32))
             intrinsics.append(intri_opencv.astype(np.float32))
             image_paths.append(str(image_path))
@@ -314,6 +317,7 @@ class ZjuVggtGeomDataset(BaseDataset):
             "cam_points": cam_points,
             "world_points": world_points,
             "point_masks": point_masks,
+            "foreground_masks": foreground_masks,
             "image_paths": image_paths,
             "original_sizes": original_sizes,
         }

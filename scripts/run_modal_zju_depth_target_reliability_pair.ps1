@@ -112,6 +112,16 @@ function Get-ProfileSettings([string]$ProfileName) {
                 NumWorkers = 12
             }
         }
+        "a10080_high_util" {
+            return [pscustomobject]@{
+                ModalGpu = "A100-80GB"
+                ModalCpu = 16
+                ModalMemoryMb = 147456
+                MaxImgPerGpu = 24
+                AccumSteps = 1
+                NumWorkers = 16
+            }
+        }
         default {
             throw "Unsupported ThroughputProfile: $ProfileName"
         }

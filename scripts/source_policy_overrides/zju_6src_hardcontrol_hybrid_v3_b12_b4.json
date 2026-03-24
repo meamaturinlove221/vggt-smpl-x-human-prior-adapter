@@ -1,0 +1,35 @@
+{
+  "label": "zju_6src_hardcontrol_hybrid_v3_b12_b4",
+  "cases": [
+    {
+      "seq_name": "CoreView_390",
+      "view_profile": "6src_hist",
+      "frame_id": 1080,
+      "target_camera": "Camera_B4",
+      "override_name": "swap_b20_to_b6",
+      "source_cameras": [
+        "Camera_B2",
+        "Camera_B15",
+        "Camera_B10",
+        "Camera_B18",
+        "Camera_B22",
+        "Camera_B6"
+      ]
+    },
+    {
+      "seq_name": "CoreView_390",
+      "view_profile": "6src_hist",
+      "frame_id": 1080,
+      "target_camera": "Camera_B12",
+      "override_name": "hybrid_b23_b8",
+      "source_cameras": [
+        "Camera_B16",
+        "Camera_B18",
+        "Camera_B23",
+        "Camera_B5",
+        "Camera_B8",
+        "Camera_B13"
+      ]
+    }
+  ]
+}

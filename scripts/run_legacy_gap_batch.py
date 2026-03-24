@@ -316,6 +316,15 @@ def copy_existing_legacy_run(report_json: Path, dst_case_root: Path, *, overwrit
     return dst_report
 
 
+def find_existing_case_report(case_root: Path) -> Path | None:
+    if not case_root.is_dir():
+        return None
+    matches = sorted(case_root.rglob("report.json"), key=lambda p: p.stat().st_mtime, reverse=True)
+    if not matches:
+        return None
+    return matches[0]
+
+
 def parse_last_tagged_line(text: str, prefix: str) -> str:
     found = ""
     for line in text.splitlines():
@@ -534,6 +543,11 @@ def resolve_legacy_images(report_path: Path, report: dict) -> dict[str, Path]:
             if not value:
                 continue
             candidate = Path(value)
+            # Legacy reports often store remote Modal paths like /mnt/out/... even when
+            # the corresponding PNGs were already copied next to report.json locally.
+            local_sibling = report_dir / candidate.name
+            if local_sibling.is_file():
+                return local_sibling
             if not candidate.is_absolute():
                 candidate = (report_dir / value).resolve()
             if candidate.is_file():
@@ -808,6 +822,18 @@ def main() -> None:
                     "case_id": case.case_id,
                     "source_report": str(source_report),
                     "copied_report": str(report_path),
+                }
+            )
+            write_json(status_path, status)
+            continue
+        existing_report = find_existing_case_report(case_root)
+        if existing_report is not None:
+            legacy_reports[case.case_id] = existing_report
+            status["steps"].append(
+                {
+                    "step": "reuse_existing_legacy_case",
+                    "case_id": case.case_id,
+                    "report_json": str(existing_report),
                 }
             )
             write_json(status_path, status)

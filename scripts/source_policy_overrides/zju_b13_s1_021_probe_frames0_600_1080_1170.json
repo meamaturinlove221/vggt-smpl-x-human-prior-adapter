@@ -1,0 +1,65 @@
+{
+  "label": "zju_b13_s1_021_probe_frames0_600_1080_1170",
+  "cases": [
+    {
+      "seq_name": "CoreView_390",
+      "view_profile": "6src_hist",
+      "frame_id": 0,
+      "target_camera": "Camera_B13",
+      "override_name": "swap_b1_to_b15",
+      "source_cameras": [
+        "Camera_B12",
+        "Camera_B17",
+        "Camera_B19",
+        "Camera_B6",
+        "Camera_B23",
+        "Camera_B15"
+      ]
+    },
+    {
+      "seq_name": "CoreView_390",
+      "view_profile": "6src_hist",
+      "frame_id": 600,
+      "target_camera": "Camera_B13",
+      "override_name": "swap_b1_to_b15",
+      "source_cameras": [
+        "Camera_B12",
+        "Camera_B17",
+        "Camera_B19",
+        "Camera_B6",
+        "Camera_B23",
+        "Camera_B15"
+      ]
+    },
+    {
+      "seq_name": "CoreView_390",
+      "view_profile": "6src_hist",
+      "frame_id": 1080,
+      "target_camera": "Camera_B13",
+      "override_name": "swap_b1_to_b15",
+      "source_cameras": [
+        "Camera_B12",
+        "Camera_B17",
+        "Camera_B19",
+        "Camera_B6",
+        "Camera_B23",
+        "Camera_B15"
+      ]
+    },
+    {
+      "seq_name": "CoreView_390",
+      "view_profile": "6src_hist",
+      "frame_id": 1170,
+      "target_camera": "Camera_B13",
+      "override_name": "swap_b1_to_b15",
+      "source_cameras": [
+        "Camera_B12",
+        "Camera_B17",
+        "Camera_B19",
+        "Camera_B6",
+        "Camera_B23",
+        "Camera_B15"
+      ]
+    }
+  ]
+}

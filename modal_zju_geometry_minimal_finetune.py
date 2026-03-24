@@ -4,6 +4,7 @@ import shlex
 import shutil
 import subprocess
 import sys
+import threading
 import time
 import base64
 from dataclasses import asdict, dataclass
@@ -100,6 +101,9 @@ MEMORY_MB = int(
 )
 TIMEOUT_SEC = int(
     os.environ.get("VGGT_ZJU_MODAL_TIMEOUT_SEC", os.environ.get("VGGT_MODAL_TIMEOUT_SEC", str(24 * 60 * 60)))
+)
+LIVE_COMMIT_INTERVAL_SEC = int(
+    os.environ.get("VGGT_ZJU_MODAL_LIVE_COMMIT_SEC", os.environ.get("VGGT_MODAL_LIVE_COMMIT_SEC", "30"))
 )
 
 CODE_SYNC_IGNORE = [
@@ -318,6 +322,10 @@ def _build_overrides(
         f"optim.optimizer.lr={float(cfg.learning_rate)}",
         f"limit_train_batches={int(cfg.limit_train_batches)}",
         f"limit_val_batches={int(cfg.limit_val_batches)}",
+        "data.train.pin_memory=True",
+        "data.val.pin_memory=True",
+        "cuda.allow_tf32=True",
+        "cuda.cudnn_benchmark=True",
         "model.enable_camera=True",
         "model.enable_depth=True",
         "model.enable_point=False",
@@ -325,6 +333,14 @@ def _build_overrides(
         "loss.point=null",
         "loss.track=null",
     ]
+
+    if cfg.num_workers > 0:
+        overrides.extend(
+            [
+                "data.train.persistent_workers=True",
+                "data.val.persistent_workers=True",
+            ]
+        )
 
     if not cfg.freeze_aggregator:
         overrides.append("optim.frozen_module_names=[]")
@@ -394,6 +410,64 @@ def _resolve_checkpoint_path(remote_subpath: str) -> Path:
     )
 
 
+def _stream_subprocess_with_live_mirror(
+    *,
+    cmd: list[str],
+    cwd: Path,
+    env: dict[str, str],
+    mirror_log_path: Path,
+    commit_callback=None,
+    commit_interval_sec: int = 30,
+) -> None:
+    mirror_log_path.parent.mkdir(parents=True, exist_ok=True)
+    stop_event = threading.Event()
+    commit_thread = None
+
+    if commit_callback is not None and commit_interval_sec > 0:
+        def _commit_worker():
+            while not stop_event.wait(commit_interval_sec):
+                try:
+                    commit_callback()
+                except Exception as exc:
+                    print(f"[modal-zju-geometry] live commit warning: {exc}", flush=True)
+
+        commit_thread = threading.Thread(target=_commit_worker, daemon=True)
+        commit_thread.start()
+
+    return_code = None
+    with mirror_log_path.open("w", encoding="utf-8", errors="replace") as mirror_handle:
+        process = subprocess.Popen(
+            cmd,
+            cwd=str(cwd),
+            env=env,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+            bufsize=1,
+        )
+        try:
+            assert process.stdout is not None
+            for line in process.stdout:
+                mirror_handle.write(line)
+                mirror_handle.flush()
+                print(line, end="", flush=True)
+        finally:
+            return_code = process.wait()
+            stop_event.set()
+            if commit_thread is not None:
+                commit_thread.join(timeout=max(commit_interval_sec, 1))
+            if commit_callback is not None:
+                try:
+                    commit_callback()
+                except Exception as exc:
+                    print(f"[modal-zju-geometry] final commit warning: {exc}", flush=True)
+
+    if return_code != 0:
+        raise subprocess.CalledProcessError(return_code, cmd)
+
+
 def _run_training_subprocess(
     cfg: ZjuFinetuneConfig,
     *,
@@ -428,12 +502,17 @@ def _run_training_subprocess(
         repo_pythonpath if not existing_pythonpath else repo_pythonpath + os.pathsep + existing_pythonpath
     )
     env["PYTHONUNBUFFERED"] = "1"
+    env["PYTHONIOENCODING"] = "utf-8"
+    env["PYTHONUTF8"] = "1"
 
-    subprocess.run(
-        cmd,
-        cwd=str(remote_code_dir),
+    live_log_path = output_root / "driver_live.log"
+    _stream_subprocess_with_live_mirror(
+        cmd=cmd,
+        cwd=remote_code_dir,
         env=env,
-        check=True,
+        mirror_log_path=live_log_path,
+        commit_callback=output_volume.commit,
+        commit_interval_sec=LIVE_COMMIT_INTERVAL_SEC,
     )
 
     output_volume.commit()
@@ -540,6 +619,7 @@ def run_remote_zju_geometry_ablation_pair(cfg_json: str) -> None:
                 "config": stage_cfg.config,
                 "exp_name": stage_cfg.exp_name,
                 "output_root": (pair_output_root / stage_name).as_posix(),
+                "driver_live_log": (pair_output_root / stage_name / "driver_live.log").as_posix(),
             }
             _write_json(status_path, status)
             _run_training_subprocess(

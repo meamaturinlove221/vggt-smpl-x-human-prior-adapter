@@ -266,6 +266,9 @@ def compute_unproject_geometry_loss(
     detach_depth_conf=True,
     depth_conf_power=1.0,
     depth_conf_threshold=0.0,
+    use_foreground_region_mask=False,
+    foreground_erode_px=0,
+    foreground_drop_bottom_ratio=0.0,
     **kwargs,
 ):
     """
@@ -286,6 +289,18 @@ def compute_unproject_geometry_loss(
     gt_mask = batch["point_masks"].clone()
     valid_mask = gt_mask & pred_depth_mask & torch.isfinite(pred_world_points).all(dim=-1)
     conf_weights = None
+
+    if use_foreground_region_mask:
+        foreground_masks = batch.get("foreground_masks", None)
+        if foreground_masks is None:
+            raise ValueError("use_foreground_region_mask=True requires batch['foreground_masks'].")
+        region_mask = foreground_masks.to(device=valid_mask.device, dtype=torch.bool)
+        region_mask = build_reliable_foreground_region_mask(
+            region_mask,
+            erode_px=int(foreground_erode_px),
+            drop_bottom_ratio=float(foreground_drop_bottom_ratio),
+        )
+        valid_mask = valid_mask & region_mask
 
     if use_depth_conf_gate:
         pred_depth_conf = predictions.get("depth_conf", None)
@@ -329,6 +344,36 @@ def compute_unproject_geometry_loss(
         loss = loss_values.mean()
 
     return {"loss_unproject_geometry": loss}
+
+
+def build_reliable_foreground_region_mask(mask, erode_px=0, drop_bottom_ratio=0.0):
+    """
+    Build a stricter target-side region mask from the raw foreground mask.
+
+    This supports a minimal "reliable region" treatment without changing the
+    baseline camera/depth losses:
+    - optional binary erosion to suppress uncertain silhouette edges
+    - optional removal of a bottom image band to avoid floor/ground contact zones
+    """
+    region_mask = mask.to(dtype=torch.bool)
+    bb, ss, hh, ww = region_mask.shape
+
+    erode_px = int(max(0, erode_px))
+    if erode_px > 0:
+        kernel = 2 * erode_px + 1
+        flat = region_mask.reshape(bb * ss, 1, hh, ww)
+        inv = (~flat).float()
+        # Binary erosion via dilation of the inverse mask.
+        eroded = F.max_pool2d(inv, kernel_size=kernel, stride=1, padding=erode_px) == 0
+        region_mask = eroded.reshape(bb, ss, hh, ww)
+
+    drop_bottom_ratio = float(max(0.0, min(0.95, drop_bottom_ratio)))
+    if drop_bottom_ratio > 0.0:
+        cutoff = int(hh * (1.0 - drop_bottom_ratio))
+        if cutoff < hh:
+            region_mask[..., cutoff:, :] = False
+
+    return region_mask
 
 def camera_loss_single(pred_pose_enc, gt_pose_enc, loss_type="l1"):
     """
