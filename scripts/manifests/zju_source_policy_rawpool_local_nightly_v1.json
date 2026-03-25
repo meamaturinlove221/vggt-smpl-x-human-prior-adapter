@@ -1,0 +1,166 @@
+{
+  "schema_version": 1,
+  "status": "local_only_not_cloud_ready",
+  "problem_id": "zju_6src_source_policy_regularization_v2_confdepth_only",
+  "main_direction": "keep depth + camera -> unproject -> render; hold confdepth_dropworst_gradconfmask as the only local lead, keep cloud off, and only allow one new anchor-conditioned conf_depth semantics candidate after the completed local attribution v3 pass",
+  "current_cloud_blocker": "The current confdepth_dropworst_gradconfmask lead fixes the remaining grad+conf confidence-routing leak on top of the confdepth_dropworst_only route and further improves conf_depth/reg_depth without rebounding camera/T, but both depth terms are still materially worse than baseline on the tighter local gate, so the local training axis is not fully fixed and cloud must remain closed.",
+  "current_lead": {
+    "config": "training/config/zju_vggt_geom_unproject_source_policy_nearest_rawpool_confdepth_dropworst_gradconfmask_minimal.yaml",
+    "gate_summary": "docs/geometry_confdepth_only_local_gate_20260325.md",
+    "attribution_summary": "output/zju_conf_depth_attribution_confdepth_dropworst_gradconfmask_20260325_v3/summary.md",
+    "why_lead": [
+      "The current local lead keeps the same nearest_ring + geom_plus_raw input path, preserves the conf_depth-specific drop-worst rule, and also makes grad+conf confidence weighting respect the narrowed conf_depth mask.",
+      "On the tighter 10-train / 5-val local gate, it improves val_loss_conf_depth from 0.2514 to 0.2289 and val_loss_reg_depth from 0.1799 to 0.1760 versus the previous confdepth_dropworst_only lead while keeping val_loss_T and val_loss_camera flat.",
+      "It is still not cloud-ready because val_loss_conf_depth and val_loss_reg_depth remain worse than baseline."
+    ]
+  },
+  "historical_stage_markers": [
+    {
+      "name": "nearest_rawpool",
+      "config": "training/config/zju_vggt_geom_unproject_source_policy_nearest_rawpool_minimal.yaml",
+      "summary": "docs/geometry_source_policy_rawpool_local_gate_20260325.md",
+      "note": "Historical lead only. Do not treat this config as the current nightly lead."
+    }
+  ],
+  "accepted_findings": [
+    {
+      "path": "training/loss.py",
+      "fact": "Depth, confidence, regression, and unproject geometry supervision are already driven by batch point_masks, not by source-only raw views directly."
+    },
+    {
+      "path": "output/zju_source_policy_supervision_audit_nearest_rawpool_20260325_v1/summary.md",
+      "fact": "On the settled rawpool supervision audit, source-only raw views already have zero point pixels and zero camera/depth/unproject geometry-loss eligibility."
+    },
+    {
+      "path": "training/loss.py",
+      "fact": "Camera supervision is now filtered at the frame level by real supervised point support, so source-only raw views no longer enter camera loss just because another frame in the sample is valid."
+    },
+    {
+      "path": "training/loss.py",
+      "fact": "Depth loss now supports respect_conf_mask_in_grad_conf, so the grad+conf branch can stop confidence-weighting pixels that the conf_depth-specific routing already removed from conf supervision."
+    },
+    {
+      "path": "output/zju_training_ablation/zju_source_policy_confdepth_dropworst_gradconfmask_vs_lead_20260325_v1/summary.md",
+      "fact": "The confdepth_dropworst_gradconfmask follow-up is the current local lead: versus confdepth_dropworst_only on the tighter gate, val loss_conf_depth improves from 0.2514 to 0.2289 and val loss_reg_depth improves from 0.1799 to 0.1760 while val loss_T and val loss_camera stay flat."
+    },
+    {
+      "path": "output/zju_training_ablation/zju_source_policy_confdepth_dropworst_gradconfmask_vs_baseline_20260325_v1/summary.md",
+      "fact": "Even after the gradconfmask fix, the current lead is still not baseline-clean: on val, loss_conf_depth stays higher than baseline (0.2289 vs 0.1181) and loss_reg_depth stays higher than baseline (0.1760 vs 0.1181), so cloud remains blocked."
+    },
+    {
+      "path": "output/zju_conf_depth_attribution_confdepth_dropworst_gradconfmask_20260325_v3/summary.md",
+      "fact": "The completed attribution v3 audit keeps the same anchor-only conf_depth finding on the audited 32-sample val slice and now narrows the next local move further: the only clearly positive camera-level conf_depth delta is concentrated in anchor Camera_B1, so the next allowed candidate family is anchor-conditioned conf target normalization."
+    },
+    {
+      "path": "output/zju_training_ablation/zju_source_policy_confdepth_dropworst_gradconfmask_viewmean_vs_lead_20260325_v1/summary.md",
+      "fact": "The active_view_mean aggregation candidate is numerically redundant under the current 4-image recipe and does not create a new promotable lead."
+    }
+  ],
+  "frozen_non_reentry_candidates": [
+    {
+      "name": "min_supervised_views_2",
+      "config": "training/config/zju_vggt_geom_unproject_source_policy_nearest_rawpool_minimal.yaml",
+      "summary": "output/zju_training_ablation/zju_source_policy_nearest_rawpool_minsup2_local_gate_20260325_v1/summary.md",
+      "reason": "Worse camera, translation, and unproject geometry than baseline."
+    },
+    {
+      "name": "source_anchor_policy_max_depth_conf",
+      "config": "training/config/zju_vggt_geom_unproject_source_policy_nearest_rawpool_minimal.yaml",
+      "summary": "output/zju_training_ablation/zju_source_policy_nearest_rawpool_bestanchor_local_gate_20260325_v1/summary.md",
+      "reason": "Worse objective, camera, translation, depth confidence, depth regression, and unproject geometry than baseline."
+    },
+    {
+      "name": "dropworst_supervised",
+      "config": "training/config/zju_vggt_geom_unproject_source_policy_nearest_rawpool_dropworst_supervised_minimal.yaml",
+      "summary": "output/zju_training_ablation/zju_source_policy_nearest_rawpool_dropworst_vs_lead_20260325_v1/summary.md",
+      "reason": "Superseded by the narrower conf_depth-only route and never cleared the local promotion rule."
+    },
+    {
+      "name": "confdepth_dropworst_trainmix50",
+      "config": "training/config/zju_vggt_geom_unproject_source_policy_nearest_rawpool_confdepth_dropworst_trainmix50_minimal.yaml",
+      "summary": "output/zju_training_ablation/zju_source_policy_confdepth_dropworst_trainmix50_vs_lead_20260325_v1/summary.md",
+      "reason": "Reduced train-time rawpool exposure but sharply regressed camera, translation, conf_depth, reg_depth, unproject geometry, and objective versus the current lead."
+    },
+    {
+      "name": "confdepth_dropworst_gradconfmask_viewmean",
+      "config": "training/config/zju_vggt_geom_unproject_source_policy_nearest_rawpool_confdepth_dropworst_gradconfmask_viewmean_minimal.yaml",
+      "summary": "output/zju_training_ablation/zju_source_policy_confdepth_dropworst_gradconfmask_viewmean_vs_lead_20260325_v1/summary.md",
+      "reason": "Numerically redundant under the current 4-image recipe."
+    },
+    {
+      "name": "exclude_rawpool_only_supervision_standalone",
+      "summary": "output/zju_source_policy_supervision_audit_nearest_rawpool_20260325_v1/summary.md",
+      "reason": "Already true on the current code path and therefore not a real candidate axis."
+    }
+  ],
+  "next_local_diagnostic": {
+    "name": "conf_depth_attribution_v3",
+    "status": "completed_locally",
+    "entrypoint": "scripts/audit_zju_conf_depth_attribution.py",
+    "config": "training/config/zju_vggt_geom_unproject_source_policy_nearest_rawpool_confdepth_dropworst_gradconfmask_minimal.yaml",
+    "latest_output": "output/zju_conf_depth_attribution_confdepth_dropworst_gradconfmask_20260325_v3/summary.md",
+    "latest_result": {
+      "dominant_failure_shape": "anchor_conditioned",
+      "recommended_candidate_family": "anchor_conditioned_conf_target_normalization",
+      "top_anchor_camera": "Camera_B1",
+      "top_anchor_delta_conf_depth_mean": 0.6812
+    },
+    "next_allowed_candidate_family": "anchor_conditioned_conf_target_normalization",
+    "required_outputs": [
+      "anchor_summary",
+      "frame_summary",
+      "region_summary",
+      "candidate_recommendation"
+    ],
+    "goal": "Decide whether the remaining conf_depth gap is primarily anchor-conditioned, frame-concentrated, region-conditioned, or a tail-distribution problem before opening one new candidate."
+  },
+  "non_goals": [
+    "Do not reopen v10/v11 inference-side patch collection.",
+    "Do not reopen global zju_min_depth_conf sweeps.",
+    "Do not reopen reliable-region or bottom-only auxiliary unproject losses.",
+    "Do not restore the ghost stack.",
+    "Do not launch any cloud pair while the current local training axis is still unresolved."
+  ],
+  "nightly_modes": [
+    {
+      "name": "diagnostic_only",
+      "default": true,
+      "when": "No genuinely new local training candidate has been checked in since the previous night.",
+      "steps": [
+        "Run preflight and require zero active Modal apps plus zero stale repo-scoped python/powershell/modal processes.",
+        "Run conf_depth attribution v3 on the current confdepth_dropworst_gradconfmask lead.",
+        "Emit anchor, frame, and region summaries plus one candidate recommendation; do not train and keep cloud_gate=false."
+      ]
+    },
+    {
+      "name": "single_candidate_local_gate",
+      "default": false,
+      "when": "Exactly one new local training-side candidate has been checked in and it is genuinely different from the frozen non-reentry list.",
+      "steps": [
+        "Run preflight first.",
+        "Run the supervision audit on the candidate config only if its dataset or loss routing differs from the current lead.",
+        "Run 1 train / 1 val smoke.",
+        "Run one tighter local gate against baseline and the current confdepth_dropworst_gradconfmask lead; do not branch into a second candidate the same night.",
+        "Promote only if camera/T do not materially rebound and conf_depth/reg_depth both improve versus the current lead."
+      ]
+    }
+  ],
+  "promotion_requirements_before_cloud_consideration": [
+    "Keep val_loss_camera no materially worse than the current confdepth_dropworst_gradconfmask lead.",
+    "Keep val_loss_T no worse than the current confdepth_dropworst_gradconfmask lead.",
+    "Improve val_loss_conf_depth versus the current confdepth_dropworst_gradconfmask lead.",
+    "Improve val_loss_reg_depth versus the current confdepth_dropworst_gradconfmask lead.",
+    "Do not introduce new path, cache, or raw-image loading failures.",
+    "Even after a local pass, require a fresh manual decision before flipping cloud_gate."
+  ],
+  "single_source_of_truth": [
+    "output/geometry_post_v9_nightly_state/consistency_check.md",
+    "docs/geometry_post_v9_next_training_question_20260325.md",
+    "scripts/manifests/zju_next_training_question_v1.json",
+    "scripts/manifests/zju_source_policy_rawpool_local_nightly_v1.json"
+  ],
+  "patch_collection_stop": true,
+  "ready_for_new_training_question": true,
+  "cloud_gate": false,
+  "launch_cloud_now": false
+}
