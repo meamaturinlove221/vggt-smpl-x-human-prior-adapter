@@ -1,0 +1,108 @@
+{
+  "label": "zju_post_v9_residual_cluster_v1",
+  "frozen_manifest_version": "v9",
+  "main_override_manifest": "scripts/source_policy_overrides/zju_6src_hardcontrol_hybrid_v9_b1_b2_b4_b12_frameaware_b13_b15_b23_frames0_600_1080_1170.json",
+  "baseline_round": "output/geometry_view_sweep_zju/round12_6src_uniform_alltargets_frames0_600_1080_1170_v1",
+  "main_round": "output/geometry_view_sweep_zju/round15_6src_uniform_override_b1_b2_b4_b12_frameaware_b13_b15_b23_alltargets_frames0_600_1080_1170_v9",
+  "reference_round": "output/geometry_view_sweep_zju/round3_12src_uniform_v1",
+  "main_view_profile": "6src_hist",
+  "reference_view_profile": "12src_nested",
+  "legacy_view_profile_tag": "6src_post_v9_residual_from_current",
+  "search_priority": [
+    "frame1170_trio",
+    "repeated_cameras"
+  ],
+  "cases": [
+    {
+      "seq_name": "CoreView_390",
+      "frame_id": 0,
+      "target_camera": "Camera_B13"
+    },
+    {
+      "seq_name": "CoreView_390",
+      "frame_id": 0,
+      "target_camera": "Camera_B23"
+    },
+    {
+      "seq_name": "CoreView_390",
+      "frame_id": 600,
+      "target_camera": "Camera_B11"
+    },
+    {
+      "seq_name": "CoreView_390",
+      "frame_id": 600,
+      "target_camera": "Camera_B13"
+    },
+    {
+      "seq_name": "CoreView_390",
+      "frame_id": 1080,
+      "target_camera": "Camera_B23"
+    },
+    {
+      "seq_name": "CoreView_390",
+      "frame_id": 1170,
+      "target_camera": "Camera_B11"
+    },
+    {
+      "seq_name": "CoreView_390",
+      "frame_id": 1170,
+      "target_camera": "Camera_B16"
+    },
+    {
+      "seq_name": "CoreView_390",
+      "frame_id": 1170,
+      "target_camera": "Camera_B7"
+    }
+  ],
+  "cluster_groups": {
+    "frame1170_trio": [
+      {
+        "seq_name": "CoreView_390",
+        "frame_id": 1170,
+        "target_camera": "Camera_B11"
+      },
+      {
+        "seq_name": "CoreView_390",
+        "frame_id": 1170,
+        "target_camera": "Camera_B16"
+      },
+      {
+        "seq_name": "CoreView_390",
+        "frame_id": 1170,
+        "target_camera": "Camera_B7"
+      }
+    ],
+    "repeated_cameras": [
+      {
+        "seq_name": "CoreView_390",
+        "frame_id": 0,
+        "target_camera": "Camera_B13"
+      },
+      {
+        "seq_name": "CoreView_390",
+        "frame_id": 0,
+        "target_camera": "Camera_B23"
+      },
+      {
+        "seq_name": "CoreView_390",
+        "frame_id": 600,
+        "target_camera": "Camera_B11"
+      },
+      {
+        "seq_name": "CoreView_390",
+        "frame_id": 600,
+        "target_camera": "Camera_B13"
+      },
+      {
+        "seq_name": "CoreView_390",
+        "frame_id": 1080,
+        "target_camera": "Camera_B23"
+      },
+      {
+        "seq_name": "CoreView_390",
+        "frame_id": 1170,
+        "target_camera": "Camera_B11"
+      }
+    ]
+  }
+}

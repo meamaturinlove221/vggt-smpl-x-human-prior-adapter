@@ -2,16 +2,19 @@ defaults:
   - default_dataset.yaml
   - _self_
 
-exp_name: zju_vggt_geom_unproject_minimal
+exp_name: zju_vggt_geom_unproject_source_policy_nearest_rawpool_minimal
 zju_dir: /YOUR/PATH/TO/ZJU
 zju_seq_names: CoreView_390
 zju_geom_subdir: vggt_geom
 zju_camera_source: gt
 zju_mask_source: mask
-zju_source_policy: random
-zju_source_view_pool: cached_only
+zju_source_policy: nearest_ring
+zju_source_view_pool: geom_plus_raw
+zju_source_view_pool_train_probability: 1.0
 zju_source_anchor_policy: random
 zju_min_supervised_views: 1
+zju_supervised_view_quality_filter: none
+zju_conf_depth_view_quality_filter: none
 zju_min_depth_conf: 0.0
 zju_holdout_stride: 10
 img_size: 518
@@ -51,8 +54,11 @@ data:
           mask_source: ${zju_mask_source}
           source_policy: ${zju_source_policy}
           source_view_pool: ${zju_source_view_pool}
+          source_view_pool_train_probability: ${zju_source_view_pool_train_probability}
           source_anchor_policy: ${zju_source_anchor_policy}
           min_supervised_views: ${zju_min_supervised_views}
+          supervised_view_quality_filter: ${zju_supervised_view_quality_filter}
+          conf_depth_view_quality_filter: ${zju_conf_depth_view_quality_filter}
           min_depth_conf: ${zju_min_depth_conf}
           holdout_stride: ${zju_holdout_stride}
   val:
@@ -79,8 +85,11 @@ data:
           mask_source: ${zju_mask_source}
           source_policy: ${zju_source_policy}
           source_view_pool: ${zju_source_view_pool}
+          source_view_pool_train_probability: ${zju_source_view_pool_train_probability}
           source_anchor_policy: ${zju_source_anchor_policy}
           min_supervised_views: ${zju_min_supervised_views}
+          supervised_view_quality_filter: ${zju_supervised_view_quality_filter}
+          conf_depth_view_quality_filter: ${zju_conf_depth_view_quality_filter}
           min_depth_conf: ${zju_min_depth_conf}
           holdout_stride: ${zju_holdout_stride}
 
@@ -127,19 +136,37 @@ checkpoint:
 loss:
   _target_: loss.MultitaskLoss
   camera:
-    weight: 5.0
-    loss_type: "l1"
-  depth:
+    _target_: loss.compute_camera_loss
     weight: 1.0
-    gradient_loss_fn: "grad"
+    loss_type: l1
+    gamma: 0.8
+    pose_encoding_type: absT_quaR_FoV
+    weight_trans: 1.0
+    weight_rot: 1.0
+    weight_focal: 0.5
+  depth:
+    _target_: loss.compute_depth_loss
+    weight: 1.0
+    gamma: 1.0
+    alpha: 0.2
+    gradient_loss_fn: grad+conf
     valid_range: 0.98
   point: null
   track: null
   unproject_geometry:
+    _target_: loss.compute_unproject_geometry_loss
     weight: 0.2
-    loss_type: "l2"
+    loss_type: l2
     valid_range: 0.98
     min_valid_points: 100
+    pose_encoding_type: absT_quaR_FoV
+    use_depth_conf_gate: False
+    detach_depth_conf: True
+    depth_conf_power: 1.0
+    depth_conf_threshold: 0.0
+    use_foreground_region_mask: False
+    foreground_erode_px: 0
+    foreground_drop_bottom_ratio: 0.0
 
 optim:
   param_group_modifiers: False

@@ -25,9 +25,10 @@
 | `trainmix50` should not re-enter nightly | covered in compare doc + manifest | [summary.md](/f:/vggt/vggt-main/output/zju_training_ablation/zju_source_policy_confdepth_dropworst_trainmix50_vs_lead_20260325_v1/summary.md), [zju_source_policy_rawpool_local_nightly_v1.json](/f:/vggt/vggt-main/scripts/manifests/zju_source_policy_rawpool_local_nightly_v1.json) | frozen |
 | `active_view_mean` should not re-enter nightly | covered in compare doc + manifest | [summary.md](/f:/vggt/vggt-main/output/zju_training_ablation/zju_source_policy_confdepth_dropworst_gradconfmask_viewmean_vs_lead_20260325_v1/summary.md), [zju_source_policy_rawpool_local_nightly_v1.json](/f:/vggt/vggt-main/scripts/manifests/zju_source_policy_rawpool_local_nightly_v1.json) | frozen as redundant |
 | "exclude rawpool-only views from geometry supervision" should not be reopened as a standalone candidate | covered by code + audit | [loss.py](/f:/vggt/vggt-main/training/loss.py), [zju_vggt_geom.py](/f:/vggt/vggt-main/training/data/datasets/zju_vggt_geom.py), [summary.md](/f:/vggt/vggt-main/output/zju_source_policy_supervision_audit_nearest_rawpool_20260325_v1/summary.md) | frozen as redundant on current code path |
-| Default nightly should be `diagnostic_only` and run `conf_depth attribution v3` | covered in nightly plan + manifest | [geometry_source_policy_rawpool_nightly_plan_20260325.md](/f:/vggt/vggt-main/docs/geometry_source_policy_rawpool_nightly_plan_20260325.md), [zju_source_policy_rawpool_local_nightly_v1.json](/f:/vggt/vggt-main/scripts/manifests/zju_source_policy_rawpool_local_nightly_v1.json) | fixed |
+| Default nightly should be `steady_hold` now that `conf_depth attribution v3` is already complete | covered in nightly plan + manifest | [geometry_source_policy_rawpool_nightly_plan_20260325.md](/f:/vggt/vggt-main/docs/geometry_source_policy_rawpool_nightly_plan_20260325.md), [zju_source_policy_rawpool_local_nightly_v1.json](/f:/vggt/vggt-main/scripts/manifests/zju_source_policy_rawpool_local_nightly_v1.json) | fixed |
 | Completed `conf_depth attribution v3` should constrain the next candidate family | covered by latest local audit + manifest | [summary.md](/f:/vggt/vggt-main/output/zju_conf_depth_attribution_confdepth_dropworst_gradconfmask_20260325_v3/summary.md), [zju_source_policy_rawpool_local_nightly_v1.json](/f:/vggt/vggt-main/scripts/manifests/zju_source_policy_rawpool_local_nightly_v1.json) | fixed as `anchor_conditioned_conf_target_normalization` |
-| A single-candidate local gate is still allowed for one genuinely new `conf_depth semantics` candidate | covered in nightly plan + manifest | [geometry_source_policy_rawpool_nightly_plan_20260325.md](/f:/vggt/vggt-main/docs/geometry_source_policy_rawpool_nightly_plan_20260325.md), [zju_source_policy_rawpool_local_nightly_v1.json](/f:/vggt/vggt-main/scripts/manifests/zju_source_policy_rawpool_local_nightly_v1.json) | allowed under one-candidate rule |
+| The first anchor-conditioned candidate `anchorb1confscale05` failed and must stay frozen | covered in compare summaries + manifest | [summary.md](/f:/vggt/vggt-main/output/zju_training_ablation/zju_source_policy_confdepth_dropworst_gradconfmask_anchorb1confscale05_vs_lead_20260325_v1/summary.md), [summary.md](/f:/vggt/vggt-main/output/zju_training_ablation/zju_source_policy_confdepth_dropworst_gradconfmask_anchorb1confscale05_vs_baseline_20260325_v1/summary.md), [zju_source_policy_rawpool_local_nightly_v1.json](/f:/vggt/vggt-main/scripts/manifests/zju_source_policy_rawpool_local_nightly_v1.json) | frozen |
+| A new single-candidate local gate is only allowed after a fresh manual training question | covered in nightly plan + manifest | [geometry_source_policy_rawpool_nightly_plan_20260325.md](/f:/vggt/vggt-main/docs/geometry_source_policy_rawpool_nightly_plan_20260325.md), [zju_source_policy_rawpool_local_nightly_v1.json](/f:/vggt/vggt-main/scripts/manifests/zju_source_policy_rawpool_local_nightly_v1.json) | manual reset required |
 
 ## Still Open
 
@@ -37,8 +38,9 @@
 - The remaining open problem is:
   - the current `confdepth_dropworst_gradconfmask` lead is already anchor-only on the audited val slice
   - there is still a `conf_depth / reg_depth` gap to baseline
-  - the completed v3 diagnostic localizes the remaining positive camera-level gap to anchor `Camera_B1`
-  - the next allowed move is one anchor-conditioned `conf_depth semantics` candidate, not another sampler/exposure branch
+  - the completed v3 diagnostic localized the remaining positive camera-level gap to anchor `Camera_B1`
+  - the first and only attempted anchor-conditioned candidate (`anchorb1confscale05`) failed the tighter local gate
+  - the next automatic move is therefore not another sibling branch; a fresh manual training question is required before any new candidate opens
 
 ## Single Source Of Truth
 

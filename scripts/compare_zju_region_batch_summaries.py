@@ -16,6 +16,11 @@ def parse_args():
     parser.add_argument("--label_b", type=str, default="summary_b")
     parser.add_argument("--output_dir", type=Path, required=True)
     parser.add_argument("--title", type=str, default="ZJU Region Batch Comparison")
+    parser.add_argument(
+        "--ignore_view_profile",
+        action="store_true",
+        help="Match cases by seq/frame/target only. Useful when comparing 6src and 12src case sets.",
+    )
     return parser.parse_args()
 
 
@@ -42,22 +47,29 @@ def subtract(a, b):
     return float(b) - float(a)
 
 
-def keyed_rows(rows: list[dict]) -> dict:
+def keyed_rows(rows: list[dict], ignore_view_profile: bool = False) -> dict:
     keyed = {}
     for row in rows:
-        key = (
-            str(row.get("seq_name", "")),
-            int(row.get("frame_id", 0)),
-            str(row.get("view_profile", "")),
-            str(row.get("target_camera", "")),
-        )
+        if ignore_view_profile:
+            key = (
+                str(row.get("seq_name", "")),
+                int(row.get("frame_id", 0)),
+                str(row.get("target_camera", "")),
+            )
+        else:
+            key = (
+                str(row.get("seq_name", "")),
+                int(row.get("frame_id", 0)),
+                str(row.get("view_profile", "")),
+                str(row.get("target_camera", "")),
+            )
         keyed[key] = row
     return keyed
 
 
-def build_case_rows(rows_a: list[dict], rows_b: list[dict]) -> list[dict]:
-    keyed_a = keyed_rows(rows_a)
-    keyed_b = keyed_rows(rows_b)
+def build_case_rows(rows_a: list[dict], rows_b: list[dict], ignore_view_profile: bool = False) -> list[dict]:
+    keyed_a = keyed_rows(rows_a, ignore_view_profile=ignore_view_profile)
+    keyed_b = keyed_rows(rows_b, ignore_view_profile=ignore_view_profile)
     keys = sorted(set(keyed_a.keys()) & set(keyed_b.keys()))
     cases = []
     for key in keys:
@@ -67,8 +79,10 @@ def build_case_rows(rows_a: list[dict], rows_b: list[dict]) -> list[dict]:
             {
                 "seq_name": key[0],
                 "frame_id": key[1],
-                "view_profile": key[2],
-                "target_camera": key[3],
+                "view_profile_a": str(row_a.get("view_profile", "")),
+                "view_profile_b": str(row_b.get("view_profile", "")),
+                "view_profile": str(row_b.get("view_profile", row_a.get("view_profile", ""))),
+                "target_camera": key[2] if ignore_view_profile else key[3],
                 "full_decision_a": row_a.get("full_decision", "n/a"),
                 "full_decision_b": row_b.get("full_decision", "n/a"),
                 "full_depth_minus_point_mae_a": maybe_float(row_a.get("full_depth_minus_point_mae")),
@@ -111,10 +125,21 @@ def build_case_rows(rows_a: list[dict], rows_b: list[dict]) -> list[dict]:
     return cases
 
 
-def build_payload(payload_a: dict, payload_b: dict, label_a: str, label_b: str, title: str) -> dict:
+def build_payload(
+    payload_a: dict,
+    payload_b: dict,
+    label_a: str,
+    label_b: str,
+    title: str,
+    ignore_view_profile: bool = False,
+) -> dict:
     agg_a = payload_a["aggregate"]
     agg_b = payload_b["aggregate"]
-    rows = build_case_rows(payload_a.get("rows", []), payload_b.get("rows", []))
+    rows = build_case_rows(
+        payload_a.get("rows", []),
+        payload_b.get("rows", []),
+        ignore_view_profile=ignore_view_profile,
+    )
 
     full = {
         "case_count_a": int(agg_a.get("case_count", 0)),
@@ -163,6 +188,7 @@ def build_payload(payload_a: dict, payload_b: dict, label_a: str, label_b: str, 
         "title": title,
         "label_a": label_a,
         "label_b": label_b,
+        "ignore_view_profile": bool(ignore_view_profile),
         "summary_a": str(payload_a.get("output_dir", "")),
         "summary_b": str(payload_b.get("output_dir", "")),
         "full": full,
@@ -182,6 +208,7 @@ def write_markdown(path: Path, payload: dict):
         "",
         f"- {payload['label_a']}: `{payload['summary_a']}`",
         f"- {payload['label_b']}: `{payload['summary_b']}`",
+        f"- ignore_view_profile: `{payload.get('ignore_view_profile', False)}`",
         "",
         "## Full Frame",
         "",
@@ -249,7 +276,14 @@ def main():
     args = parse_args()
     payload_a = load_json(args.summary_a)
     payload_b = load_json(args.summary_b)
-    payload = build_payload(payload_a, payload_b, args.label_a, args.label_b, args.title)
+    payload = build_payload(
+        payload_a,
+        payload_b,
+        args.label_a,
+        args.label_b,
+        args.title,
+        ignore_view_profile=args.ignore_view_profile,
+    )
     write_json(args.output_dir / "summary.json", payload)
     write_markdown(args.output_dir / "summary.md", payload)
     print(f"[done] Wrote {args.output_dir / 'summary.md'}")

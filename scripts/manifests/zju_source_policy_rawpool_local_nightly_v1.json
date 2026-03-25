@@ -1,8 +1,9 @@
 {
   "schema_version": 1,
+  "automation_entrypoint": "scripts/run_zju_source_policy_rawpool_local_nightly.py",
   "status": "local_only_not_cloud_ready",
   "problem_id": "zju_6src_source_policy_regularization_v2_confdepth_only",
-  "main_direction": "keep depth + camera -> unproject -> render; hold confdepth_dropworst_gradconfmask as the only local lead, keep cloud off, and only allow one new anchor-conditioned conf_depth semantics candidate after the completed local attribution v3 pass",
+  "main_direction": "keep depth + camera -> unproject -> render; hold confdepth_dropworst_gradconfmask as the only local lead, freeze the failed anchorb1confscale05 follow-up, keep cloud off, and require a fresh manual training question before any further candidate opens",
   "current_cloud_blocker": "The current confdepth_dropworst_gradconfmask lead fixes the remaining grad+conf confidence-routing leak on top of the confdepth_dropworst_only route and further improves conf_depth/reg_depth without rebounding camera/T, but both depth terms are still materially worse than baseline on the tighter local gate, so the local training axis is not fully fixed and cloud must remain closed.",
   "current_lead": {
     "config": "training/config/zju_vggt_geom_unproject_source_policy_nearest_rawpool_confdepth_dropworst_gradconfmask_minimal.yaml",
@@ -52,6 +53,10 @@
       "fact": "The completed attribution v3 audit keeps the same anchor-only conf_depth finding on the audited 32-sample val slice and now narrows the next local move further: the only clearly positive camera-level conf_depth delta is concentrated in anchor Camera_B1, so the next allowed candidate family is anchor-conditioned conf target normalization."
     },
     {
+      "path": "output/zju_training_ablation/zju_source_policy_confdepth_dropworst_gradconfmask_anchorb1confscale05_vs_lead_20260325_v1/summary.md",
+      "fact": "The single allowed anchor-conditioned follow-up was exercised locally with a train-only Camera_B1 conf-target scale of 0.5; it lowered train loss_conf_depth but failed the tighter local gate because val loss_conf_depth regressed from 0.2289 to 0.3233 and val loss_reg_depth regressed from 0.1760 to 0.1901 versus the current lead."
+    },
+    {
       "path": "output/zju_training_ablation/zju_source_policy_confdepth_dropworst_gradconfmask_viewmean_vs_lead_20260325_v1/summary.md",
       "fact": "The active_view_mean aggregation candidate is numerically redundant under the current 4-image recipe and does not create a new promotable lead."
     }
@@ -88,6 +93,12 @@
       "reason": "Numerically redundant under the current 4-image recipe."
     },
     {
+      "name": "confdepth_dropworst_gradconfmask_anchorb1confscale05",
+      "config": "training/config/zju_vggt_geom_unproject_source_policy_nearest_rawpool_confdepth_dropworst_gradconfmask_anchorb1confscale05_minimal.yaml",
+      "summary": "output/zju_training_ablation/zju_source_policy_confdepth_dropworst_gradconfmask_anchorb1confscale05_vs_lead_20260325_v1/summary.md",
+      "reason": "The single allowed anchor-conditioned conf target normalization test failed the tighter gate: val_loss_conf_depth and val_loss_reg_depth both worsened versus the current lead, so no sibling in this family should auto-reenter nightly."
+    },
+    {
       "name": "exclude_rawpool_only_supervision_standalone",
       "summary": "output/zju_source_policy_supervision_audit_nearest_rawpool_20260325_v1/summary.md",
       "reason": "Already true on the current code path and therefore not a real candidate axis."
@@ -105,7 +116,8 @@
       "top_anchor_camera": "Camera_B1",
       "top_anchor_delta_conf_depth_mean": 0.6812
     },
-    "next_allowed_candidate_family": "anchor_conditioned_conf_target_normalization",
+    "follow_up_status": "The single allowed anchor-conditioned follow-up was consumed locally by anchorb1confscale05 and failed the tighter gate, so this family is now frozen pending a fresh manual training question.",
+    "next_allowed_candidate_family": null,
     "required_outputs": [
       "anchor_summary",
       "frame_summary",
@@ -123,19 +135,19 @@
   ],
   "nightly_modes": [
     {
-      "name": "diagnostic_only",
+      "name": "steady_hold",
       "default": true,
-      "when": "No genuinely new local training candidate has been checked in since the previous night.",
+      "when": "No freshly approved local training question with one genuinely new candidate has been checked in since the previous night.",
       "steps": [
         "Run preflight and require zero active Modal apps plus zero stale repo-scoped python/powershell/modal processes.",
-        "Run conf_depth attribution v3 on the current confdepth_dropworst_gradconfmask lead.",
-        "Emit anchor, frame, and region summaries plus one candidate recommendation; do not train and keep cloud_gate=false."
+        "Run consistency check and refresh the local status snapshot.",
+        "Do not rerun attribution v3 by default, do not train, and keep cloud_gate=false."
       ]
     },
     {
       "name": "single_candidate_local_gate",
       "default": false,
-      "when": "Exactly one new local training-side candidate has been checked in and it is genuinely different from the frozen non-reentry list.",
+      "when": "Exactly one new local training-side candidate has been checked in, it is genuinely different from the frozen non-reentry list, and it has been manually approved as a fresh local training question after the failed anchorb1confscale05 round.",
       "steps": [
         "Run preflight first.",
         "Run the supervision audit on the candidate config only if its dataset or loss routing differs from the current lead.",

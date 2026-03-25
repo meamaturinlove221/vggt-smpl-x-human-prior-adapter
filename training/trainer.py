@@ -720,9 +720,9 @@ class Trainer:
         """
         tensor_keys = [
             "images", "depths", "extrinsics", "intrinsics", 
-            "cam_points", "world_points", "point_masks", 
+            "cam_points", "world_points", "point_masks", "foreground_masks", "conf_depth_point_masks",
         ]        
-        string_keys = ["seq_name"]
+        string_keys = ["seq_name", "selection_anchor_camera"]
         
         for key in tensor_keys:
             if key in batch:
@@ -732,7 +732,7 @@ class Trainer:
                                                 dim=0)
         
         for key in string_keys:
-            if key in batch:
+            if key in batch and batch[key] is not None:
                 batch[key] = batch[key] * 2
         
         return batch
@@ -770,7 +770,9 @@ class Trainer:
         y_hat = model(images=batch["images"])
         
         # Loss computation
-        loss_dict = self.loss(y_hat, batch)
+        loss_batch = dict(batch)
+        loss_batch["_loss_phase"] = phase
+        loss_dict = self.loss(y_hat, loss_batch)
         
         # Combine all data for logging
         log_data = {**y_hat, **loss_dict, **batch}

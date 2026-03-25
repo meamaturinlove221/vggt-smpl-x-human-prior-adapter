@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "problem_id": "",
+  "baseline_config": "",
+  "candidate_config": "",
+  "extra_overrides": "",
+  "local_gate_doc": "",
+  "acceptance_cases": [],
+  "acceptance_metrics": [
+    "full_depth_minus_point_mae",
+    "fg_human_depth_minus_point_mae",
+    "bg_far_depth_minus_point_mae",
+    "bg_bottom_band_depth_minus_point_mae",
+    "legacy_gap_depth_minus_point"
+  ],
+  "throughput_profile": "",
+  "cloud_gate": false,
+  "launch_cloud_now": false,
+  "notes": "Populate this template only after a new training or ablation question is selected. Nightly may copy this template into a run-local cloud_experiment_template.json, but it must never flip cloud_gate automatically."
+}

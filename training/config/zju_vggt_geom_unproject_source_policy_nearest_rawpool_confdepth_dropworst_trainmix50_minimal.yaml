@@ -1,0 +1,6 @@
+defaults:
+  - zju_vggt_geom_unproject_source_policy_nearest_rawpool_confdepth_dropworst_minimal
+  - _self_
+
+exp_name: zju_vggt_geom_unproject_source_policy_nearest_rawpool_confdepth_dropworst_trainmix50_minimal
+zju_source_view_pool_train_probability: 0.5

@@ -2,13 +2,13 @@ defaults:
   - default_dataset.yaml
   - _self_
 
-exp_name: zju_vggt_geom_unproject_minimal
+exp_name: zju_vggt_geom_unproject_source_policy_uniform_minimal
 zju_dir: /YOUR/PATH/TO/ZJU
 zju_seq_names: CoreView_390
 zju_geom_subdir: vggt_geom
 zju_camera_source: gt
 zju_mask_source: mask
-zju_source_policy: random
+zju_source_policy: uniform_ring
 zju_source_view_pool: cached_only
 zju_source_anchor_policy: random
 zju_min_supervised_views: 1

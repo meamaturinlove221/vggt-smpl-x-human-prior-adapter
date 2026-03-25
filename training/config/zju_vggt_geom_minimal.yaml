@@ -8,6 +8,10 @@ zju_seq_names: CoreView_390
 zju_geom_subdir: vggt_geom
 zju_camera_source: gt
 zju_mask_source: mask
+zju_source_policy: random
+zju_source_view_pool: cached_only
+zju_source_anchor_policy: random
+zju_min_supervised_views: 1
 zju_min_depth_conf: 0.0
 zju_holdout_stride: 10
 img_size: 518
@@ -45,6 +49,10 @@ data:
           geom_subdir: ${zju_geom_subdir}
           camera_source: ${zju_camera_source}
           mask_source: ${zju_mask_source}
+          source_policy: ${zju_source_policy}
+          source_view_pool: ${zju_source_view_pool}
+          source_anchor_policy: ${zju_source_anchor_policy}
+          min_supervised_views: ${zju_min_supervised_views}
           min_depth_conf: ${zju_min_depth_conf}
           holdout_stride: ${zju_holdout_stride}
   val:
@@ -69,6 +77,10 @@ data:
           geom_subdir: ${zju_geom_subdir}
           camera_source: ${zju_camera_source}
           mask_source: ${zju_mask_source}
+          source_policy: ${zju_source_policy}
+          source_view_pool: ${zju_source_view_pool}
+          source_anchor_policy: ${zju_source_anchor_policy}
+          min_supervised_views: ${zju_min_supervised_views}
           min_depth_conf: ${zju_min_depth_conf}
           holdout_stride: ${zju_holdout_stride}
 

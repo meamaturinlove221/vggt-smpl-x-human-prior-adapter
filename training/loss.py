@@ -144,8 +144,10 @@ def compute_camera_loss(
     pred_pose_encodings = pred_dict['pose_enc_list']
     # Binary mask for valid points per frame (B, N, H, W)
     point_masks = batch_data['point_masks']
-    # Only consider frames with enough valid points (>100)
-    valid_frame_mask = point_masks[:, 0].sum(dim=[-1, -2]) > 100
+    # Only consider frames that actually have enough supervised points.
+    # This matters for source-only raw views, which intentionally carry
+    # GT cameras but zero geometry supervision.
+    valid_frame_mask = point_masks.sum(dim=[-1, -2]) > 100
     # Number of prediction stages
     n_stages = len(pred_pose_encodings)
 
@@ -457,7 +459,21 @@ def compute_point_loss(predictions, batch, gamma=1.0, alpha=0.2, gradient_loss_f
     return loss_dict
 
 
-def compute_depth_loss(predictions, batch, gamma=1.0, alpha=0.2, gradient_loss_fn = None, valid_range=-1, **kwargs):
+def compute_depth_loss(
+    predictions,
+    batch,
+    gamma=1.0,
+    alpha=0.2,
+    gradient_loss_fn=None,
+    valid_range=-1,
+    conf_loss_aggregation="pixel_mean",
+    respect_conf_mask_in_grad_conf=False,
+    anchor_conditioned_conf_target_cameras=None,
+    anchor_conditioned_conf_target_scale=1.0,
+    anchor_conditioned_conf_target_train_only=True,
+    anchor_conditioned_conf_target_foreground_bottom_ratio=0.0,
+    **kwargs,
+):
     """
     Compute depth loss.
     
@@ -468,6 +484,7 @@ def compute_depth_loss(predictions, batch, gamma=1.0, alpha=0.2, gradient_loss_f
         alpha: Weight for confidence regularization
         gradient_loss_fn: Type of gradient loss to apply
         valid_range: Quantile range for outlier filtering
+        conf_loss_aggregation: How to aggregate confidence loss across valid pixels/views
     """
     pred_depth = predictions['depth']
     pred_depth_conf = predictions['depth_conf']
@@ -476,6 +493,8 @@ def compute_depth_loss(predictions, batch, gamma=1.0, alpha=0.2, gradient_loss_f
     gt_depth = check_and_fix_inf_nan(gt_depth, "gt_depth")
     gt_depth = gt_depth[..., None]              # (B, H, W, 1)
     gt_depth_mask = batch['point_masks'].clone()   # 3D points derived from depth map, so we use the same mask
+    conf_depth_mask = batch.get('conf_depth_point_masks', gt_depth_mask).clone()
+    conf_depth_mask = conf_depth_mask & gt_depth_mask
 
     if gt_depth_mask.sum() < 100:
         # If there are less than 100 valid points, skip this batch
@@ -487,8 +506,24 @@ def compute_depth_loss(predictions, batch, gamma=1.0, alpha=0.2, gradient_loss_f
 
     # NOTE: we put conf inside regression_loss so that we can also apply conf loss to the gradient loss in a multi-scale manner
     # this is hacky, but very easier to implement
-    loss_conf, loss_grad, loss_reg = regression_loss(pred_depth, gt_depth, gt_depth_mask, conf=pred_depth_conf,
-                                             gradient_loss_fn=gradient_loss_fn, gamma=gamma, alpha=alpha, valid_range=valid_range)
+    loss_conf, loss_grad, loss_reg = regression_loss(
+        pred_depth,
+        gt_depth,
+        gt_depth_mask,
+        conf=pred_depth_conf,
+        conf_mask=conf_depth_mask,
+        gradient_loss_fn=gradient_loss_fn,
+        gamma=gamma,
+        alpha=alpha,
+        valid_range=valid_range,
+        conf_loss_aggregation=conf_loss_aggregation,
+        respect_conf_mask_in_grad_conf=respect_conf_mask_in_grad_conf,
+        batch=batch,
+        anchor_conditioned_conf_target_cameras=anchor_conditioned_conf_target_cameras,
+        anchor_conditioned_conf_target_scale=anchor_conditioned_conf_target_scale,
+        anchor_conditioned_conf_target_train_only=anchor_conditioned_conf_target_train_only,
+        anchor_conditioned_conf_target_foreground_bottom_ratio=anchor_conditioned_conf_target_foreground_bottom_ratio,
+    )
 
     loss_dict = {
         f"loss_conf_depth": loss_conf,
@@ -499,7 +534,110 @@ def compute_depth_loss(predictions, batch, gamma=1.0, alpha=0.2, gradient_loss_f
     return loss_dict
 
 
-def regression_loss(pred, gt, mask, conf=None, gradient_loss_fn=None, gamma=1.0, alpha=0.2, valid_range=-1):
+def _normalize_batch_anchor_cameras(selection_anchor_camera, batch_size):
+    if batch_size <= 0:
+        return []
+    if selection_anchor_camera is None:
+        return [None] * batch_size
+    if isinstance(selection_anchor_camera, str):
+        values = [selection_anchor_camera]
+    elif isinstance(selection_anchor_camera, (list, tuple)):
+        values = list(selection_anchor_camera)
+    else:
+        values = [selection_anchor_camera]
+    values = [None if value is None else str(value) for value in values]
+    if len(values) == batch_size:
+        return values
+    if len(values) == 1:
+        return values * batch_size
+    if len(values) < batch_size:
+        return values + ([None] * (batch_size - len(values)))
+    return values[:batch_size]
+
+
+def _build_anchor_conditioned_conf_scale_map(
+    batch,
+    conf_reg_map,
+    anchor_conditioned_conf_target_cameras=None,
+    anchor_conditioned_conf_target_scale=1.0,
+    anchor_conditioned_conf_target_train_only=True,
+    anchor_conditioned_conf_target_foreground_bottom_ratio=0.0,
+):
+    if batch is None:
+        return None
+    if anchor_conditioned_conf_target_cameras is None:
+        return None
+    if isinstance(anchor_conditioned_conf_target_cameras, str):
+        target_cameras = {anchor_conditioned_conf_target_cameras}
+    else:
+        target_cameras = {
+            str(camera_name)
+            for camera_name in anchor_conditioned_conf_target_cameras
+            if camera_name is not None
+        }
+    if not target_cameras:
+        return None
+
+    scale_value = float(anchor_conditioned_conf_target_scale)
+    if scale_value == 1.0:
+        return None
+
+    if anchor_conditioned_conf_target_train_only:
+        phase = str(batch.get("_loss_phase", "")).lower()
+        if phase != "train":
+            return None
+
+    batch_anchor_cameras = _normalize_batch_anchor_cameras(
+        batch.get("selection_anchor_camera"),
+        conf_reg_map.shape[0],
+    )
+    per_sample_scale = torch.ones(
+        (conf_reg_map.shape[0], 1, 1, 1),
+        device=conf_reg_map.device,
+        dtype=conf_reg_map.dtype,
+    )
+    for batch_idx, camera_name in enumerate(batch_anchor_cameras):
+        if camera_name in target_cameras:
+            per_sample_scale[batch_idx] = scale_value
+    scale_map = per_sample_scale.expand(-1, conf_reg_map.shape[1], conf_reg_map.shape[2], conf_reg_map.shape[3])
+
+    bottom_ratio = float(max(0.0, min(0.95, anchor_conditioned_conf_target_foreground_bottom_ratio)))
+    if bottom_ratio <= 0.0:
+        return scale_map
+
+    foreground_masks = batch.get("foreground_masks", None)
+    if foreground_masks is None:
+        raise ValueError(
+            "anchor_conditioned_conf_target_foreground_bottom_ratio requires batch['foreground_masks']."
+        )
+    foreground_masks = foreground_masks.to(device=conf_reg_map.device, dtype=torch.bool)
+    nonbottom_mask = build_reliable_foreground_region_mask(
+        foreground_masks,
+        erode_px=0,
+        drop_bottom_ratio=bottom_ratio,
+    )
+    bottom_mask = foreground_masks & (~nonbottom_mask)
+    return torch.where(bottom_mask, scale_map, torch.ones_like(scale_map))
+
+
+def regression_loss(
+    pred,
+    gt,
+    mask,
+    conf=None,
+    conf_mask=None,
+    gradient_loss_fn=None,
+    gamma=1.0,
+    alpha=0.2,
+    valid_range=-1,
+    conf_loss_aggregation="pixel_mean",
+    respect_conf_mask_in_grad_conf=False,
+    batch=None,
+    anchor_conditioned_conf_target_cameras=None,
+    anchor_conditioned_conf_target_scale=1.0,
+    anchor_conditioned_conf_target_train_only=True,
+    anchor_conditioned_conf_target_foreground_bottom_ratio=0.0,
+):
     """
     Core regression loss function with confidence weighting and optional gradient loss.
     
@@ -516,7 +654,8 @@ def regression_loss(pred, gt, mask, conf=None, gradient_loss_fn=None, gamma=1.0,
         gamma: Weight for confidence loss
         alpha: Weight for confidence regularization
         valid_range: Quantile range for outlier filtering
-    
+        conf_loss_aggregation: How to aggregate the confidence loss across valid pixels/views
+
     Returns:
         loss_conf: Confidence-weighted loss
         loss_grad: Gradient loss (0 if not specified)
@@ -524,21 +663,77 @@ def regression_loss(pred, gt, mask, conf=None, gradient_loss_fn=None, gamma=1.0,
     """
     bb, ss, hh, ww, nc = pred.shape
 
+    if conf_mask is None:
+        conf_mask = mask
+    conf_mask = conf_mask & mask
+
+    reg_map = torch.norm(gt - pred, dim=-1)
+    reg_map = check_and_fix_inf_nan(reg_map, "loss_reg_map")
+
+    conf_reg_scale_map = _build_anchor_conditioned_conf_scale_map(
+        batch,
+        reg_map,
+        anchor_conditioned_conf_target_cameras=anchor_conditioned_conf_target_cameras,
+        anchor_conditioned_conf_target_scale=anchor_conditioned_conf_target_scale,
+        anchor_conditioned_conf_target_train_only=anchor_conditioned_conf_target_train_only,
+        anchor_conditioned_conf_target_foreground_bottom_ratio=anchor_conditioned_conf_target_foreground_bottom_ratio,
+    )
+    conf_reg_map = reg_map if conf_reg_scale_map is None else reg_map * conf_reg_scale_map
+
     # Compute L2 distance between predicted and ground truth points
-    loss_reg = torch.norm(gt[mask] - pred[mask], dim=-1)
+    loss_reg = reg_map[mask]
     loss_reg = check_and_fix_inf_nan(loss_reg, "loss_reg")
 
     # Confidence-weighted loss: gamma * loss * conf - alpha * log(conf)
-    # This encourages the model to be confident on easy examples and less confident on hard ones
-    loss_conf = gamma * loss_reg * conf[mask] - alpha * torch.log(conf[mask])
-    loss_conf = check_and_fix_inf_nan(loss_conf, "loss_conf")
+    # This encourages the model to be confident on easy examples and less confident on hard ones.
+    if conf_loss_aggregation == "pixel_mean":
+        conf_reg = conf_reg_map[conf_mask]
+        conf_reg = check_and_fix_inf_nan(conf_reg, "conf_reg")
+        loss_conf_values = gamma * conf_reg * conf[conf_mask] - alpha * torch.log(conf[conf_mask])
+        loss_conf_values = check_and_fix_inf_nan(loss_conf_values, "loss_conf")
+        loss_conf = None
+    elif conf_loss_aggregation == "active_view_mean":
+        per_view_conf_losses = []
+        for batch_idx in range(bb):
+            for view_idx in range(ss):
+                view_conf_mask = conf_mask[batch_idx, view_idx]
+                if int(view_conf_mask.sum().item()) <= 0:
+                    continue
+
+                view_reg = conf_reg_map[batch_idx, view_idx][view_conf_mask]
+                view_reg = check_and_fix_inf_nan(view_reg, "conf_reg_view")
+                view_conf = conf[batch_idx, view_idx][view_conf_mask]
+                view_loss = gamma * view_reg * view_conf - alpha * torch.log(view_conf)
+                view_loss = check_and_fix_inf_nan(view_loss, "loss_conf_view")
+                if valid_range > 0:
+                    view_loss = filter_by_quantile(view_loss, valid_range)
+                per_view_conf_losses.append(view_loss.mean())
+
+        if per_view_conf_losses:
+            loss_conf = torch.stack(per_view_conf_losses).mean()
+            loss_conf = check_and_fix_inf_nan(loss_conf, "loss_conf_depth")
+        else:
+            loss_conf = (0.0 * pred).mean()
+        loss_conf_values = None
+    else:
+        raise ValueError(
+            "conf_loss_aggregation must be one of 'pixel_mean' or 'active_view_mean'."
+        )
         
     # Initialize gradient loss
     loss_grad = 0
 
     # Prepare confidence for gradient loss if needed
-    if "conf" in gradient_loss_fn:
-        to_feed_conf = conf.reshape(bb*ss, hh, ww)
+    if gradient_loss_fn is not None and "conf" in gradient_loss_fn:
+        if conf is None:
+            raise ValueError("gradient_loss_fn requests confidence weighting but conf is None.")
+        if respect_conf_mask_in_grad_conf:
+            # Pixels outside conf_mask should keep plain gradient supervision
+            # without confidence weighting or confidence regularization.
+            grad_conf = torch.where(conf_mask, conf, torch.ones_like(conf))
+        else:
+            grad_conf = conf
+        to_feed_conf = grad_conf.reshape(bb*ss, hh, ww)
     else:
         to_feed_conf = None
 
@@ -564,15 +759,16 @@ def regression_loss(pred, gt, mask, conf=None, gradient_loss_fn=None, gamma=1.0,
         )
 
     # Process confidence-weighted loss
-    if loss_conf.numel() > 0:
-        # Filter out outliers using quantile-based thresholding
-        if valid_range>0:
-            loss_conf = filter_by_quantile(loss_conf, valid_range)
+    if loss_conf_values is not None:
+        if loss_conf_values.numel() > 0:
+            # Filter out outliers using quantile-based thresholding
+            if valid_range > 0:
+                loss_conf_values = filter_by_quantile(loss_conf_values, valid_range)
 
-        loss_conf = check_and_fix_inf_nan(loss_conf, f"loss_conf_depth")
-        loss_conf = loss_conf.mean()
-    else:
-        loss_conf = (0.0 * pred).mean()
+            loss_conf_values = check_and_fix_inf_nan(loss_conf_values, "loss_conf_depth")
+            loss_conf = loss_conf_values.mean()
+        else:
+            loss_conf = (0.0 * pred).mean()
 
     # Process regular regression loss
     if loss_reg.numel() > 0:
@@ -713,9 +909,12 @@ def gradient_loss(prediction, target, mask, conf=None, gamma=1.0, alpha=0.2):
         conf = conf[..., None].expand(-1, -1, -1, prediction.shape[-1])
         conf_x = conf[:, :, 1:]
         conf_y = conf[:, 1:, :]
+        mask_x_f = mask_x.to(dtype=grad_x.dtype)
+        mask_y_f = mask_y.to(dtype=grad_y.dtype)
 
-        grad_x = gamma * grad_x * conf_x - alpha * torch.log(conf_x)
-        grad_y = gamma * grad_y * conf_y - alpha * torch.log(conf_y)
+        # Keep the confidence regularizer inside the valid gradient support only.
+        grad_x = gamma * grad_x * conf_x - alpha * torch.log(conf_x) * mask_x_f
+        grad_y = gamma * grad_y * conf_y - alpha * torch.log(conf_y) * mask_y_f
 
     # Sum gradients and normalize by number of valid pixels
     grad_loss = torch.sum(grad_x, (1, 2, 3)) + torch.sum(grad_y, (1, 2, 3))

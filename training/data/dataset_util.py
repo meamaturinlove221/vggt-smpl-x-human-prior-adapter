@@ -633,10 +633,34 @@ def read_image_cv2(path: str, rgb: bool = True) -> np.ndarray:
         print(f"File does not exist or is empty: {path}")
         return None
 
-    img = cv2.imread(path)
+    use_imdecode_first = not str(path).isascii()
+
+    img = None
+    if not use_imdecode_first:
+        img = cv2.imread(path)
+    if img is None:
+        try:
+            buffer = np.fromfile(path, dtype=np.uint8)
+        except OSError:
+            buffer = None
+        if buffer is not None and buffer.size > 0:
+            img = cv2.imdecode(buffer, cv2.IMREAD_UNCHANGED)
+    if img is None and use_imdecode_first:
+        img = cv2.imread(path)
+
     if img is None:
         print(f"Could not load image={path}. Retrying...")
-        img = cv2.imread(path)
+        if not use_imdecode_first:
+            img = cv2.imread(path)
+        if img is None:
+            try:
+                buffer = np.fromfile(path, dtype=np.uint8)
+            except OSError:
+                buffer = None
+            if buffer is not None and buffer.size > 0:
+                img = cv2.imdecode(buffer, cv2.IMREAD_UNCHANGED)
+        if img is None and use_imdecode_first:
+            img = cv2.imread(path)
         if img is None:
             print("Retry failed.")
             return None

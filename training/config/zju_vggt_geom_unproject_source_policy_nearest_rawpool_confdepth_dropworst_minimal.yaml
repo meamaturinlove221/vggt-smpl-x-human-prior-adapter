@@ -1,0 +1,6 @@
+defaults:
+  - zju_vggt_geom_unproject_source_policy_nearest_rawpool_minimal
+  - _self_
+
+exp_name: zju_vggt_geom_unproject_source_policy_nearest_rawpool_confdepth_dropworst_minimal
+zju_conf_depth_view_quality_filter: drop_worst_by_depth_conf_if_multi_supervised

@@ -173,6 +173,17 @@
     - all-target `v8 -> v9` moves `depth = 46 -> 48` and `point = 10 -> 8`
     - only `Camera_B13 @ frame 1170` and `Camera_B23 @ frame 1170` change
     - there are still no non-target collateral regressions
+- A new post-`v9` stop gate is now also complete:
+  - [geometry_post_v9_b11_stop_gate_20260324.md](/f:/vggt/vggt-main/docs/geometry_post_v9_b11_stop_gate_20260324.md)
+  - key readout:
+    - exactly one more post-`v9` residual cleanup round was run on
+      `Camera_B11`
+    - `swap Camera_B6 -> Camera_B17` is the best local `B11` family
+    - it repairs `frame 1170` and preserves the existing `frame 1080` depth win
+    - but it still does not repair `frame 600`, and its transfer is already too
+      narrow to justify another manifest promotion
+    - decision: keep `v9` frozen as the main local manifest and stop adding
+      manual residual overrides for now
 
 ## What We Learned
 
@@ -233,6 +244,13 @@
     - `frame 600`: `B11 / B13`
     - `frame 1080`: `B23`
     - `frame 1170`: `B11 / B16 / B7`
+  - a final extra local residual round on `B11` did find another usable
+    target-frame family
+  - but that family still did not cleanly resolve the repeated `frame 600`
+    `B11` slice
+  - so the local source-policy line has now crossed into diminishing returns:
+    it can still produce narrower patches, but not obviously cleaner reusable
+    rules
 
 ## Immediate Decision
 
@@ -249,10 +267,9 @@
 - Shift the next experiment target to:
   - keep the next question local
   - freeze `v9` as the current local frame-aware main manifest
-  - specifically, the post-`v9` residual cluster beyond the already-closed
-    repaired `B1 / B2 / B4 / B12 / B13@1170 / B15 / B23@1170` slice
-  - especially `frame 1170` around `B11 / B16 / B7`, then the repeated
-    `B13 / B23 / B11` residuals on `frame 0 / 600 / 1080`
+  - do not open another manual residual override round yet
+  - specifically, treat the current post-`v9` residual cluster as the handoff
+    point into a new explicit training/ablation question
   - while keeping `12src_uniform` as the best current sparse geometry-friendly
     reference
   - and treating the completed local `6src hybrid v5/v6` evidence as closure of
@@ -279,17 +296,18 @@
   - and the old `B2 4 / 4 point` residual is now fully closed by `v7/v8`
   - and the old `frame 1170 B13 / B23` pair is now also locally closed by `v9`
   - but the post-`v9` residual cluster remains
-  - especially `frame 1170` around `B11 / B16 / B7`
+  - and one more `B11` round showed that the next step is no longer a cleaner
+    manual override family
 - But there still should not be any automatic new Modal launch:
   - the next cloud run should only start once the next experiment target is
     chosen explicitly
 - The best next minimal step is now to choose between:
-  - continuing the post-`v9` residual on `frame 1170`, starting from
-    `Camera_B11`
-  - or widening the same local diagnosis to the repeated remaining residuals
-    `Camera_B13 / B23 / B11`
-  - or, only after that next local residual axis is judged resolved or bounded,
-    choosing a fresh training/ablation question
+  - turning the current residual evidence into a new explicit local
+    training/ablation hypothesis
+  - or, if that question is still not clear enough, doing read-only diagnosis on
+    the repeated remaining residuals `B11 / B13 / B23` without adding new
+    override families
+  - and only after that, choosing whether any fresh cloud run is justified
 - Operationally:
   - keep the future cloud throughput settings on hand
   - keep Modal clean until that next question is chosen
@@ -328,6 +346,8 @@
   - keep the next residual source-policy question local for now
   - `frame 1080`, the old `B12 @ frame 600` line, the old `B2` slice, and the
     old `frame 1170 B13 / B23` pair no longer block cloud on their own
+  - but the extra `B11` round also says the project should stop treating manual
+    override collection as the default next move
   - and only reopen cloud once there is a deliberately chosen new
     training/ablation question, or the remaining residual cleanup has been
     judged complete enough to stop being the active local focus

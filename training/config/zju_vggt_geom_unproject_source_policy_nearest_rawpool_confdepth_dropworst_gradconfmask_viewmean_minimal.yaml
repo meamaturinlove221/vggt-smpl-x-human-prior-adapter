@@ -1,0 +1,9 @@
+defaults:
+  - zju_vggt_geom_unproject_source_policy_nearest_rawpool_confdepth_dropworst_gradconfmask_minimal
+  - _self_
+
+exp_name: zju_vggt_geom_unproject_source_policy_nearest_rawpool_confdepth_dropworst_gradconfmask_viewmean_minimal
+
+loss:
+  depth:
+    conf_loss_aggregation: active_view_mean

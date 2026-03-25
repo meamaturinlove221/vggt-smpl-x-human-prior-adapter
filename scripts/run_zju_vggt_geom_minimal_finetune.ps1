@@ -17,6 +17,7 @@ param(
     [int]$HoldoutStride = 10,
     [string]$CameraSource = "gt",
     [string]$MaskSource = "mask",
+    [string]$SourceViewPool = "",
     [double]$MinDepthConf = 0.0,
     [string[]]$ExtraOverrides = @(),
     [switch]$EnableUnprojectGeometry,
@@ -72,6 +73,98 @@ function Resolve-DefaultZjuDir() {
     return ""
 }
 
+function Split-SeqNames([string]$SeqNamesText) {
+    return $SeqNamesText.Split(",") | ForEach-Object { $_.Trim() } | Where-Object { -not [string]::IsNullOrWhiteSpace($_) }
+}
+
+function Split-GeomSubdirs([string]$GeomSubdirText) {
+    return $GeomSubdirText.Split(",") | ForEach-Object { $_.Trim() } | Where-Object { -not [string]::IsNullOrWhiteSpace($_) }
+}
+
+function Get-ZjuGeomRootScore([string]$Root, [string[]]$SeqNamesList, [string[]]$GeomSubdirsList) {
+    if ([string]::IsNullOrWhiteSpace($Root) -or -not (Test-Path $Root)) {
+        return [pscustomobject]@{
+            ValidSubdirCount = 0
+            TotalFrameCount = 0
+        }
+    }
+    $validSubdirCount = 0
+    $totalFrameCount = 0
+    foreach ($seqName in $SeqNamesList) {
+        foreach ($geomSubdir in $GeomSubdirsList) {
+            $geomDir = Join-Path (Join-Path $Root $seqName) $geomSubdir
+            if (-not (Test-Path $geomDir)) {
+                continue
+            }
+            $frameCount = (Get-ChildItem $geomDir -Filter "frame_*.npz" -ErrorAction SilentlyContinue | Measure-Object).Count
+            if ($frameCount -gt 0) {
+                $validSubdirCount += 1
+                $totalFrameCount += $frameCount
+            }
+        }
+    }
+    return [pscustomobject]@{
+        ValidSubdirCount = $validSubdirCount
+        TotalFrameCount = $totalFrameCount
+    }
+}
+
+function Resolve-ZjuGeomRoot([string]$Requested, [string]$SeqNamesText, [string]$GeomSubdir) {
+    $seqNamesList = Split-SeqNames $SeqNamesText
+    $geomSubdirsList = Split-GeomSubdirs $GeomSubdir
+    if ($seqNamesList.Count -eq 0) {
+        throw "SeqNames must contain at least one sequence."
+    }
+    if ($geomSubdirsList.Count -eq 0) {
+        throw "GeomSubdir must contain at least one subdir."
+    }
+
+    $candidates = @()
+    if (-not [string]::IsNullOrWhiteSpace($Requested)) {
+        $candidates += $Requested
+    }
+
+    $defaultRoot = Resolve-DefaultZjuDir
+    if (-not [string]::IsNullOrWhiteSpace($defaultRoot)) {
+        $candidates += $defaultRoot
+    }
+
+    $gDatasets = "G:\" + [char]0x6570 + [char]0x636E + [char]0x96C6
+    $fallbacks = @(
+        (Join-Path $gDatasets "datasets\\ZJU_MoCap\\data\\zju_mocap"),
+        "F:\\datasets\\ZJU_MoCap\\data\\zju_mocap"
+    )
+    $seen = @{}
+    $bestCandidate = $null
+    $bestScore = $null
+    foreach ($candidate in ($candidates + $fallbacks)) {
+        if ([string]::IsNullOrWhiteSpace($candidate)) {
+            continue
+        }
+        $key = $candidate.ToLowerInvariant()
+        if ($seen.ContainsKey($key)) {
+            continue
+        }
+        $seen[$key] = $true
+        $score = Get-ZjuGeomRootScore $candidate $seqNamesList $geomSubdirsList
+        if ($score.ValidSubdirCount -le 0) {
+            continue
+        }
+        if ($null -eq $bestCandidate -or
+            $score.ValidSubdirCount -gt $bestScore.ValidSubdirCount -or
+            ($score.ValidSubdirCount -eq $bestScore.ValidSubdirCount -and $score.TotalFrameCount -gt $bestScore.TotalFrameCount)) {
+            $bestCandidate = $candidate
+            $bestScore = $score
+        }
+    }
+
+    if ($null -ne $bestCandidate) {
+        return (Resolve-Path $bestCandidate).Path
+    }
+
+    throw "Unable to resolve a ZJU root containing frame_*.npz under geom_subdir='$GeomSubdir' for seq_names='$SeqNamesText'."
+}
+
 function Resolve-DefaultCheckpoint() {
     $gProjects = "G:\" + [char]0x9879 + [char]0x76EE + [char]0x5907 + [char]0x4EFD
     $projectName = "vggt_" + [char]0x5C0F + [char]0x611F + [char]0x5EA6 + [char]0x4E0D + [char]0x8D77 + [char]0x4F5C + [char]0x7528
@@ -94,15 +187,10 @@ function Resolve-DefaultCheckpoint() {
     return ""
 }
 
-if ([string]::IsNullOrWhiteSpace($ZjuDir)) {
-    $ZjuDir = Resolve-DefaultZjuDir
-}
 if ([string]::IsNullOrWhiteSpace($Checkpoint)) {
     $Checkpoint = Resolve-DefaultCheckpoint
 }
-if ([string]::IsNullOrWhiteSpace($ZjuDir)) {
-    throw "ZjuDir is required."
-}
+$ZjuDir = Resolve-ZjuGeomRoot $ZjuDir $SeqNames $GeomSubdir
 if ([string]::IsNullOrWhiteSpace($Checkpoint)) {
     throw "Checkpoint is required."
 }
@@ -160,6 +248,10 @@ if ($NoFreezeAggregator) {
     $overrides += "optim.frozen_module_names=[]"
 }
 
+if (-not [string]::IsNullOrWhiteSpace($SourceViewPool)) {
+    $overrides += "zju_source_view_pool='$SourceViewPool'"
+}
+
 if ($EnableUnprojectGeometry) {
     $overrides += "++loss.unproject_geometry.weight=$UnprojectGeometryWeight"
     $overrides += "++loss.unproject_geometry.loss_type='$UnprojectGeometryLossType'"
@@ -181,6 +273,11 @@ Write-Host "[zju-geom-finetune] python=$python"
 Write-Host "[zju-geom-finetune] zju_dir=$ZjuDir"
 Write-Host "[zju-geom-finetune] seq_names=$SeqNames"
 Write-Host "[zju-geom-finetune] geom_subdir=$GeomSubdir"
+if (-not [string]::IsNullOrWhiteSpace($SourceViewPool)) {
+    Write-Host "[zju-geom-finetune] source_view_pool=$SourceViewPool"
+} else {
+    Write-Host "[zju-geom-finetune] source_view_pool=(use config default)"
+}
 Write-Host "[zju-geom-finetune] checkpoint=$Checkpoint"
 Write-Host "[zju-geom-finetune] config=$Config"
 Write-Host "[zju-geom-finetune] num_images=$NumImages max_img_per_gpu=$MaxImgPerGpu accum_steps=$AccumSteps"

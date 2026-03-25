@@ -10,7 +10,8 @@
 - The latest completed `conf_depth attribution v3` pass points to one narrow next move:
   - `anchor_conditioned_conf_target_normalization`
   - worst positive camera-level delta remains concentrated in anchor `Camera_B1`
-- The nightly default remains `diagnostic_only`: `preflight -> conf_depth attribution v3 -> status emit`. No training runs unless one genuinely new `conf_depth semantics` candidate is explicitly checked in.
+- The single allowed anchor-conditioned follow-up was exercised locally as `anchorb1confscale05` and failed the tighter gate.
+- The nightly default is now a hold state: `preflight -> consistency check -> status emit`. No training runs unless a fresh manual training question explicitly approves one genuinely new candidate.
 
 ## Current Lead
 
@@ -25,6 +26,10 @@
   - On the audited 32-sample val slice, `conf_depth` remains anchor-only.
   - The only clearly positive camera-level delta is concentrated in anchor `Camera_B1`.
   - The current local recommendation is `anchor_conditioned_conf_target_normalization`.
+- Failed anchor-conditioned follow-up:
+  - [summary.md](/f:/vggt/vggt-main/output/zju_training_ablation/zju_source_policy_confdepth_dropworst_gradconfmask_anchorb1confscale05_vs_lead_20260325_v1/summary.md)
+  - [summary.md](/f:/vggt/vggt-main/output/zju_training_ablation/zju_source_policy_confdepth_dropworst_gradconfmask_anchorb1confscale05_vs_baseline_20260325_v1/summary.md)
+  - The train-only `Camera_B1` conf-target scale `0.5` candidate reduced train `conf_depth`, but on the same val metric it regressed `loss_conf_depth` from `0.2289 -> 0.3233` and `loss_reg_depth` from `0.1760 -> 0.1901` versus the current lead.
 - Historical stage marker, not current lead:
   - [zju_vggt_geom_unproject_source_policy_nearest_rawpool_minimal.yaml](/f:/vggt/vggt-main/training/config/zju_vggt_geom_unproject_source_policy_nearest_rawpool_minimal.yaml)
   - [geometry_source_policy_rawpool_local_gate_20260325.md](/f:/vggt/vggt-main/docs/geometry_source_policy_rawpool_local_gate_20260325.md)
@@ -41,10 +46,12 @@
   - [summary.md](/f:/vggt/vggt-main/output/zju_training_ablation/zju_source_policy_confdepth_dropworst_trainmix50_vs_lead_20260325_v1/summary.md)
 - `active_view_mean`
   - [summary.md](/f:/vggt/vggt-main/output/zju_training_ablation/zju_source_policy_confdepth_dropworst_gradconfmask_viewmean_vs_lead_20260325_v1/summary.md)
+- `anchorb1confscale05`
+  - [summary.md](/f:/vggt/vggt-main/output/zju_training_ablation/zju_source_policy_confdepth_dropworst_gradconfmask_anchorb1confscale05_vs_lead_20260325_v1/summary.md)
 - "exclude rawpool-only views from geometry supervision" as a standalone candidate
   - [summary.md](/f:/vggt/vggt-main/output/zju_source_policy_supervision_audit_nearest_rawpool_20260325_v1/summary.md)
 
-## Default Diagnostic Night
+## Completed Diagnostic
 
 - Planned entrypoint:
   - [audit_zju_conf_depth_attribution.py](/f:/vggt/vggt-main/scripts/audit_zju_conf_depth_attribution.py)
@@ -55,20 +62,23 @@
   - frame summary
   - region summary
   - candidate recommendation
+- Result:
+  - `dominant_failure_shape = anchor_conditioned`
+  - `recommended_candidate_family = anchor_conditioned_conf_target_normalization`
 - The rawpool supervision-leak question is already treated as settled local evidence. Re-run that audit only when a future candidate changes dataset or loss routing.
 
 ## Default Nightly Sequence
 
 1. Preflight
-   - Require `modal app list` to be empty.
-   - Require no stale repo-scoped `python / powershell / modal` processes.
-   - Do not stop active Modal apps automatically.
-2. Run `conf_depth attribution v3`
-   - Audit the current lead only.
-   - Emit anchor, frame, and region summaries plus a single candidate recommendation.
-   - Do not train and do not open a sibling candidate on this night.
+  - Require `modal app list` to be empty.
+  - Require no stale repo-scoped `python / powershell / modal` processes.
+  - Do not stop active Modal apps automatically.
+2. Run consistency check
+   - Refresh the local status snapshot.
+   - Do not rerun `conf_depth attribution v3` by default.
+   - Do not open a sibling candidate automatically after the failed `anchorb1confscale05` round.
 3. Emit status only
-   - Refresh the local status summary.
+   - Keep the current lead fixed.
    - Keep `cloud_gate=false`.
 
 ## Single Candidate Local Gate
@@ -90,6 +100,7 @@
      - baseline
      - current `confdepth_dropworst_gradconfmask` lead
   5. Stop after that one candidate.
+- This mode is no longer automatic; it requires a fresh manual training question because the first anchor-conditioned round has already been consumed and failed.
 
 ## Promotion Gate
 

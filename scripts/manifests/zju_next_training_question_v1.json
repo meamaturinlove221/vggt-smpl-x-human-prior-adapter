@@ -1,0 +1,165 @@
+{
+  "schema_version": 1,
+  "status": "ready_for_new_training_question",
+  "problem_family": "source_policy_rule_regularization",
+  "recommended_problem_id": "zju_6src_source_policy_regularization_v2_confdepth_only",
+  "main_manifest_version": "v9",
+  "baseline_config": "training/config/zju_vggt_geom_unproject_minimal.yaml",
+  "candidate_config": "training/config/zju_vggt_geom_unproject_source_policy_nearest_rawpool_confdepth_dropworst_gradconfmask_minimal.yaml",
+  "current_cloud_blocker": "The current confdepth_dropworst_gradconfmask lead fixes the remaining grad+conf confidence-routing leak on top of the confdepth_dropworst_only route and further improves conf_depth/reg_depth without rebounding camera/T, but both depth terms are still materially worse than baseline on the tighter local gate, so the local training axis is not fully fixed and cloud must remain closed.",
+  "candidate_config_status": "local_maincache_num_images4_confdepth_dropworst_gradconfmask_now_passes_probe_smoke_and_10_train_5_val_gate_vs_the_previous_confdepth_only_lead_but_still_does_not_clear_the_baseline_gap_on_conf_depth_or_reg_depth",
+  "geometry_direction": "keep depth + camera -> unproject -> render",
+  "question": "What genuinely new local training question remains after the completed Camera_B1-conditioned conf-target normalization round failed the tighter local gate, even though conf_depth-only routing and grad+conf mask-respect are already in place and the current lead already behaves anchor-only on the audited val slice?",
+  "why_now": [
+    "The post-v9 residual cluster is now bounded locally.",
+    "The single allowed bounded-search round was consumed without producing a reusable shared donor pattern.",
+    "The next step is no longer best framed as another manual override family."
+  ],
+  "local_code_gaps": [
+    {
+      "path": "training/data/datasets/zju_vggt_geom.py",
+      "fact": "The dataset now exposes a minimal source_policy hook (random, nearest_ring, uniform_ring), but it only changes behavior when available_view_count exceeds the requested num_images."
+    },
+    {
+      "path": "training/data/datasets/zju_vggt_geom.py",
+      "fact": "The dataset now also supports source_view_pool=geom_plus_raw, so the training batch can keep one supervised geom anchor while filling the remaining source-policy slots from the full raw camera ring on the real main cache."
+    },
+    {
+      "path": "scripts/run_zju_vggt_geom_minimal_finetune.ps1",
+      "fact": "The local finetune launcher now resolves a ZJU root against seq_names and geom_subdir, so default vggt_geom runs land on the real non-empty root instead of an empty fallback."
+    },
+    {
+      "path": "training/data/dataset_util.py",
+      "fact": "The local image loader now prefers np.fromfile + cv2.imdecode on non-ASCII Windows paths, so the new raw-source-view training path no longer floods local gates with avoidable cv2.imread warnings."
+    },
+    {
+      "path": "training/data/datasets/zju_vggt_geom.py",
+      "fact": "The dataset now supports merging multiple geom_subdirs under one root and deduplicating by camera name, so partial multi-view add-on caches can already enlarge the candidate view pool locally."
+    },
+    {
+      "path": "training/data/composed_dataset.py",
+      "fact": "The composed dataset still only fixes image count and aspect ratio; there is no higher-level policy-conditioned sampler or learned source-selection objective."
+    },
+    {
+      "path": "training/config/zju_vggt_geom_unproject_source_policy_nearest_rawpool_minimal.yaml",
+      "fact": "A new rawpool candidate now keeps fix_img_num=4 on the real main cache while expanding the candidate pool to 23 cameras via raw source-only views; the current local lead is nearest_ring+geom_plus_raw, not the older uniform-only scaffold."
+    },
+    {
+      "path": "training/config/zju_vggt_geom_unproject_source_policy_nearest_rawpool_confdepth_dropworst_minimal.yaml",
+      "fact": "A narrower conf_depth-only candidate now exists: it keeps the same nearest_ring+geom_plus_raw input path and only narrows conf_depth supervision by dropping the lowest-confidence extra supervised cached view when multiple supervised views appear."
+    },
+    {
+      "path": "training/loss.py",
+      "fact": "The depth loss path now supports respect_conf_mask_in_grad_conf, so grad+conf confidence weighting can respect the narrowed conf_depth mask instead of continuing to weight removed pixels."
+    },
+    {
+      "path": "scripts/compare_zju_geom_cache_variants.py",
+      "fact": "The two full-length local cache variants that currently exist for CoreView_390, real vggt_geom and vggt_geom_4v_backup, were compared directly and provide the exact same 4-camera pool on sampled and common frames, so they do not create union headroom by themselves."
+    },
+    {
+      "path": "training/loss.py",
+      "fact": "Camera supervision is now filtered at the frame level by actual supervised point support, instead of letting source-only raw views enter camera loss just because the first frame in the sample was valid."
+    },
+    {
+      "path": "output/zju_source_policy_supervision_audit_nearest_rawpool_20260325_v1/summary.md",
+      "fact": "A 32-sample supervision audit on the current nearest_rawpool lead shows that source-only raw views already have zero point pixels and zero camera/depth/unproject loss eligibility, so a plain 'exclude rawpool-only views from geometry supervision' candidate would be redundant on the current code path."
+    },
+    {
+      "path": "output/zju_training_ablation/zju_source_policy_nearest_rawpool_local_gate_20260325_v1/summary.md",
+      "fact": "After the frame-level camera-mask fix, the stricter 10-train/5-val local gate on nearest_ring+geom_plus_raw is now the current lead: val loss_objective improves from 0.6343 to 0.2415, val loss_camera improves from 0.0644 to 0.0218, and val loss_T improves from 0.0475 to 0.0003, but depth confidence/regression still move in the wrong direction and the axis is not cloud-ready yet."
+    },
+    {
+      "path": "output/zju_conf_depth_attribution_nearest_rawpool_20260325_v1/summary.md",
+      "fact": "A same-input conf_depth attribution audit on the current nearest_rawpool lead shows the blocker is concentrated in extra_supervised views: anchor_supervised conf_depth_mean is 0.2978 while extra_supervised conf_depth_mean is 0.7299, and the extra_supervised delta versus baseline on the same input is +0.5498."
+    },
+    {
+      "path": "output/zju_training_ablation/zju_source_policy_nearest_rawpool_minsup2_local_gate_20260325_v1/summary.md",
+      "fact": "Keeping two supervised geom views while filling the remaining slots from rawpool was tested locally and rejected: it slightly improves val loss_objective, but it clearly worsens val camera, translation, rotation, focal, and unproject geometry losses versus baseline."
+    },
+    {
+      "path": "output/zju_training_ablation/zju_source_policy_nearest_rawpool_bestanchor_local_gate_20260325_v1/summary.md",
+      "fact": "Choosing the supervised anchor by max cached depth_conf was also tested locally and rejected: despite the cached 4-view set having a stable low-confidence worst camera, the max_depth_conf anchor policy worsened val loss_objective, loss_camera, loss_T, loss_conf_depth, loss_reg_depth, and loss_unproject_geometry versus baseline."
+    },
+    {
+      "path": "output/zju_training_ablation/zju_source_policy_nearest_rawpool_dropworst_vs_lead_20260325_v1/summary.md",
+      "fact": "Dropping the lowest-confidence extra supervised cached view when multi-supervised samples occur improves val loss_objective, loss_camera, loss_T, loss_reg_depth, and loss_unproject_geometry relative to the current nearest_rawpool lead, but still slightly worsens val loss_conf_depth, so it does not clear the stricter local promotion rule yet."
+    },
+    {
+      "path": "output/zju_source_policy_supervision_audit_nearest_rawpool_dropworst_20260325_v1/summary.md",
+      "fact": "A 32-sample supervision audit on the dropworst_supervised variant shows exactly one active supervised view per sampled batch item and still zero geometry-loss eligibility for source-only views."
+    },
+    {
+      "path": "output/zju_training_ablation/zju_source_policy_confdepth_dropworst_vs_lead_20260325_v1/summary.md",
+      "fact": "The confdepth_dropworst_only candidate became the intermediate local lead: versus the previous nearest_rawpool lead on the tighter gate, val loss_conf_depth improves from 0.2696 to 0.2514 and val loss_reg_depth improves from 0.1831 to 0.1799 while val loss_T stays at 0.0003 and val loss_camera only shifts from 0.0218 to 0.0219."
+    },
+    {
+      "path": "output/zju_conf_depth_attribution_confdepth_dropworst_20260325_v1/summary.md",
+      "fact": "A same-input attribution audit on the confdepth_dropworst_only candidate shows extra_supervised conf-depth eligibility is reduced to zero while anchor conf_depth_mean improves by -0.0239 versus the previous nearest_rawpool lead."
+    },
+    {
+      "path": "output/zju_training_ablation/zju_source_policy_confdepth_dropworst_gradconfmask_vs_lead_20260325_v1/summary.md",
+      "fact": "The confdepth_dropworst_gradconfmask follow-up is the current local lead: versus confdepth_dropworst_only on the tighter gate, val loss_conf_depth improves from 0.2514 to 0.2289 and val loss_reg_depth improves from 0.1799 to 0.1760 while val loss_T and val loss_camera stay flat."
+    },
+    {
+      "path": "output/zju_training_ablation/zju_source_policy_confdepth_dropworst_gradconfmask_vs_baseline_20260325_v1/summary.md",
+      "fact": "Even after the gradconfmask fix, the current lead is still not baseline-clean: on val, loss_conf_depth stays higher than baseline (0.2289 vs 0.1181) and loss_reg_depth stays higher than baseline (0.1760 vs 0.1181), so cloud remains blocked."
+    },
+    {
+      "path": "output/zju_conf_depth_attribution_confdepth_dropworst_gradconfmask_20260325_v3/summary.md",
+      "fact": "The completed attribution v3 audit on the current gradconfmask lead keeps conf_depth anchor-only on the audited 32-sample val slice and narrows the remaining positive camera-level gap to anchor Camera_B1."
+    },
+    {
+      "path": "output/zju_training_ablation/zju_source_policy_confdepth_dropworst_gradconfmask_anchorb1confscale05_vs_lead_20260325_v1/summary.md",
+      "fact": "The first anchor-conditioned follow-up was exercised locally with a train-only Camera_B1 conf-target scale of 0.5 and failed the tighter gate: val loss_conf_depth worsened from 0.2289 to 0.3233 and val loss_reg_depth worsened from 0.1760 to 0.1901 versus the current lead."
+    },
+    {
+      "path": "output/zju_training_ablation/zju_source_policy_confdepth_dropworst_gradconfmask_viewmean_vs_lead_20260325_v1/summary.md",
+      "fact": "A conf_depth active-view-mean aggregation candidate was tested locally and is effectively identical to the current lead on the tighter gate: val loss_camera and loss_T stay flat, val loss_conf_depth stays at 0.2289, and val loss_reg_depth only shifts from 0.1760 to 0.1759, so this axis does not create a new promotable lead."
+    },
+    {
+      "path": "output/zju_training_ablation/zju_source_policy_confdepth_dropworst_trainmix50_vs_lead_20260325_v1/summary.md",
+      "fact": "A new train-only rawpool exposure control was also tested locally on top of confdepth_dropworst_only: source_view_pool_train_probability=0.5 reduced avg source-only exposure from 2.75 to 1.53 views per train sample, but it sharply worsened val loss_camera, loss_T, loss_conf_depth, loss_reg_depth, loss_unproject_geometry, and objective versus the current lead."
+    }
+  ],
+  "candidate_implementation_requirements": [
+    "Keep the intended 4-image recipe on the real main cache while using source_view_pool=geom_plus_raw so the source-policy hook has actual headroom without depending on a full-length add-on cache.",
+    "Prefer nearest_ring+geom_plus_raw with the confdepth_dropworst_gradconfmask route as the current local lead; the tested min_supervised_views=2 variant did not help.",
+    "Do not switch the supervised anchor to max_depth_conf as a default training rule; that variant was tested locally and rejected.",
+    "Do not open a new candidate whose only change is 'exclude rawpool-only views from geometry supervision'; that exclusion is already true on the current code path and is now backed by a local supervision audit.",
+    "Keep the respect_conf_mask_in_grad_conf fix; without it, the grad+conf branch keeps confidence-weighting pixels that the conf_depth-only routing already removed.",
+    "Do not reopen an anchor-only conf_depth target candidate under the current 4-image recipe; the audited gradconfmask lead already has zero extra_supervised and zero source_only conf-valid pixels on the 32-sample val slice.",
+    "Do not auto-open another anchor-conditioned conf target normalization sibling under the current question; the tested train-only Camera_B1 scale=0.5 candidate already failed the tighter local gate.",
+    "Do not reopen conf_loss_aggregation=active_view_mean under the current 4-image recipe; its 10-train/5-val gate is numerically identical to the current gradconfmask lead and therefore redundant.",
+    "Treat the whole-line drop_worst_by_depth_conf_if_multi_supervised variant as a rejected branch and keep the narrower conf_depth-only route as the current local lead.",
+    "Do not assume lower train-time rawpool exposure is automatically stabilizing; the tested source_view_pool_train_probability=0.5 variant was locally rejected.",
+    "Do not rely on simply combining the currently available full-length caches, because the existing vggt_geom and vggt_geom_4v_backup variants are camera-identical.",
+    "Treat the full_length_addon_manifest as an alternate local data path, not as the only remaining way to unlock headroom.",
+    "Keep the frame-level camera-mask fix; without it, raw source-only views pollute the camera branch and distort the local gate.",
+    "Validate the rawpool candidate beyond the current 10-train/5-val gate before considering cloud, because the current lead still shows mixed depth-confidence and depth-regression behavior.",
+    "Keep the current inference-side v9 override manifest as frozen local evidence, not as the new training mechanism."
+  ],
+  "non_goals": [
+    "Do not reopen global zju_min_depth_conf sweeps.",
+    "Do not reopen reliable-region or bottom-only auxiliary unproject losses.",
+    "Do not restore the ghost stack.",
+    "Do not collect another manual override family by default."
+  ],
+  "required_before_cloud": [
+    "Pass a stricter local baseline-vs-confdepth_dropworst_gradconfmask gate under the intended 4-image recipe on the real main cache without the remaining conf_depth and reg_depth gap that still appears on the 10-train/5-val gate.",
+    "Do not count the current vggt_geom + vggt_geom_4v_backup pair as headroom, because their frame-aligned camera pools are identical.",
+    "Do not count the current 1-train/1-val, 3-train/1-val, or 10-train/5-val rawpool probes as full local validation; they prove the path and identify the current tradeoff, but they are still local gates rather than final evidence.",
+    "If the add-on-cache route is revisited later, do not count the current multiview add-on plan alone as headroom until the missing frames are actually materialized.",
+    "Keep cloud_gate=false until the new training question is explicitly approved."
+  ],
+  "acceptance_metrics": [
+    "full_depth_minus_point_mae",
+    "fg_human_depth_minus_point_mae",
+    "bg_far_depth_minus_point_mae",
+    "bg_bottom_band_depth_minus_point_mae",
+    "legacy_gap_depth_minus_point"
+  ],
+  "patch_collection_stop": true,
+  "ready_for_new_training_question": true,
+  "cloud_gate": false,
+  "launch_cloud_now": false
+}
