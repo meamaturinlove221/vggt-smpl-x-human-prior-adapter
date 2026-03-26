@@ -167,13 +167,18 @@ def load_state(state_path: Path) -> dict:
 
 
 def build_training_question_brief(local_manifest: dict, training_question_manifest: dict, mode: str, reason: str) -> dict:
+    next_local_diagnostic = local_manifest.get("next_local_diagnostic", {})
     return {
         "status": str(training_question_manifest["status"]),
         "candidate_config": str(training_question_manifest["candidate_config"]),
         "problem_family": str(training_question_manifest.get("problem_family", "")),
         "recommended_problem_id": str(training_question_manifest.get("recommended_problem_id", "")),
         "geometry_direction": str(training_question_manifest.get("geometry_direction", local_manifest.get("main_direction", ""))),
+        "question": str(training_question_manifest.get("question", "")),
+        "why_now": list(training_question_manifest.get("why_now", [])),
         "current_cloud_blocker": str(local_manifest["current_cloud_blocker"]),
+        "next_local_diagnostic_name": str(next_local_diagnostic.get("name", "")),
+        "next_allowed_candidate_family": next_local_diagnostic.get("next_allowed_candidate_family"),
         "patch_collection_stop": bool(local_manifest["patch_collection_stop"]),
         "ready_for_new_training_question": bool(local_manifest["ready_for_new_training_question"]),
         "cloud_gate": bool(local_manifest["cloud_gate"]),
@@ -293,6 +298,8 @@ def main():
             "Bypass",
             "-File",
             str(PREFLIGHT_PS1),
+            "-MinFreeMemoryGb",
+            "0",
         ],
         cwd=REPO_ROOT,
     )
@@ -301,8 +308,9 @@ def main():
     write_text(preflight_stdout, preflight.stdout)
     write_text(preflight_stderr, preflight.stderr)
 
+    lead_name = Path(str(local_manifest["current_lead"]["config"])).stem
     reason = (
-        "steady_hold: keep confdepth_dropworst_gradconfmask as the local lead, do not train, "
+        f"steady_hold: keep {lead_name} as the local lead, do not train, "
         "do not open a new candidate automatically, and keep cloud off until a fresh manual training question exists."
     )
     brief = build_training_question_brief(local_manifest, training_question_manifest, mode, reason)

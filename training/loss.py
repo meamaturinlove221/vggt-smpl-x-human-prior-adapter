@@ -10,7 +10,7 @@ import torch.nn.functional as F
 from dataclasses import dataclass
 from vggt.utils.pose_enc import extri_intri_to_pose_encoding, pose_encoding_to_extri_intri
 from train_utils.general import check_and_fix_inf_nan
-from math import ceil, floor
+from math import ceil, floor, isfinite
 
 
 @dataclass(eq=False)
@@ -472,6 +472,11 @@ def compute_depth_loss(
     anchor_conditioned_conf_target_scale=1.0,
     anchor_conditioned_conf_target_train_only=True,
     anchor_conditioned_conf_target_foreground_bottom_ratio=0.0,
+    anchor_conditioned_conf_target_quality_min=None,
+    anchor_conditioned_conf_target_quality_max=None,
+    anchor_conditioned_conf_target_quality_interp="none",
+    anchor_conditioned_conf_target_quality_low=None,
+    anchor_conditioned_conf_target_quality_high=None,
     **kwargs,
 ):
     """
@@ -523,6 +528,11 @@ def compute_depth_loss(
         anchor_conditioned_conf_target_scale=anchor_conditioned_conf_target_scale,
         anchor_conditioned_conf_target_train_only=anchor_conditioned_conf_target_train_only,
         anchor_conditioned_conf_target_foreground_bottom_ratio=anchor_conditioned_conf_target_foreground_bottom_ratio,
+        anchor_conditioned_conf_target_quality_min=anchor_conditioned_conf_target_quality_min,
+        anchor_conditioned_conf_target_quality_max=anchor_conditioned_conf_target_quality_max,
+        anchor_conditioned_conf_target_quality_interp=anchor_conditioned_conf_target_quality_interp,
+        anchor_conditioned_conf_target_quality_low=anchor_conditioned_conf_target_quality_low,
+        anchor_conditioned_conf_target_quality_high=anchor_conditioned_conf_target_quality_high,
     )
 
     loss_dict = {
@@ -555,6 +565,38 @@ def _normalize_batch_anchor_cameras(selection_anchor_camera, batch_size):
     return values[:batch_size]
 
 
+def _normalize_batch_anchor_quality_scores(selection_anchor_quality_score, batch_size):
+    if batch_size <= 0:
+        return []
+    if selection_anchor_quality_score is None:
+        return [None] * batch_size
+    if isinstance(selection_anchor_quality_score, torch.Tensor):
+        if selection_anchor_quality_score.ndim == 0:
+            values = [selection_anchor_quality_score.item()]
+        else:
+            values = selection_anchor_quality_score.detach().cpu().reshape(-1).tolist()
+    elif isinstance(selection_anchor_quality_score, (list, tuple)):
+        values = list(selection_anchor_quality_score)
+    else:
+        values = [selection_anchor_quality_score]
+
+    normalized = []
+    for value in values:
+        if value is None:
+            normalized.append(None)
+            continue
+        value = float(value)
+        normalized.append(value if isfinite(value) else None)
+
+    if len(normalized) == batch_size:
+        return normalized
+    if len(normalized) == 1:
+        return normalized * batch_size
+    if len(normalized) < batch_size:
+        return normalized + ([None] * (batch_size - len(normalized)))
+    return normalized[:batch_size]
+
+
 def _build_anchor_conditioned_conf_scale_map(
     batch,
     conf_reg_map,
@@ -562,6 +604,11 @@ def _build_anchor_conditioned_conf_scale_map(
     anchor_conditioned_conf_target_scale=1.0,
     anchor_conditioned_conf_target_train_only=True,
     anchor_conditioned_conf_target_foreground_bottom_ratio=0.0,
+    anchor_conditioned_conf_target_quality_min=None,
+    anchor_conditioned_conf_target_quality_max=None,
+    anchor_conditioned_conf_target_quality_interp="none",
+    anchor_conditioned_conf_target_quality_low=None,
+    anchor_conditioned_conf_target_quality_high=None,
 ):
     if batch is None:
         return None
@@ -591,14 +638,66 @@ def _build_anchor_conditioned_conf_scale_map(
         batch.get("selection_anchor_camera"),
         conf_reg_map.shape[0],
     )
+    batch_anchor_quality_scores = _normalize_batch_anchor_quality_scores(
+        batch.get("selection_anchor_quality_score"),
+        conf_reg_map.shape[0],
+    )
     per_sample_scale = torch.ones(
         (conf_reg_map.shape[0], 1, 1, 1),
         device=conf_reg_map.device,
         dtype=conf_reg_map.dtype,
     )
+    quality_min = None if anchor_conditioned_conf_target_quality_min is None else float(anchor_conditioned_conf_target_quality_min)
+    quality_max = None if anchor_conditioned_conf_target_quality_max is None else float(anchor_conditioned_conf_target_quality_max)
+    quality_interp = str(anchor_conditioned_conf_target_quality_interp or "none").lower()
+    quality_low = None if anchor_conditioned_conf_target_quality_low is None else float(anchor_conditioned_conf_target_quality_low)
+    quality_high = None if anchor_conditioned_conf_target_quality_high is None else float(anchor_conditioned_conf_target_quality_high)
+    if quality_interp not in {"none", "linear", "quadratic", "smoothstep"}:
+        raise ValueError(
+            "anchor_conditioned_conf_target_quality_interp must be one of "
+            "'none', 'linear', 'quadratic', or 'smoothstep'."
+        )
+    if quality_interp != "none" and (quality_min is not None or quality_max is not None):
+        raise ValueError(
+            "anchor_conditioned_conf_target_quality_min/max are mutually exclusive with "
+            "anchor_conditioned_conf_target_quality_interp != 'none'."
+        )
+    if quality_interp in {"linear", "quadratic", "smoothstep"}:
+        if quality_low is None or quality_high is None:
+            raise ValueError(
+                "anchor_conditioned_conf_target_quality_interp in "
+                "{'linear','quadratic','smoothstep'} requires "
+                "anchor_conditioned_conf_target_quality_low/high."
+            )
+        if quality_high <= quality_low:
+            raise ValueError(
+                "anchor_conditioned_conf_target_quality_high must be greater than "
+                "anchor_conditioned_conf_target_quality_low."
+            )
     for batch_idx, camera_name in enumerate(batch_anchor_cameras):
-        if camera_name in target_cameras:
-            per_sample_scale[batch_idx] = scale_value
+        if camera_name not in target_cameras:
+            continue
+        quality_score = batch_anchor_quality_scores[batch_idx]
+        if quality_interp in {"linear", "quadratic", "smoothstep"}:
+            if quality_score is None:
+                continue
+            raw_quality_weight = (float(quality_score) - quality_low) / (quality_high - quality_low)
+            raw_quality_weight = float(max(0.0, min(1.0, raw_quality_weight)))
+            if raw_quality_weight <= 0.0:
+                continue
+            if quality_interp == "quadratic":
+                quality_weight = raw_quality_weight * raw_quality_weight
+            elif quality_interp == "smoothstep":
+                quality_weight = raw_quality_weight * raw_quality_weight * (3.0 - 2.0 * raw_quality_weight)
+            else:
+                quality_weight = raw_quality_weight
+            per_sample_scale[batch_idx] = 1.0 + quality_weight * (scale_value - 1.0)
+            continue
+        if quality_min is not None and (quality_score is None or quality_score < quality_min):
+            continue
+        if quality_max is not None and (quality_score is None or quality_score > quality_max):
+            continue
+        per_sample_scale[batch_idx] = scale_value
     scale_map = per_sample_scale.expand(-1, conf_reg_map.shape[1], conf_reg_map.shape[2], conf_reg_map.shape[3])
 
     bottom_ratio = float(max(0.0, min(0.95, anchor_conditioned_conf_target_foreground_bottom_ratio)))
@@ -637,6 +736,11 @@ def regression_loss(
     anchor_conditioned_conf_target_scale=1.0,
     anchor_conditioned_conf_target_train_only=True,
     anchor_conditioned_conf_target_foreground_bottom_ratio=0.0,
+    anchor_conditioned_conf_target_quality_min=None,
+    anchor_conditioned_conf_target_quality_max=None,
+    anchor_conditioned_conf_target_quality_interp="none",
+    anchor_conditioned_conf_target_quality_low=None,
+    anchor_conditioned_conf_target_quality_high=None,
 ):
     """
     Core regression loss function with confidence weighting and optional gradient loss.
@@ -677,6 +781,11 @@ def regression_loss(
         anchor_conditioned_conf_target_scale=anchor_conditioned_conf_target_scale,
         anchor_conditioned_conf_target_train_only=anchor_conditioned_conf_target_train_only,
         anchor_conditioned_conf_target_foreground_bottom_ratio=anchor_conditioned_conf_target_foreground_bottom_ratio,
+        anchor_conditioned_conf_target_quality_min=anchor_conditioned_conf_target_quality_min,
+        anchor_conditioned_conf_target_quality_max=anchor_conditioned_conf_target_quality_max,
+        anchor_conditioned_conf_target_quality_interp=anchor_conditioned_conf_target_quality_interp,
+        anchor_conditioned_conf_target_quality_low=anchor_conditioned_conf_target_quality_low,
+        anchor_conditioned_conf_target_quality_high=anchor_conditioned_conf_target_quality_high,
     )
     conf_reg_map = reg_map if conf_reg_scale_map is None else reg_map * conf_reg_scale_map
 

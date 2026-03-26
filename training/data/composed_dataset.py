@@ -154,7 +154,18 @@ class ComposedDataset(Dataset, ABC):
         if foreground_masks is not None:
             sample["foreground_masks"] = foreground_masks
         if "selection_anchor_camera" in batch:
-            sample["selection_anchor_camera"] = batch["selection_anchor_camera"]
+            anchor_camera = batch["selection_anchor_camera"]
+            sample["selection_anchor_camera"] = "" if anchor_camera is None else str(anchor_camera)
+        if "selection_anchor_camera" in batch and "supervised_view_quality_scores" in batch:
+            anchor_camera = batch["selection_anchor_camera"]
+            anchor_quality_score = None
+            if anchor_camera is not None:
+                anchor_quality_score = batch["supervised_view_quality_scores"].get(str(anchor_camera))
+            if anchor_quality_score is None:
+                anchor_quality_score = float("nan")
+            sample["selection_anchor_quality_score"] = torch.tensor(
+                float(anchor_quality_score), dtype=torch.float32
+            )
 
         # --- Track Processing (if enabled) ---
         if self.load_track:

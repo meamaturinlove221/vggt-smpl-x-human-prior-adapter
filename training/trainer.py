@@ -721,15 +721,19 @@ class Trainer:
         tensor_keys = [
             "images", "depths", "extrinsics", "intrinsics", 
             "cam_points", "world_points", "point_masks", "foreground_masks", "conf_depth_point_masks",
+            "selection_anchor_quality_score",
         ]        
         string_keys = ["seq_name", "selection_anchor_camera"]
         
         for key in tensor_keys:
             if key in batch:
                 original_tensor = batch[key]
-                batch[key] = torch.concatenate([original_tensor, 
-                                                torch.flip(original_tensor, dims=[1])], 
-                                                dim=0)
+                flipped_tensor = (
+                    torch.flip(original_tensor, dims=[1])
+                    if original_tensor.ndim > 1
+                    else original_tensor
+                )
+                batch[key] = torch.concatenate([original_tensor, flipped_tensor], dim=0)
         
         for key in string_keys:
             if key in batch and batch[key] is not None:
