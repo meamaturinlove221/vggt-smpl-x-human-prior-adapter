@@ -41,8 +41,34 @@ $env:LOCAL_RANK = "0"
 $env:WORLD_SIZE = "1"
 
 function Resolve-PythonExe([string]$Preferred) {
+    function Test-PythonHydra([string]$PythonPath) {
+        if ([string]::IsNullOrWhiteSpace($PythonPath) -or -not (Test-Path $PythonPath)) {
+            return $false
+        }
+        $priorErrorActionPreference = $ErrorActionPreference
+        $hasNativePreference = $null -ne (Get-Variable PSNativeCommandUseErrorActionPreference -ErrorAction SilentlyContinue)
+        if ($hasNativePreference) {
+            $priorNativePreference = $PSNativeCommandUseErrorActionPreference
+            $PSNativeCommandUseErrorActionPreference = $false
+        }
+        $ErrorActionPreference = "Continue"
+        try {
+            & $PythonPath -c "import hydra; print('HYDRA_OK')" *> $null
+            return ($LASTEXITCODE -eq 0)
+        } finally {
+            $ErrorActionPreference = $priorErrorActionPreference
+            if ($hasNativePreference) {
+                $PSNativeCommandUseErrorActionPreference = $priorNativePreference
+            }
+        }
+    }
+
     if (-not [string]::IsNullOrWhiteSpace($Preferred) -and (Test-Path $Preferred)) {
-        return (Resolve-Path $Preferred).Path
+        $resolvedPreferred = (Resolve-Path $Preferred).Path
+        if (Test-PythonHydra $resolvedPreferred) {
+            return $resolvedPreferred
+        }
+        Write-Warning "[zju-geom-finetune] preferred python missing hydra, falling back: $resolvedPreferred"
     }
 
     $candidates = @(
@@ -53,7 +79,10 @@ function Resolve-PythonExe([string]$Preferred) {
     )
     foreach ($candidate in $candidates) {
         if (Test-Path $candidate) {
-            return (Resolve-Path $candidate).Path
+            $resolvedCandidate = (Resolve-Path $candidate).Path
+            if (Test-PythonHydra $resolvedCandidate) {
+                return $resolvedCandidate
+            }
         }
     }
     return "python"
@@ -301,6 +330,9 @@ if ($DryRun) {
 Push-Location (Join-Path $repoRoot "training")
 try {
     & $python @argList
+    if ($LASTEXITCODE -ne 0) {
+        exit $LASTEXITCODE
+    }
 } finally {
     Pop-Location
 }

@@ -15,8 +15,11 @@
 - A new postmortem shows the hard `q>=3.0` gate was also over-selective: it still excluded `4 / 10` bad `Camera_B1` audit rows and touched only `0.7476%` of conf-depth-supervised pixels on a 512-sample train slice.
 - A follow-up quality-region boundary check shows the region is too narrow as well: all `10 / 10` bad `Camera_B1` audit rows still have positive non-bottom `conf_depth` deltas, while `q>=3.0 + whole_foreground` covers `22.6975%` of conf-depth-supervised pixels on a fresh 512-sample train slice versus only `0.7983%` for `q>=3.0 + bottom20`.
 - A further rule-shape sweep shows the next question should not be another broader hard-threshold whole-foreground sibling either: `q>=3.0 + whole_foreground` still omits `4 / 10` bad audit rows, `q>=2.75 + whole_foreground` still omits `1 / 10`, while a continuous `qmin -> qmax` whole-foreground reference rule covers all `10 / 10` bad rows with a `5.1155%` effective conf-depth reduction fraction on the same fresh 512-sample train slice.
-- The continuous loss knob is now implemented locally, but both tested whole-foreground continuous follow-ups are now frozen: the first exact `linear qmin -> qmax + whole_foreground + scale0.5` candidate regressed both `conf_depth` and `reg_depth`, and the softer `scale0.75` fallback recommended by the local soft sweep also regressed both depth terms.
-- The line therefore returns to `steady_hold` until a fresh manual question justifies an even softer or reshaped quality-conditioned rule.
+- The continuous loss knob is now implemented locally, and the tested whole-foreground and interior conf-target-normalization family is now frozen: the first exact `linear qmin -> qmax + whole_foreground + scale0.5` candidate regressed both `conf_depth` and `reg_depth`, the softer `scale0.75` fallback also regressed both depth terms, the `quadratic + whole_foreground + scale0.5` candidate also failed, and the `linear + foreground_interior(erode5) + scale0.75` candidate still failed even though it was slightly closer than the rejected whole-foreground `scale0.75` fallback.
+- The loss-routing line has now been pushed further too: a hard whole-foreground `conf_depth_mask` drop was far too aggressive; a softer train-only joint depth-loss scale0.75 candidate was materially closer but still failed; `qlinear` and then `qquadratic` whole-foreground joint-depth scale0.75 candidates moved closer again; `qquadratic` whole-foreground joint-depth scale0.875 became the closest whole-foreground routing variant so far; and the first whole-foreground decoupled conf/reg routing follow-up still landed at `0.2378 / 0.1776` on `conf_depth / reg_depth`. Every one of those candidates still regressed both depth terms versus the stable lead while keeping `camera/T` flat.
+- Local code review now also confirms that supervised `point_masks` and `conf_depth_point_masks` are already built from foreground-clipped depth maps, so the exhausted whole-foreground family was not a hidden whole-frame masking bug.
+- Local code review also shows that under the current `zju_min_supervised_views: 1` rawpool recipe, a plain `anchor_view_only` toggle is close to a no-op because the anchor-supervised view is already the only view with non-zero depth supervision.
+- The line therefore returns to `steady_hold` until a fresh manual question changes a different dimension than another whole-foreground or interior interpolation reskin and, more specifically, changes real non-wholefg selectivity beyond the rejected whole-foreground joint-depth softening-scalar frontier, the rejected whole-foreground decoupled branch-routing follow-up, the rejected foreground-edge joint-depth frontier, and the rejected hard gt `depth_conf` threshold follow-up inside that edge route.
 
 ## Current Lead
 
@@ -96,6 +99,33 @@
   - `loss_T: 0.0003 -> 0.0003`
   - `loss_conf_depth: 0.2289 -> 0.2483`
   - `loss_reg_depth: 0.1760 -> 0.1797`
+- Whole-foreground quadratic follow-up:
+  - [summary.md](/f:/vggt/vggt-main/output/zju_training_ablation/zju_source_policy_confdepth_dropworst_gradconfmask_anchorb1qquadraticwholefgconfscale05_vs_lead_20260326_v1/summary.md)
+  - `loss_camera: 0.0219 -> 0.0218`
+  - `loss_T: 0.0003 -> 0.0003`
+  - `loss_conf_depth: 0.2288 -> 0.2587`
+  - `loss_reg_depth: 0.1759 -> 0.1817`
+- Foreground-interior linear follow-up:
+  - [summary.md](/f:/vggt/vggt-main/output/zju_training_ablation/zju_source_policy_confdepth_dropworst_gradconfmask_anchorb1qlinearfginteriorerode5confscale075_vs_lead_20260326_v1/summary.md)
+  - `loss_camera: 0.0219 -> 0.0219`
+  - `loss_T: 0.0003 -> 0.0003`
+  - `loss_conf_depth: 0.2288 -> 0.2432`
+  - `loss_reg_depth: 0.1759 -> 0.1787`
+- Whole-foreground hard confmask-drop routing follow-up:
+  - [summary.md](/f:/vggt/vggt-main/output/zju_training_ablation/zju_source_policy_confdepth_dropworst_gradconfmask_anchorb1qge275wholefgconfmaskdrop_vs_lead_20260326_v1/summary.md)
+  - `loss_camera: 0.0219 -> 0.0218`
+  - `loss_T: 0.0003 -> 0.0003`
+  - `loss_conf_depth: 0.2289 -> 0.3018`
+  - `loss_reg_depth: 0.1760 -> 0.1959`
+- Whole-foreground joint depth-loss scale0.75 routing follow-up:
+  - [summary.md](/f:/vggt/vggt-main/output/zju_training_ablation/zju_source_policy_confdepth_dropworst_gradconfmask_anchorb1qge275wholefgjointdepthscale075_vs_lead_20260326_v1/summary.md)
+  - `loss_camera: 0.0219 -> 0.0219`
+  - `loss_T: 0.0003 -> 0.0003`
+  - `loss_conf_depth: 0.2288 -> 0.2546`
+  - `loss_reg_depth: 0.1759 -> 0.1805`
+- Foreground-clipped supervision fact:
+  - [zju_vggt_geom.py](/f:/vggt/vggt-main/training/data/datasets/zju_vggt_geom.py)
+  - Supervised depth is already clipped by `fg_mask` before point masks are built, so whole-foreground candidates were operating inside real foreground supervision rather than a hidden whole-frame path.
 - Redundant aggregation candidate:
   - [summary.md](/f:/vggt/vggt-main/output/zju_training_ablation/zju_source_policy_confdepth_dropworst_gradconfmask_viewmean_vs_lead_20260325_v1/summary.md)
   - `active_view_mean` does not materially move `camera`, `T`, `conf_depth`, or `reg_depth` on the tighter gate.
@@ -105,9 +135,21 @@
 - Repo-level manifest:
   - [zju_next_training_question_v1.json](/f:/vggt/vggt-main/scripts/manifests/zju_next_training_question_v1.json)
 - Recommended question:
-  - after both the first exact and first softer continuous `Camera_B1` whole-foreground quality-conditioned rules (`linear qmin -> qmax`, `scale0.5` and `scale0.75`) regressed `conf_depth` and `reg_depth` versus the stable lead, is any even softer or reshaped quality-conditioned rule worth approving as a fresh manual question without harming `camera/T`?
+  - after the whole-foreground linear and quadratic plus foreground-interior linear `Camera_B1` conf-target-normalization candidates all regressed `conf_depth` and `reg_depth` versus the stable lead, the whole-foreground hard confmask-drop routing candidate failed, the whole-foreground joint-depth softening-scalar frontier only approached the stable lead without crossing it, and the best edge-band plus hard `depth_conf` threshold follow-up was too aggressive, is any softer non-wholefg selectivity-changing or branch-routing quality-conditioned depth-loss rule worth approving as a fresh manual question without harming `camera/T`?
 - Implementation note:
-  - [composed_dataset.py](/f:/vggt/vggt-main/training/data/composed_dataset.py) now forwards `selection_anchor_quality_score` into the training sample, and [loss.py](/f:/vggt/vggt-main/training/loss.py) now supports both `anchor_conditioned_conf_target_quality_min/max` and `anchor_conditioned_conf_target_quality_interp='linear'` with `quality_low/high`; the remaining blocker is no longer missing plumbing but that both the first exact and first softer whole-foreground rules already failed, so any future manual question must justify an even softer or reshaped rule that improves both `conf_depth` and `reg_depth`.
+  - [composed_dataset.py](/f:/vggt/vggt-main/training/data/composed_dataset.py) now forwards `selection_anchor_quality_score` into the training sample, and [loss.py](/f:/vggt/vggt-main/training/loss.py) already separates `gt_depth_mask` from `conf_depth_mask` inside `compute_depth_loss`.
+  - The codebase now supports four distinct local mechanisms for this family: conf-target scaling on `conf_reg_map`, explicit `conf_depth_mask` routing, train-only joint depth-loss scaling on `reg_map`, and default-off continuous pixel-level `depth_conf` interpolation for both conf-target and reg-target routing.
+  - The remaining blocker is therefore no longer missing plumbing but that the whole-foreground and interior conf-target-normalization family is exhausted locally and even the tested whole-foreground plus edge-band routing frontiers still failed, so any future manual question must justify a different selectivity or branch-routing dimension that still improves both `conf_depth` and `reg_depth`.
+  - The lowest-friction next family on the current code path is now `interpolated_eligibility_shaping`; `partial_joint_depth_routing` remains the secondary allowed family.
+  - A cross-check with [geometry_direction_status_20260323_threshold_and_pow2_completed.md](/f:/vggt/vggt-main/docs/geometry_direction_status_20260323_threshold_and_pow2_completed.md) points the same way: both that older threshold/pow2 line and the recent `depth_conf<=p60` rejection argue against another abrupt or sharpened weighting rule, so the first approved shape should stay smooth.
+  - The first approved interpolated candidate no longer needs a fresh code patch: [zju_vggt_geom_unproject_source_policy_nearest_rawpool_confdepth_dropworst_gradconfmask_anchorb1qquadraticfgedge5depthconfsmoothstepp60jointdepthscale0875_minimal.yaml](/f:/vggt/vggt-main/training/config/zju_vggt_geom_unproject_source_policy_nearest_rawpool_confdepth_dropworst_gradconfmask_anchorb1qquadraticfgedge5depthconfsmoothstepp60jointdepthscale0875_minimal.yaml) is already materialized as the config-only `smoothstep_taper` first candidate.
+  - The fastest manual approval path is now one explicit command: `python scripts/arm_zju_source_policy_approved_problem.py`.
+  - That approval helper now refuses to overwrite an existing active `approved_problem.json` unless explicitly forced, so the single-problem contract stays fail-closed by default.
+  - The fastest approved execution path is now the next explicit command too: `python scripts/run_zju_source_policy_research_candidate.py`.
+  - That approved-candidate runner now also reuses canonical short-gate and long-gate baseline/stable reference logs from `output/zju_source_policy_research_loop/gate_reference_logs.json`, so a future `100/20` evaluation reruns only the candidate branch before compare/writeback.
+  - The same runner now archives and removes the active `approved_problem.json` on exit, so a real run returns the research loop to `IDLE_GUARD` without manual cleanup.
+  - The approved-problem contract is now explicit too: approved runs must carry `first_candidate_shape` and `first_candidate_config`, and the first interpolated approval is pinned to the prebuilt config-only `smoothstep_taper` candidate rather than a looser cousin.
+  - The current overnight contract is single-candidate: any fresh approved problem may synthesize only one candidate, run `1/1 -> 10/5 -> 100/20` only as promoted by the gate sequence, then return to guard without a sibling sweep.
 - Keep rejected or frozen:
   - [dropworst_supervised vs lead](/f:/vggt/vggt-main/output/zju_training_ablation/zju_source_policy_nearest_rawpool_dropworst_vs_lead_20260325_v1/summary.md)
   - [bestanchor local gate](/f:/vggt/vggt-main/output/zju_training_ablation/zju_source_policy_nearest_rawpool_bestanchor_local_gate_20260325_v1/summary.md)
@@ -120,6 +162,10 @@
   - [anchorb1qge3bottom20 postmortem](/f:/vggt/vggt-main/output/zju_quality_conditioned_candidate_postmortem_anchorb1qge3bottom20_20260326_v1/summary.md)
   - [anchorb1qlinearwholefgconfscale05 vs stable lead](/f:/vggt/vggt-main/output/zju_training_ablation/zju_source_policy_confdepth_dropworst_gradconfmask_anchorb1qlinearwholefgconfscale05_vs_lead_20260326_v1/summary.md)
   - [anchorb1qlinearwholefgconfscale075 vs stable lead](/f:/vggt/vggt-main/output/zju_training_ablation/zju_source_policy_confdepth_dropworst_gradconfmask_anchorb1qlinearwholefgconfscale075_vs_lead_20260326_v1/summary.md)
+  - [anchorb1qquadraticwholefgconfscale05 vs stable lead](/f:/vggt/vggt-main/output/zju_training_ablation/zju_source_policy_confdepth_dropworst_gradconfmask_anchorb1qquadraticwholefgconfscale05_vs_lead_20260326_v1/summary.md)
+  - [anchorb1qlinearfginteriorerode5confscale075 vs stable lead](/f:/vggt/vggt-main/output/zju_training_ablation/zju_source_policy_confdepth_dropworst_gradconfmask_anchorb1qlinearfginteriorerode5confscale075_vs_lead_20260326_v1/summary.md)
+  - [anchorb1qge275wholefgconfmaskdrop vs stable lead](/f:/vggt/vggt-main/output/zju_training_ablation/zju_source_policy_confdepth_dropworst_gradconfmask_anchorb1qge275wholefgconfmaskdrop_vs_lead_20260326_v1/summary.md)
+  - [anchorb1qge275wholefgjointdepthscale075 vs stable lead](/f:/vggt/vggt-main/output/zju_training_ablation/zju_source_policy_confdepth_dropworst_gradconfmask_anchorb1qge275wholefgjointdepthscale075_vs_lead_20260326_v1/summary.md)
 
 ## Cloud Gate
 

@@ -722,6 +722,7 @@ class ZjuVggtGeomDataset(BaseDataset):
         point_masks = []
         foreground_masks = []
         conf_depth_point_masks = []
+        depth_conf_maps = []
         extrinsics = []
         intrinsics = []
         image_paths = []
@@ -780,6 +781,10 @@ class ZjuVggtGeomDataset(BaseDataset):
                 conf_depth_point_mask = point_mask.astype(bool)
             else:
                 conf_depth_point_mask = np.zeros(target_hw, dtype=bool)
+            if is_supervised_camera and depth_conf is not None:
+                depth_conf_map = depth_conf.astype(np.float32)
+            else:
+                depth_conf_map = np.zeros(target_hw, dtype=np.float32)
 
             images.append(image)
             depths.append(depth_map.astype(np.float32))
@@ -788,6 +793,7 @@ class ZjuVggtGeomDataset(BaseDataset):
             point_masks.append(point_mask.astype(bool))
             foreground_masks.append(raw_fg_mask.astype(bool))
             conf_depth_point_masks.append(conf_depth_point_mask)
+            depth_conf_maps.append(depth_conf_map)
             extrinsics.append(extri_opencv.astype(np.float32))
             intrinsics.append(intri_opencv.astype(np.float32))
             image_paths.append(str(image_path))
@@ -827,6 +833,7 @@ class ZjuVggtGeomDataset(BaseDataset):
             "world_points": world_points,
             "point_masks": point_masks,
             "conf_depth_point_masks": conf_depth_point_masks,
+            "depth_conf_maps": depth_conf_maps,
             "foreground_masks": foreground_masks,
             "image_paths": image_paths,
             "original_sizes": original_sizes,

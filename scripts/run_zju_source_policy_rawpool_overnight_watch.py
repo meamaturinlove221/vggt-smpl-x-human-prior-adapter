@@ -18,6 +18,7 @@ DEFAULT_OUTPUT_ROOT = REPO_ROOT / "output" / "zju_source_policy_rawpool_overnigh
 DEFAULT_LOCK_PATH = DEFAULT_OUTPUT_ROOT / "active_watch.json"
 DEFAULT_LATEST_SESSION_PATH = DEFAULT_OUTPUT_ROOT / "latest_session.json"
 DEFAULT_LATEST_GUARD_SNAPSHOT_PATH = DEFAULT_OUTPUT_ROOT / "latest_guard_snapshot.json"
+DEFAULT_REPO_PROCESS_ALLOWLIST_PATH = REPO_ROOT / "output" / "zju_source_policy_research_loop" / "repo_process_allowlist.json"
 ALLOWED_REPO_PROCESS_MARKERS = (
     "run_zju_source_policy_rawpool_overnight_watch.py",
     "run_zju_source_policy_rawpool_guard_daemon.py",
@@ -40,6 +41,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--lock-path", type=Path, default=DEFAULT_LOCK_PATH)
     parser.add_argument("--latest-session-path", type=Path, default=DEFAULT_LATEST_SESSION_PATH)
     parser.add_argument("--latest-guard-snapshot-path", type=Path, default=DEFAULT_LATEST_GUARD_SNAPSHOT_PATH)
+    parser.add_argument("--repo-process-allowlist-path", type=Path, default=DEFAULT_REPO_PROCESS_ALLOWLIST_PATH)
     parser.add_argument("--interval-sec", type=int, default=1800)
     parser.add_argument("--sleep-heartbeat-sec", type=int, default=60)
     parser.add_argument("--duration-hours", type=float, default=10.0)
@@ -191,6 +193,7 @@ def sleep_with_heartbeat(
     latest_decision_json: str,
     current_lead_config: str,
     expected_lead_config: str,
+    repo_process_allowlist_path: Path,
 ) -> None:
     total_sleep_sec = max(int(total_sleep_sec), 0)
     step = max(int(heartbeat_sec), 5)
@@ -208,7 +211,7 @@ def sleep_with_heartbeat(
         state = load_json(state_path)
         consistency = load_json(consistency_path)
         modal_apps = list_modal_apps()
-        repo_processes = get_repo_processes()
+        repo_processes = get_repo_processes(repo_process_allowlist_path)
         validate_live_guards(modal_apps=modal_apps, repo_processes=repo_processes)
         validate_live_state(
             state=state,
@@ -284,7 +287,20 @@ def list_modal_apps() -> list[dict]:
     return payload if isinstance(payload, list) else []
 
 
-def get_repo_processes() -> list[dict]:
+def load_dynamic_repo_process_markers(path: Path) -> tuple[str, ...]:
+    if not path.exists():
+        return ()
+    try:
+        payload = load_json(path)
+    except Exception:
+        return ()
+    markers = payload.get("allowed_markers", [])
+    if not isinstance(markers, list):
+        return ()
+    return tuple(str(marker) for marker in markers if str(marker).strip())
+
+
+def get_repo_processes(repo_process_allowlist_path: Path) -> list[dict]:
     command = """
 $repo = '{repo}'
 $selfPid = {self_pid}
@@ -309,10 +325,12 @@ $items | ConvertTo-Json -Compress
         rows = payload
     else:
         rows = [payload]
+    allowed_markers = tuple(marker.lower() for marker in (ALLOWED_REPO_PROCESS_MARKERS + load_dynamic_repo_process_markers(repo_process_allowlist_path)))
     filtered = []
     for row in rows:
         cmd = str(row.get("CommandLine", ""))
-        if any(marker in cmd for marker in ALLOWED_REPO_PROCESS_MARKERS):
+        cmd_lower = cmd.lower()
+        if any(marker in cmd_lower for marker in allowed_markers):
             continue
         filtered.append(row)
     return filtered
@@ -400,7 +418,7 @@ def run_cycle(args: argparse.Namespace, session_dir: Path, cycle_index: int, exp
     state = load_json(args.state_path)
     consistency = load_json(args.consistency_path)
     modal_apps = list_modal_apps()
-    repo_processes = get_repo_processes()
+    repo_processes = get_repo_processes(args.repo_process_allowlist_path)
     validate_cycle_outputs(decision, state, consistency, modal_apps, repo_processes)
     validate_expected_lead(
         decision=decision,
@@ -554,6 +572,7 @@ def main() -> None:
         "lock_path": str(args.lock_path.resolve()),
         "latest_session_path": str(args.latest_session_path.resolve()),
         "latest_guard_snapshot_path": str(args.latest_guard_snapshot_path.resolve()),
+        "repo_process_allowlist_path": str(args.repo_process_allowlist_path.resolve()),
     }
     write_json(session_dir / "settings.json", settings)
     write_runtime_status(
@@ -625,6 +644,7 @@ def main() -> None:
                 latest_decision_json=last_cycle_summary.get("nightly_decision_json", ""),
                 current_lead_config=str(last_cycle_summary.get("current_lead_config", "")),
                 expected_lead_config=expected_lead_config,
+                repo_process_allowlist_path=args.repo_process_allowlist_path,
             )
     except Exception as exc:
         final_status = "failed"

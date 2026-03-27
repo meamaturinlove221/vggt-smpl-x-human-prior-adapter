@@ -738,6 +738,22 @@ class Trainer:
         for key in string_keys:
             if key in batch and batch[key] is not None:
                 batch[key] = batch[key] * 2
+
+        if "selection_anchor_view_index" in batch:
+            original_index = batch["selection_anchor_view_index"]
+            if "images" in batch and batch["images"].ndim > 1:
+                view_count = int(batch["images"].shape[1])
+            else:
+                view_count = 0
+            if view_count > 0:
+                flipped_index = torch.where(
+                    original_index >= 0,
+                    (view_count - 1) - original_index,
+                    original_index,
+                )
+            else:
+                flipped_index = original_index
+            batch["selection_anchor_view_index"] = torch.concatenate([original_index, flipped_index], dim=0)
         
         return batch
 

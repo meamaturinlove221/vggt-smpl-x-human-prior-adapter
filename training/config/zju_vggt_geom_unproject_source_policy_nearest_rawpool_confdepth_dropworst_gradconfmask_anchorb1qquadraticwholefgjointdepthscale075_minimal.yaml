@@ -1,0 +1,15 @@
+defaults:
+  - zju_vggt_geom_unproject_source_policy_nearest_rawpool_confdepth_dropworst_gradconfmask_minimal
+  - _self_
+
+exp_name: zju_vggt_geom_unproject_source_policy_nearest_rawpool_confdepth_dropworst_gradconfmask_anchorb1qquadraticwholefgjointdepthscale075_minimal
+
+loss:
+  depth:
+    anchor_conditioned_reg_target_cameras:
+      - Camera_B1
+    anchor_conditioned_reg_target_scale: 0.75
+    anchor_conditioned_reg_target_train_only: True
+    anchor_conditioned_reg_target_quality_interp: quadratic
+    anchor_conditioned_reg_target_quality_low: 2.4610
+    anchor_conditioned_reg_target_quality_high: 4.4193

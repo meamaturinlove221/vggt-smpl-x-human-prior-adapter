@@ -1,0 +1,9 @@
+defaults:
+  - zju_vggt_geom_unproject_source_policy_nearest_rawpool_confdepth_dropworst_gradconfmask_anchorb1qlinearwholefgconfscale075_minimal
+  - _self_
+
+exp_name: zju_vggt_geom_unproject_source_policy_nearest_rawpool_confdepth_dropworst_gradconfmask_anchorb1qlinearfginteriorerode5confscale075_minimal
+
+loss:
+  depth:
+    anchor_conditioned_conf_target_foreground_erode_px: 5

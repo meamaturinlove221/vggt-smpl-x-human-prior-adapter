@@ -1,0 +1,13 @@
+defaults:
+  - zju_vggt_geom_unproject_source_policy_nearest_rawpool_confdepth_dropworst_gradconfmask_minimal
+  - _self_
+
+exp_name: zju_vggt_geom_unproject_source_policy_nearest_rawpool_confdepth_dropworst_gradconfmask_anchorb1disagreementjointconf0875reg1125_minimal
+
+loss:
+  depth:
+    anchor_conditioned_disagreement_cameras:
+      - Camera_B1
+    anchor_conditioned_disagreement_conf_scale: 0.875
+    anchor_conditioned_disagreement_reg_scale: 1.125
+    anchor_conditioned_disagreement_train_only: True

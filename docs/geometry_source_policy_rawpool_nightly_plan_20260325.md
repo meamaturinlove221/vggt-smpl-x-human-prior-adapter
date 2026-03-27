@@ -13,9 +13,13 @@
 - A postmortem on that candidate shows the hard `q>=3.0` gate was over-selective: it still excluded `4 / 10` bad `Camera_B1` audit rows and touched only `0.7476%` of conf-depth-supervised pixels on a 512-sample train slice.
 - A follow-up quality-region boundary check shows the region was over-selective too: all `10 / 10` bad `Camera_B1` audit rows still have positive non-bottom `conf_depth` deltas, while `q>=3.0 + whole_foreground` covers `22.6975%` of conf-depth-supervised pixels on a fresh 512-sample train slice versus only `0.7983%` for `q>=3.0 + bottom20`.
 - A further rule-shape sweep shows the next question is not another broader hard-threshold whole-foreground sibling either: `q>=3.0 + whole_foreground` still omits `4 / 10` bad audit rows, `q>=2.75 + whole_foreground` still omits `1 / 10`, and the best-supported next shape is a continuous `Camera_B1` whole-foreground quality-conditioned rule.
-- The continuous loss knob now exists locally, but both tested whole-foreground continuous rules are frozen: the first exact `linear qmin -> qmax + whole_foreground + scale0.5` candidate failed the tighter gate, and the softer `scale0.75` fallback recommended by the local soft sweep failed too.
+- The continuous loss knob now exists locally, but the tested whole-foreground and interior conf-target-normalization family is now frozen: the first exact `linear qmin -> qmax + whole_foreground + scale0.5` candidate failed the tighter gate, the softer `scale0.75` fallback failed too, the `quadratic + whole_foreground + scale0.5` candidate also failed, and the `linear + foreground_interior(erode5) + scale0.75` candidate still failed even though it was slightly closer than the rejected whole-foreground `scale0.75` fallback.
+- The loss-routing line has now been pushed further too: `Camera_B1 + q>=2.75 + whole_foreground + conf_depth_mask drop` was too aggressive; `Camera_B1 + q>=2.75 + whole_foreground + joint depth-loss scale0.75` was materially less damaging but still failed; `qlinear + whole_foreground + joint depth-loss scale0.75` and `qquadratic + whole_foreground + joint depth-loss scale0.75` moved closer again; and `qquadratic + whole_foreground + joint depth-loss scale0.875` became the closest whole-foreground routing variant so far. But every one of those candidates still regressed both `conf_depth` and `reg_depth` versus the stable lead while keeping `camera/T` flat.
+- Local code review now also confirms that supervised `point_masks` and `conf_depth_point_masks` are already built from foreground-clipped depth maps, so the exhausted whole-foreground family was not a hidden whole-frame masking bug.
+- The current frontier reading is therefore sharper than before: progressively softer whole-foreground joint-depth scalars appear to asymptotically return toward the stable lead rather than cross it, the first whole-foreground decoupled conf/reg follow-up also stayed worse than the stable lead, the first non-wholefg foreground-edge frontier got even closer without crossing, and a hard gt `depth_conf` threshold inside that promising edge route was too aggressive. The next approved question should therefore change non-wholefg selectivity with a softer pixel-level or branch-routing semantics rather than add another global whole-foreground scalar, another whole-foreground branch-routing reskin, another plain edge-band scalar near-neighbor, or another hard pixel threshold.
 - The nightly default remains a hold state: `preflight -> consistency check -> status emit`. No training runs unless a fresh manual training question explicitly approves one genuinely new candidate.
 - The overnight automation wrapper is now [run_zju_source_policy_rawpool_overnight_watch.py](/f:/vggt/vggt-main/scripts/run_zju_source_policy_rawpool_overnight_watch.py): it only repeats machine-readable `steady_hold`, refreshes its lock heartbeat while sleeping, and re-checks that the stable lead has not drifted, `cloud_gate=false`, consistency, Modal apps, and repo-scoped processes after each cycle.
+- The watch now also supports a dynamic repo-process allowlist via `output/zju_source_policy_research_loop/repo_process_allowlist.json`, but that active allowlist must stay empty by default while the research track remains `IDLE_GUARD`.
 
 ## Current Lead
 
@@ -67,6 +71,14 @@
   - [summary.md](/f:/vggt/vggt-main/output/zju_training_ablation/zju_source_policy_confdepth_dropworst_gradconfmask_anchorb1qlinearwholefgconfscale05_vs_lead_20260326_v1/summary.md)
 - `anchorb1qlinearwholefgconfscale075`
   - [summary.md](/f:/vggt/vggt-main/output/zju_training_ablation/zju_source_policy_confdepth_dropworst_gradconfmask_anchorb1qlinearwholefgconfscale075_vs_lead_20260326_v1/summary.md)
+- `anchorb1qquadraticwholefgconfscale05`
+  - [summary.md](/f:/vggt/vggt-main/output/zju_training_ablation/zju_source_policy_confdepth_dropworst_gradconfmask_anchorb1qquadraticwholefgconfscale05_vs_lead_20260326_v1/summary.md)
+- `anchorb1qlinearfginteriorerode5confscale075`
+  - [summary.md](/f:/vggt/vggt-main/output/zju_training_ablation/zju_source_policy_confdepth_dropworst_gradconfmask_anchorb1qlinearfginteriorerode5confscale075_vs_lead_20260326_v1/summary.md)
+- `anchorb1qge275wholefgconfmaskdrop`
+  - [summary.md](/f:/vggt/vggt-main/output/zju_training_ablation/zju_source_policy_confdepth_dropworst_gradconfmask_anchorb1qge275wholefgconfmaskdrop_vs_lead_20260326_v1/summary.md)
+- `anchorb1qge275wholefgjointdepthscale075`
+  - [summary.md](/f:/vggt/vggt-main/output/zju_training_ablation/zju_source_policy_confdepth_dropworst_gradconfmask_anchorb1qge275wholefgjointdepthscale075_vs_lead_20260326_v1/summary.md)
 - "exclude rawpool-only views from geometry supervision" as a standalone candidate
   - [summary.md](/f:/vggt/vggt-main/output/zju_source_policy_supervision_audit_nearest_rawpool_20260325_v1/summary.md)
 
@@ -119,7 +131,34 @@
   - `loss_T: 0.0003 -> 0.0003`
   - `loss_conf_depth: 0.2289 -> 0.2483`
   - `loss_reg_depth: 0.1760 -> 0.1797`
-- That recommendation replaced the exhausted fixed-scale B1 family, but the first quality-conditioned member did not clear promotion, its hard threshold proved over-selective, the follow-up boundary check showed `bottom20` is too narrow, the rule-shape sweep ruled out broader hard-threshold whole-foreground siblings, the first exact continuous whole-foreground candidate failed, and the first softer whole-foreground fallback failed as well. Default nightly therefore returns to `steady_hold` and still does not auto-train.
+- Whole-foreground quadratic follow-up:
+  - [summary.md](/f:/vggt/vggt-main/output/zju_training_ablation/zju_source_policy_confdepth_dropworst_gradconfmask_anchorb1qquadraticwholefgconfscale05_vs_lead_20260326_v1/summary.md)
+  - `loss_camera: 0.0219 -> 0.0218`
+  - `loss_T: 0.0003 -> 0.0003`
+  - `loss_conf_depth: 0.2288 -> 0.2587`
+  - `loss_reg_depth: 0.1759 -> 0.1817`
+- Foreground-interior linear follow-up:
+  - [summary.md](/f:/vggt/vggt-main/output/zju_training_ablation/zju_source_policy_confdepth_dropworst_gradconfmask_anchorb1qlinearfginteriorerode5confscale075_vs_lead_20260326_v1/summary.md)
+  - `loss_camera: 0.0219 -> 0.0219`
+  - `loss_T: 0.0003 -> 0.0003`
+  - `loss_conf_depth: 0.2288 -> 0.2432`
+  - `loss_reg_depth: 0.1759 -> 0.1787`
+- Whole-foreground hard confmask-drop routing follow-up:
+  - [summary.md](/f:/vggt/vggt-main/output/zju_training_ablation/zju_source_policy_confdepth_dropworst_gradconfmask_anchorb1qge275wholefgconfmaskdrop_vs_lead_20260326_v1/summary.md)
+  - `loss_camera: 0.0219 -> 0.0218`
+  - `loss_T: 0.0003 -> 0.0003`
+  - `loss_conf_depth: 0.2289 -> 0.3018`
+  - `loss_reg_depth: 0.1760 -> 0.1959`
+- Whole-foreground joint depth-loss scale0.75 routing follow-up:
+  - [summary.md](/f:/vggt/vggt-main/output/zju_training_ablation/zju_source_policy_confdepth_dropworst_gradconfmask_anchorb1qge275wholefgjointdepthscale075_vs_lead_20260326_v1/summary.md)
+  - `loss_camera: 0.0219 -> 0.0219`
+  - `loss_T: 0.0003 -> 0.0003`
+  - `loss_conf_depth: 0.2288 -> 0.2546`
+  - `loss_reg_depth: 0.1759 -> 0.1805`
+- Local code fact after those runs:
+  - [zju_vggt_geom.py](/f:/vggt/vggt-main/training/data/datasets/zju_vggt_geom.py)
+  - Supervised depth is already clipped by `fg_mask` before point masks are built, so whole-foreground candidates were operating inside real foreground supervision rather than a hidden whole-frame path.
+- That recommendation replaced the exhausted fixed-scale B1 family, but the first quality-conditioned member did not clear promotion, its hard threshold proved over-selective, the follow-up boundary check showed `bottom20` is too narrow, the rule-shape sweep ruled out broader hard-threshold whole-foreground siblings, the whole-foreground linear/quadratic and foreground-interior linear normalization candidates all failed, the whole-foreground hard confmask-drop routing candidate failed, the tested whole-foreground joint-depth softening-scalar frontier also failed to beat the stable lead, and the first whole-foreground decoupled conf/reg routing follow-up still regressed both depth terms. The next manual question therefore has to stay in the loss-routing dimension while changing real non-wholefg selectivity beyond another whole-foreground scalar or whole-foreground branch-routing near-neighbor. Default nightly therefore returns to `steady_hold` and still does not auto-train.
 - The rawpool supervision-leak question remains settled local evidence. Re-run that audit only when a future candidate changes dataset or loss routing.
 
 ## Default Nightly Sequence
@@ -146,6 +185,7 @@
   - Keep a live lock file and refresh the sleep heartbeat so the watch can be distinguished from a hung process.
   - Keep both `active_watch.json` and `latest_session.json` updated so the current unattended session can be inspected without waiting for process exit.
   - Re-check during sleep heartbeats that the state still points at the stable `confdepth_dropworst_gradconfmask` lead, there are still zero active Modal apps, and there are still zero unexpected repo-scoped `python/powershell/pwsh/modal` processes, instead of waiting until the next full cycle.
+  - Only the built-in guard markers plus the temporary markers explicitly listed in `output/zju_source_policy_research_loop/repo_process_allowlist.json` count as allowed repo-scoped processes, and that active allowlist must stay empty unless a future approved research candidate is actually running.
   - Keep `latest_guard_snapshot.json` updated with the most recent successful guard check so the last clean Modal/process snapshot, `consistency_ok`, the current state lead, and the state cloud flags are visible at a fixed path.
   - Re-check after each cycle that `consistency_check` is clean, `current_lead_config` still matches the stable `confdepth_dropworst_gradconfmask` lead, `cloud_gate=false`, `launch_cloud_now=false`, there are zero active Modal apps, and there are zero unexpected repo-scoped `python/powershell/pwsh/modal` processes.
 - Non-goals:
@@ -159,7 +199,7 @@
 - That candidate must be a non-redundant `conf_depth semantics` hypothesis.
 - Under the current evidence, any future candidate still has to justify a quality-conditioned conf-target rule rather than another constant camera-only scale.
 - It must also justify why it is broader or more continuous than the rejected hard `q>=3.0` gate and why it is not defaulting back to the already-too-narrow `bottom20` region.
-- Under the newest evidence, it must also justify why it is continuous rather than another broader hard-threshold whole-foreground sibling.
+- Under the newest evidence, it must also justify why it changes a different dimension than another whole-foreground or foreground-interior interpolation reskin inside anchor-conditioned conf-target normalization.
 - It must be materially different from:
   - `min_supervised_views = 2`
   - `source_anchor_policy = max_depth_conf`
@@ -175,8 +215,8 @@
      - baseline
      - current `confdepth_dropworst_gradconfmask` lead
   5. Stop after that one candidate.
-- This mode is not automatic; it requires a fresh manual training question after both tested fixed-scale B1-conditioned follow-ups were exhausted, the stable lead was restored to `confdepth_dropworst_gradconfmask`, the first quality-conditioned follow-up was frozen, and both the first exact and first softer whole-foreground continuous candidates were frozen too.
-- If that fresh question is approved, it must justify an even softer or reshaped rule beyond the already-frozen exact `linear qmin -> qmax + whole_foreground + scale0.5` and softer `scale0.75` variants.
+- This mode is not automatic; it requires a fresh manual training question after the tested fixed-scale B1-conditioned follow-ups were exhausted, the stable lead was restored to `confdepth_dropworst_gradconfmask`, the first quality-conditioned follow-up was frozen, the whole-foreground linear and quadratic candidates were frozen, and the foreground-interior linear candidate was frozen too.
+- If that fresh question is approved, it must justify a different non-wholefg selectivity dimension beyond the already-frozen whole-foreground/interior normalization family, the rejected whole-foreground hard confmask-drop candidate, the rejected whole-foreground joint-depth softening-scalar frontier, and the rejected whole-foreground decoupled conf/reg follow-up.
 
 ## Promotion Gate
 

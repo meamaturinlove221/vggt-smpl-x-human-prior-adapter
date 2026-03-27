@@ -348,20 +348,32 @@ def compute_unproject_geometry_loss(
     return {"loss_unproject_geometry": loss}
 
 
-def build_reliable_foreground_region_mask(mask, erode_px=0, drop_bottom_ratio=0.0):
+def build_reliable_foreground_region_mask(mask, erode_px=0, drop_bottom_ratio=0.0, edge_band_px=0):
     """
     Build a stricter target-side region mask from the raw foreground mask.
 
     This supports a minimal "reliable region" treatment without changing the
     baseline camera/depth losses:
     - optional binary erosion to suppress uncertain silhouette edges
+    - optional selection of a foreground boundary ring
     - optional removal of a bottom image band to avoid floor/ground contact zones
     """
     region_mask = mask.to(dtype=torch.bool)
     bb, ss, hh, ww = region_mask.shape
 
     erode_px = int(max(0, erode_px))
-    if erode_px > 0:
+    edge_band_px = int(max(0, edge_band_px))
+    if erode_px > 0 and edge_band_px > 0:
+        raise ValueError("erode_px and edge_band_px are mutually exclusive region selectors.")
+
+    if edge_band_px > 0:
+        kernel = 2 * edge_band_px + 1
+        flat = region_mask.reshape(bb * ss, 1, hh, ww)
+        inv = (~flat).float()
+        eroded = F.max_pool2d(inv, kernel_size=kernel, stride=1, padding=edge_band_px) == 0
+        edge_mask = flat & ~eroded
+        region_mask = edge_mask.reshape(bb, ss, hh, ww)
+    elif erode_px > 0:
         kernel = 2 * erode_px + 1
         flat = region_mask.reshape(bb * ss, 1, hh, ww)
         inv = (~flat).float()
@@ -471,12 +483,43 @@ def compute_depth_loss(
     anchor_conditioned_conf_target_cameras=None,
     anchor_conditioned_conf_target_scale=1.0,
     anchor_conditioned_conf_target_train_only=True,
+    anchor_conditioned_conf_target_foreground_erode_px=0,
+    anchor_conditioned_conf_target_foreground_edge_band_px=0,
     anchor_conditioned_conf_target_foreground_bottom_ratio=0.0,
     anchor_conditioned_conf_target_quality_min=None,
     anchor_conditioned_conf_target_quality_max=None,
     anchor_conditioned_conf_target_quality_interp="none",
     anchor_conditioned_conf_target_quality_low=None,
     anchor_conditioned_conf_target_quality_high=None,
+    anchor_conditioned_conf_mask_cameras=None,
+    anchor_conditioned_conf_mask_train_only=True,
+    anchor_conditioned_conf_mask_foreground_erode_px=0,
+    anchor_conditioned_conf_mask_foreground_edge_band_px=0,
+    anchor_conditioned_conf_mask_foreground_bottom_ratio=0.0,
+    anchor_conditioned_conf_mask_quality_min=None,
+    anchor_conditioned_conf_mask_quality_max=None,
+    anchor_conditioned_reg_target_cameras=None,
+    anchor_conditioned_reg_target_scale=1.0,
+    anchor_conditioned_reg_target_train_only=True,
+    anchor_conditioned_reg_target_foreground_erode_px=0,
+    anchor_conditioned_reg_target_foreground_edge_band_px=0,
+    anchor_conditioned_reg_target_foreground_bottom_ratio=0.0,
+    anchor_conditioned_reg_target_quality_min=None,
+    anchor_conditioned_reg_target_quality_max=None,
+    anchor_conditioned_reg_target_quality_interp="none",
+    anchor_conditioned_reg_target_quality_low=None,
+    anchor_conditioned_reg_target_quality_high=None,
+    anchor_conditioned_reg_target_anchor_view_only=False,
+    anchor_conditioned_reg_target_depth_conf_min=None,
+    anchor_conditioned_reg_target_depth_conf_max=None,
+    anchor_conditioned_reg_target_depth_conf_interp="none",
+    anchor_conditioned_reg_target_depth_conf_low=None,
+    anchor_conditioned_reg_target_depth_conf_high=None,
+    anchor_conditioned_conf_target_depth_conf_min=None,
+    anchor_conditioned_conf_target_depth_conf_max=None,
+    anchor_conditioned_conf_target_depth_conf_interp="none",
+    anchor_conditioned_conf_target_depth_conf_low=None,
+    anchor_conditioned_conf_target_depth_conf_high=None,
     **kwargs,
 ):
     """
@@ -500,6 +543,21 @@ def compute_depth_loss(
     gt_depth_mask = batch['point_masks'].clone()   # 3D points derived from depth map, so we use the same mask
     conf_depth_mask = batch.get('conf_depth_point_masks', gt_depth_mask).clone()
     conf_depth_mask = conf_depth_mask & gt_depth_mask
+    anchor_conditioned_conf_mask_drop_map = _build_anchor_conditioned_conf_mask_drop_map(
+        batch,
+        conf_depth_mask,
+        anchor_conditioned_conf_mask_cameras=anchor_conditioned_conf_mask_cameras,
+        anchor_conditioned_conf_mask_train_only=anchor_conditioned_conf_mask_train_only,
+        anchor_conditioned_conf_mask_foreground_erode_px=anchor_conditioned_conf_mask_foreground_erode_px,
+        anchor_conditioned_conf_mask_foreground_edge_band_px=anchor_conditioned_conf_mask_foreground_edge_band_px,
+        anchor_conditioned_conf_mask_foreground_bottom_ratio=anchor_conditioned_conf_mask_foreground_bottom_ratio,
+        anchor_conditioned_conf_mask_quality_min=anchor_conditioned_conf_mask_quality_min,
+        anchor_conditioned_conf_mask_quality_max=anchor_conditioned_conf_mask_quality_max,
+    )
+    if anchor_conditioned_conf_mask_drop_map is not None:
+        # Route the targeted pixels out of conf-depth supervision while leaving
+        # the underlying gt_depth mask unchanged for the regression branch.
+        conf_depth_mask = conf_depth_mask & ~anchor_conditioned_conf_mask_drop_map
 
     if gt_depth_mask.sum() < 100:
         # If there are less than 100 valid points, skip this batch
@@ -524,15 +582,41 @@ def compute_depth_loss(
         conf_loss_aggregation=conf_loss_aggregation,
         respect_conf_mask_in_grad_conf=respect_conf_mask_in_grad_conf,
         batch=batch,
+        anchor_conditioned_reg_target_cameras=anchor_conditioned_reg_target_cameras,
+        anchor_conditioned_reg_target_scale=anchor_conditioned_reg_target_scale,
+        anchor_conditioned_reg_target_train_only=anchor_conditioned_reg_target_train_only,
+        anchor_conditioned_reg_target_foreground_erode_px=anchor_conditioned_reg_target_foreground_erode_px,
+        anchor_conditioned_reg_target_foreground_edge_band_px=anchor_conditioned_reg_target_foreground_edge_band_px,
+        anchor_conditioned_reg_target_foreground_bottom_ratio=anchor_conditioned_reg_target_foreground_bottom_ratio,
+        anchor_conditioned_reg_target_quality_min=anchor_conditioned_reg_target_quality_min,
+        anchor_conditioned_reg_target_quality_max=anchor_conditioned_reg_target_quality_max,
+        anchor_conditioned_reg_target_quality_interp=anchor_conditioned_reg_target_quality_interp,
+        anchor_conditioned_reg_target_quality_low=anchor_conditioned_reg_target_quality_low,
+        anchor_conditioned_reg_target_quality_high=anchor_conditioned_reg_target_quality_high,
+        anchor_conditioned_reg_target_anchor_view_only=anchor_conditioned_reg_target_anchor_view_only,
+        anchor_conditioned_reg_target_depth_conf_min=anchor_conditioned_reg_target_depth_conf_min,
+        anchor_conditioned_reg_target_depth_conf_max=anchor_conditioned_reg_target_depth_conf_max,
+        anchor_conditioned_reg_target_depth_conf_interp=anchor_conditioned_reg_target_depth_conf_interp,
+        anchor_conditioned_reg_target_depth_conf_low=anchor_conditioned_reg_target_depth_conf_low,
+        anchor_conditioned_reg_target_depth_conf_high=anchor_conditioned_reg_target_depth_conf_high,
         anchor_conditioned_conf_target_cameras=anchor_conditioned_conf_target_cameras,
         anchor_conditioned_conf_target_scale=anchor_conditioned_conf_target_scale,
         anchor_conditioned_conf_target_train_only=anchor_conditioned_conf_target_train_only,
+        anchor_conditioned_conf_target_foreground_erode_px=anchor_conditioned_conf_target_foreground_erode_px,
+        anchor_conditioned_conf_target_foreground_edge_band_px=anchor_conditioned_conf_target_foreground_edge_band_px,
         anchor_conditioned_conf_target_foreground_bottom_ratio=anchor_conditioned_conf_target_foreground_bottom_ratio,
         anchor_conditioned_conf_target_quality_min=anchor_conditioned_conf_target_quality_min,
         anchor_conditioned_conf_target_quality_max=anchor_conditioned_conf_target_quality_max,
         anchor_conditioned_conf_target_quality_interp=anchor_conditioned_conf_target_quality_interp,
         anchor_conditioned_conf_target_quality_low=anchor_conditioned_conf_target_quality_low,
         anchor_conditioned_conf_target_quality_high=anchor_conditioned_conf_target_quality_high,
+        anchor_conditioned_conf_target_anchor_view_only=False,
+        anchor_conditioned_conf_target_depth_conf_min=anchor_conditioned_conf_target_depth_conf_min,
+        anchor_conditioned_conf_target_depth_conf_max=anchor_conditioned_conf_target_depth_conf_max,
+        anchor_conditioned_conf_target_depth_conf_interp=anchor_conditioned_conf_target_depth_conf_interp,
+        anchor_conditioned_conf_target_depth_conf_low=anchor_conditioned_conf_target_depth_conf_low,
+        anchor_conditioned_conf_target_depth_conf_high=anchor_conditioned_conf_target_depth_conf_high,
+        **kwargs,
     )
 
     loss_dict = {
@@ -597,18 +681,172 @@ def _normalize_batch_anchor_quality_scores(selection_anchor_quality_score, batch
     return normalized[:batch_size]
 
 
+def _normalize_batch_anchor_view_indices(selection_anchor_view_index, batch_size):
+    if batch_size <= 0:
+        return []
+    if selection_anchor_view_index is None:
+        return [None] * batch_size
+    if isinstance(selection_anchor_view_index, torch.Tensor):
+        if selection_anchor_view_index.ndim == 0:
+            values = [selection_anchor_view_index.item()]
+        else:
+            values = selection_anchor_view_index.detach().cpu().reshape(-1).tolist()
+    elif isinstance(selection_anchor_view_index, (list, tuple)):
+        values = list(selection_anchor_view_index)
+    else:
+        values = [selection_anchor_view_index]
+
+    normalized = []
+    for value in values:
+        if value is None:
+            normalized.append(None)
+            continue
+        try:
+            idx = int(value)
+        except (TypeError, ValueError):
+            normalized.append(None)
+            continue
+        normalized.append(idx if idx >= 0 else None)
+
+    if len(normalized) == batch_size:
+        return normalized
+    if len(normalized) == 1:
+        return normalized * batch_size
+    if len(normalized) < batch_size:
+        return normalized + ([None] * (batch_size - len(normalized)))
+    return normalized[:batch_size]
+
+
+def _build_anchor_view_only_mask(batch, reference_mask):
+    if batch is None or reference_mask is None:
+        return None
+    anchor_view_indices = _normalize_batch_anchor_view_indices(
+        batch.get("selection_anchor_view_index"),
+        reference_mask.shape[0],
+    )
+    if not anchor_view_indices:
+        return None
+    anchor_view_mask = torch.zeros_like(reference_mask, dtype=torch.bool)
+    view_count = int(reference_mask.shape[1])
+    for batch_idx, view_idx in enumerate(anchor_view_indices):
+        if view_idx is None:
+            continue
+        if 0 <= int(view_idx) < view_count:
+            anchor_view_mask[batch_idx, int(view_idx)] = True
+    if not bool(anchor_view_mask.any().item()):
+        return None
+    return anchor_view_mask
+
+
+def _build_anchor_conditioned_disagreement_scale_maps(
+    batch,
+    reg_map,
+    conf,
+    conf_mask,
+    *,
+    anchor_conditioned_disagreement_cameras=None,
+    anchor_conditioned_disagreement_conf_scale=1.0,
+    anchor_conditioned_disagreement_reg_scale=1.0,
+    anchor_conditioned_disagreement_train_only=True,
+):
+    if batch is None or reg_map is None or conf is None or conf_mask is None:
+        return None, None
+    if anchor_conditioned_disagreement_cameras is None:
+        return None, None
+    conf_scale = float(anchor_conditioned_disagreement_conf_scale)
+    reg_scale = float(anchor_conditioned_disagreement_reg_scale)
+    if conf_scale == 1.0 and reg_scale == 1.0:
+        return None, None
+
+    if anchor_conditioned_disagreement_train_only:
+        phase = str(batch.get("_loss_phase", "")).lower()
+        if phase != "train":
+            return None, None
+
+    if isinstance(anchor_conditioned_disagreement_cameras, str):
+        target_cameras = {anchor_conditioned_disagreement_cameras}
+    else:
+        target_cameras = {
+            str(camera_name)
+            for camera_name in anchor_conditioned_disagreement_cameras
+            if camera_name is not None
+        }
+    if not target_cameras:
+        return None, None
+
+    batch_anchor_cameras = _normalize_batch_anchor_cameras(
+        batch.get("selection_anchor_camera"),
+        reg_map.shape[0],
+    )
+    per_sample_target = torch.zeros(
+        (reg_map.shape[0], 1, 1, 1),
+        device=reg_map.device,
+        dtype=torch.bool,
+    )
+    for batch_idx, camera_name in enumerate(batch_anchor_cameras):
+        if camera_name in target_cameras:
+            per_sample_target[batch_idx] = True
+    if not bool(per_sample_target.any().item()):
+        return None, None
+
+    anchor_view_mask = _build_anchor_view_only_mask(batch, conf_mask)
+    if anchor_view_mask is None:
+        return None, None
+
+    target_mask = conf_mask & anchor_view_mask & per_sample_target.expand_as(conf_mask)
+    if not bool(target_mask.any().item()):
+        return None, None
+
+    detached_reg = check_and_fix_inf_nan(reg_map.detach(), "anchor_conditioned_disagreement_reg_map")
+    detached_conf = check_and_fix_inf_nan(conf.detach(), "anchor_conditioned_disagreement_conf").clamp(0.0, 1.0)
+    masked_reg = torch.where(target_mask, detached_reg, torch.zeros_like(detached_reg))
+    per_sample_max = masked_reg.reshape(reg_map.shape[0], -1).amax(dim=1).clamp_min(1e-6).view(-1, 1, 1, 1)
+    reg_norm = (detached_reg / per_sample_max).clamp(0.0, 1.0)
+    disagreement = torch.abs(reg_norm - (1.0 - detached_conf).clamp(0.0, 1.0))
+    disagreement = check_and_fix_inf_nan(disagreement, "anchor_conditioned_disagreement_map")
+
+    ones = torch.ones_like(reg_map)
+    conf_scale_map = None
+    reg_scale_map = None
+    if conf_scale != 1.0:
+        conf_scale_map = torch.where(
+            target_mask,
+            1.0 + disagreement * (conf_scale - 1.0),
+            ones,
+        )
+    if reg_scale != 1.0:
+        reg_scale_map = torch.where(
+            target_mask,
+            1.0 + disagreement * (reg_scale - 1.0),
+            ones,
+        )
+    return conf_scale_map, reg_scale_map
+
+
 def _build_anchor_conditioned_conf_scale_map(
     batch,
     conf_reg_map,
     anchor_conditioned_conf_target_cameras=None,
     anchor_conditioned_conf_target_scale=1.0,
     anchor_conditioned_conf_target_train_only=True,
+    anchor_conditioned_conf_target_foreground_erode_px=0,
+    anchor_conditioned_conf_target_foreground_edge_band_px=0,
     anchor_conditioned_conf_target_foreground_bottom_ratio=0.0,
     anchor_conditioned_conf_target_quality_min=None,
     anchor_conditioned_conf_target_quality_max=None,
     anchor_conditioned_conf_target_quality_interp="none",
     anchor_conditioned_conf_target_quality_low=None,
     anchor_conditioned_conf_target_quality_high=None,
+    anchor_conditioned_conf_target_anchor_view_only=False,
+    anchor_conditioned_conf_target_depth_conf_min=None,
+    anchor_conditioned_conf_target_depth_conf_max=None,
+    anchor_conditioned_conf_target_depth_conf_interp="none",
+    anchor_conditioned_conf_target_depth_conf_low=None,
+    anchor_conditioned_conf_target_depth_conf_high=None,
+    anchor_conditioned_disagreement_cameras=None,
+    anchor_conditioned_disagreement_conf_scale=1.0,
+    anchor_conditioned_disagreement_reg_scale=1.0,
+    anchor_conditioned_disagreement_train_only=True,
 ):
     if batch is None:
         return None
@@ -700,23 +938,184 @@ def _build_anchor_conditioned_conf_scale_map(
         per_sample_scale[batch_idx] = scale_value
     scale_map = per_sample_scale.expand(-1, conf_reg_map.shape[1], conf_reg_map.shape[2], conf_reg_map.shape[3])
 
+    target_mask = None
+
+    if anchor_conditioned_conf_target_anchor_view_only:
+        anchor_view_mask = _build_anchor_view_only_mask(batch, scale_map)
+        if anchor_view_mask is None:
+            return None
+        target_mask = anchor_view_mask
+
+    erode_px = int(max(0, anchor_conditioned_conf_target_foreground_erode_px))
+    edge_band_px = int(max(0, anchor_conditioned_conf_target_foreground_edge_band_px))
     bottom_ratio = float(max(0.0, min(0.95, anchor_conditioned_conf_target_foreground_bottom_ratio)))
-    if bottom_ratio <= 0.0:
+    if erode_px > 0 or edge_band_px > 0 or bottom_ratio > 0.0:
+        foreground_masks = batch.get("foreground_masks", None)
+        if foreground_masks is None:
+            raise ValueError(
+                "anchor_conditioned_conf_target_foreground_erode_px / foreground_edge_band_px / "
+                "foreground_bottom_ratio "
+                "requires batch['foreground_masks']."
+            )
+        foreground_masks = foreground_masks.to(device=conf_reg_map.device, dtype=torch.bool)
+        target_region_mask = build_reliable_foreground_region_mask(
+            foreground_masks,
+            erode_px=erode_px,
+            edge_band_px=edge_band_px,
+            drop_bottom_ratio=bottom_ratio,
+        )
+        target_mask = target_region_mask if target_mask is None else (target_mask & target_region_mask)
+
+    depth_conf_min = None if anchor_conditioned_conf_target_depth_conf_min is None else float(anchor_conditioned_conf_target_depth_conf_min)
+    depth_conf_max = None if anchor_conditioned_conf_target_depth_conf_max is None else float(anchor_conditioned_conf_target_depth_conf_max)
+    depth_conf_interp = str(anchor_conditioned_conf_target_depth_conf_interp or "none").lower()
+    depth_conf_low = None if anchor_conditioned_conf_target_depth_conf_low is None else float(anchor_conditioned_conf_target_depth_conf_low)
+    depth_conf_high = None if anchor_conditioned_conf_target_depth_conf_high is None else float(anchor_conditioned_conf_target_depth_conf_high)
+    if depth_conf_interp not in {"none", "linear", "quadratic", "smoothstep"}:
+        raise ValueError(
+            "anchor_conditioned_conf_target_depth_conf_interp must be one of "
+            "'none', 'linear', 'quadratic', or 'smoothstep'."
+        )
+    if depth_conf_interp != "none" and (depth_conf_min is not None or depth_conf_max is not None):
+        raise ValueError(
+            "anchor_conditioned_conf_target_depth_conf_min/max are mutually exclusive with "
+            "anchor_conditioned_conf_target_depth_conf_interp != 'none'."
+        )
+    if depth_conf_interp in {"linear", "quadratic", "smoothstep"}:
+        if depth_conf_low is None or depth_conf_high is None:
+            raise ValueError(
+                "anchor_conditioned_conf_target_depth_conf_interp in "
+                "{'linear','quadratic','smoothstep'} requires "
+                "anchor_conditioned_conf_target_depth_conf_low/high."
+            )
+        if depth_conf_high <= depth_conf_low:
+            raise ValueError(
+                "anchor_conditioned_conf_target_depth_conf_high must be greater than "
+                "anchor_conditioned_conf_target_depth_conf_low."
+            )
+
+    depth_conf_maps = None
+    if (
+        depth_conf_min is not None
+        or depth_conf_max is not None
+        or depth_conf_interp in {"linear", "quadratic", "smoothstep"}
+    ):
+        depth_conf_maps = batch.get("depth_conf_maps", None)
+        if depth_conf_maps is None:
+            raise ValueError(
+                "anchor_conditioned_conf_target_depth_conf_* requires batch['depth_conf_maps']."
+            )
+        depth_conf_maps = depth_conf_maps.to(device=conf_reg_map.device, dtype=conf_reg_map.dtype)
+    if depth_conf_interp in {"linear", "quadratic", "smoothstep"}:
+        valid_depth_conf = torch.isfinite(depth_conf_maps)
+        depth_conf_position = torch.zeros_like(depth_conf_maps)
+        depth_conf_position[valid_depth_conf] = (
+            (depth_conf_maps[valid_depth_conf] - depth_conf_low) / (depth_conf_high - depth_conf_low)
+        ).clamp(0.0, 1.0)
+        depth_conf_effect = 1.0 - depth_conf_position
+        if depth_conf_interp == "quadratic":
+            depth_conf_effect = depth_conf_effect * depth_conf_effect
+        elif depth_conf_interp == "smoothstep":
+            depth_conf_effect = depth_conf_effect * depth_conf_effect * (3.0 - 2.0 * depth_conf_effect)
+        scale_map = torch.where(
+            valid_depth_conf,
+            1.0 + depth_conf_effect * (scale_map - 1.0),
+            torch.ones_like(scale_map),
+        )
+    if depth_conf_min is not None or depth_conf_max is not None:
+        depth_conf_mask = torch.isfinite(depth_conf_maps)
+        if depth_conf_min is not None:
+            depth_conf_mask = depth_conf_mask & (depth_conf_maps >= depth_conf_min)
+        if depth_conf_max is not None:
+            depth_conf_mask = depth_conf_mask & (depth_conf_maps <= depth_conf_max)
+        target_mask = depth_conf_mask if target_mask is None else (target_mask & depth_conf_mask)
+
+    if target_mask is None:
         return scale_map
+    return torch.where(target_mask, scale_map, torch.ones_like(scale_map))
+
+
+def _build_anchor_conditioned_conf_mask_drop_map(
+    batch,
+    reference_mask,
+    anchor_conditioned_conf_mask_cameras=None,
+    anchor_conditioned_conf_mask_train_only=True,
+    anchor_conditioned_conf_mask_foreground_erode_px=0,
+    anchor_conditioned_conf_mask_foreground_edge_band_px=0,
+    anchor_conditioned_conf_mask_foreground_bottom_ratio=0.0,
+    anchor_conditioned_conf_mask_quality_min=None,
+    anchor_conditioned_conf_mask_quality_max=None,
+):
+    if batch is None:
+        return None
+    if anchor_conditioned_conf_mask_cameras is None:
+        return None
+    if isinstance(anchor_conditioned_conf_mask_cameras, str):
+        target_cameras = {anchor_conditioned_conf_mask_cameras}
+    else:
+        target_cameras = {
+            str(camera_name)
+            for camera_name in anchor_conditioned_conf_mask_cameras
+            if camera_name is not None
+        }
+    if not target_cameras:
+        return None
+
+    if anchor_conditioned_conf_mask_train_only:
+        phase = str(batch.get("_loss_phase", "")).lower()
+        if phase != "train":
+            return None
+
+    batch_anchor_cameras = _normalize_batch_anchor_cameras(
+        batch.get("selection_anchor_camera"),
+        reference_mask.shape[0],
+    )
+    batch_anchor_quality_scores = _normalize_batch_anchor_quality_scores(
+        batch.get("selection_anchor_quality_score"),
+        reference_mask.shape[0],
+    )
+    quality_min = None if anchor_conditioned_conf_mask_quality_min is None else float(anchor_conditioned_conf_mask_quality_min)
+    quality_max = None if anchor_conditioned_conf_mask_quality_max is None else float(anchor_conditioned_conf_mask_quality_max)
+    per_sample_drop = torch.zeros(
+        (reference_mask.shape[0], 1, 1, 1),
+        device=reference_mask.device,
+        dtype=torch.bool,
+    )
+    for batch_idx, camera_name in enumerate(batch_anchor_cameras):
+        if camera_name not in target_cameras:
+            continue
+        quality_score = batch_anchor_quality_scores[batch_idx]
+        if quality_min is not None and (quality_score is None or quality_score < quality_min):
+            continue
+        if quality_max is not None and (quality_score is None or quality_score > quality_max):
+            continue
+        per_sample_drop[batch_idx] = True
+
+    if not bool(per_sample_drop.any().item()):
+        return None
+
+    drop_map = per_sample_drop.expand_as(reference_mask)
+    erode_px = int(max(0, anchor_conditioned_conf_mask_foreground_erode_px))
+    edge_band_px = int(max(0, anchor_conditioned_conf_mask_foreground_edge_band_px))
+    bottom_ratio = float(max(0.0, min(0.95, anchor_conditioned_conf_mask_foreground_bottom_ratio)))
+    if erode_px <= 0 and edge_band_px <= 0 and bottom_ratio <= 0.0:
+        return drop_map & reference_mask
 
     foreground_masks = batch.get("foreground_masks", None)
     if foreground_masks is None:
         raise ValueError(
-            "anchor_conditioned_conf_target_foreground_bottom_ratio requires batch['foreground_masks']."
+            "anchor_conditioned_conf_mask_foreground_erode_px / foreground_edge_band_px / "
+            "foreground_bottom_ratio "
+            "requires batch['foreground_masks']."
         )
-    foreground_masks = foreground_masks.to(device=conf_reg_map.device, dtype=torch.bool)
-    nonbottom_mask = build_reliable_foreground_region_mask(
+    foreground_masks = foreground_masks.to(device=reference_mask.device, dtype=torch.bool)
+    target_region_mask = build_reliable_foreground_region_mask(
         foreground_masks,
-        erode_px=0,
+        erode_px=erode_px,
+        edge_band_px=edge_band_px,
         drop_bottom_ratio=bottom_ratio,
     )
-    bottom_mask = foreground_masks & (~nonbottom_mask)
-    return torch.where(bottom_mask, scale_map, torch.ones_like(scale_map))
+    return drop_map & target_region_mask & reference_mask
 
 
 def regression_loss(
@@ -732,15 +1131,40 @@ def regression_loss(
     conf_loss_aggregation="pixel_mean",
     respect_conf_mask_in_grad_conf=False,
     batch=None,
+    anchor_conditioned_reg_target_cameras=None,
+    anchor_conditioned_reg_target_scale=1.0,
+    anchor_conditioned_reg_target_train_only=True,
+    anchor_conditioned_reg_target_foreground_erode_px=0,
+    anchor_conditioned_reg_target_foreground_edge_band_px=0,
+    anchor_conditioned_reg_target_foreground_bottom_ratio=0.0,
+    anchor_conditioned_reg_target_quality_min=None,
+    anchor_conditioned_reg_target_quality_max=None,
+    anchor_conditioned_reg_target_quality_interp="none",
+    anchor_conditioned_reg_target_quality_low=None,
+    anchor_conditioned_reg_target_quality_high=None,
+    anchor_conditioned_reg_target_anchor_view_only=False,
+    anchor_conditioned_reg_target_depth_conf_min=None,
+    anchor_conditioned_reg_target_depth_conf_max=None,
+    anchor_conditioned_reg_target_depth_conf_interp="none",
+    anchor_conditioned_reg_target_depth_conf_low=None,
+    anchor_conditioned_reg_target_depth_conf_high=None,
     anchor_conditioned_conf_target_cameras=None,
     anchor_conditioned_conf_target_scale=1.0,
     anchor_conditioned_conf_target_train_only=True,
+    anchor_conditioned_conf_target_foreground_erode_px=0,
+    anchor_conditioned_conf_target_foreground_edge_band_px=0,
     anchor_conditioned_conf_target_foreground_bottom_ratio=0.0,
     anchor_conditioned_conf_target_quality_min=None,
     anchor_conditioned_conf_target_quality_max=None,
     anchor_conditioned_conf_target_quality_interp="none",
     anchor_conditioned_conf_target_quality_low=None,
     anchor_conditioned_conf_target_quality_high=None,
+    anchor_conditioned_conf_target_anchor_view_only=False,
+    anchor_conditioned_conf_target_depth_conf_min=None,
+    anchor_conditioned_conf_target_depth_conf_max=None,
+    anchor_conditioned_conf_target_depth_conf_interp="none",
+    anchor_conditioned_conf_target_depth_conf_low=None,
+    anchor_conditioned_conf_target_depth_conf_high=None,
 ):
     """
     Core regression loss function with confidence weighting and optional gradient loss.
@@ -774,23 +1198,68 @@ def regression_loss(
     reg_map = torch.norm(gt - pred, dim=-1)
     reg_map = check_and_fix_inf_nan(reg_map, "loss_reg_map")
 
-    conf_reg_scale_map = _build_anchor_conditioned_conf_scale_map(
+    reg_target_scale_map = _build_anchor_conditioned_conf_scale_map(
         batch,
         reg_map,
+        anchor_conditioned_conf_target_cameras=anchor_conditioned_reg_target_cameras,
+        anchor_conditioned_conf_target_scale=anchor_conditioned_reg_target_scale,
+        anchor_conditioned_conf_target_train_only=anchor_conditioned_reg_target_train_only,
+        anchor_conditioned_conf_target_foreground_erode_px=anchor_conditioned_reg_target_foreground_erode_px,
+        anchor_conditioned_conf_target_foreground_edge_band_px=anchor_conditioned_reg_target_foreground_edge_band_px,
+        anchor_conditioned_conf_target_foreground_bottom_ratio=anchor_conditioned_reg_target_foreground_bottom_ratio,
+        anchor_conditioned_conf_target_quality_min=anchor_conditioned_reg_target_quality_min,
+        anchor_conditioned_conf_target_quality_max=anchor_conditioned_reg_target_quality_max,
+        anchor_conditioned_conf_target_quality_interp=anchor_conditioned_reg_target_quality_interp,
+        anchor_conditioned_conf_target_quality_low=anchor_conditioned_reg_target_quality_low,
+        anchor_conditioned_conf_target_quality_high=anchor_conditioned_reg_target_quality_high,
+        anchor_conditioned_conf_target_anchor_view_only=anchor_conditioned_reg_target_anchor_view_only,
+        anchor_conditioned_conf_target_depth_conf_min=anchor_conditioned_reg_target_depth_conf_min,
+        anchor_conditioned_conf_target_depth_conf_max=anchor_conditioned_reg_target_depth_conf_max,
+        anchor_conditioned_conf_target_depth_conf_interp=anchor_conditioned_reg_target_depth_conf_interp,
+        anchor_conditioned_conf_target_depth_conf_low=anchor_conditioned_reg_target_depth_conf_low,
+        anchor_conditioned_conf_target_depth_conf_high=anchor_conditioned_reg_target_depth_conf_high,
+    )
+    reg_target_map = reg_map if reg_target_scale_map is None else reg_map * reg_target_scale_map
+
+    conf_reg_scale_map = _build_anchor_conditioned_conf_scale_map(
+        batch,
+        reg_target_map,
         anchor_conditioned_conf_target_cameras=anchor_conditioned_conf_target_cameras,
         anchor_conditioned_conf_target_scale=anchor_conditioned_conf_target_scale,
         anchor_conditioned_conf_target_train_only=anchor_conditioned_conf_target_train_only,
+        anchor_conditioned_conf_target_foreground_erode_px=anchor_conditioned_conf_target_foreground_erode_px,
+        anchor_conditioned_conf_target_foreground_edge_band_px=anchor_conditioned_conf_target_foreground_edge_band_px,
         anchor_conditioned_conf_target_foreground_bottom_ratio=anchor_conditioned_conf_target_foreground_bottom_ratio,
         anchor_conditioned_conf_target_quality_min=anchor_conditioned_conf_target_quality_min,
         anchor_conditioned_conf_target_quality_max=anchor_conditioned_conf_target_quality_max,
         anchor_conditioned_conf_target_quality_interp=anchor_conditioned_conf_target_quality_interp,
         anchor_conditioned_conf_target_quality_low=anchor_conditioned_conf_target_quality_low,
         anchor_conditioned_conf_target_quality_high=anchor_conditioned_conf_target_quality_high,
+        anchor_conditioned_conf_target_anchor_view_only=anchor_conditioned_conf_target_anchor_view_only,
+        anchor_conditioned_conf_target_depth_conf_min=anchor_conditioned_conf_target_depth_conf_min,
+        anchor_conditioned_conf_target_depth_conf_max=anchor_conditioned_conf_target_depth_conf_max,
+        anchor_conditioned_conf_target_depth_conf_interp=anchor_conditioned_conf_target_depth_conf_interp,
+        anchor_conditioned_conf_target_depth_conf_low=anchor_conditioned_conf_target_depth_conf_low,
+        anchor_conditioned_conf_target_depth_conf_high=anchor_conditioned_conf_target_depth_conf_high,
     )
-    conf_reg_map = reg_map if conf_reg_scale_map is None else reg_map * conf_reg_scale_map
+    conf_reg_map = reg_target_map if conf_reg_scale_map is None else reg_target_map * conf_reg_scale_map
+    disagreement_conf_scale_map, disagreement_reg_scale_map = _build_anchor_conditioned_disagreement_scale_maps(
+        batch,
+        reg_map,
+        conf,
+        conf_mask,
+        anchor_conditioned_disagreement_cameras=anchor_conditioned_disagreement_cameras,
+        anchor_conditioned_disagreement_conf_scale=anchor_conditioned_disagreement_conf_scale,
+        anchor_conditioned_disagreement_reg_scale=anchor_conditioned_disagreement_reg_scale,
+        anchor_conditioned_disagreement_train_only=anchor_conditioned_disagreement_train_only,
+    )
+    if disagreement_reg_scale_map is not None:
+        reg_target_map = reg_target_map * disagreement_reg_scale_map
+    if disagreement_conf_scale_map is not None:
+        conf_reg_map = conf_reg_map * disagreement_conf_scale_map
 
     # Compute L2 distance between predicted and ground truth points
-    loss_reg = reg_map[mask]
+    loss_reg = reg_target_map[mask]
     loss_reg = check_and_fix_inf_nan(loss_reg, "loss_reg")
 
     # Confidence-weighted loss: gamma * loss * conf - alpha * log(conf)

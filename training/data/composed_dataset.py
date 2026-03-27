@@ -120,6 +120,9 @@ class ComposedDataset(Dataset, ABC):
         conf_depth_point_masks = None
         if "conf_depth_point_masks" in batch and batch["conf_depth_point_masks"] is not None:
             conf_depth_point_masks = torch.from_numpy(np.stack(batch["conf_depth_point_masks"]).astype(bool))
+        depth_conf_maps = None
+        if "depth_conf_maps" in batch and batch["depth_conf_maps"] is not None:
+            depth_conf_maps = torch.from_numpy(np.stack(batch["depth_conf_maps"]).astype(np.float32))
         ids = torch.from_numpy(batch["ids"])    # Frame indices sampled from the original sequence
         foreground_masks = None
         if "foreground_masks" in batch and batch["foreground_masks"] is not None:
@@ -151,11 +154,23 @@ class ComposedDataset(Dataset, ABC):
         }
         if conf_depth_point_masks is not None:
             sample["conf_depth_point_masks"] = conf_depth_point_masks
+        if depth_conf_maps is not None:
+            sample["depth_conf_maps"] = depth_conf_maps
         if foreground_masks is not None:
             sample["foreground_masks"] = foreground_masks
         if "selection_anchor_camera" in batch:
             anchor_camera = batch["selection_anchor_camera"]
             sample["selection_anchor_camera"] = "" if anchor_camera is None else str(anchor_camera)
+            anchor_view_index = -1
+            camera_names = batch.get("camera_names")
+            if anchor_camera is not None and camera_names is not None:
+                try:
+                    anchor_view_index = int(list(camera_names).index(str(anchor_camera)))
+                except ValueError:
+                    anchor_view_index = -1
+            sample["selection_anchor_view_index"] = torch.tensor(
+                int(anchor_view_index), dtype=torch.int64
+            )
         if "selection_anchor_camera" in batch and "supervised_view_quality_scores" in batch:
             anchor_camera = batch["selection_anchor_camera"]
             anchor_quality_score = None

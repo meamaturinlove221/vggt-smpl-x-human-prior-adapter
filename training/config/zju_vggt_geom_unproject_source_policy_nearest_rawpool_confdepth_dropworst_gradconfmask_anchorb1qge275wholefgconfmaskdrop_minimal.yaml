@@ -1,0 +1,12 @@
+defaults:
+  - zju_vggt_geom_unproject_source_policy_nearest_rawpool_confdepth_dropworst_gradconfmask_minimal
+  - _self_
+
+exp_name: zju_vggt_geom_unproject_source_policy_nearest_rawpool_confdepth_dropworst_gradconfmask_anchorb1qge275wholefgconfmaskdrop_minimal
+
+loss:
+  depth:
+    anchor_conditioned_conf_mask_cameras:
+      - Camera_B1
+    anchor_conditioned_conf_mask_train_only: True
+    anchor_conditioned_conf_mask_quality_min: 2.75
