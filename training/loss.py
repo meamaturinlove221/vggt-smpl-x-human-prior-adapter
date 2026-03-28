@@ -12,6 +12,45 @@ from vggt.utils.pose_enc import extri_intri_to_pose_encoding, pose_encoding_to_e
 from train_utils.general import check_and_fix_inf_nan
 from math import ceil, floor, isfinite
 
+HYDRA_META_KEYS = {"_target_", "_recursive_", "_convert_", "_partial_"}
+REGRESSION_LOSS_EXTRA_ALLOWED_KEYS = {
+    "anchor_conditioned_disagreement_cameras",
+    "anchor_conditioned_disagreement_conf_scale",
+    "anchor_conditioned_disagreement_reg_scale",
+    "anchor_conditioned_disagreement_train_only",
+}
+
+
+def _loss_call_kwargs(loss_cfg):
+    if loss_cfg is None:
+        return {}
+    return {
+        key: value
+        for key, value in loss_cfg.items()
+        if key not in HYDRA_META_KEYS and key != "weight"
+    }
+
+
+def _collect_regression_loss_extra_kwargs(kwargs):
+    filtered_kwargs = {}
+    unsupported_keys = []
+    for key, value in kwargs.items():
+        if key in HYDRA_META_KEYS or key == "weight":
+            continue
+        if key in REGRESSION_LOSS_EXTRA_ALLOWED_KEYS:
+            filtered_kwargs[key] = value
+            continue
+        unsupported_keys.append(key)
+
+    if unsupported_keys:
+        unsupported_keys = ", ".join(sorted(unsupported_keys))
+        raise TypeError(
+            "compute_depth_loss received unsupported regression kwargs: "
+            f"{unsupported_keys}"
+        )
+
+    return filtered_kwargs
+
 
 @dataclass(eq=False)
 class MultitaskLoss(torch.nn.Module):
@@ -49,14 +88,18 @@ class MultitaskLoss(torch.nn.Module):
         
         # Camera pose loss - if pose encodings are predicted
         if "pose_enc_list" in predictions:
-            camera_loss_dict = compute_camera_loss(predictions, batch, **self.camera)   
+            camera_loss_dict = compute_camera_loss(
+                predictions, batch, **_loss_call_kwargs(self.camera)
+            )
             camera_loss = camera_loss_dict["loss_camera"] * self.camera["weight"]   
             total_loss = total_loss + camera_loss
             loss_dict.update(camera_loss_dict)
         
         # Depth estimation loss - if depth maps are predicted
         if "depth" in predictions:
-            depth_loss_dict = compute_depth_loss(predictions, batch, **self.depth)
+            depth_loss_dict = compute_depth_loss(
+                predictions, batch, **_loss_call_kwargs(self.depth)
+            )
             depth_loss = depth_loss_dict["loss_conf_depth"] + depth_loss_dict["loss_reg_depth"] + depth_loss_dict["loss_grad_depth"]
             depth_loss = depth_loss * self.depth["weight"]
             total_loss = total_loss + depth_loss
@@ -64,7 +107,9 @@ class MultitaskLoss(torch.nn.Module):
 
         # 3D point reconstruction loss - if world points are predicted
         if "world_points" in predictions:
-            point_loss_dict = compute_point_loss(predictions, batch, **self.point)
+            point_loss_dict = compute_point_loss(
+                predictions, batch, **_loss_call_kwargs(self.point)
+            )
             point_loss = point_loss_dict["loss_conf_point"] + point_loss_dict["loss_reg_point"] + point_loss_dict["loss_grad_point"]
             point_loss = point_loss * self.point["weight"]
             total_loss = total_loss + point_loss
@@ -73,7 +118,7 @@ class MultitaskLoss(torch.nn.Module):
         # Geometry-chain auxiliary loss built from predicted depth + predicted camera.
         if self.unproject_geometry is not None and "depth" in predictions and "pose_enc" in predictions:
             unproject_geometry_loss_dict = compute_unproject_geometry_loss(
-                predictions, batch, **self.unproject_geometry
+                predictions, batch, **_loss_call_kwargs(self.unproject_geometry)
             )
             unproject_geometry_weight = resolve_scheduled_loss_weight(
                 self.unproject_geometry["weight"],
@@ -520,6 +565,14 @@ def compute_depth_loss(
     anchor_conditioned_conf_target_depth_conf_interp="none",
     anchor_conditioned_conf_target_depth_conf_low=None,
     anchor_conditioned_conf_target_depth_conf_high=None,
+    anchor_conditioned_disagreement_cameras=None,
+    anchor_conditioned_disagreement_conf_scale=1.0,
+    anchor_conditioned_disagreement_reg_scale=1.0,
+    anchor_conditioned_disagreement_train_only=True,
+    anchor_conditioned_unproject_consistency_cameras=None,
+    anchor_conditioned_unproject_consistency_conf_scale=1.0,
+    anchor_conditioned_unproject_consistency_reg_scale=1.0,
+    anchor_conditioned_unproject_consistency_train_only=True,
     **kwargs,
 ):
     """
@@ -569,6 +622,7 @@ def compute_depth_loss(
 
     # NOTE: we put conf inside regression_loss so that we can also apply conf loss to the gradient loss in a multi-scale manner
     # this is hacky, but very easier to implement
+    regression_loss_extra_kwargs = _collect_regression_loss_extra_kwargs(kwargs)
     loss_conf, loss_grad, loss_reg = regression_loss(
         pred_depth,
         gt_depth,
@@ -616,7 +670,17 @@ def compute_depth_loss(
         anchor_conditioned_conf_target_depth_conf_interp=anchor_conditioned_conf_target_depth_conf_interp,
         anchor_conditioned_conf_target_depth_conf_low=anchor_conditioned_conf_target_depth_conf_low,
         anchor_conditioned_conf_target_depth_conf_high=anchor_conditioned_conf_target_depth_conf_high,
-        **kwargs,
+        anchor_conditioned_disagreement_cameras=anchor_conditioned_disagreement_cameras,
+        anchor_conditioned_disagreement_conf_scale=anchor_conditioned_disagreement_conf_scale,
+        anchor_conditioned_disagreement_reg_scale=anchor_conditioned_disagreement_reg_scale,
+        anchor_conditioned_disagreement_train_only=anchor_conditioned_disagreement_train_only,
+        anchor_conditioned_unproject_consistency_cameras=anchor_conditioned_unproject_consistency_cameras,
+        anchor_conditioned_unproject_consistency_conf_scale=anchor_conditioned_unproject_consistency_conf_scale,
+        anchor_conditioned_unproject_consistency_reg_scale=anchor_conditioned_unproject_consistency_reg_scale,
+        anchor_conditioned_unproject_consistency_train_only=anchor_conditioned_unproject_consistency_train_only,
+        anchor_conditioned_unproject_consistency_pred_pose_enc=predictions.get("pose_enc", None),
+        anchor_conditioned_unproject_consistency_image_size_hw=batch["images"].shape[-2:] if "images" in batch else None,
+        **regression_loss_extra_kwargs,
     )
 
     loss_dict = {
@@ -818,6 +882,140 @@ def _build_anchor_conditioned_disagreement_scale_maps(
         reg_scale_map = torch.where(
             target_mask,
             1.0 + disagreement * (reg_scale - 1.0),
+            ones,
+        )
+    return conf_scale_map, reg_scale_map
+
+
+def _build_anchor_conditioned_unproject_consistency_scale_maps(
+    batch,
+    pred_depth,
+    pred_pose_enc,
+    reg_mask,
+    conf_mask,
+    *,
+    image_size_hw=None,
+    anchor_conditioned_unproject_consistency_cameras=None,
+    anchor_conditioned_unproject_consistency_conf_scale=1.0,
+    anchor_conditioned_unproject_consistency_reg_scale=1.0,
+    anchor_conditioned_unproject_consistency_train_only=True,
+    pose_encoding_type="absT_quaR_FoV",
+):
+    if batch is None or pred_depth is None or reg_mask is None or conf_mask is None:
+        return None, None
+    if anchor_conditioned_unproject_consistency_cameras is None:
+        return None, None
+    conf_scale = float(anchor_conditioned_unproject_consistency_conf_scale)
+    reg_scale = float(anchor_conditioned_unproject_consistency_reg_scale)
+    if conf_scale == 1.0 and reg_scale == 1.0:
+        return None, None
+
+    if anchor_conditioned_unproject_consistency_train_only:
+        phase = str(batch.get("_loss_phase", "")).lower()
+        if phase != "train":
+            return None, None
+
+    if isinstance(anchor_conditioned_unproject_consistency_cameras, str):
+        target_cameras = {anchor_conditioned_unproject_consistency_cameras}
+    else:
+        target_cameras = {
+            str(camera_name)
+            for camera_name in anchor_conditioned_unproject_consistency_cameras
+            if camera_name is not None
+        }
+    if not target_cameras:
+        return None, None
+
+    batch_anchor_cameras = _normalize_batch_anchor_cameras(
+        batch.get("selection_anchor_camera"),
+        reg_mask.shape[0],
+    )
+    per_sample_target = torch.zeros(
+        (reg_mask.shape[0], 1, 1, 1),
+        device=reg_mask.device,
+        dtype=torch.bool,
+    )
+    for batch_idx, camera_name in enumerate(batch_anchor_cameras):
+        if camera_name in target_cameras:
+            per_sample_target[batch_idx] = True
+    if not bool(per_sample_target.any().item()):
+        return None, None
+
+    anchor_view_mask = _build_anchor_view_only_mask(batch, conf_mask)
+    if anchor_view_mask is None:
+        return None, None
+
+    if pred_pose_enc is None:
+        raise ValueError(
+            "anchor_conditioned_unproject_consistency_* requires predictions['pose_enc']."
+        )
+    if image_size_hw is None:
+        images = batch.get("images", None)
+        if images is None:
+            raise ValueError(
+                "anchor_conditioned_unproject_consistency_* requires batch['images'] or "
+                "an explicit image_size_hw."
+            )
+        image_size_hw = images.shape[-2:]
+    if "world_points" not in batch:
+        raise ValueError(
+            "anchor_conditioned_unproject_consistency_* requires batch['world_points']."
+        )
+
+    pred_world_points = unproject_depth_and_pose_to_world_points(
+        pred_depth,
+        pred_pose_enc,
+        image_size_hw=image_size_hw,
+        pose_encoding_type=pose_encoding_type,
+    )
+    finite_pred_world = torch.isfinite(pred_world_points).all(dim=-1)
+    pred_world_points = check_and_fix_inf_nan(
+        pred_world_points,
+        "anchor_conditioned_unproject_consistency_pred_world_points",
+    )
+    gt_world_points = check_and_fix_inf_nan(
+        batch["world_points"],
+        "anchor_conditioned_unproject_consistency_gt_world_points",
+    )
+
+    target_mask = (
+        conf_mask
+        & reg_mask
+        & anchor_view_mask
+        & per_sample_target.expand_as(conf_mask)
+        & finite_pred_world
+        & (pred_depth[..., 0] > 0)
+    )
+    if not bool(target_mask.any().item()):
+        return None, None
+
+    residual = torch.norm(pred_world_points - gt_world_points, dim=-1)
+    residual = check_and_fix_inf_nan(
+        residual,
+        "anchor_conditioned_unproject_consistency_residual",
+    ).detach()
+    masked_residual = torch.where(target_mask, residual, torch.zeros_like(residual))
+    per_sample_max = (
+        masked_residual.reshape(pred_depth.shape[0], -1)
+        .amax(dim=1)
+        .clamp_min(1e-6)
+        .view(-1, 1, 1, 1)
+    )
+    normalized_residual = (residual / per_sample_max).clamp(0.0, 1.0)
+
+    ones = torch.ones_like(normalized_residual)
+    conf_scale_map = None
+    reg_scale_map = None
+    if conf_scale != 1.0:
+        conf_scale_map = torch.where(
+            target_mask,
+            1.0 + normalized_residual * (conf_scale - 1.0),
+            ones,
+        )
+    if reg_scale != 1.0:
+        reg_scale_map = torch.where(
+            target_mask,
+            1.0 + normalized_residual * (reg_scale - 1.0),
             ones,
         )
     return conf_scale_map, reg_scale_map
@@ -1165,6 +1363,17 @@ def regression_loss(
     anchor_conditioned_conf_target_depth_conf_interp="none",
     anchor_conditioned_conf_target_depth_conf_low=None,
     anchor_conditioned_conf_target_depth_conf_high=None,
+    anchor_conditioned_disagreement_cameras=None,
+    anchor_conditioned_disagreement_conf_scale=1.0,
+    anchor_conditioned_disagreement_reg_scale=1.0,
+    anchor_conditioned_disagreement_train_only=True,
+    anchor_conditioned_unproject_consistency_cameras=None,
+    anchor_conditioned_unproject_consistency_conf_scale=1.0,
+    anchor_conditioned_unproject_consistency_reg_scale=1.0,
+    anchor_conditioned_unproject_consistency_train_only=True,
+    anchor_conditioned_unproject_consistency_pred_pose_enc=None,
+    anchor_conditioned_unproject_consistency_image_size_hw=None,
+    anchor_conditioned_unproject_consistency_pose_encoding_type="absT_quaR_FoV",
 ):
     """
     Core regression loss function with confidence weighting and optional gradient loss.
@@ -1253,10 +1462,30 @@ def regression_loss(
         anchor_conditioned_disagreement_reg_scale=anchor_conditioned_disagreement_reg_scale,
         anchor_conditioned_disagreement_train_only=anchor_conditioned_disagreement_train_only,
     )
+    (
+        unproject_consistency_conf_scale_map,
+        unproject_consistency_reg_scale_map,
+    ) = _build_anchor_conditioned_unproject_consistency_scale_maps(
+        batch,
+        pred,
+        anchor_conditioned_unproject_consistency_pred_pose_enc,
+        mask,
+        conf_mask,
+        image_size_hw=anchor_conditioned_unproject_consistency_image_size_hw,
+        anchor_conditioned_unproject_consistency_cameras=anchor_conditioned_unproject_consistency_cameras,
+        anchor_conditioned_unproject_consistency_conf_scale=anchor_conditioned_unproject_consistency_conf_scale,
+        anchor_conditioned_unproject_consistency_reg_scale=anchor_conditioned_unproject_consistency_reg_scale,
+        anchor_conditioned_unproject_consistency_train_only=anchor_conditioned_unproject_consistency_train_only,
+        pose_encoding_type=anchor_conditioned_unproject_consistency_pose_encoding_type,
+    )
     if disagreement_reg_scale_map is not None:
         reg_target_map = reg_target_map * disagreement_reg_scale_map
     if disagreement_conf_scale_map is not None:
         conf_reg_map = conf_reg_map * disagreement_conf_scale_map
+    if unproject_consistency_reg_scale_map is not None:
+        reg_target_map = reg_target_map * unproject_consistency_reg_scale_map
+    if unproject_consistency_conf_scale_map is not None:
+        conf_reg_map = conf_reg_map * unproject_consistency_conf_scale_map
 
     # Compute L2 distance between predicted and ground truth points
     loss_reg = reg_target_map[mask]

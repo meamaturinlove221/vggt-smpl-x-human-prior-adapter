@@ -2,375 +2,88 @@
   "schema_version": 1,
   "automation_entrypoint": "scripts/run_zju_source_policy_rawpool_local_nightly.py",
   "overnight_watch_entrypoint": "scripts/run_zju_source_policy_rawpool_overnight_watch.py",
-  "status": "local_only_not_cloud_ready",
-  "problem_id": "zju_6src_source_policy_regularization_v2_confdepth_only",
-  "main_direction": "keep depth + camera -> unproject -> render; hold confdepth_dropworst_gradconfmask as the current stable local lead, freeze the tested fixed-scale Camera_B1 follow-ups, the hard-threshold family, the whole-foreground linear and quadratic conf-target-normalization follow-ups, the foreground-interior linear follow-up, the whole-foreground hard confmask-drop routing follow-up, the tested whole-foreground joint depth-loss softening-scalar follow-ups, the tested whole-foreground decoupled conf/reg routing follow-up, the tested non-wholefg foreground-edge joint depth-loss softening frontier, the tested non-wholefg foreground-edge decoupled follow-up, and the hard gt depth_conf threshold follow-up inside that edge route, and require any future manual question to stay in a genuinely new loss-routing dimension while changing real non-wholefg selectivity beyond another whole-foreground scalar, another whole-foreground branch-routing reskin, another plain edge-band softening near-neighbor, or another hard pixel threshold; default nightly stays steady_hold and cloud stays off",
-  "current_cloud_blocker": "The stable confdepth_dropworst_gradconfmask lead is still materially worse than baseline on the depth terms (val_loss_conf_depth 0.1181 -> 0.2288 and val_loss_reg_depth 0.1181 -> 0.1759). The tested Camera_B1 quality-conditioned family now fails both as conf-target normalization and as direct loss-routing attempts: the exact linear qmin->qmax whole-foreground scale0.5 rule regressed val_loss_conf_depth from 0.2289 to 0.2776 and val_loss_reg_depth from 0.1760 to 0.1848; the softer whole-foreground scale0.75 fallback regressed them from 0.2289 to 0.2483 and 0.1760 to 0.1797; the whole-foreground quadratic scale0.5 candidate regressed them from 0.2288 to 0.2587 and 0.1759 to 0.1817; the foreground-interior linear scale0.75 candidate still regressed them from 0.2288 to 0.2432 and 0.1759 to 0.1787 while keeping camera/T flat; the whole-foreground confmask-drop candidate regressed them from 0.2289 to 0.3018 and 0.1760 to 0.1959; the whole-foreground joint depth-loss q>=2.75 scale0.75 candidate regressed them from 0.2288 to 0.2546 and 0.1759 to 0.1805; the qlinear whole-foreground joint depth-loss scale0.75 candidate regressed them from 0.2288 to 0.2458 and 0.1759 to 0.1790; the qquadratic whole-foreground joint depth-loss scale0.75 candidate regressed them from 0.2288 to 0.2417 and 0.1759 to 0.1783; the qquadratic whole-foreground joint depth-loss scale0.875 frontier candidate still regressed them from 0.2288 to 0.2344 and 0.1759 to 0.1770 while keeping camera/T flat; the first whole-foreground decoupled conf/reg routing follow-up regressed them to 0.2378 and 0.1776 while keeping camera/T flat; the non-wholefg foreground-edge qquadratic joint-depth frontier tightened that boundary to 0.2330/0.1767, 0.2304/0.1762, and 0.2293/0.1760 at scales 0.5/0.75/0.875 without crossing promotion; the foreground-edge decoupled follow-up still landed at 0.2302/0.1762; and adding a hard gt depth_conf<=p60 threshold inside that promising edge route regressed to 0.2411/0.1837 despite improving camera to 0.0184. The blocker is therefore no longer missing plumbing and no longer a hidden whole-frame masking bug; supervised point masks are already foreground-clipped, the current rawpool line already concentrates depth supervision on the anchor-supervised view under zju_min_supervised_views=1, and the remaining headroom appears to require a softer non-wholefg selectivity change rather than another whole-foreground scalar, another whole-foreground decoupled near-neighbor, another plain edge-band scalar, or another hard pixel threshold. The stable current local lead therefore remains confdepth_dropworst_gradconfmask and cloud must remain closed.",
+  "status": "promoted_local_lead_synced_cloud_off",
+  "problem_id": "source_policy_hybrid_ring_regularization_v1_promoted",
+  "main_direction": "Hold source_policy_hybrid_ring_regularization / stablelead_nearest_plus_uniform_tail as the current local lead, keep research in steady_hold + IDLE_GUARD, keep no auto-next ticket, and keep cloud off until a fresh manual problem and a separate explicit downstream decision exist.",
+  "current_cloud_blocker": "The manually promoted hybrid-ring local lead is now synced as the current local lead, but cloud must remain off. This PROMOTE decision resolves local lead selection only; it does not authorize cloud execution, auto-next ticket generation, or any second candidate. Any later forward move still requires a fresh manual problem and a separate explicit downstream decision.",
   "current_lead": {
-    "config": "training/config/zju_vggt_geom_unproject_source_policy_nearest_rawpool_confdepth_dropworst_gradconfmask_minimal.yaml",
-    "gate_summary": "docs/geometry_confdepth_only_local_gate_20260325.md",
-    "attribution_summary": "output/zju_conf_depth_attribution_confdepth_dropworst_gradconfmask_20260325_v3/summary.md",
+    "config": "training/config/zju_vggt_geom_unproject_source_policy_nearestplusuniformtail_rawpool_confdepth_dropworst_gradconfmask_minimal.yaml",
+    "gate_summary": "output/zju_source_policy_research_loop/promotion_review_packet.20260328.md",
+    "attribution_summary": "output/zju_source_policy_research_loop/promotion_review_packet.20260328.md",
     "why_lead": [
-      "The current stable local lead keeps the same nearest_ring + geom_plus_raw input path, preserves the conf_depth-specific drop-worst + gradconfmask routing, and fixes the grad+conf confidence-weighting leak without changing camera, regression, or unproject routing.",
-      "On the tighter 10-train / 5-val local gate, it improves val_loss_conf_depth from 0.2514 to 0.2289 and val_loss_reg_depth from 0.1799 to 0.1760 versus confdepth_dropworst_only while keeping val_loss_T and val_loss_camera flat.",
-      "The narrower Camera_B1 bottom20 follow-up only won by a short-gate margin and then failed the 100-train / 20-val long gate, so no tested successor remains stable enough to replace this lead."
+      "It beat the previous stable lead at the short 10/5 gate on camera, conf_depth, and reg_depth while keeping translation flat.",
+      "It also beat the previous stable lead again at the long 100/20 gate and therefore earned a formal provisional_lead before manual promotion.",
+      "Manual PROMOTE has now resolved the hold, so this config is the current local lead while cloud stays off and no auto-next ticket is active."
     ]
   },
-  "historical_stage_markers": [
-    {
-      "name": "nearest_rawpool",
-      "config": "training/config/zju_vggt_geom_unproject_source_policy_nearest_rawpool_minimal.yaml",
-      "summary": "docs/geometry_source_policy_rawpool_local_gate_20260325.md",
-      "note": "Historical lead only. Do not treat this config as the current nightly lead."
-    }
-  ],
-  "accepted_findings": [
-    {
-      "path": "training/loss.py",
-      "fact": "Depth, confidence, regression, and unproject geometry supervision are already driven by batch point_masks, not by source-only raw views directly."
-    },
-    {
-      "path": "output/zju_source_policy_supervision_audit_nearest_rawpool_20260325_v1/summary.md",
-      "fact": "On the settled rawpool supervision audit, source-only raw views already have zero point pixels and zero camera/depth/unproject geometry-loss eligibility."
-    },
-    {
-      "path": "training/loss.py",
-      "fact": "Camera supervision is now filtered at the frame level by real supervised point support, so source-only raw views no longer enter camera loss just because another frame in the sample is valid."
-    },
-    {
-      "path": "training/loss.py",
-      "fact": "Depth loss now supports respect_conf_mask_in_grad_conf, so the grad+conf branch can stop confidence-weighting pixels that the conf_depth-specific routing already removed from conf supervision."
-    },
-    {
-      "path": "output/zju_training_ablation/zju_source_policy_confdepth_dropworst_gradconfmask_vs_lead_20260325_v1/summary.md",
-      "fact": "The confdepth_dropworst_gradconfmask follow-up remains the current stable local lead: versus confdepth_dropworst_only on the tighter gate, val loss_conf_depth improves from 0.2514 to 0.2289 and val loss_reg_depth improves from 0.1799 to 0.1760 while val loss_T and val loss_camera stay flat."
-    },
-    {
-      "path": "output/zju_training_ablation/zju_source_policy_confdepth_dropworst_gradconfmask_vs_baseline_20260325_v1/summary.md",
-      "fact": "Even after the gradconfmask fix, the current stable lead is still not baseline-clean: on val, loss_conf_depth stays higher than baseline (0.2289 vs 0.1181) and loss_reg_depth stays higher than baseline (0.1760 vs 0.1181)."
-    },
-    {
-      "path": "output/zju_conf_depth_attribution_confdepth_dropworst_gradconfmask_20260325_v3/summary.md",
-      "fact": "The completed attribution v3 audit on the current gradconfmask lead keeps the same anchor-only conf_depth finding on the audited 32-sample val slice and narrows the only clearly positive camera-level conf_depth delta to anchor Camera_B1."
-    },
-    {
-      "path": "output/zju_training_ablation/zju_source_policy_confdepth_dropworst_gradconfmask_anchorb1confscale05_vs_lead_20260325_v1/summary.md",
-      "fact": "The broader whole-frame Camera_B1 conf-target scale-0.5 follow-up failed the tighter local gate: val loss_conf_depth regressed from 0.2289 to 0.3233 and val loss_reg_depth regressed from 0.1760 to 0.1901 versus the current stable gradconfmask lead."
-    },
-    {
-      "path": "training/loss.py",
-      "fact": "Depth loss now also supports anchor_conditioned_conf_target_foreground_bottom_ratio, so anchor-conditioned conf-target scaling can be restricted to the foreground bottom band without changing camera, regression, or unproject routing."
-    },
-    {
-      "path": "output/zju_training_ablation/zju_source_policy_confdepth_dropworst_gradconfmask_anchorb1bottom20confscale05_vs_lead_20260325_v1/summary.md",
-      "fact": "The narrower train-only Camera_B1 foreground-bottom20 conf-target scale 0.5 candidate briefly cleared the 10-train / 5-val gate by a margin of 0.0002 on conf_depth and 0.0001 on reg_depth versus the current stable gradconfmask lead."
-    },
-    {
-      "path": "output/zju_training_ablation/zju_source_policy_current_lead_longgate_100t_20v_overnight_20260326_v1_vs_previous_lead/summary.md",
-      "fact": "The same narrower B1-bottom20 candidate failed the stricter 100-train / 20-val long gate: versus confdepth_dropworst_gradconfmask, val loss_camera worsened from 0.0498 to 0.0499, val loss_T from 0.0209 to 0.0210, val loss_conf_depth from -0.0577 to -0.0496, and val loss_reg_depth from 0.0911 to 0.0965."
-    },
-    {
-      "path": "output/zju_conf_depth_quality_signal_confdepth_dropworst_gradconfmask_20260326_v1/summary.md",
-      "fact": "A follow-up quality-signal audit on the same attribution slice shows that the remaining bad anchor is not just Camera_B1 in the abstract: within Camera_B1 anchor rows, cached quality_score correlates positively with worse delta conf_depth (r=0.6555), while non-B1 anchors remain net-improving, so the next bounded question is quality-conditioned conf-target normalization rather than another fixed B1 scale sibling."
-    },
-    {
-      "path": "training/data/composed_dataset.py",
-      "fact": "ComposedDataset now forwards selection_anchor_quality_score into the training sample and normalizes missing selection_anchor_camera values to a collatable empty string, so quality-conditioned loss routing can consume cached anchor metadata without breaking DataLoader collation."
-    },
-    {
-      "path": "training/trainer.py",
-      "fact": "Batch repetition now duplicates selection_anchor_quality_score together with the tensor fields, so quality-conditioned candidates keep batch-aligned metadata under repeat_batch."
-    },
-    {
-      "path": "training/loss.py",
-      "fact": "Depth loss now supports anchor_conditioned_conf_target_quality_min and anchor_conditioned_conf_target_quality_max, so quality-conditioned conf-target scaling can be bounded by cached anchor quality without changing camera, regression, or unproject routing."
-    },
-    {
-      "path": "training/loss.py",
-      "fact": "Depth loss now also supports anchor_conditioned_conf_target_quality_interp with quality_low and quality_high, so continuous per-sample Camera_B1 quality-conditioned conf-target scaling can be tested without changing camera, regression, or unproject routing."
-    },
-    {
-      "path": "training/data/datasets/zju_vggt_geom.py",
-      "fact": "Supervised depth is already clipped by the per-view foreground mask before point masks are built, so point_masks and conf_depth_point_masks already stay inside foreground support on supervised frames; the rejected whole-foreground candidates were not secretly exercising whole-frame depth supervision."
-    },
-    {
-      "path": "training/loss.py",
-      "fact": "The current anchor-conditioned Camera_B1 conf-target knobs only rescale conf_reg_map inside the confidence term; they do not change conf_depth_point_masks or gt_depth point-mask eligibility, which is why the later loss-routing candidates were genuinely different from another whole-foreground or interior interpolation reskin."
-    },
-    {
-      "path": "training/loss.py",
-      "fact": "Depth loss now also supports anchor_conditioned_conf_mask_cameras plus quality- and region-conditioned train-only conf_depth-mask routing, so Camera_B1 quality rules can now change conf-depth eligibility directly rather than only rescaling conf_reg_map."
-    },
-    {
-      "path": "training/loss.py",
-      "fact": "Depth loss now also supports anchor_conditioned_reg_target_* train-only joint depth-loss scaling, so Camera_B1 quality rules can test coupled conf+reg depth treatment rather than only conf-target normalization or hard conf-depth-mask drop."
-    },
-    {
-      "path": "output/zju_training_ablation/zju_source_policy_confdepth_dropworst_gradconfmask_anchorb1qquadraticwholefgconfscale05_vs_lead_20260326_v1/summary.md",
-      "fact": "The whole-foreground quadratic scale0.5 candidate also failed the tighter gate: versus the stable lead, val_loss_conf_depth regressed from 0.2288 to 0.2587 and val_loss_reg_depth regressed from 0.1759 to 0.1817 while camera/T stayed flat."
-    },
-    {
-      "path": "output/zju_training_ablation/zju_source_policy_confdepth_dropworst_gradconfmask_anchorb1qlinearfginteriorerode5confscale075_vs_lead_20260326_v1/summary.md",
-      "fact": "The foreground-interior linear scale0.75 candidate was slightly closer than the rejected whole-foreground scale0.75 fallback, but it still failed the tighter gate: versus the stable lead, val_loss_conf_depth regressed from 0.2288 to 0.2432 and val_loss_reg_depth regressed from 0.1759 to 0.1787 while camera/T stayed flat."
-    },
-    {
-      "path": "output/zju_training_ablation/zju_source_policy_confdepth_dropworst_gradconfmask_anchorb1qge275wholefgconfmaskdrop_vs_lead_20260326_v1/summary.md",
-      "fact": "The first whole-foreground hard confmask-drop routing candidate also failed the tighter gate: versus the stable lead, val_loss_conf_depth regressed from 0.2289 to 0.3018 and val_loss_reg_depth regressed from 0.1760 to 0.1959 while val_loss_camera only nudged from 0.0219 to 0.0218 and val_loss_T stayed flat."
-    },
-    {
-      "path": "output/zju_training_ablation/zju_source_policy_confdepth_dropworst_gradconfmask_anchorb1qge275wholefgjointdepthscale075_vs_lead_20260326_v1/summary.md",
-      "fact": "The first softer whole-foreground joint depth-loss scale0.75 routing candidate was materially less damaging than hard confmask-drop but still failed the tighter gate: versus the stable lead, val_loss_conf_depth regressed from 0.2288 to 0.2546 and val_loss_reg_depth regressed from 0.1759 to 0.1805 while camera/T stayed flat."
-    },
-    {
-      "path": "output/zju_training_ablation/zju_source_policy_confdepth_dropworst_gradconfmask_anchorb1qlinearwholefgjointdepthscale075_vs_lead_20260326_v1/summary.md",
-      "fact": "A softer qlinear whole-foreground joint depth-loss scale0.75 follow-up moved materially closer than the q>=2.75 step candidate but still failed the tighter gate: versus the stable lead, val_loss_conf_depth regressed from 0.2288 to 0.2458 and val_loss_reg_depth regressed from 0.1759 to 0.1790 while camera/T stayed flat."
-    },
-    {
-      "path": "output/zju_training_ablation/zju_source_policy_confdepth_dropworst_gradconfmask_anchorb1qquadraticwholefgjointdepthscale075_vs_lead_20260326_v1/summary.md",
-      "fact": "The qquadratic whole-foreground joint depth-loss scale0.75 follow-up tightened the gap again but still failed the tighter gate: versus the stable lead, val_loss_conf_depth regressed from 0.2288 to 0.2417 and val_loss_reg_depth regressed from 0.1759 to 0.1783 while camera/T stayed flat."
-    },
-    {
-      "path": "output/zju_training_ablation/zju_source_policy_confdepth_dropworst_gradconfmask_anchorb1qquadraticwholefgjointdepthscale0875_vs_lead_20260326_v1/summary.md",
-      "fact": "The qquadratic whole-foreground joint depth-loss scale0.875 frontier candidate was the closest routing variant so far, but it still failed promotion: versus the stable lead, val_loss_conf_depth regressed from 0.2288 to 0.2344 and val_loss_reg_depth regressed from 0.1759 to 0.1770 while camera/T stayed flat, suggesting this whole-foreground scalar family asymptotically returns toward the stable lead without crossing it."
-    },
-    {
-      "path": "output/zju_training_ablation/zju_source_policy_confdepth_dropworst_gradconfmask_anchorb1qge3bottom20confscale05_vs_lead_20260326_v1/summary.md",
-      "fact": "The first quality-conditioned candidate keeps camera/T flat but does not clear the promotion rule: on the tighter 10-train / 5-val gate, val loss_conf_depth only improves from 0.2288 to 0.2287 while val loss_reg_depth stays flat at 0.1759 versus the stable gradconfmask lead."
-    },
-    {
-      "path": "output/zju_quality_conditioned_candidate_postmortem_anchorb1qge3bottom20_20260326_v1/summary.md",
-      "fact": "A postmortem on the rejected q>=3.0 candidate shows the hard threshold is over-selective: 4 / 10 bad Camera_B1 audit rows still sit below quality_min=3.0, and on the first 512 train samples the rule touches only 0.7476% of conf-depth-supervised pixels."
-    },
-    {
-      "path": "output/zju_quality_region_boundary_confdepth_dropworst_gradconfmask_20260326_v1/summary.md",
-      "fact": "A follow-up quality-region boundary check shows both the hard threshold and the bottom20 region are over-selective: all 10 bad Camera_B1 audit rows keep positive non-bottom conf_depth deltas, while q>=3.0 + whole foreground covers 22.6975% of conf-depth-supervised pixels on a fresh 512-sample train slice versus only 0.7983% for q>=3.0 + bottom20."
-    },
-    {
-      "path": "output/zju_quality_rule_shape_sweep_confdepth_dropworst_gradconfmask_20260326_v1/summary.md",
-      "fact": "A follow-up rule-shape sweep shows the next manual question should target a continuous Camera_B1 whole-foreground quality-conditioned rule rather than a broader hard threshold: q>=3.0 whole foreground still omits 4 / 10 bad audit rows, q>=2.75 still omits 1 / 10, while a continuous qmin->qmax whole-foreground reference rule covers all 10 bad rows with an effective conf-depth reduction fraction of 5.1155% on a fresh 512-sample train slice."
-    },
-    {
-      "path": "output/zju_training_ablation/zju_source_policy_confdepth_dropworst_gradconfmask_anchorb1qlinearwholefgconfscale05_vs_lead_20260326_v1/summary.md",
-      "fact": "The first exact continuous Camera_B1 whole-foreground quality-conditioned candidate failed the tighter local gate: versus the stable gradconfmask lead, val loss_conf_depth regressed from 0.2289 to 0.2776 and val loss_reg_depth regressed from 0.1760 to 0.1848 even though val loss_camera only nudged from 0.0219 to 0.0218 and val loss_T stayed flat."
-    },
-    {
-      "path": "output/zju_quality_continuous_soft_rule_sweep_confdepth_dropworst_gradconfmask_20260326_v1/summary.md",
-      "fact": "A softer continuous-rule sweep showed the best full-coverage fallback is linear_qmin_qmax_wholefg_scale075: it keeps all 10 bad Camera_B1 audit rows active while reducing the effective train-slice conf-depth reduction fraction from 5.9433% to 2.9716% relative to the rejected exact scale0.5 rule."
-    },
-    {
-      "path": "output/zju_training_ablation/zju_source_policy_confdepth_dropworst_gradconfmask_anchorb1qlinearwholefgconfscale075_vs_lead_20260326_v1/summary.md",
-      "fact": "The first softer continuous Camera_B1 whole-foreground candidate still failed the tighter local gate: versus the stable gradconfmask lead, val loss_conf_depth regressed from 0.2289 to 0.2483 and val loss_reg_depth regressed from 0.1760 to 0.1797 even though val loss_camera only nudged from 0.0219 to 0.0218 and val loss_T stayed flat."
-    },
-    {
-      "path": "output/zju_training_ablation/zju_source_policy_confdepth_dropworst_gradconfmask_viewmean_vs_lead_20260325_v1/summary.md",
-      "fact": "The active_view_mean aggregation candidate is numerically redundant under the current 4-image recipe and does not create a new promotable lead."
-    }
-  ],
   "frozen_non_reentry_candidates": [
     {
-      "name": "min_supervised_views_2",
-      "config": "training/config/zju_vggt_geom_unproject_source_policy_nearest_rawpool_minimal.yaml",
-      "summary": "output/zju_training_ablation/zju_source_policy_nearest_rawpool_minsup2_local_gate_20260325_v1/summary.md",
-      "reason": "Worse camera, translation, and unproject geometry than baseline."
+      "name": "interpolated_eligibility_shaping",
+      "reason": "Closed failed family for this round."
     },
     {
-      "name": "source_anchor_policy_max_depth_conf",
-      "config": "training/config/zju_vggt_geom_unproject_source_policy_nearest_rawpool_minimal.yaml",
-      "summary": "output/zju_training_ablation/zju_source_policy_nearest_rawpool_bestanchor_local_gate_20260325_v1/summary.md",
-      "reason": "Worse objective, camera, translation, depth confidence, depth regression, and unproject geometry than baseline."
+      "name": "partial_joint_depth_routing",
+      "reason": "Closed failed family for this round."
     },
     {
-      "name": "dropworst_supervised",
-      "config": "training/config/zju_vggt_geom_unproject_source_policy_nearest_rawpool_dropworst_supervised_minimal.yaml",
-      "summary": "output/zju_training_ablation/zju_source_policy_nearest_rawpool_dropworst_vs_lead_20260325_v1/summary.md",
-      "reason": "Superseded by the narrower conf_depth-only route and never cleared the local promotion rule."
+      "name": "conf_reg_disagreement_routing",
+      "reason": "Closed failed family for this round."
     },
     {
-      "name": "confdepth_dropworst_trainmix50",
-      "config": "training/config/zju_vggt_geom_unproject_source_policy_nearest_rawpool_confdepth_dropworst_trainmix50_minimal.yaml",
-      "summary": "output/zju_training_ablation/zju_source_policy_confdepth_dropworst_trainmix50_vs_lead_20260325_v1/summary.md",
-      "reason": "Reduced train-time rawpool exposure but sharply regressed camera, translation, conf_depth, reg_depth, unproject geometry, and objective versus the current lead."
+      "name": "unproject_consistency_routing",
+      "reason": "Closed failed family for this round."
     },
     {
-      "name": "confdepth_dropworst_gradconfmask_viewmean",
-      "config": "training/config/zju_vggt_geom_unproject_source_policy_nearest_rawpool_confdepth_dropworst_gradconfmask_viewmean_minimal.yaml",
-      "summary": "output/zju_training_ablation/zju_source_policy_confdepth_dropworst_gradconfmask_viewmean_vs_lead_20260325_v1/summary.md",
-      "reason": "Numerically redundant under the current 4-image recipe."
+      "name": "unproject_aux_confgate",
+      "reason": "Closed failed family for this round."
     },
     {
-      "name": "confdepth_dropworst_gradconfmask_anchorb1confscale05",
-      "config": "training/config/zju_vggt_geom_unproject_source_policy_nearest_rawpool_confdepth_dropworst_gradconfmask_anchorb1confscale05_minimal.yaml",
-      "summary": "output/zju_training_ablation/zju_source_policy_confdepth_dropworst_gradconfmask_anchorb1confscale05_vs_lead_20260325_v1/summary.md",
-      "reason": "The broader whole-frame Camera_B1 scale-0.5 test failed the tighter gate: val_loss_conf_depth and val_loss_reg_depth both worsened versus the current stable gradconfmask lead, so this exact variant stays frozen."
-    },
-    {
-      "name": "confdepth_dropworst_gradconfmask_anchorb1bottom20confscale05",
-      "config": "training/config/zju_vggt_geom_unproject_source_policy_nearest_rawpool_confdepth_dropworst_gradconfmask_anchorb1bottom20confscale05_minimal.yaml",
-      "summary": "output/zju_training_ablation/zju_source_policy_current_lead_longgate_100t_20v_overnight_20260326_v1_vs_previous_lead/summary.md",
-      "reason": "Short-gate-only marginal win. On the stricter 100-train / 20-val long gate, val_loss_camera worsened by +0.0001, val_loss_T by +0.0001, val_loss_conf_depth by +0.0081, and val_loss_reg_depth by +0.0054 versus confdepth_dropworst_gradconfmask, so this variant is frozen under the current question."
-    },
-    {
-      "name": "confdepth_dropworst_gradconfmask_anchorb1qge3bottom20confscale05",
-      "config": "training/config/zju_vggt_geom_unproject_source_policy_nearest_rawpool_confdepth_dropworst_gradconfmask_anchorb1qge3bottom20confscale05_minimal.yaml",
-      "summary": "output/zju_training_ablation/zju_source_policy_confdepth_dropworst_gradconfmask_anchorb1qge3bottom20confscale05_vs_lead_20260326_v1/summary.md",
-      "reason": "The first quality-conditioned candidate only nudged val_loss_conf_depth from 0.2288 to 0.2287 while leaving val_loss_reg_depth flat at 0.1759 and slightly worsening val_loss_objective. A follow-up postmortem also shows the hard q>=3.0 gate is over-selective, so this exact variant is frozen pending a fresh manual question."
-    },
-    {
-      "name": "confdepth_dropworst_gradconfmask_anchorb1qlinearwholefgconfscale05",
-      "config": "training/config/zju_vggt_geom_unproject_source_policy_nearest_rawpool_confdepth_dropworst_gradconfmask_anchorb1qlinearwholefgconfscale05_minimal.yaml",
-      "summary": "output/zju_training_ablation/zju_source_policy_confdepth_dropworst_gradconfmask_anchorb1qlinearwholefgconfscale05_vs_lead_20260326_v1/summary.md",
-      "reason": "The first exact continuous Camera_B1 whole-foreground quality-conditioned rule failed the tighter gate: val_loss_conf_depth regressed from 0.2289 to 0.2776 and val_loss_reg_depth regressed from 0.1760 to 0.1848 versus the stable gradconfmask lead, so this exact linear qmin->qmax + scale0.5 variant is frozen."
-    },
-    {
-      "name": "confdepth_dropworst_gradconfmask_anchorb1qlinearwholefgconfscale075",
-      "config": "training/config/zju_vggt_geom_unproject_source_policy_nearest_rawpool_confdepth_dropworst_gradconfmask_anchorb1qlinearwholefgconfscale075_minimal.yaml",
-      "summary": "output/zju_training_ablation/zju_source_policy_confdepth_dropworst_gradconfmask_anchorb1qlinearwholefgconfscale075_vs_lead_20260326_v1/summary.md",
-      "reason": "The first softer continuous Camera_B1 whole-foreground rule also failed the tighter gate: val_loss_conf_depth regressed from 0.2289 to 0.2483 and val_loss_reg_depth regressed from 0.1760 to 0.1797 versus the stable gradconfmask lead, so this half-strength linear qmin->qmax + scale0.75 variant is frozen too."
-    },
-    {
-      "name": "confdepth_dropworst_gradconfmask_anchorb1qquadraticwholefgconfscale05",
-      "config": "training/config/zju_vggt_geom_unproject_source_policy_nearest_rawpool_confdepth_dropworst_gradconfmask_anchorb1qquadraticwholefgconfscale05_minimal.yaml",
-      "summary": "output/zju_training_ablation/zju_source_policy_confdepth_dropworst_gradconfmask_anchorb1qquadraticwholefgconfscale05_vs_lead_20260326_v1/summary.md",
-      "reason": "The whole-foreground quadratic scale0.5 follow-up also failed the tighter gate: val_loss_conf_depth regressed from 0.2288 to 0.2587 and val_loss_reg_depth regressed from 0.1759 to 0.1817 versus the stable lead, so this interpolation-neighbor reskin is frozen."
-    },
-    {
-      "name": "confdepth_dropworst_gradconfmask_anchorb1qlinearfginteriorerode5confscale075",
-      "config": "training/config/zju_vggt_geom_unproject_source_policy_nearest_rawpool_confdepth_dropworst_gradconfmask_anchorb1qlinearfginteriorerode5confscale075_minimal.yaml",
-      "summary": "output/zju_training_ablation/zju_source_policy_confdepth_dropworst_gradconfmask_anchorb1qlinearfginteriorerode5confscale075_vs_lead_20260326_v1/summary.md",
-      "reason": "The foreground-interior linear scale0.75 follow-up still failed the tighter gate: val_loss_conf_depth regressed from 0.2288 to 0.2432 and val_loss_reg_depth regressed from 0.1759 to 0.1787 versus the stable lead, so this region-neighbor reskin is frozen too."
-    },
-    {
-      "name": "confdepth_dropworst_gradconfmask_anchorb1qge275wholefgconfmaskdrop",
-      "config": "training/config/zju_vggt_geom_unproject_source_policy_nearest_rawpool_confdepth_dropworst_gradconfmask_anchorb1qge275wholefgconfmaskdrop_minimal.yaml",
-      "summary": "output/zju_training_ablation/zju_source_policy_confdepth_dropworst_gradconfmask_anchorb1qge275wholefgconfmaskdrop_vs_lead_20260326_v1/summary.md",
-      "reason": "The first whole-foreground hard confmask-drop routing follow-up was too aggressive: val_loss_conf_depth regressed from 0.2289 to 0.3018 and val_loss_reg_depth regressed from 0.1760 to 0.1959 versus the stable lead even though camera/T stayed flat, so this exact whole-foreground hard-drop shape is frozen."
-    },
-    {
-      "name": "confdepth_dropworst_gradconfmask_anchorb1qge275wholefgjointdepthscale075",
-      "config": "training/config/zju_vggt_geom_unproject_source_policy_nearest_rawpool_confdepth_dropworst_gradconfmask_anchorb1qge275wholefgjointdepthscale075_minimal.yaml",
-      "summary": "output/zju_training_ablation/zju_source_policy_confdepth_dropworst_gradconfmask_anchorb1qge275wholefgjointdepthscale075_vs_lead_20260326_v1/summary.md",
-      "reason": "The first softer whole-foreground joint depth-loss scale0.75 follow-up reduced the damage versus hard confmask-drop but still regressed val_loss_conf_depth from 0.2288 to 0.2546 and val_loss_reg_depth from 0.1759 to 0.1805 versus the stable lead while camera/T stayed flat, so this exact whole-foreground shape is frozen too."
-    },
-    {
-      "name": "confdepth_dropworst_gradconfmask_anchorb1qlinearwholefgjointdepthscale075",
-      "config": "training/config/zju_vggt_geom_unproject_source_policy_nearest_rawpool_confdepth_dropworst_gradconfmask_anchorb1qlinearwholefgjointdepthscale075_minimal.yaml",
-      "summary": "output/zju_training_ablation/zju_source_policy_confdepth_dropworst_gradconfmask_anchorb1qlinearwholefgjointdepthscale075_vs_lead_20260326_v1/summary.md",
-      "reason": "The qlinear whole-foreground joint depth-loss scale0.75 follow-up was materially closer than the q>=2.75 step candidate but still regressed val_loss_conf_depth from 0.2288 to 0.2458 and val_loss_reg_depth from 0.1759 to 0.1790 versus the stable lead, so this whole-foreground scalar softening point is frozen."
-    },
-    {
-      "name": "confdepth_dropworst_gradconfmask_anchorb1qquadraticwholefgjointdepthscale075",
-      "config": "training/config/zju_vggt_geom_unproject_source_policy_nearest_rawpool_confdepth_dropworst_gradconfmask_anchorb1qquadraticwholefgjointdepthscale075_minimal.yaml",
-      "summary": "output/zju_training_ablation/zju_source_policy_confdepth_dropworst_gradconfmask_anchorb1qquadraticwholefgjointdepthscale075_vs_lead_20260326_v1/summary.md",
-      "reason": "The qquadratic whole-foreground joint depth-loss scale0.75 follow-up closed the gap again but still regressed val_loss_conf_depth from 0.2288 to 0.2417 and val_loss_reg_depth from 0.1759 to 0.1783 versus the stable lead, so this whole-foreground scalar softening point is frozen too."
-    },
-    {
-      "name": "confdepth_dropworst_gradconfmask_anchorb1qquadraticwholefgjointdepthscale0875",
-      "config": "training/config/zju_vggt_geom_unproject_source_policy_nearest_rawpool_confdepth_dropworst_gradconfmask_anchorb1qquadraticwholefgjointdepthscale0875_minimal.yaml",
-      "summary": "output/zju_training_ablation/zju_source_policy_confdepth_dropworst_gradconfmask_anchorb1qquadraticwholefgjointdepthscale0875_vs_lead_20260326_v1/summary.md",
-      "reason": "The qquadratic whole-foreground joint depth-loss scale0.875 frontier candidate was the closest routing variant so far, but it still regressed val_loss_conf_depth from 0.2288 to 0.2344 and val_loss_reg_depth from 0.1759 to 0.1770 versus the stable lead, indicating this whole-foreground scalar family approaches the stable lead from below without yet creating a promotable successor."
-    },
-    {
-      "name": "exclude_rawpool_only_supervision_standalone",
-      "summary": "output/zju_source_policy_supervision_audit_nearest_rawpool_20260325_v1/summary.md",
-      "reason": "Already true on the current code path and therefore not a real candidate axis."
+      "name": "source_policy_hybrid_ring_regularization_same_family_retry",
+      "reason": "Promoted lead already spent the single-ticket family budget."
     }
   ],
   "next_local_diagnostic": {
-    "name": "post_wholefg_and_interior_boundary_reset_v1",
-    "status": "completed_locally",
-    "entrypoint": "output/zju_source_policy_rawpool_status_20260326_current/problem_definition_different_dimension_working_draft.md",
-    "config": "training/config/zju_vggt_geom_unproject_source_policy_nearest_rawpool_confdepth_dropworst_gradconfmask_minimal.yaml",
-    "latest_output": "output/zju_source_policy_rawpool_status_20260326_current/problem_definition_different_dimension_working_draft.md",
-    "latest_result": {
-      "selectivity_blocker": "whole_foreground_and_interior_conf_target_normalization_family_exhausted_locally",
-      "next_question_shape": "manual_different_dimension_camera_b1_quality_conditioned_rule",
-      "top_anchor_camera": "Camera_B1",
-      "recommended_reference_rule": "change_loss_routing_dimension_not_region_or_interp",
-      "wholefg_quadratic_candidate_config": "training/config/zju_vggt_geom_unproject_source_policy_nearest_rawpool_confdepth_dropworst_gradconfmask_anchorb1qquadraticwholefgconfscale05_minimal.yaml",
-      "wholefg_quadratic_candidate_status": "rejected_local_gate",
-      "interior_linear_candidate_config": "training/config/zju_vggt_geom_unproject_source_policy_nearest_rawpool_confdepth_dropworst_gradconfmask_anchorb1qlinearfginteriorerode5confscale075_minimal.yaml",
-      "interior_linear_candidate_status": "rejected_local_gate",
-      "wholefg_confmaskdrop_candidate_config": "training/config/zju_vggt_geom_unproject_source_policy_nearest_rawpool_confdepth_dropworst_gradconfmask_anchorb1qge275wholefgconfmaskdrop_minimal.yaml",
-      "wholefg_confmaskdrop_candidate_status": "rejected_local_gate",
-      "wholefg_jointdepthscale_candidate_config": "training/config/zju_vggt_geom_unproject_source_policy_nearest_rawpool_confdepth_dropworst_gradconfmask_anchorb1qge275wholefgjointdepthscale075_minimal.yaml",
-      "wholefg_jointdepthscale_candidate_status": "rejected_local_gate",
-      "point_mask_foreground_fact": "supervised_point_masks_already_foreground_clipped",
-      "current_knob_boundary": "wholefg_joint_depth_softening_scalar_family_moves_toward_stable_lead_without_crossing"
-    },
-    "follow_up_status": "Attribution v3, the long-gate demotion, the quality-signal audit, the hard-threshold postmortem, the boundary check, the rule-shape sweep, the softer continuous-rule sweep, and the later whole-foreground plus non-wholefg edge-band routing candidates are now aligned: the fixed-scale Camera_B1 family is exhausted, the hard q>=3.0 + bottom20 rule is frozen as over-selective, bottom20 is too narrow, the whole-foreground linear scale0.5 and scale0.75 candidates failed, the whole-foreground quadratic scale0.5 candidate failed, the foreground-interior linear scale0.75 candidate failed, the whole-foreground hard confmask-drop routing candidate failed, the whole-foreground joint depth-loss softening-scalar frontier (step, qlinear, qquadratic scale0.75, qquadratic scale0.875) also failed to beat the stable lead, the foreground-edge joint-depth frontier got closer without crossing, the foreground-edge decoupled follow-up still failed, and a hard gt depth_conf threshold inside the edge route was too aggressive. Supervised point masks are already foreground-clipped, so the family is not blocked by a hidden whole-frame leak. The next question can stay in loss-routing space, but it now has to change non-wholefg selectivity with softer semantics than a hard pixel threshold. Default nightly therefore returns to steady_hold.",
-    "next_allowed_candidate_family": "quality_conditioned_non_wholefg_selectivity_routing",
-    "required_outputs": [
-      "different_dimension_problem_definition",
-      "loss_routing_change_rationale",
-      "single_candidate_recommendation"
-    ],
-    "goal": "Record that the whole-foreground/interior normalization family, the whole-foreground hard confmask-drop routing candidate, and the tested whole-foreground joint depth-loss softening-scalar family are all exhausted locally, then define the next manual question boundary around a different selectivity or branch-routing dimension."
+    "name": "fresh_manual_problem_only_if_later_needed",
+    "status": "deferred_until_future_manual_problem",
+    "next_allowed_candidate_family": "",
+    "goal": "Do not auto-open another ticket. Only define a fresh manual problem later if another genuinely new question is needed."
   },
   "non_goals": [
-    "Do not reopen v10/v11 inference-side patch collection.",
-    "Do not reopen global zju_min_depth_conf sweeps.",
-    "Do not reopen reliable-region or bottom-only auxiliary unproject losses.",
-    "Do not restore the ghost stack.",
-    "Do not launch any cloud pair while the current local training axis is still unresolved."
+    "Do not arm or run another ticket tonight.",
+    "Do not reopen the closed five-family failure batch.",
+    "Do not auto-promote to cloud or auto-generate the next question."
   ],
   "nightly_modes": [
     {
       "name": "steady_hold",
       "default": true,
-      "when": "No freshly approved local training question with one genuinely new candidate has been checked in since the previous night.",
+      "when": "The promoted local lead is synced and there is no active approved problem.",
       "steps": [
-        "Run preflight and require zero active Modal apps plus zero stale repo-scoped python/powershell/modal processes.",
-        "For steady_hold only, treat preflight as a guard-only cleanliness check rather than a cloud-launch memory gate.",
-        "Allow only the built-in guard markers plus any temporary markers explicitly listed in output/zju_source_policy_research_loop/repo_process_allowlist.json; keep that active allowlist empty by default while research stays idle.",
-        "Run consistency check and refresh the local status snapshot.",
-        "Do not rerun attribution v3 by default, do not train, and keep cloud_gate=false."
+        "Run preflight and consistency as guard-only cleanliness checks.",
+        "Keep current_lead_config on the promoted local lead.",
+        "Keep cloud_gate=false and launch_cloud_now=false.",
+        "Do not open a candidate automatically."
       ]
     },
     {
       "name": "single_candidate_local_gate",
       "default": false,
-      "when": "Exactly one new local training-side candidate has been checked in, it is genuinely different from the frozen non-reentry list, and it follows the post-audit question boundary after the exhausted fixed-scale Camera_B1-conditioned family and the restoration of confdepth_dropworst_gradconfmask as the stable local lead.",
+      "when": "A later fresh manual problem explicitly authorizes one new local candidate.",
       "steps": [
-        "Run preflight first.",
-        "Run the supervision audit on the candidate config only if its dataset or loss routing differs from the current lead.",
-        "Run 1 train / 1 val smoke.",
-        "Run one tighter local gate against baseline and the current confdepth_dropworst_gradconfmask lead; do not branch into a second candidate the same night.",
-        "Promote only if camera/T do not materially rebound and conf_depth/reg_depth both improve versus the current lead."
+        "Remain single-ticket only.",
+        "Do not branch into cousin sweeps or a second same-night candidate."
       ]
     }
   ],
-  "overnight_watch_policy": {
-    "enabled": true,
-    "wraps_mode": "steady_hold",
-    "default_interval_sec": 1800,
-    "default_duration_hours": 10.0,
-    "sleep_heartbeat_sec": 60,
-    "latest_session_path": "output/zju_source_policy_rawpool_overnight_watch/latest_session.json",
-    "latest_guard_snapshot_path": "output/zju_source_policy_rawpool_overnight_watch/latest_guard_snapshot.json",
-    "rules": [
-      "Run the machine-readable nightly runner in auto mode and require it to resolve to steady_hold only.",
-      "After each cycle, require consistency_check ok=true, current_lead_config to remain the stable confdepth_dropworst_gradconfmask lead, cloud_gate=false, and launch_cloud_now=false.",
-      "Treat output/zju_source_policy_research_loop/repo_process_allowlist.json as the only dynamic extension to the built-in guard-process allowlist, and keep it empty by default while no approved research candidate is active.",
-      "Require zero active Modal apps and zero unexpected repo-scoped python/powershell/pwsh/modal processes after each cycle.",
-      "During sleep heartbeats, keep re-checking that current_lead_config still matches the stable confdepth_dropworst_gradconfmask lead, there are zero active Modal apps, and there are zero unexpected repo-scoped python/powershell/pwsh/modal processes.",
-      "Keep latest_guard_snapshot.json updated so the last successful guard check remains visible even between full cycles, including consistency_ok, the current state lead, and the current state cloud flags.",
-      "Keep active_watch.json and latest_session.json updated while the watch is running so unattended progress is observable.",
-      "Do not auto-open single_candidate_local_gate from overnight watch; a fresh manual training question is still required."
-    ]
-  },
   "promotion_requirements_before_cloud_consideration": [
-    "Keep val_loss_camera no materially worse than the current confdepth_dropworst_gradconfmask lead.",
-    "Keep val_loss_T no worse than the current confdepth_dropworst_gradconfmask lead.",
-    "Improve val_loss_conf_depth versus the current confdepth_dropworst_gradconfmask lead.",
-    "Improve val_loss_reg_depth versus the current confdepth_dropworst_gradconfmask lead.",
-    "Do not introduce new path, cache, or raw-image loading failures.",
-    "Even after a local pass, require a fresh manual decision before flipping cloud_gate."
+    "Keep cloud off after local promotion; a separate explicit downstream decision is still required.",
+    "Do not treat local promotion as implicit cloud authorization."
   ],
   "single_source_of_truth": [
-    "output/geometry_post_v9_nightly_state/consistency_check.md",
-    "docs/geometry_post_v9_next_training_question_20260325.md",
-    "scripts/manifests/zju_next_training_question_v1.json",
-    "scripts/manifests/zju_source_policy_rawpool_local_nightly_v1.json"
+    "output/zju_source_policy_research_loop/promotion_review_packet.20260328.md",
+    "output/zju_source_policy_research_loop/promotion_decision.20260328.json",
+    "scripts/manifests/zju_source_policy_rawpool_local_nightly_v1.json",
+    "scripts/manifests/zju_next_training_question_v1.json"
   ],
   "patch_collection_stop": true,
   "ready_for_new_training_question": true,

@@ -1,0 +1,13 @@
+defaults:
+  - zju_vggt_geom_unproject_source_policy_nearest_rawpool_confdepth_dropworst_gradconfmask_minimal
+  - _self_
+
+exp_name: zju_vggt_geom_unproject_source_policy_nearest_rawpool_confdepth_dropworst_gradconfmask_unprojectauxconfgatew005_minimal
+
+loss:
+  unproject_geometry:
+    weight: 0.05
+    use_depth_conf_gate: True
+    detach_depth_conf: True
+    depth_conf_power: 1.0
+    depth_conf_threshold: 0.0

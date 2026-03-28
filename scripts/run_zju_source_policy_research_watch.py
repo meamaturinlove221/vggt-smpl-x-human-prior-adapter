@@ -257,6 +257,17 @@ def build_research_summary(
 ) -> dict:
     allowed_markers = allowlist_payload.get("allowed_markers", [])
     active_modal_apps = [row for row in modal_apps if str(row.get("State", "")).lower() != "stopped"]
+    next_requirement = str(research_status.get("next_requirement", "")).strip().lower()
+    runner_launch_required = (
+        str(research_status.get("state", "")) == "ARMED_PROBLEM"
+        and bool(research_status.get("approved_problem_present"))
+    )
+    promotion_decision_required = "manual promotion decision" in next_requirement
+    manual_action_kind = (
+        "runner_launch"
+        if runner_launch_required
+        else ("promotion_decision" if promotion_decision_required else "")
+    )
     return {
         "state": str(research_status.get("state", "")),
         "approved_problem_present": bool(research_status.get("approved_problem_present")) or approved_problem_path.exists(),
@@ -265,10 +276,8 @@ def build_research_summary(
         "allowlist_status": str(allowlist_payload.get("status", "")),
         "active_modal_app_count": len(active_modal_apps),
         "runtime_process_count": len(research_runtime_processes),
-        "manual_action_required": (
-            str(research_status.get("state", "")) == "ARMED_PROBLEM"
-            and bool(research_status.get("approved_problem_present"))
-        ),
+        "manual_action_required": bool(manual_action_kind),
+        "manual_action_kind": manual_action_kind,
     }
 
 
@@ -335,8 +344,10 @@ def build_watch_conclusion(*, guard_all_green: bool, research_summary: dict, ref
         return f"research refresh failed but the watch remains passive: {refresh_error}"
     if not guard_all_green:
         return "guard drift detected; watch remains passive and records the failure without opening research"
-    if research_summary.get("manual_action_required"):
+    if research_summary.get("manual_action_kind") == "runner_launch":
         return "an approved problem is armed; watch remains passive and waits for an explicit manual runner launch"
+    if research_summary.get("manual_action_kind") == "promotion_decision":
+        return "guard is green and research remains idle; a provisional local lead is waiting for a fresh manual promotion decision"
     if research_summary.get("runtime_process_count", 0):
         return "research execution processes are active; watch records them but does not intervene"
     if research_summary.get("state") == "IDLE_GUARD":

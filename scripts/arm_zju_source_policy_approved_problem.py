@@ -17,6 +17,15 @@ DEFAULT_INTERP_SMOOTHSTEP_SEED_PATH = (
 DEFAULT_INTERP_SEED_PATH = DEFAULT_OUTPUT_ROOT / "approved_problem.seed.interpolated_eligibility_shaping.json"
 DEFAULT_PARTIAL_SEED_PATH = DEFAULT_OUTPUT_ROOT / "approved_problem.seed.partial_joint_depth_routing.json"
 DEFAULT_DISAGREEMENT_SEED_PATH = DEFAULT_OUTPUT_ROOT / "approved_problem.seed.conf_reg_disagreement_routing.json"
+DEFAULT_UNPROJECT_CONSISTENCY_SEED_PATH = (
+    DEFAULT_OUTPUT_ROOT / "approved_problem.seed.unproject_consistency_routing.json"
+)
+DEFAULT_UNPROJECT_AUX_CONFGATE_SEED_PATH = (
+    DEFAULT_OUTPUT_ROOT / "approved_problem.seed.unproject_aux_confgate.json"
+)
+DEFAULT_SOURCE_POLICY_HYBRID_RING_SEED_PATH = (
+    DEFAULT_OUTPUT_ROOT / "approved_problem.seed.source_policy_hybrid_ring_regularization.json"
+)
 
 
 def parse_args() -> argparse.Namespace:
@@ -29,9 +38,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--seed",
         choices=[
+            "source_policy_hybrid_ring_regularization",
+            "unproject_aux_confgate",
+            "unproject_consistency_routing",
             "conf_reg_disagreement_routing",
         ],
-        default="conf_reg_disagreement_routing",
+        default="source_policy_hybrid_ring_regularization",
     )
     parser.add_argument("--python-exe", default=sys.executable)
     parser.add_argument("--approved-problem-path", type=Path, default=DEFAULT_APPROVED_PROBLEM_PATH)
@@ -45,6 +57,12 @@ def parse_args() -> argparse.Namespace:
 
 
 def seed_path_for_name(seed_name: str) -> Path:
+    if seed_name == "source_policy_hybrid_ring_regularization":
+        return DEFAULT_SOURCE_POLICY_HYBRID_RING_SEED_PATH
+    if seed_name == "unproject_aux_confgate":
+        return DEFAULT_UNPROJECT_AUX_CONFGATE_SEED_PATH
+    if seed_name == "unproject_consistency_routing":
+        return DEFAULT_UNPROJECT_CONSISTENCY_SEED_PATH
     if seed_name == "conf_reg_disagreement_routing":
         return DEFAULT_DISAGREEMENT_SEED_PATH
     raise ValueError(f"Unknown seed: {seed_name}")

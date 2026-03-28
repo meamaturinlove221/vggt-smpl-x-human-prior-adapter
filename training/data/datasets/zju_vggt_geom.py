@@ -183,6 +183,50 @@ def _build_uniform_ring_sources(anchor_camera, source_count, ring_order, availab
     return selected
 
 
+def _build_nearest_plus_uniform_tail_sources(
+    anchor_camera,
+    source_count,
+    ring_order,
+    available_cameras,
+    excluded_cameras=None,
+):
+    if source_count <= 0:
+        return []
+    if source_count == 1:
+        return _build_nearest_ring_sources(
+            anchor_camera,
+            source_count,
+            ring_order,
+            available_cameras,
+            excluded_cameras=excluded_cameras,
+        )
+
+    nearest_count = max(1, source_count - 1)
+    uniform_count = max(0, source_count - nearest_count)
+    selected = _build_nearest_ring_sources(
+        anchor_camera,
+        nearest_count,
+        ring_order,
+        available_cameras,
+        excluded_cameras=excluded_cameras,
+    )
+    if uniform_count <= 0:
+        return selected
+
+    excluded = set(excluded_cameras or [])
+    excluded.update(selected)
+    selected.extend(
+        _build_uniform_ring_sources(
+            anchor_camera,
+            uniform_count,
+            ring_order,
+            available_cameras,
+            excluded_cameras=excluded,
+        )
+    )
+    return selected
+
+
 def _resize_rgb_image(image_rgb, target_hw):
     target_h, target_w = int(target_hw[0]), int(target_hw[1])
     return np.asarray(
@@ -301,8 +345,11 @@ class ZjuVggtGeomDataset(BaseDataset):
             raise ValueError("camera_source must be either 'gt' or 'geom'.")
         if mask_source not in ("none", "mask", "mask_cihp"):
             raise ValueError("mask_source must be one of 'none', 'mask', or 'mask_cihp'.")
-        if source_policy not in ("random", "nearest_ring", "uniform_ring"):
-            raise ValueError("source_policy must be one of 'random', 'nearest_ring', or 'uniform_ring'.")
+        if source_policy not in ("random", "nearest_ring", "uniform_ring", "nearest_plus_uniform_tail"):
+            raise ValueError(
+                "source_policy must be one of 'random', 'nearest_ring', 'uniform_ring', "
+                "or 'nearest_plus_uniform_tail'."
+            )
         if source_view_pool not in ("cached_only", "geom_plus_raw"):
             raise ValueError("source_view_pool must be one of 'cached_only' or 'geom_plus_raw'.")
         source_view_pool_train_probability = float(source_view_pool_train_probability)
@@ -530,6 +577,15 @@ class ZjuVggtGeomDataset(BaseDataset):
                         geom_available_set,
                     )
                 )
+            elif self.source_policy == "nearest_plus_uniform_tail":
+                selected_supervised.extend(
+                    _build_nearest_plus_uniform_tail_sources(
+                        anchor_camera,
+                        supervised_target - 1,
+                        ring_order,
+                        geom_available_set,
+                    )
+                )
             else:
                 raise ValueError(f"Unsupported source policy for training dataset: {self.source_policy}")
         selected_set = set(selected_supervised)
@@ -546,6 +602,14 @@ class ZjuVggtGeomDataset(BaseDataset):
             )
         elif self.source_policy == "uniform_ring":
             source_cameras = _build_uniform_ring_sources(
+                anchor_camera,
+                source_count,
+                ring_order,
+                available_set,
+                excluded_cameras=selected_set,
+            )
+        elif self.source_policy == "nearest_plus_uniform_tail":
+            source_cameras = _build_nearest_plus_uniform_tail_sources(
                 anchor_camera,
                 source_count,
                 ring_order,
