@@ -1,0 +1,28 @@
+defaults:
+  - zju_vggt_geom_unproject_source_policy_nearestplusuniformtail_rawpool_confdepth_dropworst_gradconfmask_minimal
+  - _self_
+
+exp_name: zju_vggt_geom_unproject_source_policy_nearestplusuniformtail_rawpool_confdepth_dropworst_gradconfmask_anchorb13softtailtaperreg095conf095_minimal
+
+loss:
+  depth:
+    anchor_conditioned_reg_target_cameras:
+      - Camera_B13
+    anchor_conditioned_reg_target_scale: 0.95
+    anchor_conditioned_reg_target_train_only: True
+    anchor_conditioned_reg_target_quality_interp: smoothstep
+    anchor_conditioned_reg_target_quality_low: 2.0051
+    anchor_conditioned_reg_target_quality_high: 2.3407
+    anchor_conditioned_reg_target_depth_conf_interp: smoothstep
+    anchor_conditioned_reg_target_depth_conf_low: 0.0
+    anchor_conditioned_reg_target_depth_conf_high: 5.913640410988592
+    anchor_conditioned_conf_target_cameras:
+      - Camera_B13
+    anchor_conditioned_conf_target_scale: 0.95
+    anchor_conditioned_conf_target_train_only: True
+    anchor_conditioned_conf_target_quality_interp: smoothstep
+    anchor_conditioned_conf_target_quality_low: 2.0051
+    anchor_conditioned_conf_target_quality_high: 2.3407
+    anchor_conditioned_conf_target_depth_conf_interp: smoothstep
+    anchor_conditioned_conf_target_depth_conf_low: 0.0
+    anchor_conditioned_conf_target_depth_conf_high: 5.913640410988592

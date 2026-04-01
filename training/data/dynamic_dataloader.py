@@ -23,10 +23,12 @@ class DynamicTorchDataset(ABC):
         num_workers: int,
         shuffle: bool,
         pin_memory: bool,
+        pin_memory_device: str = "",
         drop_last: bool = True,
         collate_fn: Optional[Callable] = None,
         worker_init_fn: Optional[Callable] = None,
         persistent_workers: bool = False,
+        prefetch_factor: Optional[int] = None,
         seed: int = 42,
         max_img_per_gpu: int = 48,
     ) -> None:
@@ -35,10 +37,12 @@ class DynamicTorchDataset(ABC):
         self.num_workers = num_workers
         self.shuffle = shuffle
         self.pin_memory = pin_memory
+        self.pin_memory_device = pin_memory_device
         self.drop_last = drop_last
         self.collate_fn = collate_fn
         self.worker_init_fn = worker_init_fn
         self.persistent_workers = persistent_workers
+        self.prefetch_factor = prefetch_factor
         self.seed = seed
         self.max_img_per_gpu = max_img_per_gpu
 
@@ -89,8 +93,8 @@ class DynamicTorchDataset(ABC):
             self.dataset.set_epoch(epoch)
 
         # Create and return the dataloader
-        return DataLoader(
-            self.dataset,
+        loader_kwargs = dict(
+            dataset=self.dataset,
             num_workers=self.num_workers,
             pin_memory=self.pin_memory,
             batch_sampler=self.batch_sampler,
@@ -103,6 +107,11 @@ class DynamicTorchDataset(ABC):
                 worker_init_fn=self.worker_init_fn,
             ),
         )
+        if self.num_workers > 0 and self.prefetch_factor is not None:
+            loader_kwargs["prefetch_factor"] = int(self.prefetch_factor)
+        if self.pin_memory and self.pin_memory_device:
+            loader_kwargs["pin_memory_device"] = self.pin_memory_device
+        return DataLoader(**loader_kwargs)
         
 
 class DynamicBatchSampler(Sampler):

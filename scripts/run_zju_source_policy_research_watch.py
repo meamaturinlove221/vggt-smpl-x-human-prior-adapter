@@ -21,6 +21,7 @@ DEFAULT_GUARD_SNAPSHOT_PATH = (
 DEFAULT_RESEARCH_STATUS_PATH = REPO_ROOT / "output" / "zju_source_policy_research_loop" / "research_loop_status.json"
 DEFAULT_APPROVED_PROBLEM_PATH = REPO_ROOT / "output" / "zju_source_policy_research_loop" / "approved_problem.json"
 DEFAULT_ALLOWLIST_PATH = REPO_ROOT / "output" / "zju_source_policy_research_loop" / "repo_process_allowlist.json"
+DEFAULT_LOCAL_MANIFEST_PATH = REPO_ROOT / "scripts" / "manifests" / "zju_source_policy_rawpool_local_nightly_v1.json"
 
 EXPECTED_STABLE_LEAD_CONFIG = (
     "training/config/zju_vggt_geom_unproject_source_policy_nearest_rawpool_confdepth_dropworst_gradconfmask_minimal.yaml"
@@ -50,6 +51,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--research-status-path", type=Path, default=DEFAULT_RESEARCH_STATUS_PATH)
     parser.add_argument("--approved-problem-path", type=Path, default=DEFAULT_APPROVED_PROBLEM_PATH)
     parser.add_argument("--allowlist-path", type=Path, default=DEFAULT_ALLOWLIST_PATH)
+    parser.add_argument("--local-manifest-path", type=Path, default=DEFAULT_LOCAL_MANIFEST_PATH)
     parser.add_argument("--interval-sec", type=int, default=600)
     parser.add_argument("--sleep-heartbeat-sec", type=int, default=60)
     parser.add_argument("--duration-hours", type=float, default=12.0)
@@ -223,8 +225,14 @@ $items | ConvertTo-Json -Compress
     return [payload]
 
 
-def build_guard_summary(guard_snapshot: dict) -> dict:
-    expected_lead = EXPECTED_STABLE_LEAD_CONFIG
+def resolve_expected_stable_lead(local_manifest_path: Path) -> str:
+    payload = maybe_load_json(local_manifest_path)
+    current_lead = str((payload.get("current_lead", {}) or {}).get("config", "")).strip()
+    return current_lead or EXPECTED_STABLE_LEAD_CONFIG
+
+
+def build_guard_summary(guard_snapshot: dict, local_manifest_path: Path) -> dict:
+    expected_lead = resolve_expected_stable_lead(local_manifest_path)
     lead_value = str(
         guard_snapshot.get("state_current_lead_config")
         or guard_snapshot.get("current_lead_config")
@@ -263,10 +271,18 @@ def build_research_summary(
         and bool(research_status.get("approved_problem_present"))
     )
     promotion_decision_required = "manual promotion decision" in next_requirement
+    manual_review_required = (
+        not bool(research_status.get("approved_problem_present"))
+        and bool(str(research_status.get("preferred_first_family", "")).strip())
+    )
     manual_action_kind = (
         "runner_launch"
         if runner_launch_required
-        else ("promotion_decision" if promotion_decision_required else "")
+        else (
+            "promotion_decision"
+            if promotion_decision_required
+            else ("manual_review" if manual_review_required else "")
+        )
     )
     return {
         "state": str(research_status.get("state", "")),
@@ -289,6 +305,7 @@ def build_snapshot(
     research_status_path: Path,
     approved_problem_path: Path,
     allowlist_path: Path,
+    local_manifest_path: Path,
     refresh_exit_code: int | None,
     refresh_error: str,
     cycle_dir: Path,
@@ -298,7 +315,7 @@ def build_snapshot(
     allowlist_payload = maybe_load_json(allowlist_path)
     modal_apps = list_modal_apps()
     research_runtime_processes = get_research_runtime_processes()
-    guard_summary = build_guard_summary(guard_snapshot)
+    guard_summary = build_guard_summary(guard_snapshot, local_manifest_path)
     research_summary = build_research_summary(
         research_status=research_status,
         approved_problem_path=approved_problem_path,
@@ -348,6 +365,8 @@ def build_watch_conclusion(*, guard_all_green: bool, research_summary: dict, ref
         return "an approved problem is armed; watch remains passive and waits for an explicit manual runner launch"
     if research_summary.get("manual_action_kind") == "promotion_decision":
         return "guard is green and research remains idle; a provisional local lead is waiting for a fresh manual promotion decision"
+    if research_summary.get("manual_action_kind") == "manual_review":
+        return "guard is green and research remains idle; exactly one pending manual-review family is waiting for an explicit approval before any run"
     if research_summary.get("runtime_process_count", 0):
         return "research execution processes are active; watch records them but does not intervene"
     if research_summary.get("state") == "IDLE_GUARD":
@@ -401,6 +420,7 @@ def sleep_with_heartbeat(
     research_status_path: Path,
     approved_problem_path: Path,
     allowlist_path: Path,
+    local_manifest_path: Path,
     cycle_index: int,
     total_sleep_sec: int,
     heartbeat_sec: int,
@@ -425,6 +445,7 @@ def sleep_with_heartbeat(
             research_status_path=research_status_path,
             approved_problem_path=approved_problem_path,
             allowlist_path=allowlist_path,
+            local_manifest_path=local_manifest_path,
             refresh_exit_code=None,
             refresh_error="",
             cycle_dir=heartbeat_dir,
@@ -482,6 +503,7 @@ def main() -> int:
             research_status_path=args.research_status_path,
             approved_problem_path=args.approved_problem_path,
             allowlist_path=args.allowlist_path,
+            local_manifest_path=args.local_manifest_path,
             refresh_exit_code=refresh_exit_code,
             refresh_error=refresh_error,
             cycle_dir=cycle_dir,
@@ -514,6 +536,7 @@ def main() -> int:
             research_status_path=args.research_status_path,
             approved_problem_path=args.approved_problem_path,
             allowlist_path=args.allowlist_path,
+            local_manifest_path=args.local_manifest_path,
             cycle_index=cycle_index,
             total_sleep_sec=args.interval_sec,
             heartbeat_sec=args.sleep_heartbeat_sec,

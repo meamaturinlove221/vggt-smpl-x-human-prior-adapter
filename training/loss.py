@@ -13,6 +13,11 @@ from train_utils.general import check_and_fix_inf_nan
 from math import ceil, floor, isfinite
 
 HYDRA_META_KEYS = {"_target_", "_recursive_", "_convert_", "_partial_"}
+LOSS_WEIGHT_SCHEDULE_META_KEYS = {
+    "weight_stage2_start",
+    "weight_stage2_end",
+    "weight_stage2_value",
+}
 REGRESSION_LOSS_EXTRA_ALLOWED_KEYS = {
     "anchor_conditioned_disagreement_cameras",
     "anchor_conditioned_disagreement_conf_scale",
@@ -27,7 +32,9 @@ def _loss_call_kwargs(loss_cfg):
     return {
         key: value
         for key, value in loss_cfg.items()
-        if key not in HYDRA_META_KEYS and key != "weight"
+        if key not in HYDRA_META_KEYS
+        and key != "weight"
+        and key not in LOSS_WEIGHT_SCHEDULE_META_KEYS
     }
 
 
@@ -91,7 +98,14 @@ class MultitaskLoss(torch.nn.Module):
             camera_loss_dict = compute_camera_loss(
                 predictions, batch, **_loss_call_kwargs(self.camera)
             )
-            camera_loss = camera_loss_dict["loss_camera"] * self.camera["weight"]   
+            camera_weight = resolve_two_stage_scalar(
+                self.camera["weight"],
+                batch,
+                start=self.camera.get("weight_stage2_start"),
+                end=self.camera.get("weight_stage2_end"),
+                stage2_value=self.camera.get("weight_stage2_value"),
+            )
+            camera_loss = camera_loss_dict["loss_camera"] * camera_weight
             total_loss = total_loss + camera_loss
             loss_dict.update(camera_loss_dict)
         
@@ -101,7 +115,14 @@ class MultitaskLoss(torch.nn.Module):
                 predictions, batch, **_loss_call_kwargs(self.depth)
             )
             depth_loss = depth_loss_dict["loss_conf_depth"] + depth_loss_dict["loss_reg_depth"] + depth_loss_dict["loss_grad_depth"]
-            depth_loss = depth_loss * self.depth["weight"]
+            depth_weight = resolve_two_stage_scalar(
+                self.depth["weight"],
+                batch,
+                start=self.depth.get("weight_stage2_start"),
+                end=self.depth.get("weight_stage2_end"),
+                stage2_value=self.depth.get("weight_stage2_value"),
+            )
+            depth_loss = depth_loss * depth_weight
             total_loss = total_loss + depth_loss
             loss_dict.update(depth_loss_dict)
 
@@ -111,7 +132,14 @@ class MultitaskLoss(torch.nn.Module):
                 predictions, batch, **_loss_call_kwargs(self.point)
             )
             point_loss = point_loss_dict["loss_conf_point"] + point_loss_dict["loss_reg_point"] + point_loss_dict["loss_grad_point"]
-            point_loss = point_loss * self.point["weight"]
+            point_weight = resolve_two_stage_scalar(
+                self.point["weight"],
+                batch,
+                start=self.point.get("weight_stage2_start"),
+                end=self.point.get("weight_stage2_end"),
+                stage2_value=self.point.get("weight_stage2_value"),
+            )
+            point_loss = point_loss * point_weight
             total_loss = total_loss + point_loss
             loss_dict.update(point_loss_dict)
 
@@ -124,6 +152,13 @@ class MultitaskLoss(torch.nn.Module):
                 self.unproject_geometry["weight"],
                 self.unproject_geometry,
                 batch,
+            )
+            unproject_geometry_weight = resolve_two_stage_scalar(
+                unproject_geometry_weight,
+                batch,
+                start=self.unproject_geometry.get("weight_stage2_start"),
+                end=self.unproject_geometry.get("weight_stage2_end"),
+                stage2_value=self.unproject_geometry.get("weight_stage2_value"),
             )
             unproject_geometry_loss = (
                 unproject_geometry_loss_dict["loss_unproject_geometry"] * unproject_geometry_weight
@@ -174,6 +209,105 @@ def resolve_scheduled_loss_weight(base_weight, loss_cfg, batch):
     return float(base_weight) * factor
 
 
+def resolve_two_stage_alpha(batch, start=None, end=None):
+    progress = None if batch is None else batch.get("train_progress", None)
+    if progress is None:
+        return None
+
+    start = 0.5 if start is None else float(start)
+    end = start if end is None else float(end)
+    if end < start:
+        end = start
+
+    progress = float(progress)
+    if progress <= start:
+        return 0.0
+    if end <= start or progress >= end:
+        return 1.0
+    return (progress - start) / (end - start)
+
+
+def resolve_two_stage_scalar(base_value, batch, *, start=None, end=None, stage2_value=None):
+    if stage2_value is None:
+        return float(base_value)
+    alpha = resolve_two_stage_alpha(batch, start=start, end=end)
+    if alpha is None or alpha <= 0.0:
+        return float(base_value)
+    if alpha >= 1.0:
+        return float(stage2_value)
+    return float(base_value) + alpha * (float(stage2_value) - float(base_value))
+
+
+def resolve_two_stage_label_scalars(base_values, batch, *, stage2_values=None, start=None, end=None):
+    base_values = {
+        str(label).strip(): float(scale)
+        for label, scale in dict(base_values or {}).items()
+        if str(label).strip()
+    }
+    stage2_values = {
+        str(label).strip(): float(scale)
+        for label, scale in dict(stage2_values or {}).items()
+        if str(label).strip()
+    }
+    if not stage2_values:
+        return base_values
+
+    alpha = resolve_two_stage_alpha(batch, start=start, end=end)
+    if alpha is None or alpha <= 0.0:
+        return base_values
+    if alpha >= 1.0:
+        merged = dict(base_values)
+        merged.update(stage2_values)
+        return merged
+
+    resolved = dict(base_values)
+    for label in sorted(set(base_values) | set(stage2_values)):
+        base_scale = float(base_values.get(label, 1.0))
+        stage2_scale = float(stage2_values.get(label, base_scale))
+        resolved[label] = base_scale + alpha * (stage2_scale - base_scale)
+    return resolved
+
+
+def _assemble_camera_component_dict(loss_T, loss_R, loss_FL):
+    return {
+        "loss_T": loss_T,
+        "loss_R": loss_R,
+        "loss_FL": loss_FL,
+    }
+
+
+def _resolve_loss_fl_isolation_scale(loss_fl_isolation_scale):
+    loss_fl_isolation_scale = float(loss_fl_isolation_scale)
+    if not isfinite(loss_fl_isolation_scale):
+        raise ValueError("loss_fl_isolation_scale must be finite.")
+    return loss_fl_isolation_scale
+
+
+def _resolve_loss_t_isolation_scale(loss_t_isolation_scale):
+    loss_t_isolation_scale = float(loss_t_isolation_scale)
+    if not isfinite(loss_t_isolation_scale):
+        raise ValueError("loss_t_isolation_scale must be finite.")
+    return loss_t_isolation_scale
+
+
+def _compute_total_camera_loss(
+    camera_component_dict,
+    *,
+    weight_trans,
+    weight_rot,
+    weight_focal,
+    loss_t_isolation_scale=1.0,
+    loss_fl_isolation_scale=1.0,
+):
+    isolated_t_scale = _resolve_loss_t_isolation_scale(loss_t_isolation_scale)
+    isolated_fl_scale = _resolve_loss_fl_isolation_scale(loss_fl_isolation_scale)
+    return (
+        camera_component_dict["loss_T"] * isolated_t_scale * weight_trans
+        + camera_component_dict["loss_R"] * weight_rot
+        + camera_component_dict["loss_FL"] * isolated_fl_scale * weight_focal
+    )
+
+
 def compute_camera_loss(
     pred_dict,              # predictions dict, contains pose encodings
     batch_data,             # ground truth and mask batch dict
@@ -183,6 +317,21 @@ def compute_camera_loss(
     weight_trans=1.0,       # weight for translation loss
     weight_rot=1.0,         # weight for rotation loss
     weight_focal=0.5,       # weight for focal length loss
+    sample_manifest_applied_scale=1.0,
+    sample_manifest_applied_trans_scale=1.0,
+    sample_manifest_applied_rot_scale=1.0,
+    sample_manifest_applied_focal_scale=1.0,
+    sample_manifest_label_focal_scales=None,
+    sample_manifest_schedule_start=None,
+    sample_manifest_schedule_end=None,
+    sample_manifest_applied_scale_stage2=None,
+    sample_manifest_applied_trans_scale_stage2=None,
+    sample_manifest_applied_rot_scale_stage2=None,
+    sample_manifest_applied_focal_scale_stage2=None,
+    sample_manifest_label_focal_scales_stage2=None,
+    sample_manifest_applied_train_only=True,
+    loss_t_isolation_scale=1.0,
+    loss_fl_isolation_scale=1.0,
     **kwargs
 ):
     # List of predicted pose encodings per stage
@@ -206,6 +355,76 @@ def compute_camera_loss(
         gt_extrinsics, gt_intrinsics, image_hw, pose_encoding_type=pose_encoding_type
     )
 
+    sample_manifest_scale = float(sample_manifest_applied_scale)
+    sample_manifest_trans_scale = float(sample_manifest_applied_trans_scale)
+    sample_manifest_rot_scale = float(sample_manifest_applied_rot_scale)
+    sample_manifest_focal_scale = float(sample_manifest_applied_focal_scale)
+    sample_manifest_label_focal_scales = sample_manifest_label_focal_scales or {}
+    sample_manifest_label_focal_scales = {
+        str(label).strip(): float(scale)
+        for label, scale in dict(sample_manifest_label_focal_scales).items()
+        if str(label).strip()
+    }
+    sample_manifest_scale = resolve_two_stage_scalar(
+        sample_manifest_scale,
+        batch_data,
+        start=sample_manifest_schedule_start,
+        end=sample_manifest_schedule_end,
+        stage2_value=sample_manifest_applied_scale_stage2,
+    )
+    sample_manifest_trans_scale = resolve_two_stage_scalar(
+        sample_manifest_trans_scale,
+        batch_data,
+        start=sample_manifest_schedule_start,
+        end=sample_manifest_schedule_end,
+        stage2_value=sample_manifest_applied_trans_scale_stage2,
+    )
+    sample_manifest_rot_scale = resolve_two_stage_scalar(
+        sample_manifest_rot_scale,
+        batch_data,
+        start=sample_manifest_schedule_start,
+        end=sample_manifest_schedule_end,
+        stage2_value=sample_manifest_applied_rot_scale_stage2,
+    )
+    sample_manifest_focal_scale = resolve_two_stage_scalar(
+        sample_manifest_focal_scale,
+        batch_data,
+        start=sample_manifest_schedule_start,
+        end=sample_manifest_schedule_end,
+        stage2_value=sample_manifest_applied_focal_scale_stage2,
+    )
+    sample_manifest_label_focal_scales = resolve_two_stage_label_scalars(
+        sample_manifest_label_focal_scales,
+        batch_data,
+        stage2_values=sample_manifest_label_focal_scales_stage2,
+        start=sample_manifest_schedule_start,
+        end=sample_manifest_schedule_end,
+    )
+    sample_manifest_flags = _normalize_batch_manifest_applied(
+        batch_data.get("selection_sample_manifest_applied"),
+        valid_frame_mask.shape[0],
+    )
+    sample_manifest_labels = _normalize_batch_manifest_labels(
+        batch_data.get("selection_sample_manifest_label"),
+        valid_frame_mask.shape[0],
+    )
+    apply_manifest_scale = any(
+        scale != 1.0
+        for scale in (
+            sample_manifest_scale,
+            sample_manifest_trans_scale,
+            sample_manifest_rot_scale,
+            sample_manifest_focal_scale,
+        )
+    )
+    if not apply_manifest_scale:
+        apply_manifest_scale = any(
+            float(scale) != 1.0 for scale in sample_manifest_label_focal_scales.values()
+        )
+    if apply_manifest_scale and bool(sample_manifest_applied_train_only):
+        phase = str(batch_data.get("_loss_phase", "")).lower()
+        apply_manifest_scale = phase == "train"
+
     # Initialize loss accumulators for translation, rotation, focal length
     total_loss_T = total_loss_R = total_loss_FL = 0
 
@@ -222,34 +441,92 @@ def compute_camera_loss(
             loss_FL_stage = (pred_pose_stage * 0).mean()
         else:
             # Only consider valid frames for loss computation
-            loss_T_stage, loss_R_stage, loss_FL_stage = camera_loss_single(
-                pred_pose_stage[valid_frame_mask].clone(),
-                gt_pose_encoding[valid_frame_mask].clone(),
-                loss_type=loss_type
-            )
+            pred_pose_valid = pred_pose_stage[valid_frame_mask].clone()
+            gt_pose_valid = gt_pose_encoding[valid_frame_mask].clone()
+            sample_weights_T = None
+            sample_weights_R = None
+            sample_weights_FL = None
+            if apply_manifest_scale:
+                per_sample_scale_T = torch.ones(
+                    (valid_frame_mask.shape[0],),
+                    device=pred_pose_stage.device,
+                    dtype=pred_pose_stage.dtype,
+                )
+                per_sample_scale_R = per_sample_scale_T.clone()
+                per_sample_scale_FL = per_sample_scale_T.clone()
+                for batch_idx, manifest_applied in enumerate(sample_manifest_flags):
+                    manifest_label = sample_manifest_labels[batch_idx]
+                    label_focal_scale = sample_manifest_label_focal_scales.get(manifest_label, 1.0)
+                    per_sample_scale_FL[batch_idx] = float(label_focal_scale)
+                    if manifest_applied:
+                        per_sample_scale_T[batch_idx] = sample_manifest_scale * sample_manifest_trans_scale
+                        per_sample_scale_R[batch_idx] = sample_manifest_scale * sample_manifest_rot_scale
+                        per_sample_scale_FL[batch_idx] = (
+                            sample_manifest_scale * sample_manifest_focal_scale * per_sample_scale_FL[batch_idx]
+                        )
+                sample_weights_T = per_sample_scale_T.unsqueeze(-1).expand_as(valid_frame_mask)[valid_frame_mask]
+                sample_weights_R = per_sample_scale_R.unsqueeze(-1).expand_as(valid_frame_mask)[valid_frame_mask]
+                sample_weights_FL = per_sample_scale_FL.unsqueeze(-1).expand_as(valid_frame_mask)[valid_frame_mask]
+            if sample_weights_T is None:
+                loss_T_stage, loss_R_stage, loss_FL_stage = camera_loss_single(
+                    pred_pose_valid,
+                    gt_pose_valid,
+                    loss_type=loss_type
+                )
+            elif loss_type == "l1":
+                loss_T_values = (pred_pose_valid[..., :3] - gt_pose_valid[..., :3]).abs().clamp(max=100)
+                loss_R_values = (pred_pose_valid[..., 3:7] - gt_pose_valid[..., 3:7]).abs()
+                loss_FL_values = (pred_pose_valid[..., 7:] - gt_pose_valid[..., 7:]).abs()
+                loss_T_stage = _weighted_camera_component_mean(loss_T_values, sample_weights_T)
+                loss_R_stage = _weighted_camera_component_mean(loss_R_values, sample_weights_R)
+                loss_FL_stage = _weighted_camera_component_mean(loss_FL_values, sample_weights_FL)
+            elif loss_type == "l2":
+                loss_T_values = (pred_pose_valid[..., :3] - gt_pose_valid[..., :3]).norm(dim=-1, keepdim=True)
+                loss_R_values = (pred_pose_valid[..., 3:7] - gt_pose_valid[..., 3:7]).norm(dim=-1)
+                loss_FL_values = (pred_pose_valid[..., 7:] - gt_pose_valid[..., 7:]).norm(dim=-1)
+                loss_T_stage = _weighted_camera_component_mean(loss_T_values, sample_weights_T)
+                loss_R_stage = _weighted_camera_component_mean(loss_R_values, sample_weights_R)
+                loss_FL_stage = _weighted_camera_component_mean(loss_FL_values, sample_weights_FL)
+            else:
+                raise ValueError(f"Unknown loss type: {loss_type}")
+
+        stage_component_dict = _assemble_camera_component_dict(
+            loss_T_stage,
+            loss_R_stage,
+            loss_FL_stage,
+        )
         # Accumulate weighted losses across stages
-        total_loss_T += loss_T_stage * stage_weight
-        total_loss_R += loss_R_stage * stage_weight
-        total_loss_FL += loss_FL_stage * stage_weight
+        total_loss_T += stage_component_dict["loss_T"] * stage_weight
+        total_loss_R += stage_component_dict["loss_R"] * stage_weight
+        total_loss_FL += stage_component_dict["loss_FL"] * stage_weight
 
     # Average over all stages
     avg_loss_T = total_loss_T / n_stages
     avg_loss_R = total_loss_R / n_stages
     avg_loss_FL = total_loss_FL / n_stages
 
+    camera_component_dict = _assemble_camera_component_dict(
+        avg_loss_T,
+        avg_loss_R,
+        avg_loss_FL,
+    )
+
     # Compute total weighted camera loss
-    total_camera_loss = (
-        avg_loss_T * weight_trans +
-        avg_loss_R * weight_rot +
-        avg_loss_FL * weight_focal
+    total_camera_loss = _compute_total_camera_loss(
+        camera_component_dict,
+        weight_trans=weight_trans,
+        weight_rot=weight_rot,
+        weight_focal=weight_focal,
+        loss_t_isolation_scale=loss_t_isolation_scale,
+        loss_fl_isolation_scale=loss_fl_isolation_scale,
     )
 
     # Return loss dictionary with individual components
     return {
         "loss_camera": total_camera_loss,
-        "loss_T": avg_loss_T,
-        "loss_R": avg_loss_R,
-        "loss_FL": avg_loss_FL
+        "loss_T": camera_component_dict["loss_T"],
+        "loss_R": camera_component_dict["loss_R"],
+        "loss_FL": camera_component_dict["loss_FL"]
     }
 
 
@@ -474,6 +751,71 @@ def camera_loss_single(pred_pose_enc, gt_pose_enc, loss_type="l1"):
     loss_FL = loss_FL.mean()
 
     return loss_T, loss_R, loss_FL
+
+
+def _weighted_camera_component_mean(values, sample_weights=None):
+    values = check_and_fix_inf_nan(values, "camera_component_values")
+    if sample_weights is None:
+        return values.mean()
+    sample_weights = check_and_fix_inf_nan(sample_weights, "camera_component_sample_weights")
+    sample_weights = sample_weights.to(device=values.device, dtype=values.dtype)
+    if values.ndim > 1:
+        sample_weights = sample_weights.view(-1, *([1] * (values.ndim - 1)))
+    weighted_values = values * sample_weights
+    weight_sum = sample_weights.sum()
+    if values.ndim > 1:
+        feature_count = 1
+        for dim in values.shape[1:]:
+            feature_count *= int(dim)
+        weight_sum = weight_sum * float(feature_count)
+    if float(weight_sum.detach().item()) <= 0.0:
+        return weighted_values.sum() * 0.0
+    return weighted_values.sum() / weight_sum
+
+
+def _normalize_batch_manifest_applied(selection_sample_manifest_applied, batch_size):
+    if batch_size <= 0:
+        return [False] * batch_size
+    if selection_sample_manifest_applied is None:
+        return [False] * batch_size
+    if isinstance(selection_sample_manifest_applied, torch.Tensor):
+        if selection_sample_manifest_applied.ndim == 0:
+            values = [selection_sample_manifest_applied.item()]
+        else:
+            values = selection_sample_manifest_applied.detach().cpu().reshape(-1).tolist()
+    elif isinstance(selection_sample_manifest_applied, (list, tuple)):
+        values = list(selection_sample_manifest_applied)
+    else:
+        values = [selection_sample_manifest_applied]
+    values = [bool(value) for value in values]
+    if len(values) == batch_size:
+        return values
+    if len(values) == 1:
+        return values * batch_size
+    if len(values) < batch_size:
+        return values + ([False] * (batch_size - len(values)))
+    return values[:batch_size]
+
+
+def _normalize_batch_manifest_labels(selection_sample_manifest_label, batch_size):
+    if batch_size <= 0:
+        return [""] * batch_size
+    if selection_sample_manifest_label is None:
+        return [""] * batch_size
+    if isinstance(selection_sample_manifest_label, torch.Tensor):
+        values = [str(value) for value in selection_sample_manifest_label.detach().cpu().reshape(-1).tolist()]
+    elif isinstance(selection_sample_manifest_label, (list, tuple)):
+        values = [str(value or "") for value in selection_sample_manifest_label]
+    else:
+        values = [str(selection_sample_manifest_label or "")]
+    values = [str(value).strip() for value in values]
+    if len(values) == batch_size:
+        return values
+    if len(values) == 1:
+        return values * batch_size
+    if len(values) < batch_size:
+        return values + ([""] * (batch_size - len(values)))
+    return values[:batch_size]
 
 
 def compute_point_loss(predictions, batch, gamma=1.0, alpha=0.2, gradient_loss_fn = None, valid_range=-1, **kwargs):

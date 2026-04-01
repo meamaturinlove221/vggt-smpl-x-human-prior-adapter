@@ -1,0 +1,9 @@
+defaults:
+  - zju_vggt_geom_unproject_source_policy_nearestplusuniformtail_rawpool_confdepth_dropworst_gradconfmask_contractsegmentstratifiedhardtailplusreserve8to1to1_hardcasemaxdepthanchor_minimal
+  - _self_
+
+exp_name: zju_vggt_geom_unproject_source_policy_nearestplusuniformtail_rawpool_confdepth_dropworst_gradconfmask_contractsegmentstratifiedhardtailplusreserve8to1to1_hardcasemaxdepthanchor_focalscale1125_minimal
+
+loss:
+  camera:
+    sample_manifest_applied_focal_scale: 1.125

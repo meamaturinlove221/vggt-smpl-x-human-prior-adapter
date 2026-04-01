@@ -9,29 +9,40 @@ param(
     [string]$ExpName = "zju_geometry_minimal_modal",
     [string]$OutputSubdir = "",
     [int]$NumImages = 4,
-    [int]$MaxImgPerGpu = 4,
+    [int]$MaxImgPerGpu = 16,
     [int]$AccumSteps = 1,
     [int]$MaxEpochs = 1,
     [double]$LearningRate = 5e-5,
     [int]$LimitTrainBatches = 100,
     [int]$LimitValBatches = 20,
-    [int]$NumWorkers = 4,
+    [int]$NumWorkers = 16,
+    [int]$TrainPrefetchFactor = 8,
+    [int]$ValPrefetchFactor = 4,
+    [int]$ProbeAggregateSamples = 4,
+    [int]$ProbeAggregateStride = 50,
+    [string]$ProbeReferenceConfig = "",
+    [string]$ProbeLabelCurrent = "",
+    [string]$ProbeLabelReference = "",
     [int]$HoldoutStride = 10,
     [string]$CameraSource = "gt",
     [string]$MaskSource = "mask",
     [double]$MinDepthConf = 0.0,
-    [string]$ModalGpu = "",
-    [double]$ModalCpu = 0.0,
-    [int]$ModalMemoryMb = 0,
+    [string]$ModalGpu = "A100-80GB",
+    [double]$ModalCpu = 24.0,
+    [int]$ModalMemoryMb = 196608,
     [int]$ModalTimeoutSec = 0,
     [string]$DataVolume = "",
     [string]$OutputVolume = "",
     [string]$ExtraOverrides = "",
+    [double]$PreflightMinFreeMemoryGb = 4.0,
     [switch]$Detach,
     [switch]$SkipPreflight,
     [switch]$StopExistingApps,
     [switch]$AllowLargeLocalUpload,
     [switch]$AllowAttachedLongRun,
+    [switch]$EnableCompile,
+    [switch]$SkipActiveAppCheck,
+    [switch]$NoProbeContractDiff,
     [switch]$NoFreezeAggregator,
     [switch]$DryRun
 )
@@ -62,10 +73,51 @@ function Resolve-ModalExe([string]$Preferred) {
     return "modal"
 }
 
+function Get-ActiveModalApps([string]$ModalCmd, [string]$DescriptionFilter) {
+    $raw = & $ModalCmd app list --json
+    if ($LASTEXITCODE -ne 0) {
+        throw "Failed to query Modal app list."
+    }
+    $items = @()
+    if (-not [string]::IsNullOrWhiteSpace($raw)) {
+        $parsed = $raw | ConvertFrom-Json
+        if ($parsed -is [System.Array]) {
+            $items = $parsed
+        } elseif ($null -ne $parsed) {
+            $items = @($parsed)
+        }
+    }
+
+    return @(
+        $items | Where-Object {
+            $state = "$($_.'State')".ToLowerInvariant()
+            $description = "$($_.'Description')"
+            $isActive = $state -notin @("stopped", "stopping", "completed", "failed")
+            $matchesDescription = [string]::IsNullOrWhiteSpace($DescriptionFilter) -or $description -eq $DescriptionFilter
+            $isActive -and $matchesDescription
+        }
+    )
+}
+
+function Stop-ModalApps([string]$ModalCmd, [object[]]$Apps) {
+    foreach ($app in $Apps) {
+        $appId = "$($app.'App ID')"
+        if ([string]::IsNullOrWhiteSpace($appId)) {
+            continue
+        }
+        Write-Host "[modal-zju-geometry] stopping active Modal app $appId"
+        & $ModalCmd app stop $appId
+        if ($LASTEXITCODE -ne 0) {
+            throw "Failed to stop Modal app $appId."
+        }
+    }
+}
+
 $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
 $modal = Resolve-ModalExe $ModalExe
 $entryScript = Join-Path $repoRoot "modal_zju_geometry_minimal_finetune.py"
 $preflightScript = Join-Path $repoRoot "scripts\\invoke_modal_zju_preflight.ps1"
+$modalAppDescription = "vggt-zju-geometry-minimal-finetune"
 
 if (-not $Detach -and -not $AllowAttachedLongRun) {
     if ($LimitTrainBatches -gt 20 -or $MaxEpochs -gt 1) {
@@ -76,7 +128,8 @@ if (-not $Detach -and -not $AllowAttachedLongRun) {
 if (-not $SkipPreflight) {
     $preflightArgs = @(
         "-ExecutionPolicy", "Bypass", "-File", $preflightScript,
-        "-ModalExe", $modal
+        "-ModalExe", $modal,
+        "-MinFreeMemoryGb", $PreflightMinFreeMemoryGb
     )
     if (-not [string]::IsNullOrWhiteSpace($DataVolume)) {
         $preflightArgs += @("-DataVolume", $DataVolume)
@@ -100,6 +153,24 @@ if (-not $SkipPreflight) {
     & powershell @preflightArgs
     if ($LASTEXITCODE -ne 0) {
         throw "Modal preflight failed with exit code $LASTEXITCODE."
+    }
+}
+
+if (-not $SkipActiveAppCheck) {
+    $activeApps = Get-ActiveModalApps -ModalCmd $modal -DescriptionFilter $modalAppDescription
+    if ($activeApps.Count -gt 0) {
+        $appSummary = ($activeApps | ForEach-Object { "$($_.'App ID'):$($_.'State')" }) -join ", "
+        if ($StopExistingApps) {
+            Write-Host "[modal-zju-geometry] found active Modal apps: $appSummary"
+            Stop-ModalApps -ModalCmd $modal -Apps $activeApps
+            $remainingApps = Get-ActiveModalApps -ModalCmd $modal -DescriptionFilter $modalAppDescription
+            if ($remainingApps.Count -gt 0) {
+                $remainingSummary = ($remainingApps | ForEach-Object { "$($_.'App ID'):$($_.'State')" }) -join ", "
+                throw "Refusing launch because active Modal apps still remain after stop attempt: $remainingSummary"
+            }
+        } else {
+            throw "Refusing launch because active Modal apps already exist: $appSummary. Use -StopExistingApps or wait for the existing run to finish."
+        }
     }
 }
 
@@ -158,6 +229,7 @@ if (-not [string]::IsNullOrWhiteSpace($env:VGGT_ZJU_MODAL_OUTPUT_VOLUME)) {
     Write-Host "[modal-zju-geometry] output_volume=$env:VGGT_ZJU_MODAL_OUTPUT_VOLUME"
 }
 Write-Host "[modal-zju-geometry] detach=$Detach"
+Write-Host "[modal-zju-geometry] max_img_per_gpu=$MaxImgPerGpu num_workers=$NumWorkers train_prefetch=$TrainPrefetchFactor val_prefetch=$ValPrefetchFactor"
 
 $resolvedCheckpointSubpath = $CheckpointSubpath
 if (-not [string]::IsNullOrWhiteSpace($LocalCheckpoint) -and -not $DryRun) {
@@ -195,11 +267,20 @@ $cfg = [ordered]@{
     limit_train_batches = $LimitTrainBatches
     limit_val_batches = $LimitValBatches
     num_workers = $NumWorkers
+    train_prefetch_factor = $TrainPrefetchFactor
+    val_prefetch_factor = $ValPrefetchFactor
+    emit_dataset_probe_contract_diff = (-not $NoProbeContractDiff)
+    probe_aggregate_samples = $ProbeAggregateSamples
+    probe_aggregate_stride = $ProbeAggregateStride
+    probe_reference_config = $ProbeReferenceConfig
+    probe_label_current = $ProbeLabelCurrent
+    probe_label_reference = $ProbeLabelReference
     holdout_stride = $HoldoutStride
     camera_source = $CameraSource
     mask_source = $MaskSource
     min_depth_conf = $MinDepthConf
     freeze_aggregator = (-not $NoFreezeAggregator)
+    enable_compile = $EnableCompile.IsPresent
     extra_overrides = $ExtraOverrides
 }
 $cfgJsonRaw = $cfg | ConvertTo-Json -Compress

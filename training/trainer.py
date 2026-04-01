@@ -164,6 +164,8 @@ class Trainer:
             if ckpt_path is not None:
                 self._load_resuming_checkpoint(ckpt_path)
 
+        self._maybe_compile_model()
+
         # Wrap the model with DDP
         self._setup_ddp_distributed_training(distributed, device)
         
@@ -191,6 +193,8 @@ class Trainer:
             torch.backends.cudnn.benchmark = cuda_conf.cudnn_benchmark
             torch.backends.cuda.matmul.allow_tf32 = cuda_conf.allow_tf32
             torch.backends.cudnn.allow_tf32 = cuda_conf.allow_tf32
+            if cuda_conf.allow_tf32 and hasattr(torch, "set_float32_matmul_precision"):
+                torch.set_float32_matmul_precision("high")
 
         world_size = int(os.environ.get("WORLD_SIZE", "1"))
         self.use_distributed = world_size > 1
@@ -280,6 +284,51 @@ class Trainer:
             logging.info(f"Model summary saved to {model_summary_path}")
 
         logging.info("Successfully initialized training components.")
+
+    def _maybe_compile_model(self):
+        compile_conf = getattr(self.optim_conf, "compile", None)
+        if compile_conf is None or not bool(getattr(compile_conf, "enabled", False)):
+            return
+        if self.device.type != "cuda":
+            logging.info("torch.compile requested on non-CUDA device; skipping.")
+            return
+        if not hasattr(torch, "compile"):
+            logging.warning("torch.compile requested but not available in this PyTorch build; skipping.")
+            return
+
+        backend = str(getattr(compile_conf, "backend", "inductor"))
+        mode = getattr(compile_conf, "mode", None)
+        dynamic = bool(getattr(compile_conf, "dynamic", False))
+        fullgraph = bool(getattr(compile_conf, "fullgraph", False))
+        suppress_errors = bool(getattr(compile_conf, "suppress_errors", False))
+        compile_kwargs = {
+            "backend": backend,
+            "dynamic": dynamic,
+            "fullgraph": fullgraph,
+        }
+        if mode not in (None, "", "null"):
+            compile_kwargs["mode"] = str(mode)
+        if suppress_errors:
+            try:
+                import importlib
+
+                dynamo = importlib.import_module("torch._dynamo")
+                dynamo.config.suppress_errors = True
+                logging.info("torch.compile suppress_errors enabled; backend failures will fall back to eager.")
+            except Exception as exc:
+                logging.warning("Failed to enable torch.compile suppress_errors: %s", exc)
+
+        logging.info(
+            "Compiling model with torch.compile backend=%s mode=%s dynamic=%s fullgraph=%s suppress_errors=%s",
+            backend,
+            mode,
+            dynamic,
+            fullgraph,
+            suppress_errors,
+        )
+        start_time = time.time()
+        self.model = torch.compile(self.model, **compile_kwargs)
+        logging.info("torch.compile finished in %.2fs", time.time() - start_time)
 
     def _setup_dataloaders(self):
         """Initializes train and validation datasets and dataloaders."""
@@ -722,8 +771,9 @@ class Trainer:
             "images", "depths", "extrinsics", "intrinsics", 
             "cam_points", "world_points", "point_masks", "foreground_masks", "conf_depth_point_masks",
             "selection_anchor_quality_score",
+            "selection_sample_manifest_applied",
         ]        
-        string_keys = ["seq_name", "selection_anchor_camera"]
+        string_keys = ["seq_name", "selection_anchor_camera", "selection_sample_manifest_label"]
         
         for key in tensor_keys:
             if key in batch:

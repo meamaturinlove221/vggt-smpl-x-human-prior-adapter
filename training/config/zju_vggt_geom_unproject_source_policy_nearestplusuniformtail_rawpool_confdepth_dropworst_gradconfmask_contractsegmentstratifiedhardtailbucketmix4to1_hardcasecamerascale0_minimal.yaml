@@ -1,0 +1,10 @@
+defaults:
+  - zju_vggt_geom_unproject_source_policy_nearestplusuniformtail_rawpool_confdepth_dropworst_gradconfmask_contractsegmentstratifiedhardtailbucketmix4to1_minimal
+  - _self_
+
+exp_name: zju_vggt_geom_unproject_source_policy_nearestplusuniformtail_rawpool_confdepth_dropworst_gradconfmask_contractsegmentstratifiedhardtailbucketmix4to1_hardcasecamerascale0_minimal
+
+loss:
+  camera:
+    sample_manifest_applied_scale: 0.0
+    sample_manifest_applied_train_only: True

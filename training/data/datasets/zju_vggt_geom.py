@@ -4,10 +4,12 @@
 # This source code is licensed under the license found in the
 # LICENSE file in the root directory of this source tree.
 
+import json
 import logging
 import os
 import os.path as osp
 import random
+import re
 import tempfile
 import shutil
 from pathlib import Path
@@ -19,6 +21,8 @@ from PIL import Image
 from data.base_dataset import BaseDataset
 from data.dataset_util import depth_to_world_coords_points, read_image_cv2
 
+REPO_ROOT = Path(__file__).resolve().parents[3]
+
 
 def _ensure_list(value):
     if value is None:
@@ -26,6 +30,61 @@ def _ensure_list(value):
     if isinstance(value, str):
         return [item.strip() for item in value.split(",") if item.strip()]
     return [str(item) for item in value]
+
+
+_SAMPLE_SEQ_PATTERN = re.compile(r"^zju_(?P<seq_name>.+)_frame_(?P<frame_id>\d+)$")
+
+
+def _normalize_manifest_seq_name(raw_value):
+    text = str(raw_value).strip()
+    match = _SAMPLE_SEQ_PATTERN.match(text)
+    if match:
+        return match.group("seq_name")
+    return text
+
+
+def _load_sample_manifest_entries(manifest_path: Path):
+    payload = json.loads(manifest_path.read_text(encoding="utf-8"))
+    raw_entries = payload
+    if isinstance(payload, dict):
+        raw_entries = (
+            payload.get("entries")
+            or payload.get("frame_entries")
+            or payload.get("bucket_entries")
+            or payload.get("items")
+            or []
+        )
+    if not isinstance(raw_entries, list):
+        raise ValueError(f"sample manifest must contain a list of entries: {manifest_path}")
+
+    keys = set()
+    entry_by_key = {}
+    for entry in raw_entries:
+        if not isinstance(entry, dict):
+            raise ValueError(f"sample manifest entry must be an object: {entry!r}")
+        seq_name = entry.get("seq_name")
+        frame_id = entry.get("frame_id")
+        if seq_name is None or frame_id is None:
+            raise ValueError(
+                "sample manifest entry must contain seq_name and frame_id: "
+                f"{entry!r}"
+            )
+        key = (_normalize_manifest_seq_name(seq_name), int(frame_id))
+        keys.add(key)
+        entry_by_key[key] = dict(entry)
+    return keys, entry_by_key
+
+
+def _resolve_sample_manifest_path(manifest_path_like: str) -> Path:
+    manifest_path = Path(str(manifest_path_like).strip())
+    if manifest_path.is_absolute() and manifest_path.is_file():
+        return manifest_path
+    if manifest_path.is_file():
+        return manifest_path.resolve()
+    repo_relative = (REPO_ROOT / manifest_path).resolve()
+    if repo_relative.is_file():
+        return repo_relative
+    return manifest_path
 
 
 def _read_opencv_matrix(fs, key):
@@ -42,9 +101,10 @@ def _load_zju_cameras(seq_dir: Path):
     intri_path = seq_dir / "intri.yml"
     extri_path = seq_dir / "extri.yml"
     temp_paths = []
+    temp_root = None
     use_temp_copy = (not str(intri_path).isascii()) or (not str(extri_path).isascii())
     if use_temp_copy:
-        temp_root = Path(tempfile.gettempdir()) / "vggt_zju_yaml_train"
+        temp_root = Path(tempfile.mkdtemp(prefix="vggt_zju_yaml_train_"))
         temp_root.mkdir(parents=True, exist_ok=True)
         temp_intri = temp_root / "intri.yml"
         temp_extri = temp_root / "extri.yml"
@@ -78,6 +138,11 @@ def _load_zju_cameras(seq_dir: Path):
         for temp_path in temp_paths:
             try:
                 temp_path.unlink()
+            except OSError:
+                pass
+        if temp_root is not None:
+            try:
+                temp_root.rmdir()
             except OSError:
                 pass
     return cameras
@@ -330,6 +395,13 @@ class ZjuVggtGeomDataset(BaseDataset):
         min_supervised_views: int = 1,
         supervised_view_quality_filter: str = "none",
         conf_depth_view_quality_filter: str = "none",
+        sample_manifest_path: str = "",
+        sample_manifest_label: str = "",
+        sample_manifest_use_entry_anchor: bool = False,
+        sample_manifest_anchor_field: str = "promoted_anchor_camera",
+        sample_manifest_use_entry_camera_set: bool = False,
+        sample_manifest_camera_list_field: str = "selected_camera_names",
+        sample_manifest_supervised_camera_field: str = "selected_supervised_camera_names",
     ):
         super().__init__(common_conf=common_conf)
 
@@ -390,6 +462,18 @@ class ZjuVggtGeomDataset(BaseDataset):
         self.min_supervised_views = int(min_supervised_views)
         self.supervised_view_quality_filter = str(supervised_view_quality_filter)
         self.conf_depth_view_quality_filter = str(conf_depth_view_quality_filter)
+        self.sample_manifest_path = str(sample_manifest_path or "").strip()
+        self.sample_manifest_label = str(sample_manifest_label or "").strip()
+        self.sample_manifest_use_entry_anchor = bool(sample_manifest_use_entry_anchor)
+        self.sample_manifest_anchor_field = str(sample_manifest_anchor_field or "promoted_anchor_camera").strip()
+        self.sample_manifest_use_entry_camera_set = bool(sample_manifest_use_entry_camera_set)
+        self.sample_manifest_camera_list_field = str(sample_manifest_camera_list_field or "selected_camera_names").strip()
+        self.sample_manifest_supervised_camera_field = str(
+            sample_manifest_supervised_camera_field or "selected_supervised_camera_names"
+        ).strip()
+        self.sample_manifest_applied = False
+        self.sample_manifest_entry_count = 0
+        self.sample_manifest_entry_by_key = {}
 
         self.camera_store = {}
         self.camera_ring_orders = {}
@@ -463,6 +547,50 @@ class ZjuVggtGeomDataset(BaseDataset):
                     }
                 )
 
+        if self.sample_manifest_path and split == "train":
+            manifest_path = _resolve_sample_manifest_path(self.sample_manifest_path)
+            if not manifest_path.is_file():
+                raise FileNotFoundError(f"sample manifest not found: {manifest_path}")
+            manifest_keys, manifest_entry_by_key = _load_sample_manifest_entries(manifest_path)
+            self.sample_manifest_entry_count = len(manifest_keys)
+            if not manifest_keys:
+                raise ValueError(f"sample manifest contains no usable entries: {manifest_path}")
+            before_count = len(self.sequence_list)
+            self.sequence_list = [
+                row
+                for row in self.sequence_list
+                if (str(row["seq_name"]), int(row["frame_id"])) in manifest_keys
+            ]
+            matched_keys = {
+                (str(row["seq_name"]), int(row["frame_id"]))
+                for row in self.sequence_list
+            }
+            missing_count = len(manifest_keys - matched_keys)
+            logging.info(
+                "ZJU VGGT-Geom applied sample manifest split=%s path=%s kept=%d/%d missing=%d",
+                split,
+                manifest_path,
+                len(self.sequence_list),
+                before_count,
+                missing_count,
+            )
+            if not self.sequence_list:
+                raise ValueError(
+                    f"sample manifest filtered all training entries for split={split}: {manifest_path}"
+                )
+            self.sample_manifest_entry_by_key = {
+                key: manifest_entry_by_key[key]
+                for key in matched_keys
+                if key in manifest_entry_by_key
+            }
+            self.sample_manifest_applied = True
+        elif self.sample_manifest_path:
+            logging.info(
+                "ZJU VGGT-Geom ignoring sample manifest for split=%s path=%s",
+                split,
+                self.sample_manifest_path,
+            )
+
         if self.debug:
             self.sequence_list = self.sequence_list[: min(32, len(self.sequence_list))]
 
@@ -506,7 +634,12 @@ class ZjuVggtGeomDataset(BaseDataset):
         ring_order = self.camera_ring_orders[entry["seq_name"]]
         return [camera for camera in ring_order if camera in candidate_set]
 
-    def _select_anchor_camera(self, geom_camera_names, geom):
+    def _select_anchor_camera(self, entry, geom_camera_names, geom):
+        if self.sample_manifest_use_entry_anchor:
+            manifest_entry = self.sample_manifest_entry_by_key.get((str(entry["seq_name"]), int(entry["frame_id"])), {})
+            prescribed_anchor = str(manifest_entry.get(self.sample_manifest_anchor_field, "") or "").strip()
+            if prescribed_anchor and prescribed_anchor in geom_camera_names:
+                return prescribed_anchor
         if self.source_anchor_policy == "random":
             return random.choice(list(geom_camera_names))
         if self.source_anchor_policy == "max_depth_conf":
@@ -518,6 +651,64 @@ class ZjuVggtGeomDataset(BaseDataset):
             return max(score_by_camera, key=score_by_camera.get)
         raise ValueError(f"Unsupported source anchor policy: {self.source_anchor_policy}")
 
+    def _select_manifest_camera_set(self, entry, geom_camera_names, candidate_camera_names, img_per_seq):
+        if not self.sample_manifest_use_entry_camera_set:
+            return None
+        manifest_entry = self.sample_manifest_entry_by_key.get((str(entry["seq_name"]), int(entry["frame_id"])), {})
+        raw_selected = manifest_entry.get(self.sample_manifest_camera_list_field)
+        if not isinstance(raw_selected, list):
+            return None
+        selected_camera_names = []
+        seen = set()
+        for camera_name in raw_selected:
+            camera_name = str(camera_name or "").strip()
+            if not camera_name or camera_name in seen:
+                continue
+            selected_camera_names.append(camera_name)
+            seen.add(camera_name)
+        if not selected_camera_names or len(selected_camera_names) != int(img_per_seq):
+            return None
+        candidate_camera_set = set(candidate_camera_names)
+        if any(camera_name not in candidate_camera_set for camera_name in selected_camera_names):
+            return None
+
+        raw_supervised = manifest_entry.get(self.sample_manifest_supervised_camera_field)
+        if isinstance(raw_supervised, list):
+            prescribed_supervised = []
+            seen_supervised = set()
+            for camera_name in raw_supervised:
+                camera_name = str(camera_name or "").strip()
+                if not camera_name or camera_name in seen_supervised:
+                    continue
+                prescribed_supervised.append(camera_name)
+                seen_supervised.add(camera_name)
+        else:
+            geom_camera_set = set(geom_camera_names)
+            prescribed_supervised = [
+                camera_name
+                for camera_name in selected_camera_names
+                if camera_name in geom_camera_set
+            ]
+        prescribed_supervised = [
+            camera_name
+            for camera_name in prescribed_supervised
+            if camera_name in selected_camera_names
+        ]
+
+        anchor_camera = None
+        if self.sample_manifest_use_entry_anchor:
+            prescribed_anchor = str(manifest_entry.get(self.sample_manifest_anchor_field, "") or "").strip()
+            if prescribed_anchor:
+                anchor_camera = prescribed_anchor
+        if anchor_camera not in selected_camera_names:
+            anchor_camera = next(
+                (camera for camera in prescribed_supervised if camera in selected_camera_names),
+                None,
+            )
+        if anchor_camera not in selected_camera_names:
+            anchor_camera = selected_camera_names[0]
+        return selected_camera_names, prescribed_supervised, anchor_camera
+
     def _select_camera_names_with_source_policy(self, entry, geom_camera_names, geom, img_per_seq, source_view_pool_meta):
         effective_source_view_pool = source_view_pool_meta["effective_source_view_pool"]
         candidate_camera_names = self._build_candidate_camera_names(
@@ -526,10 +717,39 @@ class ZjuVggtGeomDataset(BaseDataset):
             effective_source_view_pool,
         )
         geom_camera_set = set(geom_camera_names)
+        manifest_camera_set = self._select_manifest_camera_set(
+            entry,
+            geom_camera_names,
+            candidate_camera_names,
+            img_per_seq,
+        )
+        if manifest_camera_set is not None:
+            selected_camera_names, selected_supervised_camera_names, anchor_camera = manifest_camera_set
+            return selected_camera_names, {
+                "source_policy": self.source_policy,
+                "source_view_pool": effective_source_view_pool,
+                "requested_source_view_pool": source_view_pool_meta["requested_source_view_pool"],
+                "source_view_pool_train_probability": float(source_view_pool_meta["source_view_pool_train_probability"]),
+                "rawpool_candidate_pool_used": bool(source_view_pool_meta["rawpool_candidate_pool_used"]),
+                "source_anchor_policy": self.source_anchor_policy,
+                "min_supervised_views": self.min_supervised_views,
+                "supervised_view_quality_filter": self.supervised_view_quality_filter,
+                "conf_depth_view_quality_filter": self.conf_depth_view_quality_filter,
+                "selection_anchor_camera": anchor_camera,
+                "selected_camera_names": list(selected_camera_names),
+                "selected_supervised_camera_names": list(selected_supervised_camera_names),
+                "selected_source_only_camera_names": [
+                    camera for camera in selected_camera_names if camera not in set(selected_supervised_camera_names)
+                ],
+                "available_candidate_view_count": int(len(candidate_camera_names)),
+                "available_candidate_camera_names": list(candidate_camera_names),
+            }
         if img_per_seq >= len(candidate_camera_names):
             selected_camera_names = list(candidate_camera_names)
             if selected_camera_names:
-                anchor_camera = next((camera for camera in selected_camera_names if camera in geom_camera_set), None)
+                anchor_camera = self._select_anchor_camera(entry, geom_camera_names, geom)
+                if anchor_camera not in selected_camera_names:
+                    anchor_camera = next((camera for camera in selected_camera_names if camera in geom_camera_set), None)
                 if anchor_camera is not None and selected_camera_names[0] != anchor_camera:
                     selected_camera_names.remove(anchor_camera)
                     selected_camera_names.insert(0, anchor_camera)
@@ -553,7 +773,7 @@ class ZjuVggtGeomDataset(BaseDataset):
                 "available_candidate_camera_names": list(candidate_camera_names),
             }
 
-        anchor_camera = self._select_anchor_camera(geom_camera_names, geom)
+        anchor_camera = self._select_anchor_camera(entry, geom_camera_names, geom)
         supervised_target = min(int(img_per_seq), len(geom_camera_names), self.min_supervised_views)
         selected_supervised = [anchor_camera]
         ring_order = self.camera_ring_orders[entry["seq_name"]]
@@ -865,12 +1085,19 @@ class ZjuVggtGeomDataset(BaseDataset):
 
         batch = {
             "seq_name": f"zju_{entry['seq_name']}_frame_{entry['frame_id']:06d}",
+            "entry_seq_name": str(entry["seq_name"]),
+            "entry_frame_id": int(entry["frame_id"]),
             "ids": ids,
             "frame_num": len(extrinsics),
             "available_view_count": int(available_views),
             "available_candidate_view_count": int(available_candidate_views),
             "camera_names": selected_camera_names,
             "geom_subdirs_present": list(entry.get("geom_subdirs_present", [])),
+            "selection_sample_manifest_path": self.sample_manifest_path,
+            "selection_sample_manifest_label": self.sample_manifest_label,
+            "selection_sample_manifest_applied": bool(self.sample_manifest_applied),
+            "selection_sample_manifest_use_entry_anchor": bool(self.sample_manifest_use_entry_anchor),
+            "selection_sample_manifest_use_entry_camera_set": bool(self.sample_manifest_use_entry_camera_set),
             "selection_anchor_camera": selection_meta["selection_anchor_camera"],
             "selection_source_policy": selection_meta["source_policy"],
             "selection_source_view_pool": selection_meta["source_view_pool"],

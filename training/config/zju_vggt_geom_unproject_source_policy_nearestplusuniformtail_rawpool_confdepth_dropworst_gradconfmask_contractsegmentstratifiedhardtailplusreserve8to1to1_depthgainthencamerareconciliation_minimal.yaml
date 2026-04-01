@@ -1,0 +1,78 @@
+defaults:
+  - zju_vggt_geom_unproject_source_policy_nearestplusuniformtail_rawpool_confdepth_dropworst_gradconfmask_contractsegmentstratifiedhardtailplusreserve8to1to1_hardcasemaxdepthanchor_minimal
+  - _self_
+
+exp_name: zju_vggt_geom_unproject_source_policy_nearestplusuniformtail_rawpool_confdepth_dropworst_gradconfmask_contractsegmentstratifiedhardtailplusreserve8to1to1_depthgainthencamerareconciliation_minimal
+
+loss:
+  camera:
+    sample_manifest_schedule_start: 0.55
+    sample_manifest_schedule_end: 0.80
+    sample_manifest_label_focal_scales_stage2:
+      default: 1.05
+  depth:
+    weight_stage2_start: 0.55
+    weight_stage2_end: 0.80
+    weight_stage2_value: 0.90
+
+data:
+  train:
+    dataset:
+      dataset_configs:
+        - _target_: data.datasets.zju_vggt_geom.ZjuVggtGeomDataset
+          split: train
+          ZJU_DIR: ${zju_dir}
+          seq_names: ${zju_seq_names}
+          geom_subdir: ${zju_geom_subdir}
+          camera_source: ${zju_camera_source}
+          mask_source: ${zju_mask_source}
+          source_policy: ${zju_source_policy}
+          source_view_pool: ${zju_source_view_pool}
+          source_view_pool_train_probability: ${zju_source_view_pool_train_probability}
+          source_anchor_policy: ${zju_source_anchor_policy}
+          min_supervised_views: ${zju_min_supervised_views}
+          supervised_view_quality_filter: ${zju_supervised_view_quality_filter}
+          conf_depth_view_quality_filter: ${zju_conf_depth_view_quality_filter}
+          min_depth_conf: ${zju_min_depth_conf}
+          holdout_stride: ${zju_holdout_stride}
+          len_train: ${zju_default_stream_len_train}
+          sample_manifest_path: ""
+          sample_manifest_label: default
+        - _target_: data.datasets.zju_vggt_geom.ZjuVggtGeomDataset
+          split: train
+          ZJU_DIR: ${zju_dir}
+          seq_names: ${zju_seq_names}
+          geom_subdir: ${zju_geom_subdir}
+          camera_source: ${zju_camera_source}
+          mask_source: ${zju_mask_source}
+          source_policy: ${zju_source_policy}
+          source_view_pool: ${zju_source_view_pool}
+          source_view_pool_train_probability: ${zju_source_view_pool_train_probability}
+          source_anchor_policy: max_depth_conf
+          min_supervised_views: ${zju_min_supervised_views}
+          supervised_view_quality_filter: ${zju_supervised_view_quality_filter}
+          conf_depth_view_quality_filter: ${zju_conf_depth_view_quality_filter}
+          min_depth_conf: ${zju_min_depth_conf}
+          holdout_stride: ${zju_holdout_stride}
+          len_train: ${zju_hardcase_stream_len_train}
+          sample_manifest_path: ${zju_hardcase_manifest_path}
+          sample_manifest_label: hardtail
+        - _target_: data.datasets.zju_vggt_geom.ZjuVggtGeomDataset
+          split: train
+          ZJU_DIR: ${zju_dir}
+          seq_names: ${zju_seq_names}
+          geom_subdir: ${zju_geom_subdir}
+          camera_source: ${zju_camera_source}
+          mask_source: ${zju_mask_source}
+          source_policy: ${zju_source_policy}
+          source_view_pool: ${zju_source_view_pool}
+          source_view_pool_train_probability: ${zju_source_view_pool_train_probability}
+          source_anchor_policy: ${zju_source_anchor_policy}
+          min_supervised_views: ${zju_min_supervised_views}
+          supervised_view_quality_filter: ${zju_supervised_view_quality_filter}
+          conf_depth_view_quality_filter: ${zju_conf_depth_view_quality_filter}
+          min_depth_conf: ${zju_min_depth_conf}
+          holdout_stride: ${zju_holdout_stride}
+          len_train: ${zju_balance_reserve_stream_len_train}
+          sample_manifest_path: ${zju_balance_reserve_manifest_path}
+          sample_manifest_label: reserve

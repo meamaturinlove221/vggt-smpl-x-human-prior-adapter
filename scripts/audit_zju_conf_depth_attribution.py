@@ -2,6 +2,7 @@ import argparse
 import json
 import re
 import sys
+import time
 from collections import defaultdict
 from pathlib import Path
 
@@ -18,7 +19,12 @@ for root in (str(REPO_ROOT), str(TRAINING_ROOT)):
     if root not in sys.path:
         sys.path.insert(0, root)
 
-from loss import check_and_fix_inf_nan
+from loss import (
+    build_quantile_mask,
+    build_reliable_foreground_region_mask,
+    check_and_fix_inf_nan,
+    unproject_depth_and_pose_to_world_points,
+)
 from train_utils.normalization import normalize_camera_extrinsics_and_points_batch
 from training.data.datasets.zju_vggt_geom import ZjuVggtGeomDataset
 
@@ -27,6 +33,7 @@ FRAME_PATTERN = re.compile(r"_frame_(\d+)$")
 METRIC_KEYS = (
     "conf_depth_mean",
     "reg_depth_mean",
+    "unproject_geometry_mean",
     "pred_depth_conf_mean",
     "fg_human_conf_depth_mean",
     "bg_bottom_band_conf_depth_mean",
@@ -305,13 +312,114 @@ def build_region_masks(view_valid, view_conf_valid, foreground, bottom_mask):
     }
 
 
-def run_model_rows(model, label: str, batch: dict, sample: dict, gamma: float, alpha: float, device: torch.device):
-    with torch.no_grad():
+def compute_unproject_geometry_maps(
+    predictions: dict,
+    batch_gpu: dict,
+    *,
+    unproject_cfg: dict,
+    eps: float = 1e-8,
+):
+    image_hw = batch_gpu["images"].shape[-2:]
+    pred_world_points = unproject_depth_and_pose_to_world_points(
+        predictions["depth"],
+        predictions["pose_enc"],
+        image_size_hw=image_hw,
+        pose_encoding_type=unproject_cfg.get("pose_encoding_type", "absT_quaR_FoV"),
+    )
+    pred_world_points = check_and_fix_inf_nan(pred_world_points, "audit_pred_world_points")
+    gt_world_points = check_and_fix_inf_nan(batch_gpu["world_points"], "audit_gt_world_points")
+
+    pred_depth = predictions["depth"]
+    pred_depth_mask = pred_depth[..., 0] > eps
+    valid_mask = (
+        batch_gpu["point_masks"]
+        & pred_depth_mask
+        & torch.isfinite(pred_world_points).all(dim=-1)
+    )
+
+    pred_depth_conf = None
+    if bool(unproject_cfg.get("use_foreground_region_mask", False)):
+        foreground_masks = batch_gpu.get("foreground_masks", None)
+        if foreground_masks is None:
+            raise ValueError("use_foreground_region_mask=True requires batch['foreground_masks'].")
+        region_mask = build_reliable_foreground_region_mask(
+            foreground_masks.to(device=valid_mask.device, dtype=torch.bool),
+            erode_px=int(unproject_cfg.get("foreground_erode_px", 0) or 0),
+            drop_bottom_ratio=float(unproject_cfg.get("foreground_drop_bottom_ratio", 0.0) or 0.0),
+        )
+        valid_mask = valid_mask & region_mask
+
+    if bool(unproject_cfg.get("use_depth_conf_gate", False)):
+        pred_depth_conf = predictions.get("depth_conf", None)
+        if pred_depth_conf is None:
+            raise ValueError("use_depth_conf_gate=True requires predictions['depth_conf'].")
+        if bool(unproject_cfg.get("detach_depth_conf", True)):
+            pred_depth_conf = pred_depth_conf.detach()
+        pred_depth_conf = check_and_fix_inf_nan(pred_depth_conf, "audit_unproject_pred_depth_conf")
+        valid_mask = valid_mask & torch.isfinite(pred_depth_conf)
+        depth_conf_threshold = float(unproject_cfg.get("depth_conf_threshold", 0.0) or 0.0)
+        if depth_conf_threshold > 0.0:
+            valid_mask = valid_mask & (pred_depth_conf >= depth_conf_threshold)
+
+    residual_map = torch.norm(pred_world_points - gt_world_points, dim=-1)
+    residual_map = check_and_fix_inf_nan(residual_map, "audit_unproject_geometry_residual")
+    return residual_map, valid_mask, pred_depth_conf
+
+
+def summarize_unproject_view(
+    residual_map: torch.Tensor,
+    valid_mask: torch.Tensor,
+    pred_depth_conf: torch.Tensor | None,
+    *,
+    min_valid_points: int,
+    valid_range: float,
+    depth_conf_power: float,
+    eps: float = 1e-8,
+):
+    valid_count = int(valid_mask.sum().item())
+    if valid_count < int(min_valid_points):
+        return None, valid_count
+
+    values = residual_map[valid_mask]
+    conf_weights = None
+    if pred_depth_conf is not None:
+        conf_weights = pred_depth_conf[valid_mask].clamp_min(eps).pow(depth_conf_power)
+
+    if valid_range > 0:
+        quantile_mask = build_quantile_mask(values, valid_range)
+        if quantile_mask is not None:
+            values = values[quantile_mask]
+            if conf_weights is not None:
+                conf_weights = conf_weights[quantile_mask]
+
+    if values.numel() <= 0:
+        return None, valid_count
+    if conf_weights is not None:
+        conf_weights = check_and_fix_inf_nan(conf_weights, "audit_unproject_geometry_conf_weights")
+        score = float((values * conf_weights).sum().item() / conf_weights.sum().clamp_min(eps).item())
+        return score, valid_count
+    return float(values.mean().item()), valid_count
+
+
+def run_model_rows(
+    model,
+    label: str,
+    batch: dict,
+    sample: dict,
+    gamma: float,
+    alpha: float,
+    unproject_cfg: dict,
+    device: torch.device,
+):
+    autocast_enabled = device.type == "cuda"
+    autocast_dtype = torch.bfloat16 if autocast_enabled else torch.float32
+    with torch.inference_mode():
         batch_gpu = {
             key: value.to(device) if hasattr(value, "to") else value
             for key, value in batch.items()
         }
-        predictions = model(images=batch_gpu["images"])
+        with torch.autocast(device_type=device.type, dtype=autocast_dtype, enabled=autocast_enabled):
+            predictions = model(images=batch_gpu["images"])
 
     pred_depth = check_and_fix_inf_nan(predictions["depth"], f"{label}_pred_depth")
     pred_conf = check_and_fix_inf_nan(predictions["depth_conf"], f"{label}_pred_conf").clamp_min(1e-8)
@@ -323,12 +431,23 @@ def run_model_rows(model, label: str, batch: dict, sample: dict, gamma: float, a
 
     reg_map = torch.norm(gt_depth - pred_depth, dim=-1)
     conf_map = gamma * reg_map * pred_conf - alpha * torch.log(pred_conf)
+    unproject_residual_map, unproject_valid_mask, unproject_pred_depth_conf = compute_unproject_geometry_maps(
+        predictions,
+        batch_gpu,
+        unproject_cfg=unproject_cfg,
+    )
 
     foreground_masks = batch_gpu["foreground_masks"]
     _, _, hh, ww = point_mask.shape
     bottom_mask = build_bottom_mask(hh, ww, device)
 
-    frame_id = parse_frame_id(sample["seq_name"])
+    frame_id = sample.get("entry_frame_id")
+    if frame_id is None:
+        frame_id = parse_frame_id(sample["seq_name"])
+    entry_seq_name = str(sample.get("entry_seq_name") or sample["seq_name"])
+    unproject_min_valid_points = int(unproject_cfg.get("min_valid_points", 100) or 100)
+    unproject_valid_range = float(unproject_cfg.get("valid_range", 0.98) or 0.98)
+    unproject_depth_conf_power = float(unproject_cfg.get("depth_conf_power", 1.0) or 1.0)
     rows = []
     for view_idx, camera_name in enumerate(sample["camera_names"]):
         view_valid = valid_mask[0, view_idx]
@@ -337,12 +456,21 @@ def run_model_rows(model, label: str, batch: dict, sample: dict, gamma: float, a
         role = determine_view_role(camera_name, sample)
         region_masks = build_region_masks(view_valid, view_conf_valid, foreground, bottom_mask)
         quality_score = sample.get("supervised_view_quality_scores", {}).get(str(camera_name))
+        unproject_geometry_mean, unproject_valid_points = summarize_unproject_view(
+            unproject_residual_map[0, view_idx],
+            unproject_valid_mask[0, view_idx],
+            None if unproject_pred_depth_conf is None else unproject_pred_depth_conf[0, view_idx],
+            min_valid_points=unproject_min_valid_points,
+            valid_range=unproject_valid_range,
+            depth_conf_power=unproject_depth_conf_power,
+        )
 
         rows.append(
             {
                 "label": label,
                 "sample_index": int(sample["audit_sample_index"]),
                 "seq_name": str(sample["seq_name"]),
+                "entry_seq_name": entry_seq_name,
                 "frame_id": frame_id,
                 "view_idx": int(view_idx),
                 "camera_name": str(camera_name),
@@ -351,6 +479,7 @@ def run_model_rows(model, label: str, batch: dict, sample: dict, gamma: float, a
                 "quality_score": None if quality_score is None else float(quality_score),
                 "valid_pixels": int(view_valid.sum().item()),
                 "conf_valid_pixels": int(view_conf_valid.sum().item()),
+                "unproject_valid_points": int(unproject_valid_points),
                 "fg_human_valid_pixels": int(region_masks["fg_human_valid"].sum().item()),
                 "bg_bottom_band_valid_pixels": int(region_masks["bg_bottom_band_valid"].sum().item()),
                 "bg_far_valid_pixels": int(region_masks["bg_far_valid"].sum().item()),
@@ -359,6 +488,7 @@ def run_model_rows(model, label: str, batch: dict, sample: dict, gamma: float, a
                 "bg_far_conf_valid_pixels": int(region_masks["bg_far_conf_valid"].sum().item()),
                 "conf_depth_mean": safe_mean(conf_map[0, view_idx], view_conf_valid),
                 "reg_depth_mean": safe_mean(reg_map[0, view_idx], view_valid),
+                "unproject_geometry_mean": unproject_geometry_mean,
                 "pred_depth_conf_mean": safe_mean(pred_conf[0, view_idx], view_conf_valid),
                 "fg_human_conf_depth_mean": safe_mean(conf_map[0, view_idx], region_masks["fg_human_conf_valid"]),
                 "bg_bottom_band_conf_depth_mean": safe_mean(conf_map[0, view_idx], region_masks["bg_bottom_band_conf_valid"]),
@@ -442,6 +572,64 @@ def build_aggregate(rows):
         "by_frame": finalize_summary(by_frame),
         "by_region": build_region_summary(rows),
     }
+
+
+def build_frame_rows(rows, sample_debug_rows, label: str):
+    sample_debug_index = {
+        int(row["sample_index"]): row
+        for row in sample_debug_rows
+    }
+    grouped = []
+    for sample_index in sorted(sample_debug_index):
+        debug_row = sample_debug_index[sample_index]
+        supervised_rows = [
+            row
+            for row in rows
+            if int(row["sample_index"]) == sample_index
+            and str(row["camera_name"]) in set(debug_row.get("supervised_camera_names", []))
+        ]
+        aggregate_bucket = build_empty_bucket()
+        for row in supervised_rows:
+            add_summary_bucket(aggregate_bucket, row)
+        aggregate = finalize_summary({"frame": aggregate_bucket})["frame"]
+        frame_row = {
+            "label": label,
+            "sample_index": int(sample_index),
+            "seq_name": str(debug_row.get("entry_seq_name") or debug_row.get("seq_name") or ""),
+            "sample_seq_name": str(debug_row.get("seq_name") or ""),
+            "frame_id": debug_row.get("frame_id"),
+            "frame_key": make_frame_key(debug_row.get("frame_id")),
+            "promoted_anchor_camera": debug_row.get("selection_anchor_camera"),
+            "selected_supervised_camera_names": list(debug_row.get("supervised_camera_names", [])),
+            "selected_source_only_camera_names": list(debug_row.get("source_only_camera_names", [])),
+            "candidate_supervised_camera_names": list(debug_row.get("candidate_supervised_camera_names", [])),
+            "dropped_supervised_camera_names": list(debug_row.get("dropped_supervised_camera_names", [])),
+            "selected_camera_names": list(debug_row.get("camera_names", [])),
+            "supervised_view_count": int(len(supervised_rows)),
+            "eligible_primary_metrics": bool(
+                aggregate.get("conf_depth_mean") is not None
+                and aggregate.get("reg_depth_mean") is not None
+                and aggregate.get("unproject_geometry_mean") is not None
+            ),
+            "valid_pixels": int(aggregate["valid_pixels"]),
+            "conf_valid_pixels": int(aggregate["conf_valid_pixels"]),
+            "conf_depth_mean": aggregate.get("conf_depth_mean"),
+            "reg_depth_mean": aggregate.get("reg_depth_mean"),
+            "unproject_geometry_mean": aggregate.get("unproject_geometry_mean"),
+            "pred_depth_conf_mean": aggregate.get("pred_depth_conf_mean"),
+            "fg_human_conf_depth_mean": aggregate.get("fg_human_conf_depth_mean"),
+            "bg_bottom_band_conf_depth_mean": aggregate.get("bg_bottom_band_conf_depth_mean"),
+            "bg_far_conf_depth_mean": aggregate.get("bg_far_conf_depth_mean"),
+            "fg_human_reg_depth_mean": aggregate.get("fg_human_reg_depth_mean"),
+            "bg_bottom_band_reg_depth_mean": aggregate.get("bg_bottom_band_reg_depth_mean"),
+            "bg_far_reg_depth_mean": aggregate.get("bg_far_reg_depth_mean"),
+            "fg_bottom_conf_depth_mean": aggregate.get("fg_bottom_conf_depth_mean"),
+            "fg_nonbottom_conf_depth_mean": aggregate.get("fg_nonbottom_conf_depth_mean"),
+            "fg_bottom_reg_depth_mean": aggregate.get("fg_bottom_reg_depth_mean"),
+            "fg_nonbottom_reg_depth_mean": aggregate.get("fg_nonbottom_reg_depth_mean"),
+        }
+        grouped.append(frame_row)
+    return grouped
 
 
 def build_delta_rows(primary_rows, reference_rows):
@@ -531,6 +719,12 @@ def top_wrapped_rows_by_metric(rows, metric, descending=True, limit=12):
 
 def format_metric(value):
     return "n/a" if value is None else f"{value:.4f}"
+
+
+def write_jsonl(path: Path, rows: list[dict]) -> None:
+    with path.open("w", encoding="utf-8") as handle:
+        for row in rows:
+            handle.write(json.dumps(row, ensure_ascii=False) + "\n")
 
 
 def first_positive_item(items, metric):
@@ -878,7 +1072,19 @@ def main():
 
     gamma = float(cfg.loss.depth.gamma)
     alpha = float(cfg.loss.depth.alpha)
+    unproject_cfg = OmegaConf.to_container(cfg.loss.unproject_geometry, resolve=True)
+    if isinstance(unproject_cfg, dict):
+        unproject_cfg.pop("_target_", None)
+        unproject_cfg.pop("weight", None)
+    else:
+        unproject_cfg = {}
     sample_count = min(int(args.num_samples), len(dataset))
+    started_at = time.time()
+    print(
+        f"[audit-zju-conf-depth] split={args.split} dataset_len={len(dataset)} sample_count={sample_count} "
+        f"config={repo_rel(config_path)} checkpoint={repo_rel(primary_checkpoint)} device={args.device}",
+        flush=True,
+    )
 
     primary_rows = []
     reference_rows = []
@@ -889,16 +1095,36 @@ def main():
         batch = normalize_batch(sample_to_batch(sample))
 
         primary_rows.extend(
-            run_model_rows(primary_model, args.label, batch, sample, gamma=gamma, alpha=alpha, device=device)
+            run_model_rows(
+                primary_model,
+                args.label,
+                batch,
+                sample,
+                gamma=gamma,
+                alpha=alpha,
+                unproject_cfg=unproject_cfg,
+                device=device,
+            )
         )
         if reference_model is not None:
             reference_rows.extend(
-                run_model_rows(reference_model, args.reference_label, batch, sample, gamma=gamma, alpha=alpha, device=device)
+                run_model_rows(
+                    reference_model,
+                    args.reference_label,
+                    batch,
+                    sample,
+                    gamma=gamma,
+                    alpha=alpha,
+                    unproject_cfg=unproject_cfg,
+                    device=device,
+                )
             )
         sample_debug_rows.append(
             {
                 "sample_index": int(sample_index),
                 "seq_name": str(sample["seq_name"]),
+                "entry_seq_name": str(sample.get("entry_seq_name") or sample["seq_name"]),
+                "frame_id": sample.get("entry_frame_id"),
                 "selection_anchor_camera": sample.get("selection_anchor_camera"),
                 "camera_names": list(sample.get("camera_names", [])),
                 "candidate_supervised_camera_names": list(sample.get("candidate_supervised_camera_names", [])),
@@ -910,9 +1136,24 @@ def main():
                 "supervised_view_quality_scores": dict(sample.get("supervised_view_quality_scores", {})),
             }
         )
+        if (
+            sample_index == 0
+            or (sample_index + 1) % 25 == 0
+            or (sample_index + 1) == sample_count
+        ):
+            elapsed = time.time() - started_at
+            rate = elapsed / max(sample_index + 1, 1)
+            eta = rate * max(sample_count - (sample_index + 1), 0)
+            print(
+                f"[audit-zju-conf-depth] progress={sample_index + 1}/{sample_count} "
+                f"elapsed_sec={elapsed:.1f} eta_sec={eta:.1f} seq={sample['seq_name']}",
+                flush=True,
+            )
 
     primary_summary = build_aggregate(primary_rows)
+    primary_frame_rows = build_frame_rows(primary_rows, sample_debug_rows, args.label)
     reference_summary = None
+    reference_frame_rows = None
     delta_rows = None
     delta_summary = None
     top_delta_views = []
@@ -921,6 +1162,7 @@ def main():
     top_delta_regions = []
     if reference_rows:
         reference_summary = build_aggregate(reference_rows)
+        reference_frame_rows = build_frame_rows(reference_rows, sample_debug_rows, args.reference_label)
         delta_rows = build_delta_rows(primary_rows, reference_rows)
         delta_summary = summarize_delta_rows(delta_rows)
         top_delta_views = top_rows_by_metric(delta_rows, "delta_conf_depth_mean", descending=True, limit=16)
@@ -979,9 +1221,12 @@ def main():
         "reference_checkpoint": None if reference_checkpoint is None else repo_rel(reference_checkpoint),
         "gamma": gamma,
         "alpha": alpha,
+        "unproject_geometry_config": unproject_cfg,
         "sample_debug_rows": sample_debug_rows,
         "primary_summary": primary_summary,
+        "primary_frame_rows": primary_frame_rows,
         "reference_summary": reference_summary,
+        "reference_frame_rows": reference_frame_rows,
         "delta_summary": delta_summary,
         "anchor_summary": {
             "primary": primary_summary["by_camera"],
@@ -1016,8 +1261,26 @@ def main():
 
     json_path = output_dir / "summary.json"
     md_path = output_dir / "summary.md"
+    primary_rows_jsonl_path = output_dir / "primary_rows.jsonl"
+    primary_frame_rows_jsonl_path = output_dir / "primary_frame_rows.jsonl"
+    payload["artifacts"] = {
+        "summary_json": str(json_path),
+        "summary_md": str(md_path),
+        "primary_rows_jsonl": str(primary_rows_jsonl_path),
+        "primary_frame_rows_jsonl": str(primary_frame_rows_jsonl_path),
+    }
+    if reference_rows:
+        payload["artifacts"]["reference_rows_jsonl"] = str(output_dir / "reference_rows.jsonl")
+        payload["artifacts"]["reference_frame_rows_jsonl"] = str(output_dir / "reference_frame_rows.jsonl")
+        payload["artifacts"]["delta_rows_jsonl"] = str(output_dir / "delta_rows.jsonl")
     json_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     write_markdown(md_path, payload)
+    write_jsonl(primary_rows_jsonl_path, primary_rows)
+    write_jsonl(primary_frame_rows_jsonl_path, primary_frame_rows)
+    if reference_rows:
+        write_jsonl(output_dir / "reference_rows.jsonl", reference_rows)
+        write_jsonl(output_dir / "reference_frame_rows.jsonl", reference_frame_rows or [])
+        write_jsonl(output_dir / "delta_rows.jsonl", delta_rows or [])
     print(md_path)
 
 

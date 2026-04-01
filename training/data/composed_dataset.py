@@ -181,6 +181,14 @@ class ComposedDataset(Dataset, ABC):
             sample["selection_anchor_quality_score"] = torch.tensor(
                 float(anchor_quality_score), dtype=torch.float32
             )
+        if "selection_sample_manifest_applied" in batch:
+            sample["selection_sample_manifest_applied"] = torch.tensor(
+                bool(batch["selection_sample_manifest_applied"]), dtype=torch.bool
+            )
+        if "selection_sample_manifest_label" in batch:
+            sample["selection_sample_manifest_label"] = str(
+                batch.get("selection_sample_manifest_label") or ""
+            )
 
         # --- Track Processing (if enabled) ---
         if self.load_track:

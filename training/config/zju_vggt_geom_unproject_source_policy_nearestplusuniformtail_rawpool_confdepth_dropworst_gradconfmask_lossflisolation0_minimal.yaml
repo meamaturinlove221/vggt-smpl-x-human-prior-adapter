@@ -1,0 +1,9 @@
+defaults:
+  - zju_vggt_geom_unproject_source_policy_nearestplusuniformtail_rawpool_confdepth_dropworst_gradconfmask_minimal
+  - _self_
+
+exp_name: zju_vggt_geom_unproject_source_policy_nearestplusuniformtail_rawpool_confdepth_dropworst_gradconfmask_lossflisolation0_minimal
+
+loss:
+  camera:
+    loss_fl_isolation_scale: 0.0

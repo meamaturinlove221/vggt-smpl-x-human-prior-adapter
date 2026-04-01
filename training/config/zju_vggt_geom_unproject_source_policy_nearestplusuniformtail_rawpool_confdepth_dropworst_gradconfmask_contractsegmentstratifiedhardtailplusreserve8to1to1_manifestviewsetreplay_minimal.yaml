@@ -1,0 +1,85 @@
+defaults:
+  - zju_vggt_geom_unproject_source_policy_nearestplusuniformtail_rawpool_confdepth_dropworst_gradconfmask_minimal
+  - _self_
+
+exp_name: zju_vggt_geom_unproject_source_policy_nearestplusuniformtail_rawpool_confdepth_dropworst_gradconfmask_contractsegmentstratifiedhardtailplusreserve8to1to1_manifestviewsetreplay_minimal
+
+zju_hardcase_manifest_path: output/zju_source_policy_research_loop/contract_segment_stratified_hardtail_bucket.promotedlead.v1.json
+zju_balance_reserve_manifest_path: output/zju_source_policy_research_loop/anchor_balance_reserve_manifest.promotedlead.v1.json
+zju_default_stream_len_train: 80000
+zju_hardcase_stream_len_train: 10000
+zju_balance_reserve_stream_len_train: 10000
+
+data:
+  train:
+    dataset:
+      dataset_configs:
+        - _target_: data.datasets.zju_vggt_geom.ZjuVggtGeomDataset
+          split: train
+          ZJU_DIR: ${zju_dir}
+          seq_names: ${zju_seq_names}
+          geom_subdir: ${zju_geom_subdir}
+          camera_source: ${zju_camera_source}
+          mask_source: ${zju_mask_source}
+          source_policy: ${zju_source_policy}
+          source_view_pool: ${zju_source_view_pool}
+          source_view_pool_train_probability: ${zju_source_view_pool_train_probability}
+          source_anchor_policy: ${zju_source_anchor_policy}
+          min_supervised_views: ${zju_min_supervised_views}
+          supervised_view_quality_filter: ${zju_supervised_view_quality_filter}
+          conf_depth_view_quality_filter: ${zju_conf_depth_view_quality_filter}
+          min_depth_conf: ${zju_min_depth_conf}
+          holdout_stride: ${zju_holdout_stride}
+          len_train: ${zju_default_stream_len_train}
+          sample_manifest_path: ""
+          sample_manifest_label: ""
+          sample_manifest_use_entry_anchor: false
+          sample_manifest_use_entry_camera_set: false
+        - _target_: data.datasets.zju_vggt_geom.ZjuVggtGeomDataset
+          split: train
+          ZJU_DIR: ${zju_dir}
+          seq_names: ${zju_seq_names}
+          geom_subdir: ${zju_geom_subdir}
+          camera_source: ${zju_camera_source}
+          mask_source: ${zju_mask_source}
+          source_policy: ${zju_source_policy}
+          source_view_pool: ${zju_source_view_pool}
+          source_view_pool_train_probability: ${zju_source_view_pool_train_probability}
+          source_anchor_policy: ${zju_source_anchor_policy}
+          min_supervised_views: ${zju_min_supervised_views}
+          supervised_view_quality_filter: ${zju_supervised_view_quality_filter}
+          conf_depth_view_quality_filter: ${zju_conf_depth_view_quality_filter}
+          min_depth_conf: ${zju_min_depth_conf}
+          holdout_stride: ${zju_holdout_stride}
+          len_train: ${zju_hardcase_stream_len_train}
+          sample_manifest_path: ${zju_hardcase_manifest_path}
+          sample_manifest_label: hardtail
+          sample_manifest_use_entry_anchor: true
+          sample_manifest_anchor_field: promoted_anchor_camera
+          sample_manifest_use_entry_camera_set: true
+          sample_manifest_camera_list_field: selected_camera_names
+          sample_manifest_supervised_camera_field: selected_supervised_camera_names
+        - _target_: data.datasets.zju_vggt_geom.ZjuVggtGeomDataset
+          split: train
+          ZJU_DIR: ${zju_dir}
+          seq_names: ${zju_seq_names}
+          geom_subdir: ${zju_geom_subdir}
+          camera_source: ${zju_camera_source}
+          mask_source: ${zju_mask_source}
+          source_policy: ${zju_source_policy}
+          source_view_pool: ${zju_source_view_pool}
+          source_view_pool_train_probability: ${zju_source_view_pool_train_probability}
+          source_anchor_policy: ${zju_source_anchor_policy}
+          min_supervised_views: ${zju_min_supervised_views}
+          supervised_view_quality_filter: ${zju_supervised_view_quality_filter}
+          conf_depth_view_quality_filter: ${zju_conf_depth_view_quality_filter}
+          min_depth_conf: ${zju_min_depth_conf}
+          holdout_stride: ${zju_holdout_stride}
+          len_train: ${zju_balance_reserve_stream_len_train}
+          sample_manifest_path: ${zju_balance_reserve_manifest_path}
+          sample_manifest_label: reserve
+          sample_manifest_use_entry_anchor: true
+          sample_manifest_anchor_field: promoted_anchor_camera
+          sample_manifest_use_entry_camera_set: true
+          sample_manifest_camera_list_field: selected_camera_names
+          sample_manifest_supervised_camera_field: selected_supervised_camera_names

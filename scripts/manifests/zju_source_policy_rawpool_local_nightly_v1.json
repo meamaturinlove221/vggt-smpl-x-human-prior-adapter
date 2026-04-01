@@ -5,15 +5,26 @@
   "status": "promoted_local_lead_synced_cloud_off",
   "problem_id": "source_policy_hybrid_ring_regularization_v1_promoted",
   "main_direction": "Hold source_policy_hybrid_ring_regularization / stablelead_nearest_plus_uniform_tail as the current local lead, keep research in steady_hold + IDLE_GUARD, keep no auto-next ticket, and keep cloud off until a fresh manual problem and a separate explicit downstream decision exist.",
-  "current_cloud_blocker": "The manually promoted hybrid-ring local lead is now synced as the current local lead, but cloud must remain off. This PROMOTE decision resolves local lead selection only; it does not authorize cloud execution, auto-next ticket generation, or any second candidate. Any later forward move still requires a fresh manual problem and a separate explicit downstream decision.",
+  "current_cloud_blocker": "The manually promoted hybrid-ring local lead remains the current local lead, and cloud must remain off. The residual_case_coverage_rebalancing ticket was executed but not promoted after a corrected recheck against the actual current lead. Any later forward move still requires a fresh manual problem and a separate explicit downstream decision.",
   "current_lead": {
     "config": "training/config/zju_vggt_geom_unproject_source_policy_nearestplusuniformtail_rawpool_confdepth_dropworst_gradconfmask_minimal.yaml",
-    "gate_summary": "output/zju_source_policy_research_loop/promotion_review_packet.20260328.md",
-    "attribution_summary": "output/zju_source_policy_research_loop/promotion_review_packet.20260328.md",
+    "gate_summary": "G:/项目备份/vggt_cam_depth大文件索引/output/zju_source_policy_research_loop/promotion_decision.20260328.md",
+    "attribution_summary": "G:/项目备份/vggt_cam_depth大文件索引/output/zju_source_policy_research_loop/promotion_decision.20260328.md",
+    "family": "source_policy_hybrid_ring_regularization",
+    "first_candidate_shape": "stablelead_nearest_plus_uniform_tail",
+    "gate_references": {
+      "short_gate_reference_summary": "output/zju_source_policy_research_loop/runs/20260328_143821_zju_vggt_geom_unproject_source_policy_nearestplusuniformtail_rawpool_confdepth_dropworst_gradconfmask_minimal/short_vs_lead/summary.json",
+      "short_gate_reference_log": "training/logs/zju_source_policy_candidate_zju_vggt_geom_unproject_source_policy_nearestplusuniformtail_rawpool_confdepth_dropworst_gradconfmask_minimal_gate10x5_20260328_143821/log.txt",
+      "long_gate_reference_summary": "output/zju_source_policy_research_loop/runs/20260328_143821_zju_vggt_geom_unproject_source_policy_nearestplusuniformtail_rawpool_confdepth_dropworst_gradconfmask_minimal/long_vs_lead/summary.json",
+      "long_gate_reference_log": "training/logs/zju_source_policy_candidate_zju_vggt_geom_unproject_source_policy_nearestplusuniformtail_rawpool_confdepth_dropworst_gradconfmask_minimal_longgate100x20_20260328_143821/log.txt",
+      "long_gate_reference_status": "output/zju_source_policy_research_loop/runs/20260328_143821_zju_vggt_geom_unproject_source_policy_nearestplusuniformtail_rawpool_confdepth_dropworst_gradconfmask_minimal/status.json",
+      "long_gate_reference_source_field": "candidate_log_from_promoted_hybrid_ring_run",
+      "stable_lead_reference_note": "The canonical stable-lead reference now comes from the manually promoted hybrid-ring candidate logs, because that config remains the current local lead."
+    },
     "why_lead": [
       "It beat the previous stable lead at the short 10/5 gate on camera, conf_depth, and reg_depth while keeping translation flat.",
       "It also beat the previous stable lead again at the long 100/20 gate and therefore earned a formal provisional_lead before manual promotion.",
-      "Manual PROMOTE has now resolved the hold, so this config is the current local lead while cloud stays off and no auto-next ticket is active."
+      "A later residual_case_coverage_rebalancing ticket improved depth terms but regressed camera on the corrected 10/5 recheck against this lead, so manual REJECT kept this config current."
     ]
   },
   "frozen_non_reentry_candidates": [
@@ -40,6 +51,10 @@
     {
       "name": "source_policy_hybrid_ring_regularization_same_family_retry",
       "reason": "Promoted lead already spent the single-ticket family budget."
+    },
+    {
+      "name": "residual_case_coverage_rebalancing_same_family_retry",
+      "reason": "Executed but not promoted after corrected current-lead recheck."
     }
   ],
   "next_local_diagnostic": {
@@ -50,7 +65,7 @@
   },
   "non_goals": [
     "Do not arm or run another ticket tonight.",
-    "Do not reopen the closed five-family failure batch.",
+    "Do not reopen the closed failure batch or the residual same-family retry.",
     "Do not auto-promote to cloud or auto-generate the next question."
   ],
   "nightly_modes": [
@@ -80,13 +95,26 @@
     "Do not treat local promotion as implicit cloud authorization."
   ],
   "single_source_of_truth": [
-    "output/zju_source_policy_research_loop/promotion_review_packet.20260328.md",
-    "output/zju_source_policy_research_loop/promotion_decision.20260328.json",
+    "G:/项目备份/vggt_cam_depth大文件索引/output/zju_source_policy_research_loop/promotion_decision.20260328.md",
+    "G:/项目备份/vggt_cam_depth大文件索引/output/zju_source_policy_research_loop/promotion_decision.20260329.json",
     "scripts/manifests/zju_source_policy_rawpool_local_nightly_v1.json",
     "scripts/manifests/zju_next_training_question_v1.json"
   ],
   "patch_collection_stop": true,
   "ready_for_new_training_question": true,
   "cloud_gate": false,
-  "launch_cloud_now": false
+  "launch_cloud_now": false,
+  "latest_manual_decision": {
+    "decision": "REJECT",
+    "decision_status": "executed_but_not_promoted",
+    "decision_path": "G:/项目备份/vggt_cam_depth大文件索引/output/zju_source_policy_research_loop/promotion_decision.20260329.json",
+    "decision_family": "residual_case_coverage_rebalancing"
+  },
+  "latest_rejected_candidate": {
+    "family": "residual_case_coverage_rebalancing",
+    "candidate_shape": "promotedlead_hardcase_bucket_mix",
+    "candidate_config": "training/config/zju_vggt_geom_unproject_source_policy_nearestplusuniformtail_rawpool_confdepth_dropworst_gradconfmask_hardcasebucketmix4to1_minimal.yaml",
+    "decision_path": "G:/项目备份/vggt_cam_depth大文件索引/output/zju_source_policy_research_loop/promotion_decision.20260329.json",
+    "reason": "The residual hardcase mix did not beat the actual current hybrid-ring lead on the direct recheck: short gate regressed loss_camera, and long gate regressed both loss_camera and loss_T."
+  }
 }

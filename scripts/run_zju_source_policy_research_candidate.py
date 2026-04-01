@@ -1,4 +1,5 @@
 import argparse
+import hashlib
 import importlib.util
 import json
 import subprocess
@@ -107,6 +108,16 @@ def slugify(text: str) -> str:
 
 def config_name_from_path(path_like: str | Path) -> str:
     return normalize_repo_path(path_like).stem
+
+
+def candidate_label_from_path(path_like: str | Path, max_len: int = 96) -> str:
+    stem = config_name_from_path(path_like)
+    if len(stem) <= max_len:
+        return stem
+    digest = hashlib.sha1(stem.encode("utf-8")).hexdigest()[:10]
+    head_len = max_len - len(digest) - 1
+    head_len = max(16, head_len)
+    return f"{stem[:head_len]}_{digest}"
 
 
 def run_cmd(args: list[str], cwd: Path | None = None) -> subprocess.CompletedProcess[str]:
@@ -271,7 +282,9 @@ def clear_allowlist(path: Path) -> None:
     )
 
 
-def run_preflight() -> None:
+def run_preflight(*, cloud_must_remain_off: bool) -> str:
+    if cloud_must_remain_off:
+        return "skipped_modal_preflight_cloud_must_remain_off"
     run_checked(
         [
             "powershell",
@@ -283,6 +296,7 @@ def run_preflight() -> None:
         ],
         cwd=REPO_ROOT,
     )
+    return "ran_modal_preflight"
 
 
 def run_finetune(
@@ -579,7 +593,7 @@ def main() -> int:
         approved_problem, approved_problem_load_error = try_load_json(args.approved_problem_path)
     candidate_config = str(approved_problem.get("first_candidate_config", "")).strip()
     run_tag = now_tag()
-    candidate_stem = normalize_repo_path(candidate_config).stem if candidate_config else "no_candidate"
+    candidate_stem = candidate_label_from_path(candidate_config) if candidate_config else "no_candidate"
     run_dir = ensure_dir(args.output_root / f"{run_tag}_{candidate_stem}")
     status_path = run_dir / "status.json"
     status = {
@@ -761,7 +775,10 @@ def main() -> int:
         status["allowlist_markers"] = allowlist_markers
         status["phase"] = "preflight"
         write_json(status_path, status)
-        run_preflight()
+        status["preflight_mode"] = run_preflight(
+            cloud_must_remain_off=bool(approved_problem.get("cloud_must_remain_off", True))
+        )
+        write_json(status_path, status)
 
         smoke_exp = f"zju_source_policy_candidate_{candidate_stem}_smoke1x1_{run_tag}"
         status["phase"] = "smoke_1x1"

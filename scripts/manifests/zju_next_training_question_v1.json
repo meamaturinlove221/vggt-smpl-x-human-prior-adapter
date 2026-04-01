@@ -6,24 +6,24 @@
   "main_manifest_version": "v9",
   "baseline_config": "training/config/zju_vggt_geom_unproject_minimal.yaml",
   "candidate_config": "training/config/zju_vggt_geom_unproject_source_policy_nearestplusuniformtail_rawpool_confdepth_dropworst_gradconfmask_minimal.yaml",
-  "current_cloud_blocker": "The manually promoted hybrid-ring local lead is now synced as the current local lead, but cloud must remain off. This PROMOTE decision resolves local lead selection only; it does not authorize cloud execution, auto-next ticket generation, or any second candidate. Any later forward move still requires a fresh manual problem and a separate explicit downstream decision.",
+  "current_cloud_blocker": "The manually promoted hybrid-ring local lead remains the current local lead, and cloud must remain off. The residual_case_coverage_rebalancing ticket was executed but not promoted after a corrected recheck against the actual current lead. Any later forward move still requires a fresh manual problem and a separate explicit downstream decision.",
   "candidate_config_status": "promoted_local_lead_synced_no_active_next_training_question",
   "geometry_direction": "Hold source_policy_hybrid_ring_regularization / stablelead_nearest_plus_uniform_tail as the current local lead, keep research in steady_hold + IDLE_GUARD, keep no auto-next ticket, and keep cloud off until a fresh manual problem and a separate explicit downstream decision exist.",
   "question": "No active next training question is open. The promoted local lead is synced; define a fresh manual problem only if later needed.",
   "why_now": [
-    "Manual PROMOTE has already resolved the provisional-lead hold for source_policy_hybrid_ring_regularization / stablelead_nearest_plus_uniform_tail.",
+    "Manual REJECT has closed the residual_case_coverage_rebalancing hold after a corrected recheck against the actual current hybrid-ring lead.",
     "There is no current priority family and no auto-next ticket.",
     "The next forward move, if later needed, is a fresh manual problem rather than another same-family or cousin run."
   ],
   "local_code_gaps": [],
   "candidate_implementation_requirements": [
-    "Keep the promoted local lead as the current reference config until a future manual problem is defined.",
+    "Keep the current local lead as the reference config until a future manual problem is defined.",
     "Do not auto-arm another ticket from this manifest alone.",
     "Keep cloud off."
   ],
   "non_goals": [
     "Do not define a new manual problem automatically.",
-    "Do not reopen the closed five-family failure batch.",
+    "Do not reopen the residual same-family retry or slot_3 ticket.",
     "Do not use this manifest as implicit approval for a new run."
   ],
   "required_before_cloud": [

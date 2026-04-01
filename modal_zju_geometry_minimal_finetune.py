@@ -36,6 +36,13 @@ DEFAULT_TRAINING_REQUIREMENTS = [
     "opencv-python",
 ]
 
+PROMOTED_SOURCE_POLICY_CONFIG = (
+    "zju_vggt_geom_unproject_source_policy_nearestplusuniformtail_rawpool_confdepth_dropworst_gradconfmask_minimal"
+)
+PREVIOUS_SOURCE_POLICY_CONFIG = (
+    "zju_vggt_geom_unproject_source_policy_nearest_rawpool_confdepth_dropworst_gradconfmask_minimal"
+)
+
 
 def _load_requirements(path: Path, seen: set[str] | None = None) -> list[str]:
     seen = set() if seen is None else seen
@@ -94,16 +101,16 @@ OUTPUT_CHECKPOINT_FALLBACKS = (
     "weights/model.pt",
     "pretrained_weights/model.pt",
 )
-GPU_SPEC = os.environ.get("VGGT_ZJU_MODAL_GPU", os.environ.get("VGGT_MODAL_GPU", "A100-40GB"))
-CPU_COUNT = float(os.environ.get("VGGT_ZJU_MODAL_CPU", os.environ.get("VGGT_MODAL_CPU", "8")))
+GPU_SPEC = os.environ.get("VGGT_ZJU_MODAL_GPU", os.environ.get("VGGT_MODAL_GPU", "A100-80GB"))
+CPU_COUNT = float(os.environ.get("VGGT_ZJU_MODAL_CPU", os.environ.get("VGGT_MODAL_CPU", "24")))
 MEMORY_MB = int(
-    os.environ.get("VGGT_ZJU_MODAL_MEMORY_MB", os.environ.get("VGGT_MODAL_MEMORY_MB", "65536"))
+    os.environ.get("VGGT_ZJU_MODAL_MEMORY_MB", os.environ.get("VGGT_MODAL_MEMORY_MB", "196608"))
 )
 TIMEOUT_SEC = int(
     os.environ.get("VGGT_ZJU_MODAL_TIMEOUT_SEC", os.environ.get("VGGT_MODAL_TIMEOUT_SEC", str(24 * 60 * 60)))
 )
 LIVE_COMMIT_INTERVAL_SEC = int(
-    os.environ.get("VGGT_ZJU_MODAL_LIVE_COMMIT_SEC", os.environ.get("VGGT_MODAL_LIVE_COMMIT_SEC", "30"))
+    os.environ.get("VGGT_ZJU_MODAL_LIVE_COMMIT_SEC", os.environ.get("VGGT_MODAL_LIVE_COMMIT_SEC", "180"))
 )
 
 CODE_SYNC_IGNORE = [
@@ -176,6 +183,11 @@ TRAINING_IMAGE = (
         remote_path=(REMOTE_CODE_DIR / "vggt").as_posix(),
         ignore=CODE_SYNC_IGNORE,
     )
+    .add_local_dir(
+        str(REPO_ROOT / "scripts"),
+        remote_path=(REMOTE_CODE_DIR / "scripts").as_posix(),
+        ignore=CODE_SYNC_IGNORE,
+    )
 )
 
 app = modal.App(APP_NAME)
@@ -193,18 +205,30 @@ class ZjuFinetuneConfig:
     exp_name: str = "zju_geometry_minimal_modal"
     output_subdir: str = ""
     num_images: int = 4
-    max_img_per_gpu: int = 4
+    max_img_per_gpu: int = 16
     accum_steps: int = 1
     max_epochs: int = 1
     learning_rate: float = 5e-5
     limit_train_batches: int = 100
     limit_val_batches: int = 20
-    num_workers: int = 4
+    num_workers: int = 16
+    train_prefetch_factor: int = 8
+    val_prefetch_factor: int = 4
     holdout_stride: int = 10
     camera_source: str = "gt"
     mask_source: str = "mask"
     min_depth_conf: float = 0.0
     freeze_aggregator: bool = True
+    enable_compile: bool = False
+    emit_dataset_probe: bool = True
+    emit_dataset_probe_contract_diff: bool = True
+    probe_sample_index: int = 0
+    probe_aggregate_samples: int = 4
+    probe_aggregate_stride: int = 50
+    probe_seed: int = 42
+    probe_reference_config: str = ""
+    probe_label_current: str = "current_config"
+    probe_label_reference: str = "reference_config"
     extra_overrides: str = ""
 
     def to_json(self) -> str:
@@ -226,13 +250,15 @@ class ZjuAblationPairConfig:
     exp_prefix: str = "zju_geom_modal_pair"
     output_subdir_base: str = ""
     num_images: int = 4
-    max_img_per_gpu: int = 4
+    max_img_per_gpu: int = 16
     accum_steps: int = 1
     max_epochs: int = 1
     learning_rate: float = 5e-5
     limit_train_batches: int = 100
     limit_val_batches: int = 20
-    num_workers: int = 4
+    num_workers: int = 16
+    train_prefetch_factor: int = 8
+    val_prefetch_factor: int = 4
     holdout_stride: int = 10
     camera_source: str = "gt"
     mask_source: str = "mask"
@@ -240,6 +266,7 @@ class ZjuAblationPairConfig:
     baseline_min_depth_conf: float | None = None
     candidate_min_depth_conf: float | None = None
     freeze_aggregator: bool = True
+    enable_compile: bool = False
     extra_overrides: str = ""
 
     def to_json(self) -> str:
@@ -248,6 +275,30 @@ class ZjuAblationPairConfig:
     @staticmethod
     def from_json(blob: str) -> "ZjuAblationPairConfig":
         return ZjuAblationPairConfig(**_decode_config_blob(blob))
+
+
+@dataclass
+class ZjuResidualAuditConfig:
+    zju_subdir: str
+    seq_names: str = "CoreView_390"
+    geom_subdir: str = "vggt_geom"
+    checkpoint_subpath: str = "checkpoints/model.pt"
+    config: str = "zju_vggt_geom_minimal"
+    output_subdir: str = ""
+    label: str = "promoted_lead"
+    split: str = "train"
+    num_samples: int = 2048
+    num_images: int = 4
+    device: str = "cuda"
+    reference_checkpoint_subpath: str = ""
+    reference_label: str = "reference"
+
+    def to_json(self) -> str:
+        return json.dumps(asdict(self), ensure_ascii=False)
+
+    @staticmethod
+    def from_json(blob: str) -> "ZjuResidualAuditConfig":
+        return ZjuResidualAuditConfig(**_decode_config_blob(blob))
 
 
 def _normalize_subpath(value: str) -> str:
@@ -281,6 +332,13 @@ def _resolve_pair_output_root(exp_prefix: str, output_subdir_base: str) -> Path:
     safe_prefix = "".join(ch if ch.isalnum() or ch in ("-", "_") else "_" for ch in exp_prefix).strip("_")
     safe_prefix = safe_prefix or "zju_geom_modal_pair"
     return Path(str(REMOTE_OUTPUT_DIR / "geometry_pairs" / f"{run_tag}_{safe_prefix}"))
+
+
+def _resolve_residual_audit_output_root(output_subdir: str) -> Path:
+    if output_subdir.strip():
+        return Path(str(REMOTE_OUTPUT_DIR / _normalize_subpath(output_subdir)))
+    run_tag = time.strftime("%Y%m%d_%H%M%S")
+    return Path(str(REMOTE_OUTPUT_DIR / "zju_source_policy_research_loop" / "promoted_residual_regen_cloud" / run_tag))
 
 
 def _build_overrides(
@@ -324,6 +382,8 @@ def _build_overrides(
         f"limit_val_batches={int(cfg.limit_val_batches)}",
         "data.train.pin_memory=True",
         "data.val.pin_memory=True",
+        "+data.train.pin_memory_device=cuda",
+        "+data.val.pin_memory_device=cuda",
         "cuda.allow_tf32=True",
         "cuda.cudnn_benchmark=True",
         "model.enable_camera=True",
@@ -334,11 +394,27 @@ def _build_overrides(
         "loss.track=null",
     ]
 
+    if bool(getattr(cfg, "enable_compile", False)):
+        overrides.extend(
+            [
+                "++optim.compile.enabled=True",
+                "++optim.compile.backend=inductor",
+                "++optim.compile.mode=max-autotune",
+                "++optim.compile.dynamic=False",
+                "++optim.compile.fullgraph=False",
+                "++optim.compile.suppress_errors=True",
+            ]
+        )
+    else:
+        overrides.append("++optim.compile.enabled=False")
+
     if cfg.num_workers > 0:
         overrides.extend(
             [
-                "data.train.persistent_workers=True",
-                "data.val.persistent_workers=True",
+                "+data.train.persistent_workers=True",
+                "+data.val.persistent_workers=True",
+                f"+data.train.prefetch_factor={int(cfg.train_prefetch_factor)}",
+                f"+data.val.prefetch_factor={int(cfg.val_prefetch_factor)}",
             ]
         )
 
@@ -408,6 +484,27 @@ def _resolve_checkpoint_path(remote_subpath: str) -> Path:
         f"- requested data path: {target}\n"
         + "\n".join(f"- tried output fallback: {path}" for path in candidate_exact)
     )
+
+
+def _normalize_config_stem(config_ref: str) -> str:
+    raw = str(config_ref or "").strip().replace("\\", "/")
+    if not raw:
+        return ""
+    stem = raw.split("/")[-1]
+    if stem.endswith(".yaml"):
+        stem = stem[: -len(".yaml")]
+    return stem
+
+
+def _default_probe_reference_bundle(config_ref: str) -> tuple[str, str, str]:
+    stem = _normalize_config_stem(config_ref)
+    if stem == PROMOTED_SOURCE_POLICY_CONFIG:
+        return (
+            PREVIOUS_SOURCE_POLICY_CONFIG,
+            "promoted_nearest_plus_uniform_tail",
+            "previous_nearest_ring",
+        )
+    return ("", "current_config", "reference_config")
 
 
 def _stream_subprocess_with_live_mirror(
@@ -505,6 +602,114 @@ def _run_training_subprocess(
     env["PYTHONIOENCODING"] = "utf-8"
     env["PYTHONUTF8"] = "1"
 
+    if bool(getattr(cfg, "emit_dataset_probe", False)):
+        probe_path = remote_code_dir / "scripts" / "probe_zju_vggt_geom_dataset.py"
+        compare_probe_path = remote_code_dir / "scripts" / "compare_zju_vggt_geom_probes.py"
+        if probe_path.exists():
+            default_reference_config, default_label_current, default_label_reference = _default_probe_reference_bundle(
+                cfg.config
+            )
+            probe_reference_config = str(
+                getattr(cfg, "probe_reference_config", "") or default_reference_config
+            ).strip()
+            probe_label_current = str(
+                getattr(cfg, "probe_label_current", "") or default_label_current
+            ).strip()
+            probe_label_reference = str(
+                getattr(cfg, "probe_label_reference", "") or default_label_reference
+            ).strip()
+
+            def _build_probe_cmd(config_ref: str, output_dir: Path) -> list[str]:
+                return [
+                    sys.executable,
+                    str(probe_path),
+                    "--config",
+                    str(config_ref),
+                    "--zju_dir",
+                    str(zju_root),
+                    "--output_dir",
+                    str(output_dir),
+                    "--seed",
+                    str(int(getattr(cfg, "probe_seed", 42))),
+                    "--sample_index",
+                    str(int(getattr(cfg, "probe_sample_index", 0))),
+                    "--aggregate_samples",
+                    str(int(getattr(cfg, "probe_aggregate_samples", 4))),
+                    "--aggregate_stride",
+                    str(int(getattr(cfg, "probe_aggregate_stride", 50))),
+                    "--num_images",
+                    str(int(cfg.num_images)),
+                ]
+
+            probe_output_dir = output_root / "dataset_probe"
+            probe_log_path = output_root / "dataset_probe_live.log"
+            probe_cmd = _build_probe_cmd(cfg.config, probe_output_dir)
+            print("[modal-zju-geometry] dataset_probe =", shlex.join(probe_cmd), flush=True)
+            _stream_subprocess_with_live_mirror(
+                cmd=probe_cmd,
+                cwd=remote_code_dir,
+                env=env,
+                mirror_log_path=probe_log_path,
+                commit_callback=output_volume.commit,
+                commit_interval_sec=LIVE_COMMIT_INTERVAL_SEC,
+            )
+            output_volume.commit()
+
+            if (
+                bool(getattr(cfg, "emit_dataset_probe_contract_diff", True))
+                and probe_reference_config
+                and compare_probe_path.exists()
+            ):
+                reference_probe_output_dir = output_root / "dataset_probe_reference"
+                reference_probe_log_path = output_root / "dataset_probe_reference_live.log"
+                reference_probe_cmd = _build_probe_cmd(probe_reference_config, reference_probe_output_dir)
+                print(
+                    "[modal-zju-geometry] dataset_probe_reference =",
+                    shlex.join(reference_probe_cmd),
+                    flush=True,
+                )
+                _stream_subprocess_with_live_mirror(
+                    cmd=reference_probe_cmd,
+                    cwd=remote_code_dir,
+                    env=env,
+                    mirror_log_path=reference_probe_log_path,
+                    commit_callback=output_volume.commit,
+                    commit_interval_sec=LIVE_COMMIT_INTERVAL_SEC,
+                )
+                output_volume.commit()
+
+                diff_json_path = output_root / "dataset_probe_contract_diff.json"
+                diff_md_path = output_root / "dataset_probe_contract_diff.md"
+                diff_log_path = output_root / "dataset_probe_contract_diff_live.log"
+                diff_cmd = [
+                    sys.executable,
+                    str(compare_probe_path),
+                    "--probe-a",
+                    str(probe_output_dir),
+                    "--probe-b",
+                    str(reference_probe_output_dir),
+                    "--label-a",
+                    probe_label_current,
+                    "--label-b",
+                    probe_label_reference,
+                    "--output-json",
+                    str(diff_json_path),
+                    "--output-md",
+                    str(diff_md_path),
+                ]
+                print("[modal-zju-geometry] dataset_probe_contract_diff =", shlex.join(diff_cmd), flush=True)
+                _stream_subprocess_with_live_mirror(
+                    cmd=diff_cmd,
+                    cwd=remote_code_dir,
+                    env=env,
+                    mirror_log_path=diff_log_path,
+                    commit_callback=output_volume.commit,
+                    commit_interval_sec=LIVE_COMMIT_INTERVAL_SEC,
+                )
+                output_volume.commit()
+        else:
+            print("[modal-zju-geometry] dataset probe script missing; skipping probe export.", flush=True)
+
     live_log_path = output_root / "driver_live.log"
     _stream_subprocess_with_live_mirror(
         cmd=cmd,
@@ -517,6 +722,105 @@ def _run_training_subprocess(
 
     output_volume.commit()
     print("[modal-zju-geometry] committed output volume", flush=True)
+    return output_root
+
+
+def _run_residual_audit_subprocess(
+    cfg: ZjuResidualAuditConfig,
+    *,
+    resolved_checkpoint_path: Path,
+) -> Path:
+    zju_root = _remote_data_path(cfg.zju_subdir)
+    missing = [str(path) for path in (zju_root, resolved_checkpoint_path) if not path.exists()]
+    if missing:
+        raise FileNotFoundError(
+            "Required Modal volume paths are missing:\n- " + "\n- ".join(missing)
+        )
+
+    output_root = _resolve_residual_audit_output_root(cfg.output_subdir)
+    output_root.mkdir(parents=True, exist_ok=True)
+    remote_code_dir = Path(str(REMOTE_CODE_DIR))
+    audit_path = remote_code_dir / "scripts" / "audit_zju_conf_depth_attribution.py"
+    if not audit_path.exists():
+        raise FileNotFoundError(f"Residual audit script missing on Modal image: {audit_path}")
+
+    cmd = [
+        sys.executable,
+        str(audit_path),
+        "--config",
+        cfg.config,
+        "--checkpoint",
+        resolved_checkpoint_path.as_posix(),
+        "--label",
+        cfg.label,
+        "--split",
+        cfg.split,
+        "--num-samples",
+        str(int(cfg.num_samples)),
+        "--num-images",
+        str(int(cfg.num_images)),
+        "--zju-dir",
+        zju_root.as_posix(),
+        "--device",
+        cfg.device,
+        "--output-dir",
+        output_root.as_posix(),
+    ]
+    if cfg.reference_checkpoint_subpath.strip():
+        reference_checkpoint_path = _resolve_checkpoint_path(cfg.reference_checkpoint_subpath)
+        cmd.extend(
+            [
+                "--reference-checkpoint",
+                reference_checkpoint_path.as_posix(),
+                "--reference-label",
+                cfg.reference_label,
+            ]
+        )
+
+    env = os.environ.copy()
+    existing_pythonpath = env.get("PYTHONPATH", "")
+    repo_pythonpath = str(remote_code_dir)
+    env["PYTHONPATH"] = (
+        repo_pythonpath if not existing_pythonpath else repo_pythonpath + os.pathsep + existing_pythonpath
+    )
+    env["PYTHONUNBUFFERED"] = "1"
+    env["PYTHONIOENCODING"] = "utf-8"
+    env["PYTHONUTF8"] = "1"
+
+    print("[modal-zju-geometry] data_volume =", DATA_VOLUME_NAME, flush=True)
+    print("[modal-zju-geometry] output_volume =", OUTPUT_VOLUME_NAME, flush=True)
+    print("[modal-zju-geometry] gpu =", GPU_SPEC, flush=True)
+    print("[modal-zju-geometry] residual_audit_output_root =", output_root.as_posix(), flush=True)
+    print("[modal-zju-geometry] residual_audit_checkpoint =", resolved_checkpoint_path.as_posix(), flush=True)
+    print("[modal-zju-geometry] residual_audit_command =", shlex.join(cmd), flush=True)
+
+    live_log_path = output_root / "residual_audit_live.log"
+    _stream_subprocess_with_live_mirror(
+        cmd=cmd,
+        cwd=remote_code_dir,
+        env=env,
+        mirror_log_path=live_log_path,
+        commit_callback=output_volume.commit,
+        commit_interval_sec=LIVE_COMMIT_INTERVAL_SEC,
+    )
+
+    artifact_status = {
+        "config": cfg.config,
+        "label": cfg.label,
+        "split": cfg.split,
+        "num_samples_requested": int(cfg.num_samples),
+        "num_images": int(cfg.num_images),
+        "checkpoint": resolved_checkpoint_path.as_posix(),
+        "output_root": output_root.as_posix(),
+        "summary_json": (output_root / "summary.json").as_posix(),
+        "summary_md": (output_root / "summary.md").as_posix(),
+        "primary_frame_rows_jsonl": (output_root / "primary_frame_rows.jsonl").as_posix(),
+        "residual_audit_live_log": live_log_path.as_posix(),
+        "state": "completed",
+    }
+    _write_json(output_root / "residual_audit_status.json", artifact_status)
+    output_volume.commit()
+    print("[modal-zju-geometry] committed residual audit output volume", flush=True)
     return output_root
 
 
@@ -578,6 +882,8 @@ def run_remote_zju_geometry_ablation_pair(cfg_json: str) -> None:
         limit_train_batches=cfg.limit_train_batches,
         limit_val_batches=cfg.limit_val_batches,
         num_workers=cfg.num_workers,
+        train_prefetch_factor=cfg.train_prefetch_factor,
+        val_prefetch_factor=cfg.val_prefetch_factor,
         holdout_stride=cfg.holdout_stride,
         camera_source=cfg.camera_source,
         mask_source=cfg.mask_source,
@@ -600,6 +906,8 @@ def run_remote_zju_geometry_ablation_pair(cfg_json: str) -> None:
         limit_train_batches=cfg.limit_train_batches,
         limit_val_batches=cfg.limit_val_batches,
         num_workers=cfg.num_workers,
+        train_prefetch_factor=cfg.train_prefetch_factor,
+        val_prefetch_factor=cfg.val_prefetch_factor,
         holdout_stride=cfg.holdout_stride,
         camera_source=cfg.camera_source,
         mask_source=cfg.mask_source,
@@ -639,6 +947,24 @@ def run_remote_zju_geometry_ablation_pair(cfg_json: str) -> None:
     _write_json(status_path, status)
 
 
+@app.function(
+    image=TRAINING_IMAGE,
+    gpu=GPU_SPEC,
+    cpu=CPU_COUNT,
+    memory=MEMORY_MB,
+    timeout=TIMEOUT_SEC,
+    volumes={
+        REMOTE_DATA_DIR.as_posix(): data_volume,
+        REMOTE_OUTPUT_DIR.as_posix(): output_volume,
+    },
+)
+def run_remote_zju_geometry_residual_audit(cfg_json: str) -> str:
+    cfg = ZjuResidualAuditConfig.from_json(cfg_json)
+    ckpt_path = _resolve_checkpoint_path(cfg.checkpoint_subpath)
+    output_root = _run_residual_audit_subprocess(cfg, resolved_checkpoint_path=ckpt_path)
+    return output_root.as_posix()
+
+
 @app.local_entrypoint()
 def upload_checkpoint(
     local_path: str,
@@ -659,13 +985,15 @@ def run_zju_geometry_finetune(
     exp_name: str = "zju_geometry_minimal_modal",
     output_subdir: str = "",
     num_images: int = 4,
-    max_img_per_gpu: int = 4,
+    max_img_per_gpu: int = 16,
     accum_steps: int = 1,
     max_epochs: int = 1,
     learning_rate: float = 5e-5,
     limit_train_batches: int = 100,
     limit_val_batches: int = 20,
-    num_workers: int = 4,
+    num_workers: int = 16,
+    train_prefetch_factor: int = 8,
+    val_prefetch_factor: int = 4,
     holdout_stride: int = 10,
     camera_source: str = "gt",
     mask_source: str = "mask",
@@ -693,6 +1021,8 @@ def run_zju_geometry_finetune(
         limit_train_batches=limit_train_batches,
         limit_val_batches=limit_val_batches,
         num_workers=num_workers,
+        train_prefetch_factor=train_prefetch_factor,
+        val_prefetch_factor=val_prefetch_factor,
         holdout_stride=holdout_stride,
         camera_source=camera_source,
         mask_source=mask_source,
@@ -718,13 +1048,15 @@ def run_zju_geometry_ablation_pair(
     exp_prefix: str = "zju_geom_modal_pair",
     output_subdir_base: str = "",
     num_images: int = 4,
-    max_img_per_gpu: int = 4,
+    max_img_per_gpu: int = 16,
     accum_steps: int = 1,
     max_epochs: int = 1,
     learning_rate: float = 5e-5,
     limit_train_batches: int = 100,
     limit_val_batches: int = 20,
-    num_workers: int = 4,
+    num_workers: int = 16,
+    train_prefetch_factor: int = 8,
+    val_prefetch_factor: int = 4,
     holdout_stride: int = 10,
     camera_source: str = "gt",
     mask_source: str = "mask",
@@ -753,6 +1085,8 @@ def run_zju_geometry_ablation_pair(
         limit_train_batches=limit_train_batches,
         limit_val_batches=limit_val_batches,
         num_workers=num_workers,
+        train_prefetch_factor=train_prefetch_factor,
+        val_prefetch_factor=val_prefetch_factor,
         holdout_stride=holdout_stride,
         camera_source=camera_source,
         mask_source=mask_source,
@@ -764,3 +1098,46 @@ def run_zju_geometry_ablation_pair(
     print("[modal-zju-geometry] launch pair config:")
     print(json.dumps(asdict(cfg), indent=2, ensure_ascii=False))
     run_remote_zju_geometry_ablation_pair.remote(cfg.to_json())
+
+
+@app.local_entrypoint()
+def run_zju_geometry_residual_audit(
+    zju_subdir: str,
+    seq_names: str = "CoreView_390",
+    geom_subdir: str = "vggt_geom",
+    checkpoint_subpath: str = "checkpoints/model.pt",
+    local_checkpoint: str = "",
+    config: str = "zju_vggt_geom_minimal",
+    output_subdir: str = "",
+    label: str = "promoted_lead",
+    split: str = "train",
+    num_samples: int = 2048,
+    num_images: int = 4,
+    device: str = "cuda",
+    reference_checkpoint_subpath: str = "",
+    reference_label: str = "reference",
+) -> None:
+    resolved_checkpoint_subpath = checkpoint_subpath
+    if local_checkpoint.strip():
+        resolved_checkpoint_subpath = _upload_checkpoint(local_checkpoint, checkpoint_subpath)
+
+    cfg = ZjuResidualAuditConfig(
+        zju_subdir=zju_subdir,
+        seq_names=seq_names,
+        geom_subdir=geom_subdir,
+        checkpoint_subpath=resolved_checkpoint_subpath,
+        config=config,
+        output_subdir=output_subdir,
+        label=label,
+        split=split,
+        num_samples=num_samples,
+        num_images=num_images,
+        device=device,
+        reference_checkpoint_subpath=reference_checkpoint_subpath,
+        reference_label=reference_label,
+    )
+
+    print("[modal-zju-geometry] residual audit launch config:")
+    print(json.dumps(asdict(cfg), indent=2, ensure_ascii=False))
+    output_root = run_remote_zju_geometry_residual_audit.remote(cfg.to_json())
+    print(f"[modal-zju-geometry] residual audit output_root={output_root}")
