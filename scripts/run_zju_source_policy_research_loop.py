@@ -177,6 +177,54 @@ DEFAULT_CAMERA_TRANSLATION_OBJECTIVE_ISOLATION_DRAFT_PATH = (
 DEFAULT_CAMERA_TRANSLATION_OBJECTIVE_ISOLATION_PLAN_PATH = (
     DEFAULT_OUTPUT_ROOT / "candidate_patch_plan.camera_translation_objective_isolation.json"
 )
+DEFAULT_CAMERA_OBJECTIVE_COUPLING_REBALANCING_SEED_PATH = (
+    DEFAULT_OUTPUT_ROOT / "approved_problem.seed.camera_objective_coupling_rebalancing.json"
+)
+DEFAULT_CAMERA_DEPTH_OBJECTIVE_COUPLING_AUDIT_SEED_PATH = (
+    DEFAULT_OUTPUT_ROOT / "approved_problem.seed.camera_depth_objective_coupling_audit.json"
+)
+DEFAULT_CAMERA_OBJECTIVE_COUPLING_REBALANCING_BLUEPRINT_PATH = (
+    DEFAULT_OUTPUT_ROOT / "family_blueprint.camera_objective_coupling_rebalancing.json"
+)
+DEFAULT_CAMERA_DEPTH_OBJECTIVE_COUPLING_AUDIT_BLUEPRINT_PATH = (
+    DEFAULT_OUTPUT_ROOT / "family_blueprint.camera_depth_objective_coupling_audit.json"
+)
+DEFAULT_CAMERA_OBJECTIVE_COUPLING_REBALANCING_DRAFT_PATH = (
+    DEFAULT_OUTPUT_ROOT / "next_manual_problem_draft.camera_objective_coupling_rebalancing.20260402.json"
+)
+DEFAULT_CAMERA_DEPTH_OBJECTIVE_COUPLING_AUDIT_DRAFT_PATH = (
+    DEFAULT_OUTPUT_ROOT / "next_manual_problem_draft.camera_depth_objective_coupling_audit.20260403.json"
+)
+DEFAULT_CAMERA_OBJECTIVE_COUPLING_REBALANCING_PLAN_PATH = (
+    DEFAULT_OUTPUT_ROOT / "candidate_patch_plan.camera_objective_coupling_rebalancing.json"
+)
+DEFAULT_CAMERA_DEPTH_OBJECTIVE_COUPLING_AUDIT_PLAN_PATH = (
+    DEFAULT_OUTPUT_ROOT / "candidate_patch_plan.camera_depth_objective_coupling_audit.json"
+)
+DEFAULT_CROSS_AXIS_PLATEAU_BOUNDARY_SYNTHESIS_SEED_PATH = (
+    DEFAULT_OUTPUT_ROOT / "approved_problem.seed.cross_axis_plateau_boundary_synthesis.20260403.json"
+)
+DEFAULT_CROSS_AXIS_PLATEAU_BOUNDARY_SYNTHESIS_BLUEPRINT_PATH = (
+    DEFAULT_OUTPUT_ROOT / "family_blueprint.cross_axis_plateau_boundary_synthesis.20260403.json"
+)
+DEFAULT_CROSS_AXIS_PLATEAU_BOUNDARY_SYNTHESIS_DRAFT_PATH = (
+    DEFAULT_OUTPUT_ROOT / "next_manual_problem_draft.cross_axis_plateau_boundary_synthesis.20260403.json"
+)
+DEFAULT_CROSS_AXIS_PLATEAU_BOUNDARY_SYNTHESIS_PLAN_PATH = (
+    DEFAULT_OUTPUT_ROOT / "candidate_patch_plan.cross_axis_plateau_boundary_synthesis.20260403.json"
+)
+DEFAULT_HYBRID_RING_SECONDARY_SUPERVISED_RESERVE_SEED_PATH = (
+    DEFAULT_OUTPUT_ROOT / "approved_problem.seed.hybrid_ring_secondary_supervised_reserve.20260403.json"
+)
+DEFAULT_HYBRID_RING_SECONDARY_SUPERVISED_RESERVE_BLUEPRINT_PATH = (
+    DEFAULT_OUTPUT_ROOT / "family_blueprint.hybrid_ring_secondary_supervised_reserve.20260403.json"
+)
+DEFAULT_HYBRID_RING_SECONDARY_SUPERVISED_RESERVE_DRAFT_PATH = (
+    DEFAULT_OUTPUT_ROOT / "next_manual_problem_draft.hybrid_ring_secondary_supervised_reserve.20260403.json"
+)
+DEFAULT_HYBRID_RING_SECONDARY_SUPERVISED_RESERVE_PLAN_PATH = (
+    DEFAULT_OUTPUT_ROOT / "candidate_patch_plan.hybrid_ring_secondary_supervised_reserve.20260403.json"
+)
 DEFAULT_FRONTIER_LEDGER_PATH = DEFAULT_OUTPUT_ROOT / "frontier_ledger.json"
 DEFAULT_CANDIDATE_PATCH_PLAN_PATH = DEFAULT_OUTPUT_ROOT / "candidate_patch_plan.json"
 DEFAULT_CANDIDATE_PATCH_PLAN_MD_PATH = DEFAULT_OUTPUT_ROOT / "candidate_patch_plan.md"
@@ -262,6 +310,9 @@ ALLOWED_FAMILIES = [
     "default_stream_intrinsics_counterbalance",
     "camera_focal_objective_isolation",
     "camera_translation_objective_isolation",
+    "camera_objective_coupling_rebalancing",
+    "camera_depth_objective_coupling_audit",
+    "hybrid_ring_secondary_supervised_reserve",
 ]
 
 TAIL_CONTRACT_DERIVATIVE_FAMILIES = [
@@ -606,11 +657,69 @@ DEFAULT_CAMERA_TRANSLATION_OBJECTIVE_ISOLATION_CANDIDATE_CONFIG = (
     "zju_vggt_geom_unproject_source_policy_nearestplusuniformtail_rawpool_"
     "confdepth_dropworst_gradconfmask_losstisolation0_minimal.yaml"
 )
+DEFAULT_CAMERA_OBJECTIVE_COUPLING_REBALANCING_SHAPE = "stablelead_global_fl_relief090_t_boost105"
+DEFAULT_CAMERA_OBJECTIVE_COUPLING_REBALANCING_CANDIDATE_CONFIG = (
+    "training/config/"
+    "zju_vggt_geom_unproject_source_policy_nearestplusuniformtail_rawpool_"
+    "confdepth_dropworst_gradconfmask_flrelief090_tboost105_minimal.yaml"
+)
+DEFAULT_CAMERA_DEPTH_OBJECTIVE_COUPLING_AUDIT_SHAPE = "stablelead_global_cameraweight095_depthhold100"
+DEFAULT_CAMERA_DEPTH_OBJECTIVE_COUPLING_AUDIT_CANDIDATE_CONFIG = (
+    "training/config/"
+    "zju_vggt_geom_unproject_source_policy_nearestplusuniformtail_rawpool_"
+    "confdepth_dropworst_gradconfmask_cameraweight095_depthhold100_minimal.yaml"
+)
 DEFAULT_CAMERA_FOCAL_VS_TRANSLATION_POSTMORTEM_PATH = (
     "output/zju_source_policy_research_loop/camera_focal_vs_translation_postmortem.20260401.json"
 )
 DEFAULT_CAMERA_TRANSLATION_OBJECTIVE_ISOLATION_VALIDATION_PATH = (
     "output/zju_source_policy_research_loop/execution_prep_baseline_validation.camera_translation_objective_isolation.20260401.json"
+)
+DEFAULT_CAMERA_SUBOBJECTIVE_ISOLATION_POSTMORTEM_PATH = (
+    "output/zju_source_policy_research_loop/camera_subobjective_isolation_postmortem.20260402.json"
+)
+DEFAULT_CAMERA_OBJECTIVE_COUPLING_REBALANCING_VALIDATION_PATH = (
+    "output/zju_source_policy_research_loop/execution_prep_baseline_validation.camera_objective_coupling_rebalancing.20260402.json"
+)
+DEFAULT_CAMERA_DEPTH_OBJECTIVE_COUPLING_AUDIT_POSTMORTEM_PATH = (
+    "output/zju_source_policy_research_loop/camera_depth_objective_coupling_audit_postmortem.20260403.json"
+)
+DEFAULT_CAMERA_DEPTH_OBJECTIVE_COUPLING_AUDIT_VALIDATION_PATH = (
+    "output/zju_source_policy_research_loop/execution_prep_baseline_validation.camera_depth_objective_coupling_audit.20260403.json"
+)
+DEFAULT_CROSS_AXIS_PLATEAU_BOUNDARY_SYNTHESIS_SHAPE = "closed_axis_plateau_synthesis_audit_packet"
+DEFAULT_CROSS_AXIS_PLATEAU_BOUNDARY_SYNTHESIS_VALIDATION_PATH = (
+    "output/zju_source_policy_research_loop/execution_prep_validation.cross_axis_plateau_boundary_synthesis.20260403.json"
+)
+DEFAULT_CROSS_AXIS_PLATEAU_BOUNDARY_SYNTHESIS_RANKING_PATH = (
+    "output/zju_source_policy_research_loop/fresh_manual_problem_ranking.20260403.json"
+)
+DEFAULT_CROSS_AXIS_PLATEAU_BOUNDARY_SYNTHESIS_SUMMARY_PATH = (
+    "output/zju_source_policy_research_loop/cross_axis_plateau_boundary_synthesis.20260403.json"
+)
+DEFAULT_CROSS_AXIS_PLATEAU_BOUNDARY_SYNTHESIS_EXEC_READY_PATH = (
+    "output/zju_source_policy_research_loop/execution_ready_promotion_decision.cross_axis_plateau_boundary_synthesis.20260403.json"
+)
+DEFAULT_HYBRID_RING_SECONDARY_SUPERVISED_RESERVE_SHAPE = "anchor_plus_secondary_supervised_uniform_tail"
+DEFAULT_HYBRID_RING_SECONDARY_SUPERVISED_RESERVE_CANDIDATE_CONFIG = (
+    "training/config/"
+    "zju_vggt_geom_unproject_source_policy_nearestplusuniformtail_supervisedreserve_rawpool_"
+    "confdepth_dropworst_gradconfmask_minimal.yaml"
+)
+DEFAULT_HYBRID_RING_SECONDARY_SUPERVISED_RESERVE_VALIDATION_PATH = (
+    "output/zju_source_policy_research_loop/execution_prep_validation.hybrid_ring_secondary_supervised_reserve.20260403.json"
+)
+DEFAULT_HYBRID_RING_SECONDARY_SUPERVISED_RESERVE_EXEC_READY_PATH = (
+    "output/zju_source_policy_research_loop/execution_ready_promotion_decision.hybrid_ring_secondary_supervised_reserve.20260403.json"
+)
+DEFAULT_CLOUD_VALIDATION_RESULT_PATH = (
+    "output/zju_source_policy_research_loop/cloud_validation_result.source_policy_hybrid_ring_regularization.20260403.json"
+)
+DEFAULT_CLOUD_RUNTIME_STATE_PATH = (
+    "output/zju_source_policy_research_loop/cloud_runtime_state.20260403.json"
+)
+DEFAULT_ALIGNMENT_AUDIT_RESULT_PATH = (
+    "output/zju_source_policy_research_loop/promoted_lead_cloud_local_alignment_audit_result.20260403.json"
 )
 DEFAULT_SELECTION_CONTRACT_MECHANISM_DECISION_PATH = (
     "output/zju_source_policy_research_loop/selection_contract_mechanism_decision.20260329.json"
@@ -833,6 +942,15 @@ def maybe_resolve_repo_path(path_like: str | Path | None) -> Path | None:
     return resolve_repo_path(text)
 
 
+def latest_existing_repo_path(*relative_glob_patterns: str) -> Path | None:
+    candidates: list[Path] = []
+    for pattern in relative_glob_patterns:
+        candidates.extend(REPO_ROOT.glob(pattern))
+    if not candidates:
+        return None
+    return sorted(candidate.resolve() for candidate in candidates)[-1]
+
+
 def current_local_lead_config(local_manifest: dict) -> str:
     return str((local_manifest.get("current_lead", {}) or {}).get("config", "")).strip()
 
@@ -888,6 +1006,59 @@ def camera_translation_objective_isolation_artifacts_ready() -> bool:
         DEFAULT_CAMERA_TRANSLATION_OBJECTIVE_ISOLATION_BLUEPRINT_PATH,
         DEFAULT_CAMERA_TRANSLATION_OBJECTIVE_ISOLATION_DRAFT_PATH,
         DEFAULT_CAMERA_TRANSLATION_OBJECTIVE_ISOLATION_PLAN_PATH,
+    ]
+    return all(resolve_repo_path(path_like).exists() for path_like in required_paths)
+
+
+def camera_objective_coupling_rebalancing_artifacts_ready() -> bool:
+    required_paths = [
+        DEFAULT_CAMERA_OBJECTIVE_COUPLING_REBALANCING_CANDIDATE_CONFIG,
+        DEFAULT_CAMERA_SUBOBJECTIVE_ISOLATION_POSTMORTEM_PATH,
+        DEFAULT_CAMERA_OBJECTIVE_COUPLING_REBALANCING_VALIDATION_PATH,
+        str(DEFAULT_CAMERA_OBJECTIVE_COUPLING_REBALANCING_SEED_PATH.relative_to(REPO_ROOT)).replace("\\", "/"),
+        str(DEFAULT_CAMERA_OBJECTIVE_COUPLING_REBALANCING_BLUEPRINT_PATH.relative_to(REPO_ROOT)).replace("\\", "/"),
+        str(DEFAULT_CAMERA_OBJECTIVE_COUPLING_REBALANCING_DRAFT_PATH.relative_to(REPO_ROOT)).replace("\\", "/"),
+        str(DEFAULT_CAMERA_OBJECTIVE_COUPLING_REBALANCING_PLAN_PATH.relative_to(REPO_ROOT)).replace("\\", "/"),
+    ]
+    return all(resolve_repo_path(path_like).exists() for path_like in required_paths)
+
+
+def camera_depth_objective_coupling_audit_artifacts_ready() -> bool:
+    required_paths = [
+        DEFAULT_CAMERA_DEPTH_OBJECTIVE_COUPLING_AUDIT_CANDIDATE_CONFIG,
+        DEFAULT_CAMERA_DEPTH_OBJECTIVE_COUPLING_AUDIT_POSTMORTEM_PATH,
+        DEFAULT_CAMERA_DEPTH_OBJECTIVE_COUPLING_AUDIT_VALIDATION_PATH,
+        str(DEFAULT_CAMERA_DEPTH_OBJECTIVE_COUPLING_AUDIT_SEED_PATH.relative_to(REPO_ROOT)).replace("\\", "/"),
+        str(DEFAULT_CAMERA_DEPTH_OBJECTIVE_COUPLING_AUDIT_BLUEPRINT_PATH.relative_to(REPO_ROOT)).replace("\\", "/"),
+        str(DEFAULT_CAMERA_DEPTH_OBJECTIVE_COUPLING_AUDIT_DRAFT_PATH.relative_to(REPO_ROOT)).replace("\\", "/"),
+        str(DEFAULT_CAMERA_DEPTH_OBJECTIVE_COUPLING_AUDIT_PLAN_PATH.relative_to(REPO_ROOT)).replace("\\", "/"),
+    ]
+    return all(resolve_repo_path(path_like).exists() for path_like in required_paths)
+
+
+def cross_axis_plateau_boundary_synthesis_artifacts_ready() -> bool:
+    required_paths = [
+        DEFAULT_CROSS_AXIS_PLATEAU_BOUNDARY_SYNTHESIS_SUMMARY_PATH,
+        DEFAULT_CROSS_AXIS_PLATEAU_BOUNDARY_SYNTHESIS_RANKING_PATH,
+        DEFAULT_CROSS_AXIS_PLATEAU_BOUNDARY_SYNTHESIS_VALIDATION_PATH,
+        DEFAULT_CROSS_AXIS_PLATEAU_BOUNDARY_SYNTHESIS_EXEC_READY_PATH,
+        str(DEFAULT_CROSS_AXIS_PLATEAU_BOUNDARY_SYNTHESIS_SEED_PATH.relative_to(REPO_ROOT)).replace("\\", "/"),
+        str(DEFAULT_CROSS_AXIS_PLATEAU_BOUNDARY_SYNTHESIS_BLUEPRINT_PATH.relative_to(REPO_ROOT)).replace("\\", "/"),
+        str(DEFAULT_CROSS_AXIS_PLATEAU_BOUNDARY_SYNTHESIS_DRAFT_PATH.relative_to(REPO_ROOT)).replace("\\", "/"),
+        str(DEFAULT_CROSS_AXIS_PLATEAU_BOUNDARY_SYNTHESIS_PLAN_PATH.relative_to(REPO_ROOT)).replace("\\", "/"),
+    ]
+    return all(resolve_repo_path(path_like).exists() for path_like in required_paths)
+
+
+def hybrid_ring_secondary_supervised_reserve_artifacts_ready() -> bool:
+    required_paths = [
+        DEFAULT_HYBRID_RING_SECONDARY_SUPERVISED_RESERVE_CANDIDATE_CONFIG,
+        DEFAULT_HYBRID_RING_SECONDARY_SUPERVISED_RESERVE_VALIDATION_PATH,
+        DEFAULT_HYBRID_RING_SECONDARY_SUPERVISED_RESERVE_EXEC_READY_PATH,
+        str(DEFAULT_HYBRID_RING_SECONDARY_SUPERVISED_RESERVE_SEED_PATH.relative_to(REPO_ROOT)).replace("\\", "/"),
+        str(DEFAULT_HYBRID_RING_SECONDARY_SUPERVISED_RESERVE_BLUEPRINT_PATH.relative_to(REPO_ROOT)).replace("\\", "/"),
+        str(DEFAULT_HYBRID_RING_SECONDARY_SUPERVISED_RESERVE_DRAFT_PATH.relative_to(REPO_ROOT)).replace("\\", "/"),
+        str(DEFAULT_HYBRID_RING_SECONDARY_SUPERVISED_RESERVE_PLAN_PATH.relative_to(REPO_ROOT)).replace("\\", "/"),
     ]
     return all(resolve_repo_path(path_like).exists() for path_like in required_paths)
 
@@ -1015,6 +1186,135 @@ def build_auto_next_ticket_fields(current_priority: dict) -> dict:
             "family_blueprints": {
                 "camera_translation_objective_isolation": str(
                     DEFAULT_CAMERA_TRANSLATION_OBJECTIVE_ISOLATION_BLUEPRINT_PATH.resolve()
+                ),
+            },
+        }
+    if preferred_first_family == "camera_objective_coupling_rebalancing":
+        return {
+            "allowed_families": recommended_next_families,
+            "preferred_first_family": preferred_first_family,
+            "preferred_first_family_reason": (
+                "Both focal-only and translation-only isolation tickets already closed at short gate, and the repo now has "
+                "one prebuilt coupled FL/T rebalance candidate on the same stable lead."
+            ),
+            "preferred_first_candidate_shape": DEFAULT_CAMERA_OBJECTIVE_COUPLING_REBALANCING_SHAPE,
+            "preferred_first_candidate_shape_reason": (
+                "The next genuinely new discriminator is a bounded joint FL relief + T boost on the stable lead, "
+                "not another single-subobjective cousin."
+            ),
+            "preferred_first_candidate_config": DEFAULT_CAMERA_OBJECTIVE_COUPLING_REBALANCING_CANDIDATE_CONFIG,
+            "preferred_first_candidate_requires_code_patch": False,
+            "preferred_first_candidate_write_surface": [
+                "training/loss.py",
+                DEFAULT_CAMERA_OBJECTIVE_COUPLING_REBALANCING_CANDIDATE_CONFIG,
+            ],
+            "preferred_first_candidate_execution_note": (
+                "This first coupling-rebalancing candidate is execution-ready on the current repo and may be armed directly "
+                "once explicitly approved, while cloud remains off."
+            ),
+            "preferred_first_candidate_arm_command": (
+                "python scripts/arm_zju_source_policy_approved_problem.py --seed camera_objective_coupling_rebalancing"
+            ),
+            "preferred_first_candidate_run_command": "python scripts/run_zju_source_policy_research_candidate.py",
+            "family_blueprints": {
+                "camera_objective_coupling_rebalancing": str(
+                    DEFAULT_CAMERA_OBJECTIVE_COUPLING_REBALANCING_BLUEPRINT_PATH.resolve()
+                ),
+            },
+        }
+    if preferred_first_family == "camera_depth_objective_coupling_audit":
+        return {
+            "allowed_families": recommended_next_families,
+            "preferred_first_family": preferred_first_family,
+            "preferred_first_family_reason": (
+                "The focal-only, translation-only, and bounded FL/T coupling tickets are all now closed, and the "
+                "next honest discriminator is a higher-level camera-depth objective coupling audit on the same stable lead."
+            ),
+            "preferred_first_candidate_shape": DEFAULT_CAMERA_DEPTH_OBJECTIVE_COUPLING_AUDIT_SHAPE,
+            "preferred_first_candidate_shape_reason": (
+                "The first audit ticket should be the narrowest higher-level coupling probe: keep depth hold fixed, "
+                "reduce only the global camera objective weight to 0.95, and do not reopen camera subobjective cousins."
+            ),
+            "preferred_first_candidate_config": DEFAULT_CAMERA_DEPTH_OBJECTIVE_COUPLING_AUDIT_CANDIDATE_CONFIG,
+            "preferred_first_candidate_requires_code_patch": False,
+            "preferred_first_candidate_write_surface": [
+                "training/loss.py",
+                DEFAULT_CAMERA_DEPTH_OBJECTIVE_COUPLING_AUDIT_CANDIDATE_CONFIG,
+            ],
+            "preferred_first_candidate_execution_note": (
+                "This first camera-depth coupling audit candidate is execution-ready on the current repo and may be armed "
+                "directly once explicitly approved, while cloud remains off."
+            ),
+            "preferred_first_candidate_arm_command": (
+                "python scripts/arm_zju_source_policy_approved_problem.py --seed camera_depth_objective_coupling_audit"
+            ),
+            "preferred_first_candidate_run_command": "python scripts/run_zju_source_policy_research_candidate.py",
+            "family_blueprints": {
+                "camera_depth_objective_coupling_audit": str(
+                    DEFAULT_CAMERA_DEPTH_OBJECTIVE_COUPLING_AUDIT_BLUEPRINT_PATH.resolve()
+                ),
+            },
+        }
+    if preferred_first_family == "cross_axis_plateau_boundary_synthesis":
+        return {
+            "allowed_families": recommended_next_families,
+            "preferred_first_family": preferred_first_family,
+            "preferred_first_family_reason": (
+                "The focal-only, translation-only, FL/T coupling, and camera-depth audit axes are all formally closed, "
+                "so the next highest-value move is a higher-level synthesis problem rather than another execution ticket."
+            ),
+            "preferred_first_candidate_shape": DEFAULT_CROSS_AXIS_PLATEAU_BOUNDARY_SYNTHESIS_SHAPE,
+            "preferred_first_candidate_shape_reason": (
+                "This candidate is a non-training synthesis packet: compress the closed axes into one higher-level problem boundary "
+                "and define the next honest manual problem without reopening any cousin family."
+            ),
+            "preferred_first_candidate_config": "",
+            "preferred_first_candidate_requires_code_patch": False,
+            "preferred_first_candidate_write_surface": [
+                str(DEFAULT_CROSS_AXIS_PLATEAU_BOUNDARY_SYNTHESIS_SUMMARY_PATH),
+                str(DEFAULT_CROSS_AXIS_PLATEAU_BOUNDARY_SYNTHESIS_RANKING_PATH),
+                str(DEFAULT_CROSS_AXIS_PLATEAU_BOUNDARY_SYNTHESIS_PLAN_PATH.relative_to(REPO_ROOT)).replace("\\", "/"),
+            ],
+            "preferred_first_candidate_execution_note": (
+                "This family is execution-ready only in synthesis mode. It should remain IDLE_GUARD with cloud off, "
+                "manual approval required, and no arm/run path enabled."
+            ),
+            "preferred_first_candidate_arm_command": "",
+            "preferred_first_candidate_run_command": "",
+            "family_blueprints": {
+                "cross_axis_plateau_boundary_synthesis": str(
+                    DEFAULT_CROSS_AXIS_PLATEAU_BOUNDARY_SYNTHESIS_BLUEPRINT_PATH.resolve()
+                ),
+            },
+        }
+    if preferred_first_family == "hybrid_ring_secondary_supervised_reserve":
+        return {
+            "allowed_families": recommended_next_families,
+            "preferred_first_family": preferred_first_family,
+            "preferred_first_family_reason": (
+                "The cross-axis synthesis points to a shared selection/supervision coupling boundary: preserve the promoted hybrid-ring tail entry, "
+                "but stop dropping the secondary supervised geometric view."
+            ),
+            "preferred_first_candidate_shape": DEFAULT_HYBRID_RING_SECONDARY_SUPERVISED_RESERVE_SHAPE,
+            "preferred_first_candidate_shape_reason": (
+                "Reserve one secondary supervised geometric camera while still keeping the uniform tail source, so the candidate tests supervision-role retention "
+                "instead of another camera-loss scalar tweak."
+            ),
+            "preferred_first_candidate_config": DEFAULT_HYBRID_RING_SECONDARY_SUPERVISED_RESERVE_CANDIDATE_CONFIG,
+            "preferred_first_candidate_requires_code_patch": False,
+            "preferred_first_candidate_write_surface": [
+                "training/data/datasets/zju_vggt_geom.py",
+                DEFAULT_HYBRID_RING_SECONDARY_SUPERVISED_RESERVE_CANDIDATE_CONFIG,
+            ],
+            "preferred_first_candidate_execution_note": (
+                "This first derived family is executable on the current repo because the dataset helper and config are already materialized locally. "
+                "Manual approval would still be required before any future arm/run."
+            ),
+            "preferred_first_candidate_arm_command": "python scripts/arm_zju_source_policy_approved_problem.py --seed hybrid_ring_secondary_supervised_reserve",
+            "preferred_first_candidate_run_command": "python scripts/run_zju_source_policy_research_candidate.py",
+            "family_blueprints": {
+                "hybrid_ring_secondary_supervised_reserve": str(
+                    DEFAULT_HYBRID_RING_SECONDARY_SUPERVISED_RESERVE_BLUEPRINT_PATH.resolve()
                 ),
             },
         }
@@ -1487,6 +1787,53 @@ def build_current_priority(candidate_verdict: dict, local_manifest: dict, task_p
                 "Wait for a fresh manual promotion decision. Keep research in IDLE_GUARD, keep cloud off, and do not auto-select another family."
             ),
         }
+    if (
+        family == "camera_translation_objective_isolation"
+        and status in {"dead_same_day", "failed_long_gate"}
+        and camera_objective_coupling_rebalancing_artifacts_ready()
+    ):
+        verdict_label = status or "formal_verdict"
+        return {
+            "current_priority_family": "camera_objective_coupling_rebalancing",
+            "current_priority_reason": (
+                f"The first camera_translation_objective_isolation ticket already produced a terminal research verdict ({verdict_label}), "
+                "and together with the focal-isolation failure it closes the single-subobjective axis. The next honest single-ticket follow-up "
+                "is camera_objective_coupling_rebalancing on the same stable lead."
+            ),
+            "current_priority_candidate_shape": DEFAULT_CAMERA_OBJECTIVE_COUPLING_REBALANCING_SHAPE,
+            "current_priority_candidate_config": DEFAULT_CAMERA_OBJECTIVE_COUPLING_REBALANCING_CANDIDATE_CONFIG,
+            "current_priority_candidate_requires_code_patch": False,
+            "current_priority_candidate_write_surface": [
+                "training/loss.py",
+                DEFAULT_CAMERA_OBJECTIVE_COUPLING_REBALANCING_CANDIDATE_CONFIG,
+            ],
+            "current_priority_candidate_execution_note": (
+                "The next single approved ticket should jointly relieve FL and boost T inside loss_camera while keeping the stable lead fixed. "
+                "Do not reopen focal-only or translation-only cousins, and keep cloud off."
+            ),
+            "current_priority_arm_command": (
+                "python scripts/arm_zju_source_policy_approved_problem.py --seed camera_objective_coupling_rebalancing"
+            ),
+            "current_priority_run_command": "python scripts/run_zju_source_policy_research_candidate.py",
+            "current_frontier_hint": (
+                "The next manual approval may consider exactly one camera_objective_coupling_rebalancing ticket."
+            ),
+            "current_frontier_priority": (
+                "single-ticket coupling upgrade only: after focal-only and translation-only isolation both failed, move to one bounded "
+                "FL/T joint rebalance instead of reopening more camera subobjective cousins."
+            ),
+            "recommended_next_families": ["camera_objective_coupling_rebalancing"],
+            "recommended_family_order": ["camera_objective_coupling_rebalancing"],
+            "same_family_retry_forbidden": True,
+            "same_family_retry_reason": (
+                "The first camera_translation_objective_isolation ticket already consumed the current family budget, "
+                "so same-family retry would violate the single-ticket cross-night contract."
+            ),
+            "next_requirement": (
+                "Prepare one human-approved camera_objective_coupling_rebalancing ticket with exactly one "
+                "stablelead_global_fl_relief090_t_boost105 candidate. Do not auto-approve it and do not reopen focal-only, translation-only, tail, source, or bucket cousins."
+            ),
+        }
     if family == "camera_translation_objective_isolation" and status in {"dead_same_day", "failed_long_gate"}:
         verdict_label = status or "formal_verdict"
         return {
@@ -1519,6 +1866,252 @@ def build_current_priority(candidate_verdict: dict, local_manifest: dict, task_p
             "next_requirement": (
                 "Return to IDLE_GUARD. Do not auto-select a second ticket. If another forward move is needed, "
                 "it must come from fresh manual diagnosis evidence rather than an automatic family reopen."
+            ),
+        }
+    if family == "camera_objective_coupling_rebalancing" and status == "provisional_lead":
+        return {
+            "current_priority_family": "",
+            "current_priority_reason": (
+                "The first camera_objective_coupling_rebalancing ticket already cleared local gates strongly enough to become a provisional lead, "
+                "so research must return to guard and wait for a fresh manual promotion decision instead of opening another ticket."
+            ),
+            "current_priority_candidate_shape": "",
+            "current_priority_candidate_config": "",
+            "current_priority_candidate_requires_code_patch": False,
+            "current_priority_candidate_write_surface": [],
+            "current_priority_candidate_execution_note": (
+                "Do not auto-arm another ticket. The first camera_objective_coupling_rebalancing candidate has already spent the current family budget."
+            ),
+            "current_priority_arm_command": "",
+            "current_priority_run_command": "",
+            "current_frontier_hint": "No current priority family is selected. Wait for a fresh manual promotion decision.",
+            "current_frontier_priority": (
+                "promotion-hold: camera_objective_coupling_rebalancing is a provisional local lead; do not auto-open another family or any cloud action."
+            ),
+            "recommended_next_families": [],
+            "recommended_family_order": [],
+            "same_family_retry_forbidden": True,
+            "same_family_retry_reason": (
+                "The first camera_objective_coupling_rebalancing ticket already spent the current family budget and produced a provisional lead, "
+                "so same-family retry would violate the single-ticket cross-night contract."
+            ),
+            "next_requirement": (
+                "Wait for a fresh manual promotion decision. Keep research in IDLE_GUARD, keep cloud off, and do not auto-select another family."
+            ),
+        }
+    if (
+        family == "camera_objective_coupling_rebalancing"
+        and status in {"dead_same_day", "failed_long_gate"}
+        and camera_depth_objective_coupling_audit_artifacts_ready()
+    ):
+        verdict_label = status or "formal_verdict"
+        return {
+            "current_priority_family": "camera_depth_objective_coupling_audit",
+            "current_priority_reason": (
+                f"The first camera_objective_coupling_rebalancing ticket already produced a terminal research verdict ({verdict_label}), "
+                "so the camera subobjective axis is closed for this round. The next honest single-ticket follow-up is a higher-level "
+                "camera_depth_objective_coupling_audit on the same stable lead."
+            ),
+            "current_priority_candidate_shape": DEFAULT_CAMERA_DEPTH_OBJECTIVE_COUPLING_AUDIT_SHAPE,
+            "current_priority_candidate_config": DEFAULT_CAMERA_DEPTH_OBJECTIVE_COUPLING_AUDIT_CANDIDATE_CONFIG,
+            "current_priority_candidate_requires_code_patch": False,
+            "current_priority_candidate_write_surface": [
+                "training/loss.py",
+                DEFAULT_CAMERA_DEPTH_OBJECTIVE_COUPLING_AUDIT_CANDIDATE_CONFIG,
+            ],
+            "current_priority_candidate_execution_note": (
+                "The next single approved ticket should reduce only the global camera objective weight to 0.95 while "
+                "holding depth at 1.0 on the stable lead. Do not reopen focal-only, translation-only, or FL/T coupling cousins."
+            ),
+            "current_priority_arm_command": (
+                "python scripts/arm_zju_source_policy_approved_problem.py --seed camera_depth_objective_coupling_audit"
+            ),
+            "current_priority_run_command": "python scripts/run_zju_source_policy_research_candidate.py",
+            "current_frontier_hint": (
+                "The next manual approval may consider exactly one camera_depth_objective_coupling_audit ticket."
+            ),
+            "current_frontier_priority": (
+                "higher-level objective coupling audit only: after focal-only, translation-only, and FL/T coupling all failed, "
+                "move to one bounded global camera-vs-depth weighting audit instead of reopening more camera-object cousins."
+            ),
+            "recommended_next_families": ["camera_depth_objective_coupling_audit"],
+            "recommended_family_order": ["camera_depth_objective_coupling_audit"],
+            "same_family_retry_forbidden": True,
+            "same_family_retry_reason": (
+                "The first camera_objective_coupling_rebalancing ticket already consumed the current family budget, "
+                "so same-family retry would violate the single-ticket cross-night contract."
+            ),
+            "next_requirement": (
+                "Prepare one human-approved camera_depth_objective_coupling_audit ticket with exactly one "
+                "stablelead_global_cameraweight095_depthhold100 candidate. Do not auto-approve it and do not reopen camera subobjective, tail, source, or bucket cousins."
+            ),
+        }
+    if family == "camera_objective_coupling_rebalancing" and status in {"dead_same_day", "failed_long_gate"}:
+        verdict_label = status or "formal_verdict"
+        return {
+            "current_priority_family": "",
+            "current_priority_reason": (
+                f"The first camera_objective_coupling_rebalancing ticket already produced a terminal research verdict ({verdict_label}) at the local gate, "
+                "so the camera sub-object counterbalance axis is exhausted for this round."
+            ),
+            "current_priority_candidate_shape": "",
+            "current_priority_candidate_config": "",
+            "current_priority_candidate_requires_code_patch": False,
+            "current_priority_candidate_write_surface": [],
+            "current_priority_candidate_execution_note": (
+                "Do not auto-arm another ticket. The first camera_objective_coupling_rebalancing launch has already spent the current family budget."
+            ),
+            "current_priority_arm_command": "",
+            "current_priority_run_command": "",
+            "current_frontier_hint": "No current priority family is selected. Wait for a fresh higher-level manual problem.",
+            "current_frontier_priority": (
+                "manual-only: the camera sub-object counterbalance axis is now closed for this round; do not auto-open more camera-object cousins and keep cloud off."
+            ),
+            "recommended_next_families": [],
+            "recommended_family_order": [],
+            "same_family_retry_forbidden": True,
+            "same_family_retry_reason": (
+                "The first camera_objective_coupling_rebalancing ticket already consumed the current family budget, "
+                "so same-family retry would violate the single-ticket cross-night contract."
+            ),
+            "next_requirement": (
+                "Return to IDLE_GUARD. Do not auto-select a second ticket. If another forward move is needed, "
+                "it must come from a higher-level fresh manual problem rather than another camera sub-object counterbalance reopen."
+            ),
+        }
+    if family == "camera_depth_objective_coupling_audit" and status == "provisional_lead":
+        return {
+            "current_priority_family": "",
+            "current_priority_reason": (
+                "The first camera_depth_objective_coupling_audit ticket already cleared local gates strongly enough to become a provisional lead, "
+                "so research must return to guard and wait for a fresh manual promotion decision instead of opening another ticket."
+            ),
+            "current_priority_candidate_shape": "",
+            "current_priority_candidate_config": "",
+            "current_priority_candidate_requires_code_patch": False,
+            "current_priority_candidate_write_surface": [],
+            "current_priority_candidate_execution_note": (
+                "Do not auto-arm another ticket. The first camera_depth_objective_coupling_audit candidate has already spent the current family budget."
+            ),
+            "current_priority_arm_command": "",
+            "current_priority_run_command": "",
+            "current_frontier_hint": "No current priority family is selected. Wait for a fresh manual promotion decision.",
+            "current_frontier_priority": (
+                "promotion-hold: camera_depth_objective_coupling_audit is a provisional local lead; do not auto-open another family or any cloud action."
+            ),
+            "recommended_next_families": [],
+            "recommended_family_order": [],
+            "same_family_retry_forbidden": True,
+            "same_family_retry_reason": (
+                "The first camera_depth_objective_coupling_audit ticket already spent the current family budget and produced a provisional lead, "
+                "so same-family retry would violate the single-ticket cross-night contract."
+            ),
+            "next_requirement": (
+                "Wait for a fresh manual promotion decision. Keep research in IDLE_GUARD, keep cloud off, and do not auto-select another family."
+            ),
+        }
+    if family == "camera_depth_objective_coupling_audit" and status in {"dead_same_day", "failed_long_gate"}:
+        if cross_axis_plateau_boundary_synthesis_artifacts_ready():
+            if hybrid_ring_secondary_supervised_reserve_artifacts_ready():
+                return {
+                    "current_priority_family": "hybrid_ring_secondary_supervised_reserve",
+                    "current_priority_reason": (
+                        "The higher-level cross-axis synthesis already selected a concrete next mechanism family: keep the promoted hybrid-ring tail entry, "
+                        "but reserve one secondary supervised geometric view so the next training ticket tests supervision-role retention instead of another scalar camera-object cousin."
+                    ),
+                    "current_priority_candidate_shape": DEFAULT_HYBRID_RING_SECONDARY_SUPERVISED_RESERVE_SHAPE,
+                    "current_priority_candidate_config": DEFAULT_HYBRID_RING_SECONDARY_SUPERVISED_RESERVE_CANDIDATE_CONFIG,
+                    "current_priority_candidate_requires_code_patch": False,
+                    "current_priority_candidate_write_surface": [
+                        "training/data/datasets/zju_vggt_geom.py",
+                        DEFAULT_HYBRID_RING_SECONDARY_SUPERVISED_RESERVE_CANDIDATE_CONFIG,
+                    ],
+                    "current_priority_candidate_execution_note": (
+                        "The next manual approval may consider exactly one derived training family on the current repo. It is still cloud-off and must not be auto-armed."
+                    ),
+                    "current_priority_arm_command": "python scripts/arm_zju_source_policy_approved_problem.py --seed hybrid_ring_secondary_supervised_reserve",
+                    "current_priority_run_command": "python scripts/run_zju_source_policy_research_candidate.py",
+                    "current_frontier_hint": "The next manual approval may consider exactly one hybrid_ring_secondary_supervised_reserve ticket.",
+                    "current_frontier_priority": (
+                        "derived execution family selected: preserve tail entry, restore secondary supervision, and avoid reopening any closed camera-object scalar family."
+                    ),
+                    "recommended_next_families": ["hybrid_ring_secondary_supervised_reserve"],
+                    "recommended_family_order": ["hybrid_ring_secondary_supervised_reserve"],
+                    "same_family_retry_forbidden": True,
+                    "same_family_retry_reason": (
+                        "camera_depth_objective_coupling_audit is already closed, so the next step must stay on the new derived family rather than reopen the old axis."
+                    ),
+                    "next_requirement": (
+                        "Manual approval may review the hybrid_ring_secondary_supervised_reserve packet. Keep cloud off, do not auto-arm, and do not run automatically."
+                    ),
+                }
+            verdict_label = status or "formal_verdict"
+            return {
+                "current_priority_family": "cross_axis_plateau_boundary_synthesis",
+                "current_priority_reason": (
+                    f"The first camera_depth_objective_coupling_audit ticket already produced a terminal research verdict ({verdict_label}) at the local gate, "
+                    "and every recent camera-object axis is now formally closed. The next honest move is a higher-level cross-axis plateau boundary synthesis."
+                ),
+                "current_priority_candidate_shape": DEFAULT_CROSS_AXIS_PLATEAU_BOUNDARY_SYNTHESIS_SHAPE,
+                "current_priority_candidate_config": "",
+                "current_priority_candidate_requires_code_patch": False,
+                "current_priority_candidate_write_surface": [
+                    str(DEFAULT_CROSS_AXIS_PLATEAU_BOUNDARY_SYNTHESIS_SUMMARY_PATH),
+                    str(DEFAULT_CROSS_AXIS_PLATEAU_BOUNDARY_SYNTHESIS_RANKING_PATH),
+                    str(DEFAULT_CROSS_AXIS_PLATEAU_BOUNDARY_SYNTHESIS_PLAN_PATH.relative_to(REPO_ROOT)).replace("\\", "/"),
+                ],
+                "current_priority_candidate_execution_note": (
+                    "The next manual approval may review one non-training synthesis packet that ranks the higher-level fresh manual problems "
+                    "and pushes only the selected one into execution-ready pending-arm with cloud off."
+                ),
+                "current_priority_arm_command": "",
+                "current_priority_run_command": "",
+                "current_frontier_hint": "The next manual approval may consider exactly one higher-level cross-axis plateau synthesis packet.",
+                "current_frontier_priority": (
+                    "higher-level synthesis only: closed camera-object axes must now be compressed into a single new manual problem rather than reopened as new tickets."
+                ),
+                "recommended_next_families": ["cross_axis_plateau_boundary_synthesis"],
+                "recommended_family_order": ["cross_axis_plateau_boundary_synthesis"],
+                "same_family_retry_forbidden": True,
+                "same_family_retry_reason": (
+                    "The first camera_depth_objective_coupling_audit ticket already consumed its family budget, "
+                    "so the next step must move up a level instead of retrying the same axis."
+                ),
+                "next_requirement": (
+                    "Review the cross_axis_plateau_boundary_synthesis packet. Keep cloud off, do not arm or run a new ticket automatically, "
+                    "and use the ranked synthesis to define the next fresh manual problem."
+                ),
+            }
+        verdict_label = status or "formal_verdict"
+        return {
+            "current_priority_family": "",
+            "current_priority_reason": (
+                f"The first camera_depth_objective_coupling_audit ticket already produced a terminal research verdict ({verdict_label}) at the local gate, "
+                "so the higher-level camera-depth objective coupling audit axis is exhausted for this round."
+            ),
+            "current_priority_candidate_shape": "",
+            "current_priority_candidate_config": "",
+            "current_priority_candidate_requires_code_patch": False,
+            "current_priority_candidate_write_surface": [],
+            "current_priority_candidate_execution_note": (
+                "Do not auto-arm another ticket. The first camera_depth_objective_coupling_audit launch has already spent the current family budget."
+            ),
+            "current_priority_arm_command": "",
+            "current_priority_run_command": "",
+            "current_frontier_hint": "No current priority family is selected. Wait for a fresh higher-level manual problem.",
+            "current_frontier_priority": (
+                "manual-only: the camera-depth objective coupling audit axis is now closed for this round; do not auto-open more cousins and keep cloud off."
+            ),
+            "recommended_next_families": [],
+            "recommended_family_order": [],
+            "same_family_retry_forbidden": True,
+            "same_family_retry_reason": (
+                "The first camera_depth_objective_coupling_audit ticket already consumed the current family budget, "
+                "so same-family retry would violate the single-ticket cross-night contract."
+            ),
+            "next_requirement": (
+                "Return to IDLE_GUARD. Do not auto-select a second ticket. If another forward move is needed, "
+                "it must come from a fresh higher-level manual problem rather than another camera-depth coupling audit reopen."
             ),
         }
     manual_decision = latest_manual_promotion_decision(task_plan)
@@ -3237,6 +3830,141 @@ def build_frontier_ledger(task_plan: dict, local_manifest: dict, candidate_verdi
         translation_stop_reason = (
             "camera_translation_objective_isolation has not been fully packaged yet."
         )
+    if family == "camera_objective_coupling_rebalancing" and status:
+        coupling_status = status
+        coupling_stop_reason = candidate_verdict.get("reason", "")
+    elif camera_objective_coupling_rebalancing_artifacts_ready():
+        coupling_status = "ready_for_execution"
+        coupling_stop_reason = (
+            "The camera subobjective postmortem and joint coupling validation are both materialized, and one "
+            "single FL/T coupling candidate is execution-ready pending manual approval."
+        )
+    else:
+        coupling_status = "not_ready"
+        coupling_stop_reason = (
+            "camera_objective_coupling_rebalancing has not been fully packaged yet."
+        )
+    if family == "camera_depth_objective_coupling_audit" and status:
+        camera_depth_audit_status = status
+        camera_depth_audit_stop_reason = candidate_verdict.get("reason", "")
+    elif camera_depth_objective_coupling_audit_artifacts_ready():
+        camera_depth_audit_status = "ready_for_execution"
+        camera_depth_audit_stop_reason = (
+            "The higher-level camera-depth coupling postmortem and global camera-weight validation are both materialized, "
+            "and one single cameraweight095_depthhold100 candidate is execution-ready pending manual approval."
+        )
+    else:
+        camera_depth_audit_status = "not_ready"
+        camera_depth_audit_stop_reason = (
+            "camera_depth_objective_coupling_audit has not been fully packaged yet."
+        )
+    if cross_axis_plateau_boundary_synthesis_artifacts_ready():
+        cross_axis_status = "ready_for_execution"
+        cross_axis_stop_reason = (
+            "The ranked cross-axis plateau synthesis packet is materialized and defines the next fresh manual problem candidate at a higher level."
+        )
+    else:
+        cross_axis_status = "not_ready"
+        cross_axis_stop_reason = (
+            "cross_axis_plateau_boundary_synthesis has not been fully packaged yet."
+        )
+    if hybrid_ring_secondary_supervised_reserve_artifacts_ready():
+        supervised_reserve_status = "ready_for_execution"
+        supervised_reserve_stop_reason = (
+            "The derived execution family that preserves one secondary supervised geometric view while keeping the hybrid-ring tail entry is materialized and ready for manual approval."
+        )
+    else:
+        supervised_reserve_status = "not_ready"
+        supervised_reserve_stop_reason = (
+            "hybrid_ring_secondary_supervised_reserve has not been fully packaged yet."
+        )
+    cloud_validation_result_path = latest_existing_repo_path(
+        "output/zju_source_policy_research_loop/cloud_validation_result.source_policy_hybrid_ring_regularization.*.json"
+    ) or resolve_repo_path(DEFAULT_CLOUD_VALIDATION_RESULT_PATH)
+    alignment_audit_result_path = latest_existing_repo_path(
+        "output/zju_source_policy_research_loop/promoted_lead_cloud_local_alignment_audit_result.*.json"
+    ) or resolve_repo_path(DEFAULT_ALIGNMENT_AUDIT_RESULT_PATH)
+    cloud_validation_result = maybe_load_json(cloud_validation_result_path)
+    alignment_audit_result = maybe_load_json(alignment_audit_result_path)
+    family_readout = {
+        "wholefg_jointdepth_scalar": {
+            "status": "bounded_wrong_side",
+            "stop_reason": "softening approached the stable lead from the wrong side without crossing"
+        },
+        "wholefg_decoupled": {
+            "status": "bounded_wrong_side",
+            "stop_reason": "first decoupled conf/reg near-neighbor still regressed both depth terms"
+        },
+        "nonwholefg_edge_band_jointdepth": {
+            "status": "bounded_wrong_side",
+            "stop_reason": "edge-band frontier got very close but still did not beat the stable lead"
+        },
+        "nonwholefg_edge_band_decoupled": {
+            "status": "bounded_wrong_side",
+            "stop_reason": "edge-band decoupled near-neighbor stayed worse than the best edge-band scalar point"
+        },
+        "hard_pixel_depth_conf_threshold": {
+            "status": "rejected_too_aggressive",
+            "stop_reason": "hard gt depth_conf<=p60 threshold worsened conf_depth and reg_depth inside the promising edge-band route"
+        },
+        "residual_case_coverage_rebalancing": {
+            "status": residual_status,
+            "stop_reason": residual_stop_reason,
+        },
+        "two_stage_objective_decoupling": {
+            "status": (
+                status
+                if family == "two_stage_objective_decoupling" and status
+                else "idle_until_manually_approved"
+            ),
+            "stop_reason": (
+                candidate_verdict.get("reason", "")
+                if family == "two_stage_objective_decoupling"
+                else "A two-stage objective-decoupling ticket exists only when a fresh manual approval explicitly opens it."
+            ),
+        },
+        "tail_contract_derivative_batch": {
+            "status": tail_contract_batch_status,
+            "stop_reason": tail_contract_batch_stop_reason,
+        },
+        "default_stream_intrinsics_counterbalance": {
+            "status": default_counterbalance_status,
+            "stop_reason": default_counterbalance_stop_reason,
+        },
+        "camera_translation_objective_isolation": {
+            "status": translation_status,
+            "stop_reason": translation_stop_reason,
+        },
+        "camera_objective_coupling_rebalancing": {
+            "status": coupling_status,
+            "stop_reason": coupling_stop_reason,
+        },
+        "camera_depth_objective_coupling_audit": {
+            "status": camera_depth_audit_status,
+            "stop_reason": camera_depth_audit_stop_reason,
+        },
+        "cross_axis_plateau_boundary_synthesis": {
+            "status": cross_axis_status,
+            "stop_reason": cross_axis_stop_reason,
+        },
+        "hybrid_ring_secondary_supervised_reserve": {
+            "status": supervised_reserve_status,
+            "stop_reason": supervised_reserve_stop_reason,
+        },
+    }
+    if cloud_validation_result:
+        family_readout["source_policy_hybrid_ring_regularization_cloud_validation"] = {
+            "status": "cloud_validation_done_clean",
+            "stop_reason": (
+                "The promoted hybrid-ring stable lead already completed one downstream clean cloud validation; "
+                "that cloud line is closed and is not a continuation of any newer closed local family."
+            ),
+        }
+    if alignment_audit_result:
+        family_readout["promoted_lead_cloud_local_alignment_audit"] = {
+            "status": str(alignment_audit_result.get("status", "")),
+            "stop_reason": str(alignment_audit_result.get("summary", "")),
+        }
     return {
         "checked_at": iso_now(),
         "stable_lead_config": current_lead.get("config", ""),
@@ -3245,56 +3973,7 @@ def build_frontier_ledger(task_plan: dict, local_manifest: dict, candidate_verdi
         "frozen_families": FROZEN_FAMILIES,
         "preferred_first_family": auto_next["preferred_first_family"],
         "preferred_first_family_reason": auto_next["preferred_first_family_reason"],
-        "family_readout": {
-            "wholefg_jointdepth_scalar": {
-                "status": "bounded_wrong_side",
-                "stop_reason": "softening approached the stable lead from the wrong side without crossing"
-            },
-            "wholefg_decoupled": {
-                "status": "bounded_wrong_side",
-                "stop_reason": "first decoupled conf/reg near-neighbor still regressed both depth terms"
-            },
-            "nonwholefg_edge_band_jointdepth": {
-                "status": "bounded_wrong_side",
-                "stop_reason": "edge-band frontier got very close but still did not beat the stable lead"
-            },
-            "nonwholefg_edge_band_decoupled": {
-                "status": "bounded_wrong_side",
-                "stop_reason": "edge-band decoupled near-neighbor stayed worse than the best edge-band scalar point"
-            },
-            "hard_pixel_depth_conf_threshold": {
-                "status": "rejected_too_aggressive",
-                "stop_reason": "hard gt depth_conf<=p60 threshold worsened conf_depth and reg_depth inside the promising edge-band route"
-            },
-            "residual_case_coverage_rebalancing": {
-                "status": residual_status,
-                "stop_reason": residual_stop_reason,
-            },
-            "two_stage_objective_decoupling": {
-                "status": (
-                    status
-                    if family == "two_stage_objective_decoupling" and status
-                    else "idle_until_manually_approved"
-                ),
-                "stop_reason": (
-                    candidate_verdict.get("reason", "")
-                    if family == "two_stage_objective_decoupling"
-                    else "A two-stage objective-decoupling ticket exists only when a fresh manual approval explicitly opens it."
-                ),
-            },
-            "tail_contract_derivative_batch": {
-                "status": tail_contract_batch_status,
-                "stop_reason": tail_contract_batch_stop_reason,
-            },
-            "default_stream_intrinsics_counterbalance": {
-                "status": default_counterbalance_status,
-                "stop_reason": default_counterbalance_stop_reason,
-            },
-            "camera_translation_objective_isolation": {
-                "status": translation_status,
-                "stop_reason": translation_stop_reason,
-            }
-        },
+        "family_readout": family_readout,
         "recommended_next_families": current_priority["recommended_next_families"],
         "recommended_family_order": current_priority["recommended_family_order"],
         "current_priority_family": current_priority["current_priority_family"],
@@ -3309,6 +3988,8 @@ def build_frontier_ledger(task_plan: dict, local_manifest: dict, candidate_verdi
         ],
         "latest_formal_verdict": summarize_candidate_verdict(candidate_verdict),
         "latest_family_outcomes": build_latest_family_outcomes(candidate_verdict),
+        "latest_promoted_lead_cloud_validation": cloud_validation_result,
+        "latest_alignment_audit_result": alignment_audit_result,
     }
 
 
@@ -3343,6 +4024,14 @@ def build_family_stop_reason(candidate_verdict: dict, local_manifest: dict, task
             "No final discriminator has been materialized yet; do not auto-open more tail-contract cousins."
         )
         tail_batch_only_eligible = ""
+    cloud_validation_result_path = latest_existing_repo_path(
+        "output/zju_source_policy_research_loop/cloud_validation_result.source_policy_hybrid_ring_regularization.*.json"
+    ) or resolve_repo_path(DEFAULT_CLOUD_VALIDATION_RESULT_PATH)
+    alignment_audit_result_path = latest_existing_repo_path(
+        "output/zju_source_policy_research_loop/promoted_lead_cloud_local_alignment_audit_result.*.json"
+    ) or resolve_repo_path(DEFAULT_ALIGNMENT_AUDIT_RESULT_PATH)
+    cloud_validation_result = maybe_load_json(cloud_validation_result_path)
+    alignment_audit_result = maybe_load_json(alignment_audit_result_path)
     return {
         "checked_at": iso_now(),
         "frozen_families": {
@@ -3371,6 +4060,8 @@ def build_family_stop_reason(candidate_verdict: dict, local_manifest: dict, task
         "cloud_policy": "cloud must remain off regardless of research-loop state until a candidate clears long gate locally",
         "latest_formal_verdict": summarize_candidate_verdict(candidate_verdict),
         "latest_family_outcomes": build_latest_family_outcomes(candidate_verdict),
+        "latest_promoted_lead_cloud_validation": cloud_validation_result,
+        "latest_alignment_audit_result": alignment_audit_result,
     }
 
 
@@ -4248,6 +4939,63 @@ def validate_approved_problem(
             issues.append("mutation_dsl_must_disallow_cloud")
         if not resolve_repo_path(DEFAULT_CAMERA_TRANSLATION_OBJECTIVE_ISOLATION_CANDIDATE_CONFIG).exists():
             issues.append("camera_translation_objective_isolation_candidate_config_missing_on_disk")
+    if family == "camera_objective_coupling_rebalancing":
+        if mutation_dsl.get("allow_camera_objective_coupling_rebalancing") is not True:
+            issues.append("mutation_dsl_must_allow_camera_objective_coupling_rebalancing")
+        if mutation_dsl.get("require_existing_loss_fl_isolation_hook") is not True:
+            issues.append("mutation_dsl_must_require_existing_loss_fl_isolation_hook")
+        if mutation_dsl.get("require_existing_loss_t_isolation_hook") is not True:
+            issues.append("mutation_dsl_must_require_existing_loss_t_isolation_hook")
+        if mutation_dsl.get("allow_joint_fl_relief_and_t_boost_only") is not True:
+            issues.append("mutation_dsl_must_allow_joint_fl_relief_and_t_boost_only")
+        if mutation_dsl.get("keep_existing_depth_routing_unchanged") is not True:
+            issues.append("mutation_dsl_must_keep_existing_depth_routing_unchanged")
+        if mutation_dsl.get("disallow_camera_focal_same_family_retry") is not True:
+            issues.append("mutation_dsl_must_disallow_camera_focal_same_family_retry")
+        if mutation_dsl.get("disallow_camera_translation_same_family_retry") is not True:
+            issues.append("mutation_dsl_must_disallow_camera_translation_same_family_retry")
+        if mutation_dsl.get("disallow_tail_contract_derivative_reopen") is not True:
+            issues.append("mutation_dsl_must_disallow_tail_contract_derivative_reopen")
+        if mutation_dsl.get("disallow_cloud") is not True:
+            issues.append("mutation_dsl_must_disallow_cloud")
+        if not resolve_repo_path(DEFAULT_CAMERA_OBJECTIVE_COUPLING_REBALANCING_CANDIDATE_CONFIG).exists():
+            issues.append("camera_objective_coupling_rebalancing_candidate_config_missing_on_disk")
+    if family == "camera_depth_objective_coupling_audit":
+        if mutation_dsl.get("allow_camera_depth_objective_coupling_audit") is not True:
+            issues.append("mutation_dsl_must_allow_camera_depth_objective_coupling_audit")
+        if mutation_dsl.get("require_existing_multitask_loss_weights") is not True:
+            issues.append("mutation_dsl_must_require_existing_multitask_loss_weights")
+        if mutation_dsl.get("allow_global_camera_weight_relief_only") is not True:
+            issues.append("mutation_dsl_must_allow_global_camera_weight_relief_only")
+        if mutation_dsl.get("require_depth_weight_hold_identity") is not True:
+            issues.append("mutation_dsl_must_require_depth_weight_hold_identity")
+        if mutation_dsl.get("keep_current_stable_lead_fixed") is not True:
+            issues.append("mutation_dsl_must_keep_current_stable_lead_fixed")
+        if mutation_dsl.get("disallow_camera_focal_same_family_retry") is not True:
+            issues.append("mutation_dsl_must_disallow_camera_focal_same_family_retry")
+        if mutation_dsl.get("disallow_camera_translation_same_family_retry") is not True:
+            issues.append("mutation_dsl_must_disallow_camera_translation_same_family_retry")
+        if mutation_dsl.get("disallow_camera_objective_coupling_same_family_retry") is not True:
+            issues.append("mutation_dsl_must_disallow_camera_objective_coupling_same_family_retry")
+        if mutation_dsl.get("disallow_tail_contract_derivative_reopen") is not True:
+            issues.append("mutation_dsl_must_disallow_tail_contract_derivative_reopen")
+        if mutation_dsl.get("disallow_cloud") is not True:
+            issues.append("mutation_dsl_must_disallow_cloud")
+        if not resolve_repo_path(DEFAULT_CAMERA_DEPTH_OBJECTIVE_COUPLING_AUDIT_CANDIDATE_CONFIG).exists():
+            issues.append("camera_depth_objective_coupling_audit_candidate_config_missing_on_disk")
+    if family == "hybrid_ring_secondary_supervised_reserve":
+        if mutation_dsl.get("allow_hybrid_ring_secondary_supervised_reserve") is not True:
+            issues.append("mutation_dsl_must_allow_hybrid_ring_secondary_supervised_reserve")
+        if mutation_dsl.get("keep_promoted_hybrid_ring_tail_entry") is not True:
+            issues.append("mutation_dsl_must_keep_promoted_hybrid_ring_tail_entry")
+        if mutation_dsl.get("allow_secondary_supervised_reserve_only") is not True:
+            issues.append("mutation_dsl_must_allow_secondary_supervised_reserve_only")
+        if mutation_dsl.get("keep_cloud_off") is not True:
+            issues.append("mutation_dsl_must_keep_cloud_off")
+        if mutation_dsl.get("disallow_closed_camera_axis_reopen") is not True:
+            issues.append("mutation_dsl_must_disallow_closed_camera_axis_reopen")
+        if not resolve_repo_path(DEFAULT_HYBRID_RING_SECONDARY_SUPERVISED_RESERVE_CANDIDATE_CONFIG).exists():
+            issues.append("hybrid_ring_secondary_supervised_reserve_candidate_config_missing_on_disk")
     if approved:
         if not str(approved_problem.get("problem_id", "")).strip():
             issues.append("problem_id_required_for_approved_problem")
@@ -4622,6 +5370,57 @@ def validate_approved_problem(
                 )
             if bool(approved_problem.get("first_candidate_requires_code_patch", True)):
                 issues.append("camera_translation_objective_isolation_first_candidate_must_stay_repo_ready")
+        if family == "camera_objective_coupling_rebalancing":
+            if (
+                str(approved_problem.get("first_candidate_shape", "")).strip()
+                != DEFAULT_CAMERA_OBJECTIVE_COUPLING_REBALANCING_SHAPE
+            ):
+                issues.append(
+                    "camera_objective_coupling_rebalancing_first_candidate_must_match_stablelead_global_fl_relief090_t_boost105"
+                )
+            if (
+                first_candidate_config
+                and first_candidate_config != DEFAULT_CAMERA_OBJECTIVE_COUPLING_REBALANCING_CANDIDATE_CONFIG
+            ):
+                issues.append(
+                    "camera_objective_coupling_rebalancing_first_candidate_must_match_prebuilt_config"
+                )
+            if bool(approved_problem.get("first_candidate_requires_code_patch", True)):
+                issues.append("camera_objective_coupling_rebalancing_first_candidate_must_stay_repo_ready")
+        if family == "camera_depth_objective_coupling_audit":
+            if (
+                str(approved_problem.get("first_candidate_shape", "")).strip()
+                != DEFAULT_CAMERA_DEPTH_OBJECTIVE_COUPLING_AUDIT_SHAPE
+            ):
+                issues.append(
+                    "camera_depth_objective_coupling_audit_first_candidate_must_match_stablelead_global_cameraweight095_depthhold100"
+                )
+            if (
+                first_candidate_config
+                and first_candidate_config != DEFAULT_CAMERA_DEPTH_OBJECTIVE_COUPLING_AUDIT_CANDIDATE_CONFIG
+            ):
+                issues.append(
+                    "camera_depth_objective_coupling_audit_first_candidate_must_match_prebuilt_config"
+                )
+            if bool(approved_problem.get("first_candidate_requires_code_patch", True)):
+                issues.append("camera_depth_objective_coupling_audit_first_candidate_must_stay_repo_ready")
+        if family == "hybrid_ring_secondary_supervised_reserve":
+            if (
+                str(approved_problem.get("first_candidate_shape", "")).strip()
+                != DEFAULT_HYBRID_RING_SECONDARY_SUPERVISED_RESERVE_SHAPE
+            ):
+                issues.append(
+                    "hybrid_ring_secondary_supervised_reserve_first_candidate_must_match_anchor_plus_secondary_supervised_uniform_tail"
+                )
+            if (
+                first_candidate_config
+                and first_candidate_config != DEFAULT_HYBRID_RING_SECONDARY_SUPERVISED_RESERVE_CANDIDATE_CONFIG
+            ):
+                issues.append(
+                    "hybrid_ring_secondary_supervised_reserve_first_candidate_must_match_prebuilt_config"
+                )
+            if bool(approved_problem.get("first_candidate_requires_code_patch", True)):
+                issues.append("hybrid_ring_secondary_supervised_reserve_first_candidate_must_stay_repo_ready")
     return issues
 
 
@@ -4634,7 +5433,24 @@ def build_status(
 ) -> dict:
     current_priority = build_current_priority(candidate_verdict, local_manifest, task_plan)
     auto_next = build_auto_next_ticket_fields(current_priority)
-    ready_for_execution = current_priority["current_priority_family"] == "camera_translation_objective_isolation"
+    cloud_validation_result_path = latest_existing_repo_path(
+        "output/zju_source_policy_research_loop/cloud_validation_result.source_policy_hybrid_ring_regularization.*.json"
+    ) or resolve_repo_path(DEFAULT_CLOUD_VALIDATION_RESULT_PATH)
+    alignment_audit_result_path = latest_existing_repo_path(
+        "output/zju_source_policy_research_loop/promoted_lead_cloud_local_alignment_audit_result.*.json"
+    ) or resolve_repo_path(DEFAULT_ALIGNMENT_AUDIT_RESULT_PATH)
+    cloud_validation_result = maybe_load_json(cloud_validation_result_path)
+    alignment_audit_result = maybe_load_json(alignment_audit_result_path)
+    ready_for_execution = current_priority["current_priority_family"] in {
+        "camera_translation_objective_isolation",
+        "camera_objective_coupling_rebalancing",
+        "camera_depth_objective_coupling_audit",
+        "hybrid_ring_secondary_supervised_reserve",
+        "cross_axis_plateau_boundary_synthesis",
+    }
+    nontraining_ready_family = current_priority["current_priority_family"] in {
+        "cross_axis_plateau_boundary_synthesis",
+    }
     approved_problem_present = bool(approved_problem)
     approved_problem_ready = bool(approved_problem_present and approved_problem.get("approved"))
     if not approved_problem_present:
@@ -4663,7 +5479,11 @@ def build_status(
         "repo_process_allowlist_path": str(DEFAULT_REPO_PROCESS_ALLOWLIST_PATH.resolve()),
         "approved_problem_archive_root": str(DEFAULT_APPROVED_PROBLEM_ARCHIVE_ROOT.resolve()),
         "current_stable_lead_config": local_manifest.get("current_lead", {}).get("config", ""),
-        "current_cloud_blocker": local_manifest.get("current_cloud_blocker", ""),
+        "current_cloud_blocker": (
+            str(alignment_audit_result.get("final_boundary", "")).strip()
+            if alignment_audit_result
+            else local_manifest.get("current_cloud_blocker", "")
+        ),
         "allowed_families": auto_next["allowed_families"],
         "preferred_first_family": auto_next["preferred_first_family"],
         "preferred_first_family_reason": auto_next["preferred_first_family_reason"],
@@ -4704,8 +5524,10 @@ def build_status(
         "manual_action_required": ready_for_execution,
         "manual_action_kind": "manual_approval" if ready_for_execution else "",
         "ready_for_execution": ready_for_execution,
-        "do_not_arm_now": not ready_for_execution,
-        "do_not_run_candidate_now": not ready_for_execution,
+        "do_not_arm_now": True,
+        "do_not_run_candidate_now": True,
+        "latest_promoted_lead_cloud_validation": cloud_validation_result,
+        "latest_alignment_audit_result": alignment_audit_result,
     }
 
 

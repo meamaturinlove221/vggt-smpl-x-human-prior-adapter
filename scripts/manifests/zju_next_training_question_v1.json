@@ -6,28 +6,28 @@
   "main_manifest_version": "v9",
   "baseline_config": "training/config/zju_vggt_geom_unproject_minimal.yaml",
   "candidate_config": "training/config/zju_vggt_geom_unproject_source_policy_nearestplusuniformtail_rawpool_confdepth_dropworst_gradconfmask_minimal.yaml",
-  "current_cloud_blocker": "The manually promoted hybrid-ring local lead remains the current local lead, and cloud must remain off. The residual_case_coverage_rebalancing ticket was executed but not promoted after a corrected recheck against the actual current lead. Any later forward move still requires a fresh manual problem and a separate explicit downstream decision.",
+  "current_cloud_blocker": "camera_objective_coupling_rebalancing closed as dead_same_day at short_gate_10x5 while the promoted hybrid-ring local lead remained current, so cloud must remain off. Any later forward move now requires a fresh higher-level manual problem and a separate explicit downstream decision.",
   "candidate_config_status": "promoted_local_lead_synced_no_active_next_training_question",
-  "geometry_direction": "Hold source_policy_hybrid_ring_regularization / stablelead_nearest_plus_uniform_tail as the current local lead, keep research in steady_hold + IDLE_GUARD, keep no auto-next ticket, and keep cloud off until a fresh manual problem and a separate explicit downstream decision exist.",
-  "question": "No active next training question is open. The promoted local lead is synced; define a fresh manual problem only if later needed.",
+  "geometry_direction": "Hold source_policy_hybrid_ring_regularization / stablelead_nearest_plus_uniform_tail as the current local lead, keep research in steady_hold + IDLE_GUARD, keep no auto-next ticket, and keep cloud off because the camera sub-object counterbalance axis is exhausted and any later move now requires a fresh higher-level manual problem plus a separate explicit downstream decision.",
+  "question": "No active next training question is open. The camera sub-object counterbalance axis is closed for this round; define a fresh higher-level manual problem only if later needed.",
   "why_now": [
-    "Manual REJECT has closed the residual_case_coverage_rebalancing hold after a corrected recheck against the actual current hybrid-ring lead.",
-    "There is no current priority family and no auto-next ticket.",
-    "The next forward move, if later needed, is a fresh manual problem rather than another same-family or cousin run."
+    "camera_focal_objective_isolation closed as dead_same_day.",
+    "camera_translation_objective_isolation closed as dead_same_day.",
+    "camera_objective_coupling_rebalancing also closed as dead_same_day, so the next forward move must be a fresh higher-level manual problem rather than another camera-object cousin."
   ],
   "local_code_gaps": [],
   "candidate_implementation_requirements": [
-    "Keep the current local lead as the reference config until a future manual problem is defined.",
+    "Keep the current local lead as the reference config until a future fresh higher-level manual problem is defined.",
     "Do not auto-arm another ticket from this manifest alone.",
     "Keep cloud off."
   ],
   "non_goals": [
     "Do not define a new manual problem automatically.",
-    "Do not reopen the residual same-family retry or slot_3 ticket.",
+    "Do not reopen focal-only, translation-only, or coupling cousins.",
     "Do not use this manifest as implicit approval for a new run."
   ],
   "required_before_cloud": [
-    "A separate explicit downstream decision is still required after local promotion."
+    "A separate explicit downstream decision is still required after a future local long-gate success."
   ],
   "acceptance_metrics": [
     "loss_camera",

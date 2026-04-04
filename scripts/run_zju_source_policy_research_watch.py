@@ -265,23 +265,30 @@ def build_research_summary(
 ) -> dict:
     allowed_markers = allowlist_payload.get("allowed_markers", [])
     active_modal_apps = [row for row in modal_apps if str(row.get("State", "")).lower() != "stopped"]
+    latest_alignment_audit = research_status.get("latest_alignment_audit_result", {}) or {}
+    latest_promoted_cloud_validation = research_status.get("latest_promoted_lead_cloud_validation", {}) or {}
     next_requirement = str(research_status.get("next_requirement", "")).strip().lower()
     runner_launch_required = (
         str(research_status.get("state", "")) == "ARMED_PROBLEM"
         and bool(research_status.get("approved_problem_present"))
     )
     promotion_decision_required = "manual promotion decision" in next_requirement
+    ready_for_execution = bool(research_status.get("ready_for_execution"))
+    explicit_manual_action_kind = str(research_status.get("manual_action_kind", "")).strip()
     manual_review_required = (
         not bool(research_status.get("approved_problem_present"))
         and bool(str(research_status.get("preferred_first_family", "")).strip())
     )
     manual_action_kind = (
-        "runner_launch"
-        if runner_launch_required
-        else (
-            "promotion_decision"
-            if promotion_decision_required
-            else ("manual_review" if manual_review_required else "")
+        explicit_manual_action_kind
+        or (
+            "runner_launch"
+            if runner_launch_required
+            else (
+                "promotion_decision"
+                if promotion_decision_required
+                else ("manual_review" if manual_review_required else "")
+            )
         )
     )
     return {
@@ -292,8 +299,22 @@ def build_research_summary(
         "allowlist_status": str(allowlist_payload.get("status", "")),
         "active_modal_app_count": len(active_modal_apps),
         "runtime_process_count": len(research_runtime_processes),
-        "manual_action_required": bool(manual_action_kind),
+        "manual_action_required": bool(research_status.get("manual_action_required")) or bool(manual_action_kind),
         "manual_action_kind": manual_action_kind,
+        "ready_for_execution": ready_for_execution,
+        "alignment_audit_completed_clean": (
+            str(latest_alignment_audit.get("status", "")).strip() == "completed_clean"
+            and not ready_for_execution
+            and not str(research_status.get("current_priority_family", "")).strip()
+        ),
+        "alignment_audit_family": str(latest_alignment_audit.get("family", "")).strip(),
+        "promoted_lead_cloud_validation_done_clean": (
+            str(latest_promoted_cloud_validation.get("status", "")).strip() == "cloud_validation_done_clean"
+            or (
+                str(latest_promoted_cloud_validation.get("artifact_kind", "")).strip() == "cloud_validation_result"
+                and int(latest_promoted_cloud_validation.get("active_modal_app_count_after_finish", -1)) == 0
+            )
+        ),
     }
 
 
@@ -361,6 +382,10 @@ def build_watch_conclusion(*, guard_all_green: bool, research_summary: dict, ref
         return f"research refresh failed but the watch remains passive: {refresh_error}"
     if not guard_all_green:
         return "guard drift detected; watch remains passive and records the failure without opening research"
+    if research_summary.get("alignment_audit_completed_clean"):
+        return "guard is green; alignment audit finished clean, no active cloud app remains, and no active local family is open"
+    if research_summary.get("manual_action_kind") == "manual_approval" and research_summary.get("ready_for_execution"):
+        return "guard is green and research remains idle; exactly one execution-ready family is pending explicit manual arm approval before any run"
     if research_summary.get("manual_action_kind") == "runner_launch":
         return "an approved problem is armed; watch remains passive and waits for an explicit manual runner launch"
     if research_summary.get("manual_action_kind") == "promotion_decision":

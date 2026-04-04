@@ -41,6 +41,7 @@ param(
     [switch]$AllowLargeLocalUpload,
     [switch]$AllowAttachedLongRun,
     [switch]$EnableCompile,
+    [switch]$DisableCompile,
     [switch]$SkipActiveAppCheck,
     [switch]$NoProbeContractDiff,
     [switch]$NoFreezeAggregator,
@@ -118,6 +119,23 @@ $modal = Resolve-ModalExe $ModalExe
 $entryScript = Join-Path $repoRoot "modal_zju_geometry_minimal_finetune.py"
 $preflightScript = Join-Path $repoRoot "scripts\\invoke_modal_zju_preflight.ps1"
 $modalAppDescription = "vggt-zju-geometry-minimal-finetune"
+$isA100Profile = $ModalGpu -like "A100*"
+
+if ($EnableCompile -and $DisableCompile) {
+    throw "EnableCompile and DisableCompile cannot both be set."
+}
+
+if ($isA100Profile -and $NumWorkers -eq 16) {
+    $NumWorkers = 20
+}
+if ($isA100Profile -and $TrainPrefetchFactor -eq 8) {
+    $TrainPrefetchFactor = 12
+}
+if ($isA100Profile -and $ValPrefetchFactor -eq 4) {
+    $ValPrefetchFactor = 6
+}
+
+$useCompile = $EnableCompile.IsPresent -or ($isA100Profile -and -not $DisableCompile.IsPresent)
 
 if (-not $Detach -and -not $AllowAttachedLongRun) {
     if ($LimitTrainBatches -gt 20 -or $MaxEpochs -gt 1) {
@@ -230,6 +248,7 @@ if (-not [string]::IsNullOrWhiteSpace($env:VGGT_ZJU_MODAL_OUTPUT_VOLUME)) {
 }
 Write-Host "[modal-zju-geometry] detach=$Detach"
 Write-Host "[modal-zju-geometry] max_img_per_gpu=$MaxImgPerGpu num_workers=$NumWorkers train_prefetch=$TrainPrefetchFactor val_prefetch=$ValPrefetchFactor"
+Write-Host "[modal-zju-geometry] use_compile=$useCompile a100_profile=$isA100Profile"
 
 $resolvedCheckpointSubpath = $CheckpointSubpath
 if (-not [string]::IsNullOrWhiteSpace($LocalCheckpoint) -and -not $DryRun) {
@@ -280,7 +299,7 @@ $cfg = [ordered]@{
     mask_source = $MaskSource
     min_depth_conf = $MinDepthConf
     freeze_aggregator = (-not $NoFreezeAggregator)
-    enable_compile = $EnableCompile.IsPresent
+    enable_compile = $useCompile
     extra_overrides = $ExtraOverrides
 }
 $cfgJsonRaw = $cfg | ConvertTo-Json -Compress

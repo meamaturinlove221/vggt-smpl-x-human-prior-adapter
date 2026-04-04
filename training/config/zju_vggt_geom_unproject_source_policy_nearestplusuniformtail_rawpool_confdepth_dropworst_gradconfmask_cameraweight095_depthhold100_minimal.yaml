@@ -1,0 +1,11 @@
+defaults:
+  - zju_vggt_geom_unproject_source_policy_nearestplusuniformtail_rawpool_confdepth_dropworst_gradconfmask_minimal
+  - _self_
+
+exp_name: zju_vggt_geom_unproject_source_policy_nearestplusuniformtail_rawpool_confdepth_dropworst_gradconfmask_cameraweight095_depthhold100_minimal
+
+loss:
+  camera:
+    weight: 0.95
+  depth:
+    weight: 1.0

@@ -2,14 +2,12 @@
   "schema_version": 1,
   "automation_entrypoint": "scripts/run_zju_source_policy_rawpool_local_nightly.py",
   "overnight_watch_entrypoint": "scripts/run_zju_source_policy_rawpool_overnight_watch.py",
-  "status": "promoted_local_lead_synced_cloud_off",
-  "problem_id": "source_policy_hybrid_ring_regularization_v1_promoted",
-  "main_direction": "Hold source_policy_hybrid_ring_regularization / stablelead_nearest_plus_uniform_tail as the current local lead, keep research in steady_hold + IDLE_GUARD, keep no auto-next ticket, and keep cloud off until a fresh manual problem and a separate explicit downstream decision exist.",
-  "current_cloud_blocker": "The manually promoted hybrid-ring local lead remains the current local lead, and cloud must remain off. The residual_case_coverage_rebalancing ticket was executed but not promoted after a corrected recheck against the actual current lead. Any later forward move still requires a fresh manual problem and a separate explicit downstream decision.",
+  "status": "steady_hold_fresh_higher_level_manual_problem_required",
+  "problem_id": "",
+  "main_direction": "Hold source_policy_hybrid_ring_regularization / stablelead_nearest_plus_uniform_tail as the current local lead, keep research in steady_hold + IDLE_GUARD, keep no auto-next ticket, and keep cloud off because the camera sub-object counterbalance axis is exhausted and any later move now requires a fresh higher-level manual problem plus a separate explicit downstream decision.",
+  "current_cloud_blocker": "camera_objective_coupling_rebalancing closed as dead_same_day at short_gate_10x5 while the promoted hybrid-ring local lead remained current, so cloud must remain off. Any later forward move now requires a fresh higher-level manual problem and a separate explicit downstream decision.",
   "current_lead": {
     "config": "training/config/zju_vggt_geom_unproject_source_policy_nearestplusuniformtail_rawpool_confdepth_dropworst_gradconfmask_minimal.yaml",
-    "gate_summary": "G:/项目备份/vggt_cam_depth大文件索引/output/zju_source_policy_research_loop/promotion_decision.20260328.md",
-    "attribution_summary": "G:/项目备份/vggt_cam_depth大文件索引/output/zju_source_policy_research_loop/promotion_decision.20260328.md",
     "family": "source_policy_hybrid_ring_regularization",
     "first_candidate_shape": "stablelead_nearest_plus_uniform_tail",
     "gate_references": {
@@ -24,48 +22,32 @@
     "why_lead": [
       "It beat the previous stable lead at the short 10/5 gate on camera, conf_depth, and reg_depth while keeping translation flat.",
       "It also beat the previous stable lead again at the long 100/20 gate and therefore earned a formal provisional_lead before manual promotion.",
-      "A later residual_case_coverage_rebalancing ticket improved depth terms but regressed camera on the corrected 10/5 recheck against this lead, so manual REJECT kept this config current."
+      "Later residual-case, focal-isolation, translation-isolation, and FL/T coupling tickets all failed to dislodge it as the current local lead."
     ]
   },
   "frozen_non_reentry_candidates": [
     {
-      "name": "interpolated_eligibility_shaping",
-      "reason": "Closed failed family for this round."
+      "name": "camera_focal_objective_isolation",
+      "reason": "Executed and closed as dead_same_day for this round."
     },
     {
-      "name": "partial_joint_depth_routing",
-      "reason": "Closed failed family for this round."
+      "name": "camera_translation_objective_isolation",
+      "reason": "Executed and closed as dead_same_day for this round."
     },
     {
-      "name": "conf_reg_disagreement_routing",
-      "reason": "Closed failed family for this round."
-    },
-    {
-      "name": "unproject_consistency_routing",
-      "reason": "Closed failed family for this round."
-    },
-    {
-      "name": "unproject_aux_confgate",
-      "reason": "Closed failed family for this round."
-    },
-    {
-      "name": "source_policy_hybrid_ring_regularization_same_family_retry",
-      "reason": "Promoted lead already spent the single-ticket family budget."
-    },
-    {
-      "name": "residual_case_coverage_rebalancing_same_family_retry",
-      "reason": "Executed but not promoted after corrected current-lead recheck."
+      "name": "camera_objective_coupling_rebalancing",
+      "reason": "Executed and closed as dead_same_day for this round."
     }
   ],
   "next_local_diagnostic": {
-    "name": "fresh_manual_problem_only_if_later_needed",
+    "name": "fresh_higher_level_manual_problem_only_if_later_needed",
     "status": "deferred_until_future_manual_problem",
     "next_allowed_candidate_family": "",
-    "goal": "Do not auto-open another ticket. Only define a fresh manual problem later if another genuinely new question is needed."
+    "goal": "Do not auto-open another ticket. Only define a fresh higher-level manual problem later if another genuinely new question is needed."
   },
   "non_goals": [
     "Do not arm or run another ticket tonight.",
-    "Do not reopen the closed failure batch or the residual same-family retry.",
+    "Do not reopen focal-only, translation-only, or FL/T coupling cousins.",
     "Do not auto-promote to cloud or auto-generate the next question."
   ],
   "nightly_modes": [
@@ -83,7 +65,7 @@
     {
       "name": "single_candidate_local_gate",
       "default": false,
-      "when": "A later fresh manual problem explicitly authorizes one new local candidate.",
+      "when": "A later fresh higher-level manual problem explicitly authorizes one new local candidate.",
       "steps": [
         "Remain single-ticket only.",
         "Do not branch into cousin sweeps or a second same-night candidate."
@@ -95,8 +77,9 @@
     "Do not treat local promotion as implicit cloud authorization."
   ],
   "single_source_of_truth": [
-    "G:/项目备份/vggt_cam_depth大文件索引/output/zju_source_policy_research_loop/promotion_decision.20260328.md",
-    "G:/项目备份/vggt_cam_depth大文件索引/output/zju_source_policy_research_loop/promotion_decision.20260329.json",
+    "output/zju_source_policy_research_loop/research_loop_status.json",
+    "output/zju_source_policy_research_loop/frontier_ledger.json",
+    "output/zju_source_policy_research_loop/family_stop_reason.json",
     "scripts/manifests/zju_source_policy_rawpool_local_nightly_v1.json",
     "scripts/manifests/zju_next_training_question_v1.json"
   ],
@@ -105,16 +88,16 @@
   "cloud_gate": false,
   "launch_cloud_now": false,
   "latest_manual_decision": {
-    "decision": "REJECT",
-    "decision_status": "executed_but_not_promoted",
-    "decision_path": "G:/项目备份/vggt_cam_depth大文件索引/output/zju_source_policy_research_loop/promotion_decision.20260329.json",
-    "decision_family": "residual_case_coverage_rebalancing"
+    "decision": "",
+    "decision_status": "",
+    "decision_path": "",
+    "decision_family": ""
   },
   "latest_rejected_candidate": {
-    "family": "residual_case_coverage_rebalancing",
-    "candidate_shape": "promotedlead_hardcase_bucket_mix",
-    "candidate_config": "training/config/zju_vggt_geom_unproject_source_policy_nearestplusuniformtail_rawpool_confdepth_dropworst_gradconfmask_hardcasebucketmix4to1_minimal.yaml",
-    "decision_path": "G:/项目备份/vggt_cam_depth大文件索引/output/zju_source_policy_research_loop/promotion_decision.20260329.json",
-    "reason": "The residual hardcase mix did not beat the actual current hybrid-ring lead on the direct recheck: short gate regressed loss_camera, and long gate regressed both loss_camera and loss_T."
+    "family": "camera_objective_coupling_rebalancing",
+    "candidate_shape": "stablelead_global_fl_relief090_t_boost105",
+    "candidate_config": "training/config/zju_vggt_geom_unproject_source_policy_nearestplusuniformtail_rawpool_confdepth_dropworst_gradconfmask_flrelief090_tboost105_minimal.yaml",
+    "decision_path": "output/zju_source_policy_research_loop/candidate_verdict.json",
+    "reason": "The single FL/T coupling candidate still failed the short gate: camera improved only marginally, while T, conf_depth, and reg_depth did not improve."
   }
 }

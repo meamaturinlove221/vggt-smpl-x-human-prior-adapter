@@ -7,7 +7,7 @@ import sys
 import threading
 import time
 import base64
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, replace
 from pathlib import Path, PurePosixPath
 
 import modal
@@ -211,15 +211,15 @@ class ZjuFinetuneConfig:
     learning_rate: float = 5e-5
     limit_train_batches: int = 100
     limit_val_batches: int = 20
-    num_workers: int = 16
-    train_prefetch_factor: int = 8
-    val_prefetch_factor: int = 4
+    num_workers: int = 20
+    train_prefetch_factor: int = 12
+    val_prefetch_factor: int = 6
     holdout_stride: int = 10
     camera_source: str = "gt"
     mask_source: str = "mask"
     min_depth_conf: float = 0.0
     freeze_aggregator: bool = True
-    enable_compile: bool = False
+    enable_compile: bool = True
     emit_dataset_probe: bool = True
     emit_dataset_probe_contract_diff: bool = True
     probe_sample_index: int = 0
@@ -256,9 +256,9 @@ class ZjuAblationPairConfig:
     learning_rate: float = 5e-5
     limit_train_batches: int = 100
     limit_val_batches: int = 20
-    num_workers: int = 16
-    train_prefetch_factor: int = 8
-    val_prefetch_factor: int = 4
+    num_workers: int = 20
+    train_prefetch_factor: int = 12
+    val_prefetch_factor: int = 6
     holdout_stride: int = 10
     camera_source: str = "gt"
     mask_source: str = "mask"
@@ -266,7 +266,7 @@ class ZjuAblationPairConfig:
     baseline_min_depth_conf: float | None = None
     candidate_min_depth_conf: float | None = None
     freeze_aggregator: bool = True
-    enable_compile: bool = False
+    enable_compile: bool = True
     extra_overrides: str = ""
 
     def to_json(self) -> str:
@@ -565,6 +565,20 @@ def _stream_subprocess_with_live_mirror(
         raise subprocess.CalledProcessError(return_code, cmd)
 
 
+def _compile_failure_looks_retryable(log_path: Path) -> bool:
+    if not log_path.exists():
+        return False
+    text = log_path.read_text(encoding="utf-8", errors="replace").lower()
+    retryable_markers = (
+        "misaligned address",
+        "xid",
+        "torch.compile",
+        "inductor",
+        "cuda error",
+    )
+    return any(marker in text for marker in retryable_markers)
+
+
 def _run_training_subprocess(
     cfg: ZjuFinetuneConfig,
     *,
@@ -710,15 +724,40 @@ def _run_training_subprocess(
         else:
             print("[modal-zju-geometry] dataset probe script missing; skipping probe export.", flush=True)
 
-    live_log_path = output_root / "driver_live.log"
-    _stream_subprocess_with_live_mirror(
-        cmd=cmd,
-        cwd=remote_code_dir,
-        env=env,
-        mirror_log_path=live_log_path,
-        commit_callback=output_volume.commit,
-        commit_interval_sec=LIVE_COMMIT_INTERVAL_SEC,
-    )
+    live_log_path = output_root / ("driver_live_compile.log" if bool(getattr(cfg, "enable_compile", False)) else "driver_live.log")
+    try:
+        _stream_subprocess_with_live_mirror(
+            cmd=cmd,
+            cwd=remote_code_dir,
+            env=env,
+            mirror_log_path=live_log_path,
+            commit_callback=output_volume.commit,
+            commit_interval_sec=LIVE_COMMIT_INTERVAL_SEC,
+        )
+    except subprocess.CalledProcessError:
+        if bool(getattr(cfg, "enable_compile", False)) and _compile_failure_looks_retryable(live_log_path):
+            fallback_cfg = replace(cfg, enable_compile=False)
+            fallback_overrides = _build_overrides(fallback_cfg, output_root, resolved_checkpoint_path)
+            fallback_cmd = [sys.executable, str(launch_path), "--config", fallback_cfg.config, *fallback_overrides]
+            fallback_status = {
+                "compile_attempted": True,
+                "compile_fallback_triggered": True,
+                "reason": "retryable_compile_failure_detected",
+                "compile_log": live_log_path.as_posix(),
+                "fallback_log": (output_root / "driver_live.log").as_posix(),
+            }
+            _write_json(output_root / "compile_fallback_status.json", fallback_status)
+            print("[modal-zju-geometry] compile path failed; retrying eagerly on the same A100 run", flush=True)
+            _stream_subprocess_with_live_mirror(
+                cmd=fallback_cmd,
+                cwd=remote_code_dir,
+                env=env,
+                mirror_log_path=output_root / "driver_live.log",
+                commit_callback=output_volume.commit,
+                commit_interval_sec=LIVE_COMMIT_INTERVAL_SEC,
+            )
+        else:
+            raise
 
     output_volume.commit()
     print("[modal-zju-geometry] committed output volume", flush=True)
@@ -991,14 +1030,15 @@ def run_zju_geometry_finetune(
     learning_rate: float = 5e-5,
     limit_train_batches: int = 100,
     limit_val_batches: int = 20,
-    num_workers: int = 16,
-    train_prefetch_factor: int = 8,
-    val_prefetch_factor: int = 4,
+    num_workers: int = 20,
+    train_prefetch_factor: int = 12,
+    val_prefetch_factor: int = 6,
     holdout_stride: int = 10,
     camera_source: str = "gt",
     mask_source: str = "mask",
     min_depth_conf: float = 0.0,
     freeze_aggregator: bool = True,
+    enable_compile: bool = True,
     extra_overrides: str = "",
 ) -> None:
     resolved_checkpoint_subpath = checkpoint_subpath
@@ -1028,6 +1068,7 @@ def run_zju_geometry_finetune(
         mask_source=mask_source,
         min_depth_conf=min_depth_conf,
         freeze_aggregator=freeze_aggregator,
+        enable_compile=enable_compile,
         extra_overrides=extra_overrides,
     )
 
@@ -1054,14 +1095,15 @@ def run_zju_geometry_ablation_pair(
     learning_rate: float = 5e-5,
     limit_train_batches: int = 100,
     limit_val_batches: int = 20,
-    num_workers: int = 16,
-    train_prefetch_factor: int = 8,
-    val_prefetch_factor: int = 4,
+    num_workers: int = 20,
+    train_prefetch_factor: int = 12,
+    val_prefetch_factor: int = 6,
     holdout_stride: int = 10,
     camera_source: str = "gt",
     mask_source: str = "mask",
     min_depth_conf: float = 0.0,
     freeze_aggregator: bool = True,
+    enable_compile: bool = True,
     extra_overrides: str = "",
 ) -> None:
     resolved_checkpoint_subpath = checkpoint_subpath
@@ -1092,6 +1134,7 @@ def run_zju_geometry_ablation_pair(
         mask_source=mask_source,
         min_depth_conf=min_depth_conf,
         freeze_aggregator=freeze_aggregator,
+        enable_compile=enable_compile,
         extra_overrides=extra_overrides,
     )
 

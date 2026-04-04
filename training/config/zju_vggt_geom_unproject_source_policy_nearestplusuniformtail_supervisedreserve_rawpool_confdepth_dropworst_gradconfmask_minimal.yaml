@@ -1,0 +1,7 @@
+defaults:
+  - zju_vggt_geom_unproject_source_policy_nearestplusuniformtail_rawpool_confdepth_dropworst_gradconfmask_minimal
+  - _self_
+
+exp_name: zju_vggt_geom_unproject_source_policy_nearestplusuniformtail_supervisedreserve_rawpool_confdepth_dropworst_gradconfmask_minimal
+
+zju_source_policy: nearest_plus_uniform_tail_supervised_reserve

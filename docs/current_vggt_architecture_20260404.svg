@@ -1,0 +1,250 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="980" viewBox="0 0 1800 980">
+  <defs>
+    <style>
+      .title { font: 700 34px Georgia, 'Times New Roman', serif; fill: #232323; }
+      .subtitle { font: 600 18px Georgia, 'Times New Roman', serif; fill: #4a4a4a; }
+      .label { font: 600 18px Georgia, 'Times New Roman', serif; fill: #2f2f2f; }
+      .small { font: 500 15px Georgia, 'Times New Roman', serif; fill: #444444; }
+      .tiny { font: 500 13px Georgia, 'Times New Roman', serif; fill: #585858; }
+      .badge { font: 600 16px Georgia, 'Times New Roman', serif; fill: #7a4f00; }
+      .head { font: 700 22px Georgia, 'Times New Roman', serif; fill: #2f2f2f; }
+      .note { font: 500 14px Georgia, 'Times New Roman', serif; fill: #4b4b4b; }
+      .arrow { stroke: #808080; stroke-width: 3; fill: none; marker-end: url(#arrowhead); }
+      .dashed { stroke-dasharray: 10 8; }
+      .thin-dashed { stroke-dasharray: 6 6; }
+      .box { stroke: #a8a8a8; stroke-width: 2; fill: #ffffff; }
+    </style>
+    <marker id="arrowhead" markerWidth="14" markerHeight="10" refX="10" refY="5" orient="auto">
+      <polygon points="0,0 12,5 0,10" fill="#808080" />
+    </marker>
+    <linearGradient id="gBadge" x1="0" x2="1">
+      <stop offset="0%" stop-color="#fff1cf" />
+      <stop offset="100%" stop-color="#ffe0a6" />
+    </linearGradient>
+    <linearGradient id="gSampler" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#fff6e6" />
+      <stop offset="100%" stop-color="#ffe9c8" />
+    </linearGradient>
+    <linearGradient id="gCore" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#fafafa" />
+      <stop offset="100%" stop-color="#f2f2f2" />
+    </linearGradient>
+    <linearGradient id="gDpt" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#dcedc8" />
+      <stop offset="100%" stop-color="#bfe3aa" />
+    </linearGradient>
+    <linearGradient id="gReliability" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#eef5ff" />
+      <stop offset="100%" stop-color="#dbeaff" />
+    </linearGradient>
+    <linearGradient id="gTeacher" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#e6f7f4" />
+      <stop offset="100%" stop-color="#cdeee8" />
+    </linearGradient>
+    <linearGradient id="gVisualLift" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#f4ecff" />
+      <stop offset="100%" stop-color="#e5d7ff" />
+    </linearGradient>
+  </defs>
+
+  <rect x="0" y="0" width="1800" height="980" fill="#ffffff"/>
+
+  <text x="900" y="58" text-anchor="middle" class="title">Current Project Mainline on Top of the Original VGGT</text>
+  <text x="900" y="88" text-anchor="middle" class="subtitle">Same VGGT core, plus ZJU view selection, reliability-aware supervision, promoted hybrid source policy, and teacher-fixed visual lift.</text>
+
+  <rect x="480" y="112" rx="18" ry="18" width="840" height="44" fill="url(#gBadge)" stroke="#e0b75d" stroke-width="1.5"/>
+  <text x="900" y="140" text-anchor="middle" class="badge">Promoted stable lead = nearest_plus_uniform_tail + confdepth_dropworst + gradconfmask</text>
+
+  <text x="120" y="200" text-anchor="middle" class="head">Input</text>
+
+  <g transform="translate(45,230)">
+    <rect x="0" y="0" width="150" height="98" rx="6" ry="6" fill="#f7f7f7" stroke="#c8c8c8" />
+    <path d="M15 15 H135 M15 40 H135 M15 65 H135 M15 15 V85 M55 15 V85 M95 15 V85 M135 15 V85" stroke="#e5e5e5" stroke-width="2"/>
+    <text x="75" y="116" text-anchor="middle" class="small">anchor view</text>
+  </g>
+  <g transform="translate(45,360)">
+    <rect x="0" y="0" width="150" height="98" rx="6" ry="6" fill="#f7f7f7" stroke="#c8c8c8" />
+    <path d="M15 15 H135 M15 40 H135 M15 65 H135 M15 15 V85 M55 15 V85 M95 15 V85 M135 15 V85" stroke="#e5e5e5" stroke-width="2"/>
+    <text x="75" y="116" text-anchor="middle" class="small">supervised view</text>
+  </g>
+  <g transform="translate(45,490)">
+    <rect x="0" y="0" width="150" height="98" rx="6" ry="6" fill="#f7f7f7" stroke="#c8c8c8" />
+    <path d="M15 15 H135 M15 40 H135 M15 65 H135 M15 15 V85 M55 15 V85 M95 15 V85 M135 15 V85" stroke="#e5e5e5" stroke-width="2"/>
+    <text x="75" y="116" text-anchor="middle" class="small">source-only near view</text>
+  </g>
+  <g transform="translate(45,620)">
+    <rect x="0" y="0" width="150" height="98" rx="6" ry="6" fill="#f7f7f7" stroke="#c8c8c8" />
+    <path d="M15 15 H135 M15 40 H135 M15 65 H135 M15 15 V85 M55 15 V85 M95 15 V85 M135 15 V85" stroke="#e5e5e5" stroke-width="2"/>
+    <text x="75" y="116" text-anchor="middle" class="small">uniform tail source</text>
+  </g>
+
+  <rect x="250" y="210" rx="18" ry="18" width="230" height="560" fill="url(#gSampler)" stroke="#e0b56a" stroke-width="3"/>
+  <text x="365" y="246" text-anchor="middle" class="head">ZJU Geometry</text>
+  <text x="365" y="274" text-anchor="middle" class="head">View Sampler</text>
+  <text x="365" y="334" text-anchor="middle" class="label">anchor selection</text>
+  <text x="365" y="374" text-anchor="middle" class="label">geom_plus_raw pool</text>
+  <text x="365" y="414" text-anchor="middle" class="label">supervised vs source-only</text>
+  <text x="365" y="454" text-anchor="middle" class="label">depth-conf quality filter</text>
+  <text x="365" y="494" text-anchor="middle" class="label">drop-worst supervised view</text>
+  <text x="365" y="534" text-anchor="middle" class="label">nearest_plus_uniform_tail</text>
+  <text x="365" y="574" text-anchor="middle" class="small">selected camera set</text>
+  <text x="365" y="614" text-anchor="middle" class="small">anchor metadata</text>
+  <text x="365" y="654" text-anchor="middle" class="small">foreground masks</text>
+  <text x="365" y="694" text-anchor="middle" class="small">conf_depth maps</text>
+
+  <path class="arrow" d="M205 280 C225 280, 228 280, 242 280"/>
+  <path class="arrow" d="M205 410 C225 410, 228 410, 242 410"/>
+  <path class="arrow" d="M205 540 C225 540, 228 540, 242 540"/>
+  <path class="arrow" d="M205 670 C225 670, 228 670, 242 670"/>
+
+  <rect x="545" y="188" rx="26" ry="26" width="650" height="520" fill="url(#gCore)" stroke="#bcbcbc" stroke-width="3" class="thin-dashed"/>
+  <text x="870" y="228" text-anchor="middle" class="head">Original VGGT Core</text>
+
+  <text x="598" y="424" text-anchor="middle" class="head">DINO</text>
+  <g transform="translate(610,300)">
+    <rect x="0" y="0" width="28" height="38" fill="#f8b98b"/>
+    <rect x="0" y="46" width="28" height="38" fill="#f8b98b"/>
+    <rect x="0" y="92" width="28" height="38" fill="#f8b98b"/>
+    <rect x="0" y="138" width="28" height="38" fill="#f8b98b"/>
+  </g>
+  <g transform="translate(610,492)">
+    <rect x="0" y="0" width="28" height="38" fill="#9ec97b"/>
+    <rect x="0" y="46" width="28" height="38" fill="#9ec97b"/>
+    <rect x="0" y="92" width="28" height="38" fill="#9ec97b"/>
+    <rect x="0" y="138" width="28" height="38" fill="#9ec97b"/>
+  </g>
+
+  <text x="744" y="230" text-anchor="middle" class="small">add camera token</text>
+  <g transform="translate(730,266)">
+    <rect x="0" y="0" width="28" height="34" fill="#c86a1a"/>
+    <rect x="0" y="42" width="28" height="34" fill="#f8b98b"/>
+    <rect x="0" y="84" width="28" height="34" fill="#f8b98b"/>
+    <rect x="0" y="126" width="28" height="34" fill="#f8b98b"/>
+    <rect x="0" y="168" width="28" height="34" fill="#c86a1a"/>
+    <rect x="0" y="210" width="28" height="34" fill="#9ec97b"/>
+    <rect x="0" y="252" width="28" height="34" fill="#9ec97b"/>
+    <rect x="0" y="294" width="28" height="34" fill="#7db4e6"/>
+    <rect x="0" y="336" width="28" height="34" fill="#7db4e6"/>
+  </g>
+
+  <text x="848" y="292" text-anchor="middle" class="head">Global</text>
+  <text x="848" y="320" text-anchor="middle" class="head">Attention</text>
+  <rect x="790" y="348" rx="18" ry="18" width="116" height="260" fill="#eef4ff" stroke="#7ea3db" stroke-width="4"/>
+  <g transform="translate(833,372)">
+    <rect x="0" y="0" width="30" height="34" fill="#c86a1a"/>
+    <rect x="0" y="42" width="30" height="34" fill="#f8b98b"/>
+    <rect x="0" y="84" width="30" height="34" fill="#f8b98b"/>
+    <rect x="0" y="126" width="30" height="34" fill="#c86a1a"/>
+    <rect x="0" y="168" width="30" height="34" fill="#9ec97b"/>
+    <rect x="0" y="210" width="30" height="34" fill="#7db4e6"/>
+  </g>
+
+  <text x="1010" y="292" text-anchor="middle" class="head">Frame</text>
+  <text x="1010" y="320" text-anchor="middle" class="head">Attention</text>
+  <rect x="952" y="348" rx="18" ry="18" width="116" height="260" fill="#fff4cf" stroke="#e0ac1f" stroke-width="4"/>
+  <g transform="translate(995,372)">
+    <rect x="0" y="0" width="30" height="34" fill="#c86a1a"/>
+    <rect x="0" y="42" width="30" height="34" fill="#f8b98b"/>
+    <rect x="0" y="84" width="30" height="34" fill="#f8b98b"/>
+    <rect x="0" y="126" width="30" height="34" fill="#c86a1a"/>
+    <rect x="0" y="168" width="30" height="34" fill="#9ec97b"/>
+    <rect x="0" y="210" width="30" height="34" fill="#7db4e6"/>
+  </g>
+
+  <text x="870" y="654" text-anchor="middle" class="small">x L layers</text>
+
+  <path class="arrow" d="M482 492 C510 492, 520 492, 545 492"/>
+  <path class="arrow" d="M640 430 C678 430, 692 430, 720 430"/>
+  <path class="arrow" d="M760 430 C776 430, 782 430, 790 430"/>
+  <path class="arrow" d="M906 430 C928 430, 936 430, 952 430"/>
+  <path class="arrow" d="M1068 430 C1100 430, 1110 430, 1132 430"/>
+
+  <g transform="translate(1138,300)">
+    <rect x="0" y="0" width="28" height="34" fill="#c86a1a"/>
+    <rect x="0" y="42" width="28" height="34" fill="#c86a1a"/>
+    <rect x="0" y="84" width="28" height="34" fill="#c86a1a"/>
+  </g>
+  <g transform="translate(1138,470)">
+    <rect x="0" y="0" width="28" height="34" fill="#f8b98b"/>
+    <rect x="0" y="42" width="28" height="34" fill="#f8b98b"/>
+    <rect x="0" y="84" width="28" height="34" fill="#9ec97b"/>
+    <rect x="0" y="126" width="28" height="34" fill="#7db4e6"/>
+  </g>
+
+  <text x="1300" y="240" text-anchor="middle" class="head">Camera Head</text>
+  <circle cx="1250" cy="285" r="13" fill="#a7d47d"/>
+  <circle cx="1250" cy="335" r="13" fill="#a7d47d"/>
+  <circle cx="1250" cy="385" r="13" fill="#a7d47d"/>
+  <circle cx="1350" cy="310" r="13" fill="#a7d47d"/>
+  <circle cx="1350" cy="360" r="13" fill="#a7d47d"/>
+  <line x1="1260" y1="285" x2="1340" y2="310" stroke="#9cc56f" stroke-width="4"/>
+  <line x1="1260" y1="285" x2="1340" y2="360" stroke="#9cc56f" stroke-width="4"/>
+  <line x1="1260" y1="335" x2="1340" y2="310" stroke="#9cc56f" stroke-width="4"/>
+  <line x1="1260" y1="335" x2="1340" y2="360" stroke="#9cc56f" stroke-width="4"/>
+  <line x1="1260" y1="385" x2="1340" y2="310" stroke="#9cc56f" stroke-width="4"/>
+  <line x1="1260" y1="385" x2="1340" y2="360" stroke="#9cc56f" stroke-width="4"/>
+
+  <rect x="1244" y="470" rx="18" ry="18" width="118" height="250" fill="url(#gDpt)" stroke="#5c8b3f" stroke-width="4"/>
+  <text x="1303" y="605" text-anchor="middle" class="head">DPT</text>
+
+  <path class="arrow" d="M1166 340 C1200 340, 1210 340, 1232 340"/>
+  <path class="arrow" d="M1166 554 C1200 554, 1210 554, 1234 554"/>
+
+  <text x="1510" y="236" text-anchor="middle" class="head">Cameras</text>
+  <rect x="1452" y="280" width="56" height="64" fill="none" stroke="#7f4fb9" stroke-width="6"/>
+  <line x1="1452" y1="344" x2="1508" y2="280" stroke="#7f4fb9" stroke-width="6"/>
+  <line x1="1452" y1="280" x2="1494" y2="305" stroke="#f08b1f" stroke-width="6"/>
+  <line x1="1494" y1="305" x2="1508" y2="344" stroke="#7f4fb9" stroke-width="6"/>
+  <rect x="1528" y="280" width="56" height="64" fill="none" stroke="#7f4fb9" stroke-width="6"/>
+  <line x1="1528" y1="344" x2="1584" y2="280" stroke="#7f4fb9" stroke-width="6"/>
+  <line x1="1528" y1="280" x2="1570" y2="305" stroke="#f08b1f" stroke-width="6"/>
+  <line x1="1570" y1="305" x2="1584" y2="344" stroke="#7f4fb9" stroke-width="6"/>
+
+  <text x="1525" y="432" text-anchor="middle" class="head">Depth maps</text>
+  <rect x="1452" y="466" width="70" height="70" fill="#5ac28a"/>
+  <rect x="1528" y="466" width="70" height="70" fill="#5b3c8c"/>
+  <rect x="1452" y="466" width="70" height="70" fill="url(#gDpt)" opacity="0.95"/>
+  <rect x="1528" y="466" width="70" height="70" fill="url(#gDpt)" opacity="0.95"/>
+
+  <text x="1526" y="606" text-anchor="middle" class="small">point / track heads are not</text>
+  <text x="1526" y="628" text-anchor="middle" class="small">the primary current lead</text>
+
+  <path class="arrow" d="M1363 340 C1396 340, 1410 334, 1440 324"/>
+  <path class="arrow" d="M1363 554 C1396 554, 1410 528, 1440 504"/>
+
+  <rect x="660" y="750" rx="20" ry="20" width="450" height="160" fill="url(#gReliability)" stroke="#84a7dd" stroke-width="3"/>
+  <text x="885" y="788" text-anchor="middle" class="head">Reliability-aware Supervision</text>
+  <text x="885" y="830" text-anchor="middle" class="label">conf_depth_point_masks + depth_conf_maps</text>
+  <text x="885" y="866" text-anchor="middle" class="label">drop-worst supervised view</text>
+  <text x="885" y="902" text-anchor="middle" class="label">gradconfmask + anchor-conditioned routing</text>
+
+  <path class="arrow dashed" d="M428 770 C510 810, 560 824, 650 824"/>
+  <path class="arrow dashed" d="M1010 720 C1010 734, 1010 738, 1010 746"/>
+  <path class="arrow dashed" d="M1304 720 C1260 778, 1210 810, 1124 824"/>
+
+  <rect x="1230" y="758" rx="20" ry="20" width="235" height="152" fill="url(#gTeacher)" stroke="#58a89a" stroke-width="3"/>
+  <text x="1348" y="794" text-anchor="middle" class="head">Depth + Camera</text>
+  <text x="1348" y="824" text-anchor="middle" class="head">Unprojection</text>
+  <text x="1348" y="864" text-anchor="middle" class="label">geometry teacher</text>
+  <text x="1348" y="892" text-anchor="middle" class="small">render support / point cloud</text>
+
+  <path class="arrow" d="M1480 536 C1455 600, 1420 680, 1380 748"/>
+  <path class="arrow" d="M1480 344 C1455 520, 1428 660, 1386 748"/>
+
+  <rect x="1500" y="758" rx="20" ry="20" width="255" height="152" fill="url(#gVisualLift)" stroke="#8b6fd1" stroke-width="3"/>
+  <text x="1628" y="794" text-anchor="middle" class="head">Teacher-fixed</text>
+  <text x="1628" y="824" text-anchor="middle" class="head">Visual Lift</text>
+  <text x="1628" y="864" text-anchor="middle" class="label">mask_hole_fill_plus_guided</text>
+  <text x="1628" y="892" text-anchor="middle" class="small">better foreground render</text>
+
+  <path class="arrow" d="M1466 834 C1478 834, 1484 834, 1490 834"/>
+
+  <rect x="1580" y="642" rx="18" ry="18" width="160" height="80" fill="#ffffff" stroke="#c6c6c6" stroke-width="2"/>
+  <text x="1660" y="674" text-anchor="middle" class="label">20 / 20 local</text>
+  <text x="1660" y="704" text-anchor="middle" class="label">20 / 20 cloud</text>
+  <path class="arrow dashed" d="M1630 758 C1640 748, 1648 736, 1652 726"/>
+
+  <rect x="119" y="870" rx="10" ry="10" width="500" height="58" fill="#fafafa" stroke="#d0d0d0" stroke-width="1.5"/>
+  <text x="369" y="896" text-anchor="middle" class="note">The original VGGT backbone is preserved. The current project mainly adds data-side view policy,</text>
+  <text x="369" y="916" text-anchor="middle" class="note">reliability-aware supervision, and a frozen-teacher visual-lift branch on top of Depth + Camera.</text>
+</svg>

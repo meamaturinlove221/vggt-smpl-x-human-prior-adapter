@@ -87,6 +87,15 @@ DEFAULT_CAMERA_FOCAL_OBJECTIVE_ISOLATION_SEED_PATH = (
 DEFAULT_CAMERA_TRANSLATION_OBJECTIVE_ISOLATION_SEED_PATH = (
     DEFAULT_OUTPUT_ROOT / "approved_problem.seed.camera_translation_objective_isolation.json"
 )
+DEFAULT_CAMERA_OBJECTIVE_COUPLING_REBALANCING_SEED_PATH = (
+    DEFAULT_OUTPUT_ROOT / "approved_problem.seed.camera_objective_coupling_rebalancing.json"
+)
+DEFAULT_CAMERA_DEPTH_OBJECTIVE_COUPLING_AUDIT_SEED_PATH = (
+    DEFAULT_OUTPUT_ROOT / "approved_problem.seed.camera_depth_objective_coupling_audit.json"
+)
+DEFAULT_HYBRID_RING_SECONDARY_SUPERVISED_RESERVE_SEED_PATH = (
+    DEFAULT_OUTPUT_ROOT / "approved_problem.seed.hybrid_ring_secondary_supervised_reserve.20260403.json"
+)
 
 
 def parse_args() -> argparse.Namespace:
@@ -120,6 +129,9 @@ def parse_args() -> argparse.Namespace:
             "two_stage_objective_decoupling",
             "camera_focal_objective_isolation",
             "camera_translation_objective_isolation",
+            "camera_objective_coupling_rebalancing",
+            "camera_depth_objective_coupling_audit",
+            "hybrid_ring_secondary_supervised_reserve",
             "unproject_aux_confgate",
             "unproject_consistency_routing",
             "conf_reg_disagreement_routing",
@@ -180,6 +192,12 @@ def seed_path_for_name(seed_name: str) -> Path:
         return DEFAULT_CAMERA_FOCAL_OBJECTIVE_ISOLATION_SEED_PATH
     if seed_name == "camera_translation_objective_isolation":
         return DEFAULT_CAMERA_TRANSLATION_OBJECTIVE_ISOLATION_SEED_PATH
+    if seed_name == "camera_objective_coupling_rebalancing":
+        return DEFAULT_CAMERA_OBJECTIVE_COUPLING_REBALANCING_SEED_PATH
+    if seed_name == "camera_depth_objective_coupling_audit":
+        return DEFAULT_CAMERA_DEPTH_OBJECTIVE_COUPLING_AUDIT_SEED_PATH
+    if seed_name == "hybrid_ring_secondary_supervised_reserve":
+        return DEFAULT_HYBRID_RING_SECONDARY_SUPERVISED_RESERVE_SEED_PATH
     if seed_name == "unproject_aux_confgate":
         return DEFAULT_UNPROJECT_AUX_CONFGATE_SEED_PATH
     if seed_name == "unproject_consistency_routing":
