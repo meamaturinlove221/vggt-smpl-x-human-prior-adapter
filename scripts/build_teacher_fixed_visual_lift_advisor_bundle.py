@@ -315,7 +315,7 @@ def stack_contact_sheet(images: list[Path], captions: list[str], output_path: Pa
     canvas.save(output_path)
 
 
-def build_depth_fusion_preview(case_payload: dict, output_path: Path) -> None:
+def build_depth_plus_camera_preview(case_payload: dict, output_path: Path) -> None:
     target_full = enhance_preview_image(case_payload["target"])
     depth_full = enhance_preview_image(case_payload["depth_unproject"])
     strongest_full = enhance_preview_image(case_payload[BEST_VARIANT])
@@ -326,12 +326,12 @@ def build_depth_fusion_preview(case_payload: dict, output_path: Path) -> None:
 
     full_items = [
         (target_full, "Target | display gain only"),
-        (depth_full, "Depth fusion + camera render"),
+        (depth_full, "Depth + camera render"),
         (strongest_full, BEST_VARIANT),
     ]
     crop_items = [
         (target_crop, "Target crop | display gain only"),
-        (depth_crop, "Depth fusion crop"),
+        (depth_crop, "Depth + camera crop"),
         (strongest_crop, f"{BEST_VARIANT} crop"),
     ]
 
@@ -351,7 +351,7 @@ def build_depth_fusion_preview(case_payload: dict, output_path: Path) -> None:
     header_h = 76
     canvas = Image.new("RGB", (max(row.width for row in rows), header_h + sum(row.height for row in rows)), color=(240, 240, 240))
     draw = ImageDraw.Draw(canvas)
-    draw.text((24, 16), "Depth-fusion render preview", fill=(18, 18, 18), font=load_font(28))
+    draw.text((24, 16), "Depth + camera render preview", fill=(18, 18, 18), font=load_font(28))
     draw.text(
         (24, 48),
         "Display-only gain/tonemap applied equally for readability. This does not change the model output itself.",
@@ -490,8 +490,8 @@ def build_packets():
     shutil.copyfile(hero_case_payload["panel_path"], hero_single_full)
     hero_single_baseline_vs_strongest = VISUALS_DIR / f"hero_single_baseline_vs_strongest_{hero_case_id}.png"
     build_simple_panel(hero_case_payload, hero_single_baseline_vs_strongest, include_geometry=False)
-    hero_depth_fusion_preview = VISUALS_DIR / f"hero_depth_fusion_preview_{hero_case_id}.png"
-    build_depth_fusion_preview(hero_case_payload, hero_depth_fusion_preview)
+    hero_depth_plus_camera_preview = VISUALS_DIR / f"hero_depth_plus_camera_preview_{hero_case_id}.png"
+    build_depth_plus_camera_preview(hero_case_payload, hero_depth_plus_camera_preview)
 
     hero_panel_paths = []
     hero_panel_captions = []
@@ -723,7 +723,7 @@ def build_packets():
         "visuals": {
             "hero_single_full_comparison": rel_repo(hero_single_full),
             "hero_single_baseline_vs_strongest": rel_repo(hero_single_baseline_vs_strongest),
-            "hero_depth_fusion_preview": rel_repo(hero_depth_fusion_preview),
+            "hero_depth_plus_camera_preview": rel_repo(hero_depth_plus_camera_preview),
             "hero_five_comparison_grid": rel_repo(hero_five_grid),
             "benchmark_20case_summary_card": rel_repo(benchmark_summary_card),
         },
@@ -740,7 +740,7 @@ def build_packets():
                 f"- hero_case_id: `{hero_case_id}`",
                 f"- hero_single_full_comparison: `{rel_repo(hero_single_full)}`",
                 f"- hero_single_baseline_vs_strongest: `{rel_repo(hero_single_baseline_vs_strongest)}`",
-                f"- hero_depth_fusion_preview: `{rel_repo(hero_depth_fusion_preview)}`",
+                f"- hero_depth_plus_camera_preview: `{rel_repo(hero_depth_plus_camera_preview)}`",
                 f"- hero_five_comparison_grid: `{rel_repo(hero_five_grid)}`",
                 f"- benchmark_20case_summary_card: `{rel_repo(benchmark_summary_card)}`",
             ]
@@ -756,7 +756,7 @@ def build_packets():
                 f"- hero_case_id: `{hero_case_id}`",
                 f"- hero_single_full_comparison: `{rel_repo(hero_single_full)}`",
                 f"- hero_single_baseline_vs_strongest: `{rel_repo(hero_single_baseline_vs_strongest)}`",
-                f"- hero_depth_fusion_preview: `{rel_repo(hero_depth_fusion_preview)}`",
+                f"- hero_depth_plus_camera_preview: `{rel_repo(hero_depth_plus_camera_preview)}`",
                 f"- hero_five_comparison_grid: `{rel_repo(hero_five_grid)}`",
                 f"- benchmark_20case_summary_card: `{rel_repo(benchmark_summary_card)}`",
             ]
@@ -847,7 +847,7 @@ def build_packets():
         "",
         f"- `{rel_repo(SUMMARY_DIR / 'one_page_summary.md')}`",
         f"- `{rel_repo(hero_single_baseline_vs_strongest)}`",
-        f"- `{rel_repo(hero_depth_fusion_preview)}`",
+        f"- `{rel_repo(hero_depth_plus_camera_preview)}`",
         f"- `{rel_repo(hero_five_grid)}`",
         f"- `{rel_repo(benchmark_summary_card)}`",
         "",

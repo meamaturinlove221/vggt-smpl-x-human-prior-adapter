@@ -578,6 +578,231 @@ def unproject_depth_and_pose_to_world_points(
     return world_points
 
 
+def _images_to_rgb01(images):
+    if images is None:
+        return None
+    if images.ndim != 5:
+        raise ValueError(f"Expected batch['images'] to have 5 dims, got {images.shape}")
+    if images.shape[2] in (1, 3):
+        rgb = images.permute(0, 1, 3, 4, 2).to(torch.float32)
+    elif images.shape[-1] in (1, 3):
+        rgb = images.to(torch.float32)
+    else:
+        raise ValueError(f"Unable to infer image channel axis from {images.shape}")
+
+    max_value = float(rgb.detach().amax().item()) if rgb.numel() else 1.0
+    min_value = float(rgb.detach().amin().item()) if rgb.numel() else 0.0
+    if max_value > 1.5:
+        rgb = rgb / 255.0
+    elif min_value < 0.0:
+        rgb = (rgb + 1.0) / 2.0
+    return rgb.clamp(0.0, 1.0)
+
+
+def _build_bottom_band_mask_like(mask_hw: torch.Tensor, bottom_band_ratio: float) -> torch.Tensor:
+    bottom_band_ratio = float(max(0.0, min(0.95, bottom_band_ratio)))
+    if bottom_band_ratio <= 0.0:
+        return torch.zeros_like(mask_hw, dtype=torch.bool)
+    hh = int(mask_hw.shape[-2])
+    cutoff = int(hh * (1.0 - bottom_band_ratio))
+    bottom = torch.zeros_like(mask_hw, dtype=torch.bool)
+    if cutoff < hh:
+        bottom[..., cutoff:, :] = True
+    return bottom
+
+
+def _profile_peak_surrogate(coords01, weights, *, bin_count=32, sigma=0.045):
+    if coords01.numel() == 0 or weights.numel() == 0:
+        return weights.new_zeros(())
+    centers = torch.linspace(0.0, 1.0, steps=int(bin_count), device=coords01.device, dtype=coords01.dtype)
+    sigma = max(float(sigma), 1e-4)
+    basis = torch.exp(-((coords01.unsqueeze(-1) - centers.view(1, -1)) ** 2) / (2.0 * sigma * sigma))
+    profile = (basis * weights.unsqueeze(-1)).sum(dim=0)
+    profile = profile / profile.sum().clamp_min(1e-8)
+    return 1.0 - (profile * profile).sum()
+
+
+def _compute_anchor_projection_alignment_losses(
+    pred_world_points,
+    predictions,
+    batch,
+    *,
+    image_size_hw,
+    pose_encoding_type,
+    eps,
+    support_pull_to_fg_weight,
+    support_pull_bottom_band_extra_scale,
+    bg_black_weight,
+    bg_black_bottom_band_extra_scale,
+    fg_support_spread_weight,
+    fg_profile_peak_surrogate_weight,
+    profile_peak_bin_count,
+    profile_peak_sigma,
+    alignment_bottom_band_ratio,
+    exclude_anchor_source_view=True,
+):
+    if (
+        support_pull_to_fg_weight <= 0.0
+        and bg_black_weight <= 0.0
+        and fg_support_spread_weight <= 0.0
+        and fg_profile_peak_surrogate_weight <= 0.0
+    ):
+        zero = (0.0 * pred_world_points).mean()
+        return zero, zero, zero, zero
+
+    foreground_masks = batch.get("foreground_masks", None)
+    images = batch.get("images", None)
+    pred_depth_conf = predictions.get("depth_conf", None)
+    if foreground_masks is None or images is None:
+        zero = (0.0 * pred_world_points).mean()
+        return zero, zero, zero, zero
+
+    anchor_view_indices = _normalize_batch_anchor_view_indices(
+        batch.get("selection_anchor_view_index"),
+        pred_world_points.shape[0],
+    )
+    if not anchor_view_indices:
+        zero = (0.0 * pred_world_points).mean()
+        return zero, zero, zero, zero
+
+    pred_extrinsics, pred_intrinsics = pose_encoding_to_extri_intri(
+        predictions["pose_enc"],
+        image_size_hw=image_size_hw,
+        pose_encoding_type=pose_encoding_type,
+        build_intrinsics=True,
+    )
+    images01 = _images_to_rgb01(images)
+    bb, ss, hh, ww, _ = pred_world_points.shape
+
+    support_total = pred_world_points.new_zeros(())
+    support_denom = pred_world_points.new_zeros(())
+    black_total = pred_world_points.new_zeros(())
+    black_denom = pred_world_points.new_zeros(())
+    spread_total = pred_world_points.new_zeros(())
+    spread_count = pred_world_points.new_zeros(())
+    peak_total = pred_world_points.new_zeros(())
+    peak_count = pred_world_points.new_zeros(())
+
+    for batch_idx, anchor_idx in enumerate(anchor_view_indices):
+        if anchor_idx is None or not (0 <= int(anchor_idx) < ss):
+            continue
+        anchor_idx = int(anchor_idx)
+        anchor_fg = foreground_masks[batch_idx, anchor_idx].to(device=pred_world_points.device, dtype=torch.float32)
+        anchor_fg_input = anchor_fg.unsqueeze(0).unsqueeze(0)
+        bottom_band = _build_bottom_band_mask_like(anchor_fg > 0.5, alignment_bottom_band_ratio).to(torch.float32)
+        bottom_band_input = bottom_band.unsqueeze(0).unsqueeze(0)
+
+        anchor_extrinsic = pred_extrinsics[batch_idx, anchor_idx]
+        anchor_intrinsic = pred_intrinsics[batch_idx, anchor_idx]
+        anchor_R = anchor_extrinsic[:3, :3]
+        anchor_t = anchor_extrinsic[:3, 3]
+        fx = anchor_intrinsic[0, 0]
+        fy = anchor_intrinsic[1, 1]
+        cx = anchor_intrinsic[0, 2]
+        cy = anchor_intrinsic[1, 2]
+        sample_inside_x = []
+        sample_inside_y = []
+        sample_inside_w = []
+
+        for view_idx in range(ss):
+            if exclude_anchor_source_view and view_idx == anchor_idx:
+                continue
+
+            world_points = pred_world_points[batch_idx, view_idx]
+            if not torch.isfinite(world_points).any():
+                continue
+
+            cam_points = torch.einsum("ij,hwj->hwi", anchor_R, world_points)
+            cam_points = cam_points + anchor_t.view(1, 1, 3)
+            z = cam_points[..., 2]
+            valid = torch.isfinite(cam_points).all(dim=-1) & (z > eps)
+            if not bool(valid.any().item()):
+                continue
+
+            u = (fx * cam_points[..., 0] / z.clamp_min(eps)) + cx
+            v = (fy * cam_points[..., 1] / z.clamp_min(eps)) + cy
+            x_norm = (u / max(float(ww - 1), 1.0)) * 2.0 - 1.0
+            y_norm = (v / max(float(hh - 1), 1.0)) * 2.0 - 1.0
+            grid = torch.stack((x_norm, y_norm), dim=-1).unsqueeze(0)
+
+            fg_sample = F.grid_sample(
+                anchor_fg_input,
+                grid,
+                mode="bilinear",
+                padding_mode="zeros",
+                align_corners=True,
+            ).squeeze(0).squeeze(0)
+            bottom_sample = F.grid_sample(
+                bottom_band_input,
+                grid,
+                mode="bilinear",
+                padding_mode="zeros",
+                align_corners=True,
+            ).squeeze(0).squeeze(0)
+
+            outside_fg = (1.0 - fg_sample).clamp(0.0, 1.0)
+            if pred_depth_conf is not None:
+                source_support = check_and_fix_inf_nan(pred_depth_conf[batch_idx, view_idx], "anchor_projection_depth_conf").to(dtype=pred_world_points.dtype).clamp_min(0.0)
+                support_weight = torch.where(valid, source_support, torch.zeros_like(source_support))
+            else:
+                support_weight = valid.to(dtype=pred_world_points.dtype)
+            if not bool(support_weight.any().item()):
+                continue
+
+            inside_fg_weight = support_weight * fg_sample
+            if bool((inside_fg_weight > 0).any().item()):
+                x01 = ((x_norm + 1.0) * 0.5).clamp(0.0, 1.0)
+                y01 = ((y_norm + 1.0) * 0.5).clamp(0.0, 1.0)
+                sample_inside_x.append(x01.reshape(-1))
+                sample_inside_y.append(y01.reshape(-1))
+                sample_inside_w.append(inside_fg_weight.reshape(-1))
+
+            if support_pull_to_fg_weight > 0.0:
+                outside_penalty = outside_fg * (
+                    1.0 + bottom_sample * max(float(support_pull_bottom_band_extra_scale) - 1.0, 0.0)
+                )
+                support_total = support_total + (outside_penalty * support_weight).sum()
+                support_denom = support_denom + support_weight.sum()
+
+            if bg_black_weight > 0.0:
+                source_rgb = images01[batch_idx, view_idx]
+                source_intensity = source_rgb.mean(dim=-1)
+                black_penalty = source_intensity * outside_fg * (
+                    1.0 + bottom_sample * max(float(bg_black_bottom_band_extra_scale) - 1.0, 0.0)
+                )
+                black_total = black_total + (black_penalty * support_weight).sum()
+                black_denom = black_denom + support_weight.sum()
+
+        if sample_inside_w:
+            inside_x = torch.cat(sample_inside_x, dim=0)
+            inside_y = torch.cat(sample_inside_y, dim=0)
+            inside_w = torch.cat(sample_inside_w, dim=0).clamp_min(0.0)
+            valid_inside = inside_w > 0.0
+            inside_x = inside_x[valid_inside]
+            inside_y = inside_y[valid_inside]
+            inside_w = inside_w[valid_inside]
+            if inside_w.numel() > 0 and float(inside_w.sum().detach().item()) > 0.0:
+                prob = inside_w / inside_w.sum().clamp_min(1e-8)
+                center_x = (prob * inside_x).sum()
+                center_y = (prob * inside_y).sum()
+                spread_loss = (prob * ((inside_x - center_x) ** 2 + (inside_y - center_y) ** 2)).sum()
+                peak_loss = (
+                    _profile_peak_surrogate(inside_x, prob, bin_count=int(profile_peak_bin_count), sigma=float(profile_peak_sigma))
+                    + _profile_peak_surrogate(inside_y, prob, bin_count=int(profile_peak_bin_count), sigma=float(profile_peak_sigma))
+                )
+                spread_total = spread_total + spread_loss
+                spread_count = spread_count + 1.0
+                peak_total = peak_total + peak_loss
+                peak_count = peak_count + 1.0
+
+    zero = (0.0 * pred_world_points).mean()
+    support_loss = support_total / support_denom.clamp_min(eps) if float(support_denom.detach().item()) > 0.0 else zero
+    black_loss = black_total / black_denom.clamp_min(eps) if float(black_denom.detach().item()) > 0.0 else zero
+    spread_loss = spread_total / spread_count.clamp_min(1.0) if float(spread_count.detach().item()) > 0.0 else zero
+    peak_loss = peak_total / peak_count.clamp_min(1.0) if float(peak_count.detach().item()) > 0.0 else zero
+    return support_loss, black_loss, spread_loss, peak_loss
+
+
 def compute_unproject_geometry_loss(
     predictions,
     batch,
@@ -593,6 +818,16 @@ def compute_unproject_geometry_loss(
     use_foreground_region_mask=False,
     foreground_erode_px=0,
     foreground_drop_bottom_ratio=0.0,
+    support_pull_to_fg_weight=0.0,
+    support_pull_bottom_band_extra_scale=2.0,
+    bg_black_weight=0.0,
+    bg_black_bottom_band_extra_scale=3.0,
+    fg_support_spread_weight=0.0,
+    fg_profile_peak_surrogate_weight=0.0,
+    profile_peak_bin_count=32,
+    profile_peak_sigma=0.045,
+    alignment_bottom_band_ratio=0.2,
+    exclude_anchor_source_view=True,
     **kwargs,
 ):
     """
@@ -666,8 +901,42 @@ def compute_unproject_geometry_loss(
         loss = (loss_values * conf_weights).sum() / conf_weights.sum().clamp_min(eps)
     else:
         loss = loss_values.mean()
+    support_pull_loss, bg_black_loss, fg_spread_loss, fg_peak_loss = _compute_anchor_projection_alignment_losses(
+        pred_world_points,
+        predictions,
+        batch,
+        image_size_hw=image_hw,
+        pose_encoding_type=pose_encoding_type,
+        eps=eps,
+        support_pull_to_fg_weight=float(support_pull_to_fg_weight),
+        support_pull_bottom_band_extra_scale=float(support_pull_bottom_band_extra_scale),
+        bg_black_weight=float(bg_black_weight),
+        bg_black_bottom_band_extra_scale=float(bg_black_bottom_band_extra_scale),
+        fg_support_spread_weight=float(fg_support_spread_weight),
+        fg_profile_peak_surrogate_weight=float(fg_profile_peak_surrogate_weight),
+        profile_peak_bin_count=int(profile_peak_bin_count),
+        profile_peak_sigma=float(profile_peak_sigma),
+        alignment_bottom_band_ratio=float(alignment_bottom_band_ratio),
+        exclude_anchor_source_view=bool(exclude_anchor_source_view),
+    )
+    total_loss = loss
+    if float(support_pull_to_fg_weight) > 0.0:
+        total_loss = total_loss + float(support_pull_to_fg_weight) * support_pull_loss
+    if float(bg_black_weight) > 0.0:
+        total_loss = total_loss + float(bg_black_weight) * bg_black_loss
+    if float(fg_support_spread_weight) > 0.0:
+        total_loss = total_loss + float(fg_support_spread_weight) * fg_spread_loss
+    if float(fg_profile_peak_surrogate_weight) > 0.0:
+        total_loss = total_loss + float(fg_profile_peak_surrogate_weight) * fg_peak_loss
 
-    return {"loss_unproject_geometry": loss}
+    return {
+        "loss_unproject_geometry": total_loss,
+        "loss_unproject_geometry_base": loss,
+        "loss_support_pull_to_fg": support_pull_loss,
+        "loss_bg_black": bg_black_loss,
+        "loss_fg_support_spread": fg_spread_loss,
+        "loss_fg_profile_peak_surrogate": fg_peak_loss,
+    }
 
 
 def build_reliable_foreground_region_mask(mask, erode_px=0, drop_bottom_ratio=0.0, edge_band_px=0):

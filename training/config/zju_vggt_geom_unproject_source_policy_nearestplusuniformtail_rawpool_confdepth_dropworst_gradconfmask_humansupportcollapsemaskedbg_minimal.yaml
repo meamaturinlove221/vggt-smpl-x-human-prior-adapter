@@ -1,0 +1,18 @@
+defaults:
+  - zju_vggt_geom_unproject_source_policy_nearestplusuniformtail_rawpool_confdepth_dropworst_gradconfmask_minimal
+  - _self_
+
+exp_name: zju_vggt_geom_unproject_source_policy_nearestplusuniformtail_rawpool_confdepth_dropworst_gradconfmask_humansupportcollapsemaskedbg_minimal
+
+loss:
+  unproject_geometry:
+    support_pull_to_fg_weight: 0.04
+    support_pull_bottom_band_extra_scale: 2.5
+    bg_black_weight: 0.02
+    bg_black_bottom_band_extra_scale: 3.0
+    fg_support_spread_weight: 0.10
+    fg_profile_peak_surrogate_weight: 0.08
+    profile_peak_bin_count: 32
+    profile_peak_sigma: 0.045
+    alignment_bottom_band_ratio: 0.2
+    exclude_anchor_source_view: True

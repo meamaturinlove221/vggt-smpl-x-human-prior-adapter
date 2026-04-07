@@ -1,0 +1,14 @@
+defaults:
+  - zju_vggt_geom_unproject_source_policy_nearestplusuniformtail_rawpool_confdepth_dropworst_gradconfmask_minimal
+  - _self_
+
+exp_name: zju_vggt_geom_unproject_source_policy_nearestplusuniformtail_rawpool_confdepth_dropworst_gradconfmask_humanfgpullbgblack_minimal
+
+loss:
+  unproject_geometry:
+    support_pull_to_fg_weight: 0.08
+    support_pull_bottom_band_extra_scale: 2.5
+    bg_black_weight: 0.05
+    bg_black_bottom_band_extra_scale: 3.0
+    alignment_bottom_band_ratio: 0.2
+    exclude_anchor_source_view: True
