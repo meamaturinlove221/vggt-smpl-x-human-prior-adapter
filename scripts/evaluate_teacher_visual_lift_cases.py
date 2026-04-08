@@ -74,6 +74,18 @@ DEFAULT_PROXY_CONFIG = {
     "source_subset": [],
     "coverage_floor_ratio": 0.78,
     "coverage_floor_mix": 0.35,
+    "visible_floor_ratio": 0.98,
+    "visible_floor_mix": 0.25,
+    "visible_mass_floor_ratio": 0.95,
+    "visible_mass_floor_mix": 0.25,
+    "casewise_source_drop_topk": 0,
+    "casewise_source_keep_min": 3,
+    "source_poison_offbody_weight": 1.00,
+    "source_poison_bottom_weight": 1.00,
+    "source_poison_fragment_weight": 0.35,
+    "source_poison_peak_weight": 0.20,
+    "source_fg_reward_weight": 0.75,
+    "partition_rules": [],
 }
 
 
@@ -128,9 +140,65 @@ def _load_proxy_config(path_text: str) -> dict:
     payload["consensus_margin_floor"] = float(payload.get("consensus_margin_floor", 0.05))
     payload["coverage_floor_ratio"] = float(payload.get("coverage_floor_ratio", 0.78))
     payload["coverage_floor_mix"] = float(payload.get("coverage_floor_mix", 0.35))
+    payload["visible_floor_ratio"] = float(payload.get("visible_floor_ratio", 0.98))
+    payload["visible_floor_mix"] = float(payload.get("visible_floor_mix", 0.25))
+    payload["visible_mass_floor_ratio"] = float(payload.get("visible_mass_floor_ratio", 0.95))
+    payload["visible_mass_floor_mix"] = float(payload.get("visible_mass_floor_mix", 0.25))
+    payload["casewise_source_drop_topk"] = max(int(payload.get("casewise_source_drop_topk", 0)), 0)
+    payload["casewise_source_keep_min"] = max(int(payload.get("casewise_source_keep_min", 3)), 1)
+    payload["source_poison_offbody_weight"] = float(payload.get("source_poison_offbody_weight", 1.0))
+    payload["source_poison_bottom_weight"] = float(payload.get("source_poison_bottom_weight", 1.0))
+    payload["source_poison_fragment_weight"] = float(payload.get("source_poison_fragment_weight", 0.35))
+    payload["source_poison_peak_weight"] = float(payload.get("source_poison_peak_weight", 0.20))
+    payload["source_fg_reward_weight"] = float(payload.get("source_fg_reward_weight", 0.75))
     raw_subset = payload.get("source_subset", [])
     payload["source_subset"] = [int(item) for item in raw_subset] if isinstance(raw_subset, list) else []
+    raw_rules = payload.get("partition_rules", [])
+    payload["partition_rules"] = list(raw_rules) if isinstance(raw_rules, list) else []
     return payload
+
+
+def _case_matches_partition_rule(case: dict, case_id: str, rule: dict) -> bool:
+    rule_case_ids = rule.get("case_ids", [])
+    if isinstance(rule_case_ids, list) and rule_case_ids and case_id not in {str(item) for item in rule_case_ids}:
+        return False
+    seq_name = str(case.get("seq_name"))
+    if rule.get("seq_name") and str(rule.get("seq_name")) != seq_name:
+        return False
+    target_camera = str(case.get("target_camera"))
+    if rule.get("target_camera") and str(rule.get("target_camera")) != target_camera:
+        return False
+    frame_id = int(case.get("frame_id"))
+    if rule.get("frame_min") is not None and frame_id < int(rule.get("frame_min")):
+        return False
+    if rule.get("frame_max") is not None and frame_id > int(rule.get("frame_max")):
+        return False
+    return True
+
+
+def _resolve_case_proxy_config(case: dict, case_id: str, proxy_config: dict) -> tuple[dict, dict]:
+    resolved = dict(proxy_config)
+    applied_rules = []
+    for raw_rule in proxy_config.get("partition_rules", []):
+        if not isinstance(raw_rule, dict):
+            continue
+        if not _case_matches_partition_rule(case, case_id, raw_rule):
+            continue
+        override = raw_rule.get("proxy_config", {})
+        if not isinstance(override, dict):
+            override = {}
+        resolved.update(override)
+        applied_rules.append(
+            {
+                "rule_id": str(raw_rule.get("rule_id", f"rule_{len(applied_rules)}")),
+                "target_camera": raw_rule.get("target_camera"),
+                "frame_min": raw_rule.get("frame_min"),
+                "frame_max": raw_rule.get("frame_max"),
+                "case_ids": list(raw_rule.get("case_ids", [])) if isinstance(raw_rule.get("case_ids", []), list) else [],
+            }
+        )
+    resolved["partition_rules"] = list(proxy_config.get("partition_rules", []))
+    return resolved, {"applied_partition_rules": applied_rules}
 
 
 def _select_cases(manifest: dict, case_set: str) -> list[dict]:
@@ -210,6 +278,15 @@ def _masked_metrics(pred01: np.ndarray, tgt01: np.ndarray, mask_hw: np.ndarray) 
 
 def _clamp_image(image01: np.ndarray) -> np.ndarray:
     return np.clip(np.asarray(image01, dtype=np.float32), 0.0, 1.0)
+
+
+def _visible_mass_ratio(image01: np.ndarray, fg_mask: np.ndarray) -> float:
+    image01 = np.asarray(image01, dtype=np.float32)
+    fg_mask = np.asarray(fg_mask, dtype=bool)
+    if int(fg_mask.sum()) <= 0:
+        return 0.0
+    denom = max(float(image01.max()) * 3.0 * max(int(fg_mask.sum()), 1), 1e-8)
+    return float(image01[fg_mask].sum() / denom)
 
 
 def _apply_variant(depth_render: np.ndarray, weight01: np.ndarray, fg_mask: np.ndarray, variant_name: str) -> np.ndarray:
@@ -493,6 +570,110 @@ def _source_label_fragmentation(source_label_map: np.ndarray, fg_mask: np.ndarra
     return float(total_components)
 
 
+def _casewise_source_poison_scores(
+    source_support: np.ndarray,
+    fg_mask: np.ndarray,
+    bg_bottom_mask: np.ndarray,
+    *,
+    support_threshold: float,
+    offbody_weight: float,
+    bottom_weight: float,
+    fragment_weight: float,
+    peak_weight: float,
+    fg_reward_weight: float,
+) -> np.ndarray:
+    fg_mask = np.asarray(fg_mask, dtype=bool)
+    bg_bottom_mask = np.asarray(bg_bottom_mask, dtype=bool)
+    source_support = np.clip(np.asarray(source_support, dtype=np.float32), 0.0, None)
+    scores = []
+    for src_idx in range(source_support.shape[0]):
+        raw = source_support[src_idx]
+        total_mass = float(raw.sum())
+        if total_mass <= 1e-8:
+            scores.append(float("inf"))
+            continue
+        fg_mass = float(raw[fg_mask].sum())
+        offbody_mass = float(raw[~fg_mask].sum())
+        bottom_mass = float(raw[bg_bottom_mask].sum())
+        support01 = _normalize_support_weight(raw)
+        fg_support_mass = support01 * fg_mask.astype(np.float32)
+        row_profile = fg_support_mass.sum(axis=1)
+        col_profile = fg_support_mass.sum(axis=0)
+        fg_peak_count = int(max(_count_profile_peaks(row_profile), _count_profile_peaks(col_profile)))
+        fg_binary = ((support01 >= float(support_threshold)) & fg_mask).astype(np.uint8)
+        fg_connected_components, _largest_ratio = _connected_component_ratio(fg_binary)
+        poison = (
+            offbody_weight * (offbody_mass / total_mass)
+            + bottom_weight * (bottom_mass / total_mass)
+            + fragment_weight * max(float(fg_connected_components) - 1.0, 0.0)
+            + peak_weight * max(float(fg_peak_count) - 1.0, 0.0)
+            - fg_reward_weight * (fg_mass / total_mass)
+        )
+        scores.append(float(poison))
+    return np.asarray(scores, dtype=np.float32)
+
+
+def _apply_casewise_source_pruning(
+    source_images: np.ndarray,
+    source_raw_support: np.ndarray,
+    fg_mask: np.ndarray,
+    bg_bottom_mask: np.ndarray,
+    original_source_indices: list[int],
+    *,
+    support_threshold: float,
+    proxy_config: dict,
+) -> tuple[np.ndarray, np.ndarray, list[int], dict]:
+    source_images = np.asarray(source_images, dtype=np.float32)
+    source_raw_support = np.asarray(source_raw_support, dtype=np.float32)
+    effective_indices = list(original_source_indices)
+    diagnostics = {
+        "casewise_source_drop_topk": 0,
+        "casewise_source_poison_scores": [],
+        "kept_source_indices": list(effective_indices),
+        "dropped_source_indices": [],
+    }
+    drop_topk = max(int(proxy_config.get("casewise_source_drop_topk", 0)), 0)
+    keep_min = max(int(proxy_config.get("casewise_source_keep_min", 3)), 1)
+    if drop_topk <= 0 or source_raw_support.shape[0] <= keep_min:
+        return source_images, source_raw_support, effective_indices, diagnostics
+
+    poison_scores = _casewise_source_poison_scores(
+        source_raw_support,
+        fg_mask,
+        bg_bottom_mask,
+        support_threshold=support_threshold,
+        offbody_weight=float(proxy_config.get("source_poison_offbody_weight", 1.0)),
+        bottom_weight=float(proxy_config.get("source_poison_bottom_weight", 1.0)),
+        fragment_weight=float(proxy_config.get("source_poison_fragment_weight", 0.35)),
+        peak_weight=float(proxy_config.get("source_poison_peak_weight", 0.20)),
+        fg_reward_weight=float(proxy_config.get("source_fg_reward_weight", 0.75)),
+    )
+    drop_count = min(drop_topk, max(source_raw_support.shape[0] - keep_min, 0))
+    order = np.argsort(-poison_scores)
+    drop_local = set(int(idx) for idx in order[:drop_count])
+    keep_local = [idx for idx in range(source_raw_support.shape[0]) if idx not in drop_local]
+    effective_indices = [int(original_source_indices[idx]) for idx in keep_local]
+    diagnostics = {
+        "casewise_source_drop_topk": int(drop_count),
+        "casewise_source_poison_scores": [
+            {
+                "global_source_index": int(original_source_indices[idx]),
+                "local_source_index": int(idx),
+                "poison_score": float(poison_scores[idx]),
+            }
+            for idx in range(source_raw_support.shape[0])
+        ],
+        "kept_source_indices": list(effective_indices),
+        "dropped_source_indices": [int(original_source_indices[idx]) for idx in sorted(drop_local)],
+    }
+    return (
+        source_images[keep_local],
+        source_raw_support[keep_local],
+        effective_indices,
+        diagnostics,
+    )
+
+
 def _source_agreement_maps(source_support: np.ndarray, source_images: np.ndarray, fg_mask: np.ndarray) -> dict:
     source_support = np.clip(np.asarray(source_support, dtype=np.float32), 0.0, None)
     source_images = np.clip(np.asarray(source_images, dtype=np.float32), 0.0, 1.0)
@@ -632,10 +813,13 @@ def _build_proxy_variant_artifacts(
     source_images = np.asarray(source_images, dtype=np.float32)
     source_raw_support = np.clip(np.asarray(source_raw_support, dtype=np.float32), 0.0, None)
 
-    source_subset = [int(idx) for idx in proxy_config.get("source_subset", []) if 0 <= int(idx) < int(source_raw_support.shape[0])]
+    original_source_count = int(source_raw_support.shape[0])
+    effective_source_indices = list(range(original_source_count))
+    source_subset = [int(idx) for idx in proxy_config.get("source_subset", []) if 0 <= int(idx) < original_source_count]
     if source_subset:
         source_images = source_images[source_subset]
         source_raw_support = source_raw_support[source_subset]
+        effective_source_indices = list(source_subset)
 
     gaussian_sigma = max(float(proxy_config.get("gaussian_sigma", 0.0)), 0.0)
     morph_close_k = int(proxy_config.get("morph_close_k", 0))
@@ -644,10 +828,30 @@ def _build_proxy_variant_artifacts(
     consensus_margin_floor = float(proxy_config.get("consensus_margin_floor", 0.05))
     coverage_floor_ratio = float(proxy_config.get("coverage_floor_ratio", 0.70))
     coverage_floor_mix = float(proxy_config.get("coverage_floor_mix", 0.35))
+    visible_floor_ratio = float(proxy_config.get("visible_floor_ratio", 0.98))
+    visible_floor_mix = float(proxy_config.get("visible_floor_mix", 0.25))
+    visible_mass_floor_ratio = float(proxy_config.get("visible_mass_floor_ratio", 0.95))
+    visible_mass_floor_mix = float(proxy_config.get("visible_mass_floor_mix", 0.25))
     alpha_floor = float(proxy_config.get("alpha_floor", 0.15))
     support_gate_pow = float(proxy_config.get("support_gate_pow", 1.0))
     baseline_blend = float(proxy_config.get("baseline_blend", 0.30))
     render_mode = str(proxy_config.get("render_mode", "rehydrated")).strip().lower() or "rehydrated"
+    bottom_band = _build_bottom_band_mask(fg_mask, bottom_band_ratio).astype(np.float32)
+
+    source_images, source_raw_support, effective_source_indices, source_selection_meta = _apply_casewise_source_pruning(
+        source_images,
+        source_raw_support,
+        fg_mask,
+        bottom_band,
+        effective_source_indices,
+        support_threshold=float(proxy_config.get("support_threshold", 0.25)),
+        proxy_config=proxy_config,
+    )
+    source_selection_meta = {
+        **source_selection_meta,
+        "global_source_subset": list(source_subset),
+        "effective_source_subset": list(effective_source_indices),
+    }
 
     total_support = source_raw_support.sum(axis=0)
     denom = np.clip(total_support[None, ...], 1e-8, None)
@@ -660,7 +864,6 @@ def _build_proxy_variant_artifacts(
     margin = np.clip(top1 - top2, 0.0, 1.0)
     margin_gate = np.clip((margin - consensus_margin_floor) / 0.25, 0.0, 1.0)
     margin_gate = _smooth_gate_map(margin_gate, gaussian_sigma=gaussian_sigma, morph_close_k=morph_close_k)
-    bottom_band = _build_bottom_band_mask(fg_mask, bottom_band_ratio).astype(np.float32)
 
     agreement_maps = _source_agreement_maps(source_raw_support, source_images, fg_mask)
     medoid_probs = agreement_maps["medoid_probs"]
@@ -673,6 +876,11 @@ def _build_proxy_variant_artifacts(
         source_raw_support.shape[0],
         kernel_size=label_majority_k,
     ).astype(np.float32)
+
+    baseline_visible_mask = fg_mask & _visible_rgb_mask(baseline_image)
+    baseline_visible_coverage = float(baseline_visible_mask.sum() / max(int(fg_mask.sum()), 1))
+    baseline_visible_mass = _visible_mass_ratio(baseline_image, fg_mask)
+    baseline_visible_luma = baseline_image.mean(axis=2).astype(np.float32)
 
     def _compose_variant(support_gate: np.ndarray, source_gate: np.ndarray) -> dict:
         support_gate = np.clip(np.asarray(support_gate, dtype=np.float32), 0.0, 1.0) * fg_mask.astype(np.float32)
@@ -701,13 +909,53 @@ def _build_proxy_variant_artifacts(
                 0.0,
                 1.0,
             ).astype(np.float32)
+        candidate_visible_mask = fg_mask & _visible_rgb_mask(proxy_image)
+        current_visible_coverage = float(candidate_visible_mask.sum() / max(int(fg_mask.sum()), 1))
+        current_visible_mass = _visible_mass_ratio(proxy_image, fg_mask)
+        coverage_target = baseline_visible_coverage * max(visible_floor_ratio, 0.0)
+        mass_target = baseline_visible_mass * max(visible_mass_floor_ratio, 0.0)
+        coverage_deficit = float(
+            np.clip(
+                (coverage_target - current_visible_coverage) / max(coverage_target, 1e-6),
+                0.0,
+                1.0,
+            )
+        )
+        mass_deficit = float(
+            np.clip(
+                (mass_target - current_visible_mass) / max(mass_target, 1e-6),
+                0.0,
+                1.0,
+            )
+        )
+        rescue_strength = float(
+            np.clip(
+                max(coverage_deficit * visible_floor_mix, mass_deficit * visible_mass_floor_mix),
+                0.0,
+                1.0,
+            )
+        )
+        if rescue_strength > 1e-6 and baseline_visible_mask.any():
+            candidate_luma = proxy_image.mean(axis=2).astype(np.float32)
+            rescue_mask = baseline_visible_mask & (
+                (~candidate_visible_mask)
+                | (candidate_luma < np.maximum(0.65 * baseline_visible_luma, 0.05))
+            )
+            if rescue_mask.any():
+                rescue_alpha = (rescue_mask.astype(np.float32) * rescue_strength)[..., None]
+                proxy_image = np.clip(
+                    proxy_image * (1.0 - rescue_alpha) + baseline_image * rescue_alpha,
+                    0.0,
+                    1.0,
+                ).astype(np.float32)
         coverage_mask = fg_mask & _visible_rgb_mask(proxy_image)
         return {
             "image": proxy_image,
             "support_weight": proxy_support01,
             "raw_support_weight": proxy_total_support.astype(np.float32),
             "source_support": gated_source_support.astype(np.float32),
-            "source_subset": list(source_subset),
+            "source_subset": list(effective_source_indices),
+            "source_selection_meta": dict(source_selection_meta),
             "alpha_map": alpha_gate.astype(np.float32),
             "proxy_rgb": proxy_rgb.astype(np.float32),
             "coverage_mask": coverage_mask.astype(bool),
@@ -827,7 +1075,7 @@ def _compute_support_metrics(
     visible_rgb_mask = _visible_rgb_mask(image01)
     nonblack_mask = visible_rgb_mask
     render_coverage_mask = fg_mask & nonblack_mask
-    rehydrated_coverage_mask = np.asarray(
+    rehydrated_coverage_mask = fg_mask & np.asarray(
         coverage_mask if coverage_mask is not None else render_coverage_mask,
         dtype=bool,
     )
@@ -863,8 +1111,12 @@ def _compute_support_metrics(
         np.asarray(image01, dtype=np.float32)[fg_mask].sum() / max(float(np.asarray(image01, dtype=np.float32).max()) * 3.0 * max(int(fg_mask.sum()), 1), 1e-8)
     ) if int(fg_mask.sum()) > 0 else 0.0
     fg_support_visible_overlap_ratio = float(
-        ((high_support & rehydrated_coverage_mask).sum()) / max(int((high_support & fg_mask).sum()), 1)
+        ((high_support & fg_mask & rehydrated_coverage_mask).sum()) / max(int((high_support & fg_mask).sum()), 1)
     )
+    baseline_visible_rgb_coverage_ratio = 1.0
+    baseline_fg_bbox_visible_cover_ratio = 1.0
+    baseline_largest_fg_visible_component_ratio = 1.0
+    baseline_fg_visible_mass_ratio = 1.0
     if baseline_support_weight is None:
         fg_retained_support_area_ratio = 1.0
         fg_retained_mass_ratio = 1.0
@@ -876,27 +1128,61 @@ def _compute_support_metrics(
             None,
         )
         baseline_high_support_fg = (baseline_support_weight >= float(support_threshold)) & fg_mask
+        current_high_support_fg = high_support & fg_mask
         fg_retained_support_area_ratio = float(
-            (high_support & fg_mask).sum() / max(int(baseline_high_support_fg.sum()), 1)
+            (current_high_support_fg & baseline_high_support_fg).sum() / max(int(baseline_high_support_fg.sum()), 1)
         )
+        current_fg_support_mass = raw_support_weight[fg_mask]
+        baseline_fg_support_mass = baseline_raw_support_weight[fg_mask]
         fg_retained_mass_ratio = float(
-            raw_support_weight[fg_mask].sum() / max(float(baseline_raw_support_weight[fg_mask].sum()), 1e-8)
+            np.minimum(current_fg_support_mass, baseline_fg_support_mass).sum()
+            / max(float(baseline_fg_support_mass.sum()), 1e-8)
         )
     if baseline_image01 is None:
         fg_retained_area_ratio = 1.0
     else:
-        baseline_mean_rgb = np.asarray(baseline_image01, dtype=np.float32).mean(axis=2)
         baseline_nonblack_fg = fg_mask & _visible_rgb_mask(baseline_image01)
         baseline_alpha_map = np.clip(
             np.asarray(baseline_alpha_map if baseline_alpha_map is not None else baseline_support_weight, dtype=np.float32),
             0.0,
             1.0,
         )
-        baseline_rehydrated_coverage_mask = np.asarray(
+        baseline_rehydrated_coverage_mask = fg_mask & np.asarray(
             baseline_coverage_mask if baseline_coverage_mask is not None else baseline_nonblack_fg,
             dtype=bool,
         )
-        fg_retained_area_ratio = float(rehydrated_coverage_mask.sum() / max(int(baseline_rehydrated_coverage_mask.sum()), 1))
+        baseline_visible_rgb_coverage_ratio = float(
+            baseline_rehydrated_coverage_mask.sum() / max(int(fg_mask.sum()), 1)
+        )
+        baseline_fg_visible_mass_ratio = _visible_mass_ratio(np.asarray(baseline_image01, dtype=np.float32), fg_mask)
+        fg_retained_area_ratio = float(
+            (rehydrated_coverage_mask & baseline_rehydrated_coverage_mask).sum()
+            / max(int(baseline_rehydrated_coverage_mask.sum()), 1)
+        )
+        if int(fg_mask.sum()) > 0:
+            ys, xs = np.where(fg_mask)
+            y0, y1 = int(ys.min()), int(ys.max()) + 1
+            x0, x1 = int(xs.min()), int(xs.max()) + 1
+            fg_bbox = np.zeros_like(fg_mask, dtype=bool)
+            fg_bbox[y0:y1, x0:x1] = True
+            baseline_fg_bbox_visible_cover_ratio = float(
+                (fg_bbox & baseline_rehydrated_coverage_mask).sum() / max(int(fg_bbox.sum()), 1)
+            )
+        _base_cover_components, baseline_largest_fg_visible_component_ratio = _connected_component_ratio(
+            baseline_rehydrated_coverage_mask.astype(np.uint8)
+        )
+    fg_visible_coverage_retained_ratio = float(
+        fg_visible_rgb_coverage_ratio / max(float(baseline_visible_rgb_coverage_ratio), 1e-8)
+    )
+    fg_visible_bbox_retained_ratio = float(
+        fg_bbox_visible_cover_ratio / max(float(baseline_fg_bbox_visible_cover_ratio), 1e-8)
+    )
+    largest_fg_visible_component_retained_ratio = float(
+        largest_fg_visible_component_ratio / max(float(baseline_largest_fg_visible_component_ratio), 1e-8)
+    )
+    fg_visible_mass_retained_ratio = float(
+        fg_visible_mass_ratio / max(float(baseline_fg_visible_mass_ratio), 1e-8)
+    )
     metric_truth_bug = any(
         value > 1.001
         for value in [
@@ -925,11 +1211,15 @@ def _compute_support_metrics(
     fg_visible_mass_ratio = float(np.clip(fg_visible_mass_ratio, 0.0, 1.0))
     fg_support_visible_overlap_ratio = float(np.clip(fg_support_visible_overlap_ratio, 0.0, 1.0))
     largest_fg_visible_component_ratio = float(np.clip(largest_fg_visible_component_ratio, 0.0, 1.0))
+    fg_visible_coverage_retained_ratio = float(np.clip(fg_visible_coverage_retained_ratio, 0.0, 2.0))
+    fg_visible_bbox_retained_ratio = float(np.clip(fg_visible_bbox_retained_ratio, 0.0, 2.0))
+    largest_fg_visible_component_retained_ratio = float(np.clip(largest_fg_visible_component_retained_ratio, 0.0, 2.0))
+    fg_visible_mass_retained_ratio = float(np.clip(fg_visible_mass_retained_ratio, 0.0, 2.0))
     human_erasure_penalty = float(
-        max(0.0, 0.72 - fg_visible_rgb_coverage_ratio)
-        + max(0.0, 0.70 - fg_bbox_visible_cover_ratio)
-        + max(0.0, 0.55 - largest_fg_visible_component_ratio)
-        + max(0.0, 0.60 - fg_visible_mass_ratio)
+        max(0.0, 0.95 - fg_visible_coverage_retained_ratio)
+        + max(0.0, 0.90 - fg_visible_bbox_retained_ratio)
+        + max(0.0, 0.90 - largest_fg_visible_component_retained_ratio)
+        + max(0.0, 0.90 - fg_visible_mass_retained_ratio)
     )
     payload = {
         "support_threshold": float(support_threshold),
@@ -956,6 +1246,10 @@ def _compute_support_metrics(
         "fg_bbox_visible_cover_ratio": fg_bbox_visible_cover_ratio,
         "largest_fg_visible_component_ratio": largest_fg_visible_component_ratio,
         "fg_visible_mass_ratio": fg_visible_mass_ratio,
+        "fg_visible_coverage_retained_ratio": fg_visible_coverage_retained_ratio,
+        "fg_visible_bbox_retained_ratio": fg_visible_bbox_retained_ratio,
+        "largest_fg_visible_component_retained_ratio": largest_fg_visible_component_retained_ratio,
+        "fg_visible_mass_retained_ratio": fg_visible_mass_retained_ratio,
         "fg_bbox_cover_ratio": fg_bbox_cover_ratio,
         "fg_retained_area_ratio": fg_retained_area_ratio,
         "fg_retained_support_area_ratio": fg_retained_support_area_ratio,
@@ -1340,6 +1634,7 @@ def _evaluate_case(
     target_camera = str(case["target_camera"])
     frame_id = int(case["frame_id"])
     case_id = _infer_case_id(case)
+    proxy_config_case, case_rule_meta = _resolve_case_proxy_config(case, case_id, proxy_config)
     case_dir = output_dir / case_id
     renders_dir = case_dir / "renders"
     renders_dir.mkdir(parents=True, exist_ok=True)
@@ -1471,7 +1766,7 @@ def _evaluate_case(
         fg_mask=fg_mask,
         baseline_image=baseline_depth,
         bottom_band_ratio=bottom_band_ratio,
-        proxy_config=proxy_config,
+        proxy_config=proxy_config_case,
     )
     for variant_name in variants:
         if variant_name in PROXY_VARIANTS:
@@ -1589,6 +1884,9 @@ def _evaluate_case(
                 },
                 "baseline_render_stats": depth_render["stats"],
                 "proxy_config": proxy_config,
+                "proxy_config_case": proxy_config_case,
+                "case_partition_meta": case_rule_meta,
+                "source_selection_meta": artifact.get("source_selection_meta", {}),
             }
         )
 
