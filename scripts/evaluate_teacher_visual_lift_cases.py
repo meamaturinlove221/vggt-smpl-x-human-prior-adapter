@@ -1,9 +1,16 @@
 import argparse
+import gc
+import hashlib
 import json
 import math
+import os
 import sys
 from datetime import datetime
 from pathlib import Path
+
+if os.name == "nt":
+    # Local Windows runs can load duplicate OpenMP runtimes through torch/cv2 stacks.
+    os.environ.setdefault("KMP_DUPLICATE_LIB_OK", "TRUE")
 
 import cv2
 import numpy as np
@@ -93,6 +100,8 @@ CORRESPONDENCE_PROXY_VARIANTS = [
     "stablelead_rehydrated_operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_contract_v1",
     "stablelead_rehydrated_operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_contract_v1",
     "stablelead_rehydrated_operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_realization_v1",
+    "stablelead_rehydrated_operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_realization_v1",
+    "stablelead_rehydrated_operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_binding_realization_v1",
 ]
 PROXY_VARIANTS = LEGACY_PEAK_COLLAPSE_PROXY_VARIANTS + CORRESPONDENCE_PROXY_VARIANTS
 DEFAULT_PROXY_CONFIG = {
@@ -522,13 +531,60 @@ def _apply_variant(depth_render: np.ndarray, weight01: np.ndarray, fg_mask: np.n
 
 def _save_rgb(path: Path, image01: np.ndarray) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    Image.fromarray(to_uint8(image01)).save(path)
+    Image.fromarray(to_uint8(image01)).save(_native_io_path(path))
 
 
 def _save_gray(path: Path, image01: np.ndarray) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     gray = np.clip(np.asarray(image01, dtype=np.float32) * 255.0, 0.0, 255.0).astype(np.uint8)
-    Image.fromarray(gray, mode="L").save(path)
+    Image.fromarray(gray, mode="L").save(_native_io_path(path))
+
+
+def _native_io_path(path: Path) -> str:
+    resolved = str(path.resolve())
+    if os.name == "nt" and len(resolved) >= 240 and not resolved.startswith("\\\\?\\"):
+        if resolved.startswith("\\\\"):
+            return "\\\\?\\UNC\\" + resolved[2:]
+        return "\\\\?\\" + resolved
+    return resolved
+
+
+def _path_safe_variant_token(name: str, max_len: int = 72) -> str:
+    name = str(name)
+    if len(name) <= max_len:
+        return name
+    digest = hashlib.sha1(name.encode("utf-8")).hexdigest()[:12]
+    keep = max(16, max_len - len(digest) - 1)
+    return f"{name[:keep]}_{digest}"
+
+
+def _apply_sim3_points_float32(
+    points: np.ndarray,
+    scale: float | np.ndarray,
+    rotation: np.ndarray,
+    translation: np.ndarray,
+) -> np.ndarray:
+    points32 = np.asarray(points, dtype=np.float32)
+    rotation32 = np.asarray(rotation, dtype=np.float32)
+    translation32 = np.asarray(translation, dtype=np.float32)
+    aligned = points32 @ rotation32.T
+    aligned *= np.float32(scale)
+    aligned += translation32
+    return aligned.astype(np.float32, copy=False)
+
+
+def save_json(path: Path, payload) -> None:
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with open(_native_io_path(path), "w", encoding="utf-8") as handle:
+        json.dump(payload, handle, indent=2, ensure_ascii=False)
+
+
+def _write_text(path: Path, text: str) -> None:
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with open(_native_io_path(path), "w", encoding="utf-8") as handle:
+        handle.write(text)
 
 
 def _json_safe(value):
@@ -796,12 +852,12 @@ def _component_label_rgb(labels: np.ndarray, fg_mask: np.ndarray) -> np.ndarray:
     labels = np.asarray(labels, dtype=np.int32)
     fg_mask = np.asarray(fg_mask, dtype=bool)
     if labels.size == 0:
-        return np.zeros((*fg_mask.shape, 3), dtype=np.float32)
+        return np.zeros((*fg_mask.shape, 3), dtype=np.float16)
     label_max = int(labels.max())
-    base = np.zeros((*labels.shape, 3), dtype=np.float32)
+    base = np.zeros((*labels.shape, 3), dtype=np.float16)
     if label_max > 0:
         scaled = labels.astype(np.float32) / float(label_max)
-        base = _apply_heatmap(np.where(fg_mask, scaled, 0.0)).astype(np.float32) / 255.0
+        base = (_apply_heatmap(np.where(fg_mask, scaled, 0.0)).astype(np.float32) / 255.0).astype(np.float16)
     base[~fg_mask] = 0.0
     return base
 
@@ -1509,6 +1565,16 @@ def _save_render_operator_core_visuals(
     hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_realization_map: np.ndarray,
     hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_veto_map: np.ndarray,
     hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_alignment_map: np.ndarray,
+    hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_target_map: np.ndarray,
+    hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_map: np.ndarray,
+    hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_realization_map: np.ndarray,
+    hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_veto_map: np.ndarray,
+    hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_alignment_map: np.ndarray,
+    hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_target_map: np.ndarray,
+    hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_binding_map: np.ndarray,
+    hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_realization_map: np.ndarray,
+    hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_veto_map: np.ndarray,
+    hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_alignment_map: np.ndarray,
 ) -> dict:
     before_image = np.asarray(before_image, dtype=np.float32)
     after_image = np.asarray(after_image, dtype=np.float32)
@@ -2166,6 +2232,78 @@ def _save_render_operator_core_visuals(
             (116, 252, 244),
             strength=0.88,
         ).astype(np.float32),
+        "render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_target_overlay": _panel_mask_overlay(
+            before_image,
+            hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_target_map > 0.05,
+            (255, 100, 88),
+            strength=0.86,
+        ).astype(np.float32),
+        "render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_overlay": _panel_mask_overlay(
+            before_image,
+            hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_map > 0.05,
+            (255, 220, 120),
+            strength=0.86,
+        ).astype(np.float32),
+        "render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_realization_overlay": _panel_mask_overlay(
+            after_image,
+            hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_realization_map > 0.05,
+            (96, 255, 152),
+            strength=0.90,
+        ).astype(np.float32),
+        "before_after_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_panel": [
+            ("Before peaks", _apply_heatmap(before_render_artifact["peak_map"]).astype(np.float32) / 255.0),
+            ("Graph landing target", _apply_heatmap(hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_target_map).astype(np.float32) / 255.0),
+            ("Graph landing realization", _apply_heatmap(hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_realization_map).astype(np.float32) / 255.0),
+            ("After peaks", _apply_heatmap(after_render_artifact["peak_map"]).astype(np.float32) / 255.0),
+        ],
+        "render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_veto_overlay": _panel_mask_overlay(
+            before_image,
+            hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_veto_map > 0.05,
+            (255, 92, 92),
+            strength=0.80,
+        ).astype(np.float32),
+        "render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_alignment_overlay": _panel_mask_overlay(
+            after_image,
+            hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_alignment_map > 0.05,
+            (116, 252, 244),
+            strength=0.90,
+        ).astype(np.float32),
+        "render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_target_overlay": _panel_mask_overlay(
+            before_image,
+            hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_target_map > 0.05,
+            (255, 100, 88),
+            strength=0.86,
+        ).astype(np.float32),
+        "render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_binding_overlay": _panel_mask_overlay(
+            before_image,
+            hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_binding_map > 0.05,
+            (255, 220, 120),
+            strength=0.88,
+        ).astype(np.float32),
+        "render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_realization_overlay": _panel_mask_overlay(
+            after_image,
+            hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_realization_map > 0.05,
+            (96, 255, 152),
+            strength=0.90,
+        ).astype(np.float32),
+        "before_after_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_panel": [
+            ("Before peaks", _apply_heatmap(before_render_artifact["peak_map"]).astype(np.float32) / 255.0),
+            ("Binding target", _apply_heatmap(hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_target_map).astype(np.float32) / 255.0),
+            ("Binding", _apply_heatmap(hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_binding_map).astype(np.float32) / 255.0),
+            ("Binding realization", _apply_heatmap(hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_realization_map).astype(np.float32) / 255.0),
+        ],
+        "render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_veto_overlay": _panel_mask_overlay(
+            before_image,
+            hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_veto_map > 0.05,
+            (255, 92, 92),
+            strength=0.82,
+        ).astype(np.float32),
+        "render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_alignment_overlay": _panel_mask_overlay(
+            after_image,
+            hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_alignment_map > 0.05,
+            (116, 252, 244),
+            strength=0.90,
+        ).astype(np.float32),
     }
 
 
@@ -2225,9 +2363,19 @@ def _apply_rehydrated_operator_core_conflict_resolution(
         str(variant_name)
         == "stablelead_rehydrated_operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_realization_v1"
     )
+    is_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_realization_variant = (
+        str(variant_name)
+        == "stablelead_rehydrated_operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_realization_v1"
+    )
+    is_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_binding_realization_variant = (
+        str(variant_name)
+        == "stablelead_rehydrated_operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_binding_realization_v1"
+    )
     is_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_contract_family_or_higher = bool(
         is_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_contract_variant
         or is_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_realization_variant
+        or is_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_realization_variant
+        or is_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_binding_realization_variant
     )
     is_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_contract_family_or_higher = bool(
         is_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_contract_variant
@@ -2286,6 +2434,8 @@ def _apply_rehydrated_operator_core_conflict_resolution(
         "stablelead_rehydrated_operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_contract_v1",
         "stablelead_rehydrated_operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_contract_v1",
         "stablelead_rehydrated_operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_realization_v1",
+        "stablelead_rehydrated_operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_realization_v1",
+        "stablelead_rehydrated_operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_binding_realization_v1",
     }
     is_component_adjacency_variant = str(variant_name) in {
         "stablelead_rehydrated_operator_component_adjacency_closure_v1",
@@ -2303,6 +2453,8 @@ def _apply_rehydrated_operator_core_conflict_resolution(
         "stablelead_rehydrated_operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_contract_v1",
         "stablelead_rehydrated_operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_contract_v1",
         "stablelead_rehydrated_operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_realization_v1",
+        "stablelead_rehydrated_operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_realization_v1",
+        "stablelead_rehydrated_operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_binding_realization_v1",
     }
     is_component_consolidation_family_or_higher = bool(is_component_consolidation_variant or is_component_adjacency_variant)
     is_post_merge_realization_family_or_higher = bool(is_post_merge_realization_variant or is_component_consolidation_family_or_higher)
@@ -3241,6 +3393,16 @@ def _apply_rehydrated_operator_core_conflict_resolution(
     hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_realization_map = np.zeros_like(raw_support_weight, dtype=np.float32)
     hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_veto_map = np.zeros_like(raw_support_weight, dtype=np.float32)
     hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_alignment_map = np.zeros_like(raw_support_weight, dtype=np.float32)
+    hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_target_map = np.zeros_like(raw_support_weight, dtype=np.float32)
+    hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_map = np.zeros_like(raw_support_weight, dtype=np.float32)
+    hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_realization_map = np.zeros_like(raw_support_weight, dtype=np.float32)
+    hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_veto_map = np.zeros_like(raw_support_weight, dtype=np.float32)
+    hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_alignment_map = np.zeros_like(raw_support_weight, dtype=np.float32)
+    hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_target_map = np.zeros_like(raw_support_weight, dtype=np.float32)
+    hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_binding_map = np.zeros_like(raw_support_weight, dtype=np.float32)
+    hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_realization_map = np.zeros_like(raw_support_weight, dtype=np.float32)
+    hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_veto_map = np.zeros_like(raw_support_weight, dtype=np.float32)
+    hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_alignment_map = np.zeros_like(raw_support_weight, dtype=np.float32)
     before_secondary_visible_mask = np.zeros_like(fg_mask, dtype=bool)
     if is_hard_anchor_local_family_or_higher and is_target_hard_anchor_case:
         hard_anchor_local_radius_px = max(int(proxy_config.get("hard_anchor_local_closure_radius_px", 15)), 1)
@@ -7943,7 +8105,10 @@ def _apply_rehydrated_operator_core_conflict_resolution(
                                     0.0,
                                     1.0,
                                 ).astype(np.float32)
-                                if is_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_realization_variant:
+                                if (
+                                    is_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_realization_variant
+                                    or is_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_realization_variant
+                                ):
                                     graph_radius_px = max(
                                         int(
                                             proxy_config.get(
@@ -8346,6 +8511,760 @@ def _apply_rehydrated_operator_core_conflict_resolution(
                                         0.0,
                                         1.0,
                                     ).astype(np.float32)
+                                    if (
+                                        is_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_realization_variant
+                                        or is_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_binding_realization_variant
+                                    ):
+                                        graph_landing_radius_px = max(
+                                            int(
+                                                proxy_config.get(
+                                                    "hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_radius_px",
+                                                    graph_radius_px + 1,
+                                                )
+                                            ),
+                                            1,
+                                        )
+                                        graph_landing_floor = float(
+                                            proxy_config.get(
+                                                "hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_floor",
+                                                max(graph_floor - 0.002, 0.010),
+                                            )
+                                        )
+                                        graph_landing_kernel = np.ones(
+                                            (graph_landing_radius_px * 2 + 1, graph_landing_radius_px * 2 + 1),
+                                            dtype=np.uint8,
+                                        )
+                                        graph_live_footprint = np.maximum.reduce(
+                                            [
+                                                hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_target_map,
+                                                hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_binding_map,
+                                                hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_realization_map,
+                                                hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_alignment_map,
+                                            ]
+                                        ).astype(np.float32)
+                                        graph_landing_footprint = cv2.dilate(
+                                            (graph_live_footprint > 0.05).astype(np.uint8),
+                                            graph_landing_kernel,
+                                            iterations=1,
+                                        ).astype(np.float32)
+                                        graph_landing_closed_support = cv2.morphologyEx(
+                                            (graph_live_footprint > 0.05).astype(np.uint8),
+                                            cv2.MORPH_CLOSE,
+                                            graph_landing_kernel,
+                                        ).astype(np.float32)
+                                        hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_veto_map = np.clip(
+                                            np.maximum.reduce(
+                                                [
+                                                    hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_veto_map,
+                                                    0.44 * hard_anchor_failure_map,
+                                                    0.26 * peak_rebound_map,
+                                                    0.18 * hard_anchor_peak_breakout_map,
+                                                ]
+                                            ),
+                                            0.0,
+                                            1.0,
+                                        ).astype(np.float32)
+                                        graph_landing_need_map = np.clip(
+                                            graph_live_footprint
+                                            * np.clip(
+                                                0.22
+                                                + 0.32 * graph_gap_fill_support
+                                                + 0.26 * graph_split_support
+                                                + 0.26 * graph_peak_cleanup_support
+                                                + 0.22 * post_merge_component_closure_residual_split_map
+                                                + 0.18 * post_merge_component_adjacency_residual_split_map
+                                                + 0.18 * peak_rebound_map
+                                                + 0.12 * hard_anchor_peak_breakout_map,
+                                                0.0,
+                                                1.0,
+                                            )
+                                            * np.clip(0.42 + 0.58 * graph_landing_footprint, 0.0, 1.0)
+                                            * np.clip(
+                                                1.0
+                                                - 0.52
+                                                * hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_veto_map,
+                                                0.0,
+                                                1.0,
+                                            ),
+                                            0.0,
+                                            1.0,
+                                        ).astype(np.float32)
+                                        graph_landing_need_mask = cv2.dilate(
+                                            (graph_landing_need_map >= graph_landing_floor).astype(np.uint8),
+                                            graph_landing_kernel,
+                                            iterations=1,
+                                        ).astype(np.float32)
+                                        hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_target_map = np.clip(
+                                            graph_landing_need_mask
+                                            * graph_landing_need_map
+                                            * np.maximum(
+                                                graph_live_footprint,
+                                                np.maximum(
+                                                    graph_gap_fill_support,
+                                                    hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_alignment_map,
+                                                ),
+                                            )
+                                            * np.clip(
+                                                1.0
+                                                - 0.50
+                                                * hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_veto_map,
+                                                0.0,
+                                                1.0,
+                                            ),
+                                            0.0,
+                                            1.0,
+                                        ).astype(np.float32)
+                                        hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_alignment_map = np.clip(
+                                            np.maximum(
+                                                np.minimum(
+                                                    hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_target_map,
+                                                    np.maximum(
+                                                        hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_realization_map,
+                                                        np.maximum(graph_landing_closed_support, hard_anchor_local_shrinkage_witness_map),
+                                                    ),
+                                                ),
+                                                hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_target_map
+                                                * np.maximum(
+                                                    hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_alignment_map,
+                                                    graph_corridor_support,
+                                                )
+                                                * np.clip(
+                                                    1.0
+                                                    - 0.22
+                                                    * hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_veto_map,
+                                                    0.0,
+                                                    1.0,
+                                                ),
+                                            ),
+                                            0.0,
+                                            1.0,
+                                        ).astype(np.float32)
+                                        hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_map = np.clip(
+                                            hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_target_map
+                                            * np.clip(
+                                                4.80
+                                                * (
+                                                    0.18
+                                                    + 0.28
+                                                    * hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_realization_map
+                                                    + 0.24
+                                                    * hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_alignment_map
+                                                    + 0.18
+                                                    * hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_contract_map
+                                                    + 0.12 * post_merge_component_closure_realization_contract_map
+                                                    + 0.10 * post_merge_component_gap_closure_map
+                                                    + 0.08 * hard_anchor_peak_breakout_map
+                                                ),
+                                                0.0,
+                                                1.0,
+                                            )
+                                            * np.clip(0.40 + 0.60 * graph_landing_footprint, 0.0, 1.0)
+                                            * np.clip(
+                                                1.0
+                                                - 0.44
+                                                * hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_veto_map,
+                                                0.0,
+                                                1.0,
+                                            ),
+                                            0.0,
+                                            1.0,
+                                        ).astype(np.float32)
+                                        hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_realization_map = np.clip(
+                                            np.maximum(
+                                                hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_map,
+                                                hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_alignment_map
+                                                * np.clip(
+                                                    0.44
+                                                    + 0.56
+                                                    * np.maximum(
+                                                        graph_fill_map,
+                                                        np.maximum(graph_fragment_cleanup_map, graph_gap_fill_support),
+                                                    ),
+                                                    0.0,
+                                                    1.0,
+                                                ),
+                                            )
+                                            * np.clip(
+                                                1.0
+                                                - 0.28
+                                                * hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_veto_map,
+                                                0.0,
+                                                1.0,
+                                            ),
+                                            0.0,
+                                            1.0,
+                                        ).astype(np.float32)
+                                        graph_landing_fill_map = np.clip(
+                                            hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_realization_map
+                                            * np.maximum(
+                                                graph_gap_fill_support,
+                                                np.maximum(
+                                                    graph_split_support,
+                                                    0.60
+                                                    * hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_alignment_map,
+                                                ),
+                                            )
+                                            * np.clip(
+                                                1.0
+                                                - 0.22
+                                                * hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_veto_map,
+                                                0.0,
+                                                1.0,
+                                            ),
+                                            0.0,
+                                            1.0,
+                                        ).astype(np.float32)
+                                        graph_landing_cleanup_map = np.clip(
+                                            hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_realization_map
+                                            * np.maximum(
+                                                graph_peak_cleanup_support,
+                                                np.maximum(
+                                                    post_merge_component_closure_residual_split_map,
+                                                    post_merge_component_adjacency_residual_split_map,
+                                                ),
+                                            )
+                                            * np.clip(1.0 - 0.60 * graph_gap_fill_support, 0.10, 1.0)
+                                            * np.clip(
+                                                1.0
+                                                - 0.30
+                                                * hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_veto_map,
+                                                0.0,
+                                                1.0,
+                                            ),
+                                            0.0,
+                                            1.0,
+                                        ).astype(np.float32)
+                                        graph_landing_reference = np.clip(
+                                            composed_image
+                                            * np.clip(1.0 - 0.80 * graph_landing_cleanup_map[..., None], 0.0, 1.0)
+                                            + primary_reference_image
+                                            * (
+                                                0.995
+                                                * np.maximum(
+                                                    hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_realization_map,
+                                                    0.88 * graph_landing_fill_map,
+                                                )[..., None]
+                                            )
+                                            + target01
+                                            * (
+                                                0.955
+                                                * hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_alignment_map[..., None]
+                                            ),
+                                            0.0,
+                                            1.0,
+                                        ).astype(np.float32)
+                                        graph_landing_mix = np.clip(
+                                            np.maximum(
+                                                hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_realization_map,
+                                                0.76 * graph_landing_fill_map,
+                                            ),
+                                            0.0,
+                                            0.999995,
+                                        ).astype(np.float32)[..., None]
+                                        composed_image = np.clip(
+                                            composed_image * (1.0 - graph_landing_mix) + graph_landing_reference * graph_landing_mix,
+                                            0.0,
+                                            1.0,
+                                        ).astype(np.float32)
+                                        graph_landing_alpha_lift = np.clip(
+                                            np.maximum(
+                                                graph_landing_fill_map * 0.84,
+                                                hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_realization_map
+                                                * 0.76,
+                                            ),
+                                            0.0,
+                                            0.999995,
+                                        ).astype(np.float32)
+                                        graph_landing_alpha_shrink = np.clip(
+                                            graph_landing_cleanup_map * 0.16,
+                                            0.0,
+                                            0.66,
+                                        ).astype(np.float32)
+                                        composed_alpha = np.clip(
+                                            np.maximum(composed_alpha, graph_landing_alpha_lift) * (1.0 - graph_landing_alpha_shrink),
+                                            0.0,
+                                            1.0,
+                                        ).astype(np.float32)
+                                        coverage_mask = fg_mask & _visible_rgb_mask(composed_image)
+                                        post_artifact = _compute_render_artifact_maps(
+                                            composed_image,
+                                            target01,
+                                            fg_mask,
+                                            raw_support_weight,
+                                            source_top1_mass_map=source_top1_mass_map,
+                                            source_margin_map=source_margin_map,
+                                        )
+                                        post_largest_mask = np.asarray(post_artifact["largest_mask"], dtype=bool)
+                                        post_peak_map = np.asarray(post_artifact["peak_map"], dtype=np.float32)
+                                        normalized_post_peak_map = np.clip(
+                                            post_peak_map / max(float(post_peak_map.max()), 1e-6),
+                                            0.0,
+                                            1.0,
+                                        ).astype(np.float32)
+                                        peak_rebound_map = np.clip(post_peak_map - pre_peak_map, 0.0, None).astype(np.float32)
+                                        peak_rebound_map = np.clip(
+                                            peak_rebound_map / max(float(peak_rebound_map.max()), 1e-6),
+                                            0.0,
+                                            1.0,
+                                        ).astype(np.float32)
+                                        final_after_secondary_visible_mask = (
+                                            np.asarray(post_artifact["visible_mask"], dtype=bool)
+                                            & ~post_largest_mask
+                                            & fg_mask
+                                        )
+                                        hard_anchor_local_shrinkage_witness_map = np.clip(
+                                            np.maximum(
+                                                hard_anchor_local_shrinkage_witness_map,
+                                                (
+                                                    before_secondary_visible_mask
+                                                    & ~final_after_secondary_visible_mask
+                                                ).astype(np.float32)
+                                                * np.maximum(
+                                                    hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_target_map,
+                                                    hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_realization_map,
+                                                )
+                                                * np.clip(1.0 - 0.05 * peak_rebound_map, 0.0, 1.0),
+                                            ),
+                                            0.0,
+                                            1.0,
+                                        ).astype(np.float32)
+                                        graph_landing_overlap_support = cv2.dilate(
+                                            (hard_anchor_local_shrinkage_witness_map > 0.05).astype(np.uint8),
+                                            graph_landing_kernel,
+                                            iterations=1,
+                                        ).astype(np.float32)
+                                        hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_alignment_map = np.clip(
+                                            np.maximum(
+                                                np.minimum(
+                                                    hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_realization_map,
+                                                    hard_anchor_local_shrinkage_witness_map,
+                                                ),
+                                                hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_target_map
+                                                * graph_landing_overlap_support
+                                                * np.clip(
+                                                    1.0
+                                                    - 0.16
+                                                    * hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_veto_map,
+                                                    0.0,
+                                                    1.0,
+                                                ),
+                                            ),
+                                            0.0,
+                                            1.0,
+                                        ).astype(np.float32)
+                                        hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_realization_map = np.clip(
+                                            np.maximum(
+                                                hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_realization_map,
+                                                hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_map
+                                                * np.clip(
+                                                    0.50
+                                                    + 0.50
+                                                    * hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_alignment_map,
+                                                    0.0,
+                                                    1.0,
+                                                ),
+                                            )
+                                            * np.clip(
+                                                1.0
+                                                - 0.16
+                                                * hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_veto_map,
+                                                0.0,
+                                                1.0,
+                                            ),
+                                            0.0,
+                                            1.0,
+                                        ).astype(np.float32)
+                                        hard_anchor_failure_map = np.clip(
+                                            hard_anchor_failure_map
+                                            + 0.66
+                                            * hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_target_map
+                                            * np.clip(
+                                                1.0
+                                                - hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_alignment_map,
+                                                0.0,
+                                                1.0,
+                                            )
+                                            + 0.22 * peak_rebound_map
+                                            + 0.16
+                                            * np.clip(
+                                                1.0
+                                                - hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_realization_map,
+                                                0.0,
+                                                1.0,
+                                            )
+                                            * final_after_secondary_visible_mask.astype(np.float32),
+                                            0.0,
+                                            1.0,
+                                        ).astype(np.float32)
+                                        if is_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_binding_realization_variant:
+                                            graph_landing_binding_radius_px = max(
+                                                int(
+                                                    proxy_config.get(
+                                                        "hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_radius_px",
+                                                        graph_landing_radius_px + 1,
+                                                    )
+                                                ),
+                                                1,
+                                            )
+                                            graph_landing_binding_floor = float(
+                                                proxy_config.get(
+                                                    "hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_floor",
+                                                    max(graph_landing_floor * 0.45, 0.004),
+                                                )
+                                            )
+                                            graph_landing_binding_kernel = np.ones(
+                                                (graph_landing_binding_radius_px * 2 + 1, graph_landing_binding_radius_px * 2 + 1),
+                                                dtype=np.uint8,
+                                            )
+                                            graph_landing_binding_seed_map = np.clip(
+                                                np.maximum.reduce(
+                                                    [
+                                                        graph_live_footprint,
+                                                        0.96 * graph_landing_footprint,
+                                                        0.92 * graph_landing_closed_support,
+                                                        0.86 * graph_corridor_support,
+                                                        0.82 * hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_alignment_map,
+                                                    ]
+                                                ),
+                                                0.0,
+                                                1.0,
+                                            ).astype(np.float32)
+                                            hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_veto_map = np.clip(
+                                                np.maximum.reduce(
+                                                    [
+                                                        hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_veto_map,
+                                                        0.34 * hard_anchor_failure_map,
+                                                        0.20 * peak_rebound_map,
+                                                        0.14 * hard_anchor_peak_breakout_map,
+                                                    ]
+                                                ),
+                                                0.0,
+                                                1.0,
+                                            ).astype(np.float32)
+                                            graph_landing_binding_need_map = np.clip(
+                                                graph_landing_binding_seed_map
+                                                * np.clip(
+                                                    0.18
+                                                    + 0.30 * graph_corridor_support
+                                                    + 0.26 * graph_gap_fill_support
+                                                    + 0.22 * graph_split_support
+                                                    + 0.18 * graph_peak_cleanup_support
+                                                    + 0.16 * post_merge_component_closure_residual_split_map
+                                                    + 0.12 * post_merge_component_adjacency_residual_split_map
+                                                    + 0.10 * hard_anchor_peak_breakout_map,
+                                                    0.0,
+                                                    1.0,
+                                                )
+                                                * np.clip(
+                                                    1.0
+                                                    - 0.46
+                                                    * hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_veto_map,
+                                                    0.0,
+                                                    1.0,
+                                                ),
+                                                0.0,
+                                                1.0,
+                                            ).astype(np.float32)
+                                            graph_landing_binding_need_mask = cv2.dilate(
+                                                (graph_landing_binding_need_map >= graph_landing_binding_floor).astype(np.uint8),
+                                                graph_landing_binding_kernel,
+                                                iterations=1,
+                                            ).astype(np.float32)
+                                            hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_target_map = np.clip(
+                                                graph_landing_binding_need_mask
+                                                * np.maximum(
+                                                    graph_landing_binding_need_map,
+                                                    0.46 * graph_landing_binding_seed_map,
+                                                )
+                                                * np.maximum(
+                                                    graph_landing_fill_map,
+                                                    np.maximum(
+                                                        graph_gap_fill_support,
+                                                        np.maximum(graph_corridor_support, graph_landing_closed_support),
+                                                    ),
+                                                )
+                                                * np.clip(
+                                                    1.0
+                                                    - 0.24
+                                                    * hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_veto_map,
+                                                    0.0,
+                                                    1.0,
+                                                ),
+                                                0.0,
+                                                1.0,
+                                            ).astype(np.float32)
+                                            hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_binding_map = np.clip(
+                                                np.maximum(
+                                                    hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_target_map
+                                                    * np.clip(
+                                                        0.42
+                                                        + 0.22 * graph_landing_binding_seed_map
+                                                        + 0.18 * graph_landing_fill_map
+                                                        + 0.16 * graph_corridor_support
+                                                        + 0.12 * graph_gap_fill_support
+                                                        + 0.14 * hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_map
+                                                        + 0.12 * hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_realization_map,
+                                                        0.0,
+                                                        1.0,
+                                                    ),
+                                                    hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_target_map
+                                                    * np.maximum(
+                                                        0.68 * np.maximum(graph_landing_fill_map, graph_corridor_support),
+                                                        0.54 * hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_alignment_map,
+                                                    ),
+                                                )
+                                                * np.clip(
+                                                    1.0
+                                                    - 0.20
+                                                    * hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_veto_map,
+                                                    0.0,
+                                                    1.0,
+                                                ),
+                                                0.0,
+                                                1.0,
+                                            ).astype(np.float32)
+                                            hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_alignment_map = np.clip(
+                                                np.maximum(
+                                                    np.minimum(
+                                                        hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_binding_map,
+                                                        np.maximum(graph_landing_fill_map, graph_landing_closed_support),
+                                                    ),
+                                                    hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_target_map
+                                                    * np.maximum(
+                                                        graph_corridor_support,
+                                                        np.maximum(
+                                                            hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_alignment_map,
+                                                            hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_alignment_map,
+                                                        ),
+                                                    )
+                                                    * np.clip(
+                                                        1.0
+                                                        - 0.16
+                                                        * hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_veto_map,
+                                                        0.0,
+                                                        1.0,
+                                                    ),
+                                                ),
+                                                0.0,
+                                                1.0,
+                                            ).astype(np.float32)
+                                            hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_realization_map = np.clip(
+                                                np.maximum(
+                                                    hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_binding_map,
+                                                    hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_alignment_map
+                                                    * np.clip(
+                                                        0.48
+                                                        + 0.52
+                                                        * np.maximum(
+                                                            graph_landing_fill_map,
+                                                            np.maximum(graph_fragment_cleanup_map, graph_gap_fill_support),
+                                                        ),
+                                                        0.0,
+                                                        1.0,
+                                                    ),
+                                                )
+                                                * np.clip(
+                                                    1.0
+                                                    - 0.12
+                                                    * hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_veto_map,
+                                                    0.0,
+                                                    1.0,
+                                                ),
+                                                0.0,
+                                                1.0,
+                                            ).astype(np.float32)
+                                            graph_landing_binding_fill_map = np.clip(
+                                                hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_realization_map
+                                                * np.maximum(
+                                                    graph_landing_fill_map,
+                                                    np.maximum(graph_gap_fill_support, 0.75 * graph_corridor_support),
+                                                )
+                                                * np.clip(
+                                                    1.0
+                                                    - 0.18
+                                                    * hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_veto_map,
+                                                    0.0,
+                                                    1.0,
+                                                ),
+                                                0.0,
+                                                1.0,
+                                            ).astype(np.float32)
+                                            graph_landing_binding_cleanup_map = np.clip(
+                                                hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_realization_map
+                                                * np.maximum(
+                                                    graph_landing_cleanup_map,
+                                                    np.maximum(
+                                                        post_merge_component_closure_residual_split_map,
+                                                        post_merge_component_adjacency_residual_split_map,
+                                                    ),
+                                                )
+                                                * np.clip(1.0 - 0.45 * graph_gap_fill_support, 0.10, 1.0)
+                                                * np.clip(
+                                                    1.0
+                                                    - 0.24
+                                                    * hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_veto_map,
+                                                    0.0,
+                                                    1.0,
+                                                ),
+                                                0.0,
+                                                1.0,
+                                            ).astype(np.float32)
+                                            graph_landing_binding_reference = np.clip(
+                                                composed_image
+                                                * np.clip(1.0 - 0.75 * graph_landing_binding_cleanup_map[..., None], 0.0, 1.0)
+                                                + primary_reference_image
+                                                * (
+                                                    0.985
+                                                    * np.maximum(
+                                                        hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_realization_map,
+                                                        0.90 * graph_landing_binding_fill_map,
+                                                    )[..., None]
+                                                )
+                                                + target01
+                                                * (
+                                                    0.935
+                                                    * hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_alignment_map[..., None]
+                                                ),
+                                                0.0,
+                                                1.0,
+                                            ).astype(np.float32)
+                                            graph_landing_binding_mix = np.clip(
+                                                np.maximum(
+                                                    hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_realization_map,
+                                                    0.70 * graph_landing_binding_fill_map,
+                                                ),
+                                                0.0,
+                                                0.999995,
+                                            ).astype(np.float32)[..., None]
+                                            composed_image = np.clip(
+                                                composed_image * (1.0 - graph_landing_binding_mix)
+                                                + graph_landing_binding_reference * graph_landing_binding_mix,
+                                                0.0,
+                                                1.0,
+                                            ).astype(np.float32)
+                                            graph_landing_binding_alpha_lift = np.clip(
+                                                np.maximum(
+                                                    graph_landing_binding_fill_map * 0.82,
+                                                    hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_realization_map
+                                                    * 0.72,
+                                                ),
+                                                0.0,
+                                                0.999995,
+                                            ).astype(np.float32)
+                                            graph_landing_binding_alpha_shrink = np.clip(
+                                                graph_landing_binding_cleanup_map * 0.14,
+                                                0.0,
+                                                0.60,
+                                            ).astype(np.float32)
+                                            composed_alpha = np.clip(
+                                                np.maximum(composed_alpha, graph_landing_binding_alpha_lift)
+                                                * (1.0 - graph_landing_binding_alpha_shrink),
+                                                0.0,
+                                                1.0,
+                                            ).astype(np.float32)
+                                            coverage_mask = fg_mask & _visible_rgb_mask(composed_image)
+                                            post_artifact = _compute_render_artifact_maps(
+                                                composed_image,
+                                                target01,
+                                                fg_mask,
+                                                raw_support_weight,
+                                                source_top1_mass_map=source_top1_mass_map,
+                                                source_margin_map=source_margin_map,
+                                            )
+                                            post_largest_mask = np.asarray(post_artifact["largest_mask"], dtype=bool)
+                                            post_peak_map = np.asarray(post_artifact["peak_map"], dtype=np.float32)
+                                            normalized_post_peak_map = np.clip(
+                                                post_peak_map / max(float(post_peak_map.max()), 1e-6),
+                                                0.0,
+                                                1.0,
+                                            ).astype(np.float32)
+                                            peak_rebound_map = np.clip(post_peak_map - pre_peak_map, 0.0, None).astype(np.float32)
+                                            peak_rebound_map = np.clip(
+                                                peak_rebound_map / max(float(peak_rebound_map.max()), 1e-6),
+                                                0.0,
+                                                1.0,
+                                            ).astype(np.float32)
+                                            final_after_secondary_visible_mask = (
+                                                np.asarray(post_artifact["visible_mask"], dtype=bool)
+                                                & ~post_largest_mask
+                                                & fg_mask
+                                            )
+                                            hard_anchor_local_shrinkage_witness_map = np.clip(
+                                                np.maximum(
+                                                    hard_anchor_local_shrinkage_witness_map,
+                                                    (
+                                                        before_secondary_visible_mask
+                                                        & ~final_after_secondary_visible_mask
+                                                    ).astype(np.float32)
+                                                    * np.maximum(
+                                                        hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_target_map,
+                                                        hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_realization_map,
+                                                    )
+                                                    * np.clip(1.0 - 0.04 * peak_rebound_map, 0.0, 1.0),
+                                                ),
+                                                0.0,
+                                                1.0,
+                                            ).astype(np.float32)
+                                            graph_landing_binding_overlap_support = cv2.dilate(
+                                                (hard_anchor_local_shrinkage_witness_map > 0.05).astype(np.uint8),
+                                                graph_landing_binding_kernel,
+                                                iterations=1,
+                                            ).astype(np.float32)
+                                            hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_alignment_map = np.clip(
+                                                np.maximum(
+                                                    np.minimum(
+                                                        hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_realization_map,
+                                                        hard_anchor_local_shrinkage_witness_map,
+                                                    ),
+                                                    hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_target_map
+                                                    * graph_landing_binding_overlap_support
+                                                    * np.clip(
+                                                        1.0
+                                                        - 0.12
+                                                        * hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_veto_map,
+                                                        0.0,
+                                                        1.0,
+                                                    ),
+                                                ),
+                                                0.0,
+                                                1.0,
+                                            ).astype(np.float32)
+                                            hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_realization_map = np.clip(
+                                                np.maximum(
+                                                    hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_realization_map,
+                                                    hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_binding_map
+                                                    * np.clip(
+                                                        0.58
+                                                        + 0.42
+                                                        * hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_alignment_map,
+                                                        0.0,
+                                                        1.0,
+                                                    ),
+                                                )
+                                                * np.clip(
+                                                    1.0
+                                                    - 0.12
+                                                    * hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_veto_map,
+                                                    0.0,
+                                                    1.0,
+                                                ),
+                                                0.0,
+                                                1.0,
+                                            ).astype(np.float32)
+                                            hard_anchor_failure_map = np.clip(
+                                                hard_anchor_failure_map
+                                                + 0.58
+                                                * hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_target_map
+                                                * np.clip(
+                                                    1.0
+                                                    - hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_alignment_map,
+                                                    0.0,
+                                                    1.0,
+                                                )
+                                                + 0.16 * peak_rebound_map,
+                                                0.0,
+                                                1.0,
+                                            ).astype(np.float32)
 
     component_rank_table = []
     for component in ranked.get("components", []):
@@ -8472,6 +9391,18 @@ def _apply_rehydrated_operator_core_conflict_resolution(
                     "hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_gain": 0.0,
                     "hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_alignment_score": 0.0,
                     "hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_remaining_fraction": 0.0,
+                    "hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_target_fraction": 0.0,
+                    "hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_fraction": 0.0,
+                    "hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_realization_fraction": 0.0,
+                    "hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_gain": 0.0,
+                    "hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_alignment_score": 0.0,
+                    "hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_remaining_fraction": 0.0,
+                    "hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_target_fraction": 0.0,
+                    "hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_binding_fraction": 0.0,
+                    "hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_realization_fraction": 0.0,
+                    "hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_gain": 0.0,
+                    "hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_alignment_score": 0.0,
+                    "hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_remaining_fraction": 0.0,
                     "post_merge_component_residual_split_fraction": 0.0,
                     "post_merge_peak_residual_after_realization": 0.0,
                     "hard_anchor_realization_breakout_score": 0.0,
@@ -8699,6 +9630,24 @@ def _apply_rehydrated_operator_core_conflict_resolution(
         hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_realization_fraction = float(
             hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_realization_map[comp_mask].mean()
         )
+        hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_target_fraction = float(
+            hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_target_map[comp_mask].mean()
+        )
+        hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_fraction = float(
+            hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_map[comp_mask].mean()
+        )
+        hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_realization_fraction = float(
+            hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_realization_map[comp_mask].mean()
+        )
+        hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_target_fraction = float(
+            hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_target_map[comp_mask].mean()
+        )
+        hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_binding_fraction = float(
+            hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_binding_map[comp_mask].mean()
+        )
+        hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_realization_fraction = float(
+            hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_realization_map[comp_mask].mean()
+        )
         hard_anchor_peak_residual_contraction_overlap_fraction = float(
             np.minimum(
                 hard_anchor_peak_residual_contraction_realization_map[comp_mask],
@@ -8753,6 +9702,22 @@ def _apply_rehydrated_operator_core_conflict_resolution(
             )
             & comp_mask,
         )
+        hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_alignment_score = _mask_centroid_alignment_score(
+            (hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_target_map >= 0.05) & comp_mask,
+            (
+                (hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_realization_map >= 0.05)
+                | (hard_anchor_local_shrinkage_witness_map >= 0.05)
+            )
+            & comp_mask,
+        )
+        hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_alignment_score = _mask_centroid_alignment_score(
+            (hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_target_map >= 0.05) & comp_mask,
+            (
+                (hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_realization_map >= 0.05)
+                | (hard_anchor_local_shrinkage_witness_map >= 0.05)
+            )
+            & comp_mask,
+        )
         hard_anchor_peak_residual_contraction_gain = float(
             (float(pre_peak_map[comp_mask].mean()) - float(post_peak_map[comp_mask].mean()))
             * max(
@@ -8801,6 +9766,10 @@ def _apply_rehydrated_operator_core_conflict_resolution(
         hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_remaining_fraction = 0.0
         hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_gain = 0.0
         hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_remaining_fraction = 0.0
+        hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_gain = 0.0
+        hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_remaining_fraction = 0.0
+        hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_gain = 0.0
+        hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_remaining_fraction = 0.0
         hard_anchor_peak_residual = float(
             (
                 np.maximum(
@@ -9088,7 +10057,161 @@ def _apply_rehydrated_operator_core_conflict_resolution(
                     hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_remaining_fraction,
                 ).mean()
             )
-        if is_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_realization_variant and is_target_hard_anchor_case:
+        if is_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_binding_realization_variant and is_target_hard_anchor_case:
+            hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_gain = float(
+                max(
+                    component_merge_gain,
+                    post_merge_component_adjacency_gain,
+                    post_merge_component_closure_realization_gain,
+                )
+                * max(
+                    hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_realization_fraction
+                    * float(
+                        np.minimum(
+                            hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_realization_map[comp_mask],
+                            np.maximum(
+                                hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_realization_map[comp_mask],
+                                np.maximum(
+                                    hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_realization_map[comp_mask],
+                                    hard_anchor_local_shrinkage_witness_map[comp_mask],
+                                ),
+                            ),
+                        ).mean()
+                    ),
+                    hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_binding_fraction
+                    * hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_alignment_score,
+                    0.0,
+                )
+                * max(
+                    1.0
+                    - float(
+                        hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_veto_map[
+                            comp_mask
+                        ].mean()
+                    ),
+                    0.0,
+                )
+            )
+            hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_remaining_fraction = float(
+                np.maximum(
+                    np.maximum(
+                        post_merge_component_closure_residual_split_map[comp_mask],
+                        post_merge_component_adjacency_residual_split_map[comp_mask],
+                    )
+                    * np.clip(
+                        1.0
+                        - hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_realization_map[
+                            comp_mask
+                        ],
+                        0.0,
+                        1.0,
+                    ),
+                    hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_remaining_fraction
+                    * np.clip(
+                        1.0
+                        - hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_alignment_map[
+                            comp_mask
+                        ],
+                        0.0,
+                        1.0,
+                    ),
+                ).mean()
+            )
+            hard_anchor_peak_residual_remaining_fraction = (
+                hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_remaining_fraction
+            )
+            hard_anchor_peak_residual = float(
+                np.maximum(
+                    hard_anchor_peak_breakout_map[comp_mask]
+                    * np.clip(
+                        1.0
+                        - hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_realization_map[
+                            comp_mask
+                        ],
+                        0.0,
+                        1.0,
+                    ),
+                    hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_remaining_fraction,
+                ).mean()
+            )
+        elif is_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_realization_variant and is_target_hard_anchor_case:
+            hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_gain = float(
+                max(
+                    component_merge_gain,
+                    post_merge_component_adjacency_gain,
+                    post_merge_component_closure_realization_gain,
+                )
+                * max(
+                    hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_realization_fraction
+                    * float(
+                        np.minimum(
+                            hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_realization_map[comp_mask],
+                            np.maximum(
+                                hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_realization_map[comp_mask],
+                                np.maximum(
+                                    hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_contract_map[comp_mask],
+                                    hard_anchor_local_shrinkage_witness_map[comp_mask],
+                                ),
+                            ),
+                        ).mean()
+                    ),
+                    hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_fraction
+                    * hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_alignment_score,
+                    0.0,
+                )
+                * max(
+                    1.0
+                    - float(
+                        hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_veto_map[
+                            comp_mask
+                        ].mean()
+                    ),
+                    0.0,
+                )
+            )
+            hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_remaining_fraction = float(
+                np.maximum(
+                    np.maximum(
+                        post_merge_component_closure_residual_split_map[comp_mask],
+                        post_merge_component_adjacency_residual_split_map[comp_mask],
+                    )
+                    * np.clip(
+                        1.0
+                        - hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_realization_map[
+                            comp_mask
+                        ],
+                        0.0,
+                        1.0,
+                    ),
+                    hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_remaining_fraction
+                    * np.clip(
+                        1.0
+                        - hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_alignment_map[
+                            comp_mask
+                        ],
+                        0.0,
+                        1.0,
+                    ),
+                ).mean()
+            )
+            hard_anchor_peak_residual_remaining_fraction = (
+                hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_remaining_fraction
+            )
+            hard_anchor_peak_residual = float(
+                np.maximum(
+                    hard_anchor_peak_breakout_map[comp_mask]
+                    * np.clip(
+                        1.0
+                        - hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_realization_map[
+                            comp_mask
+                        ],
+                        0.0,
+                        1.0,
+                    ),
+                    hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_remaining_fraction,
+                ).mean()
+            )
+        elif is_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_realization_variant and is_target_hard_anchor_case:
             hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_gain = float(
                 max(
                     component_merge_gain,
@@ -9375,6 +10498,18 @@ def _apply_rehydrated_operator_core_conflict_resolution(
                 "hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_gain": hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_gain,
                 "hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_alignment_score": hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_alignment_score,
                 "hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_remaining_fraction": hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_remaining_fraction,
+                "hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_target_fraction": hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_target_fraction,
+                "hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_fraction": hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_fraction,
+                "hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_realization_fraction": hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_realization_fraction,
+                "hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_gain": hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_gain,
+                "hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_alignment_score": hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_alignment_score,
+                "hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_remaining_fraction": hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_remaining_fraction,
+                "hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_target_fraction": hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_target_fraction,
+                "hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_binding_fraction": hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_binding_fraction,
+                "hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_realization_fraction": hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_realization_fraction,
+                "hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_gain": hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_gain,
+                "hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_alignment_score": hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_alignment_score,
+                "hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_remaining_fraction": hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_remaining_fraction,
                 "post_merge_component_residual_split_fraction": post_merge_component_residual_split_fraction,
                 "post_merge_peak_residual_after_realization": post_merge_peak_residual_after_realization,
                 "hard_anchor_realization_breakout_score": hard_anchor_realization_breakout_score,
@@ -9545,9 +10680,25 @@ def _apply_rehydrated_operator_core_conflict_resolution(
         "hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_realization_map": hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_realization_map.astype(np.float32),
         "hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_veto_map": hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_veto_map.astype(np.float32),
         "hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_alignment_map": hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_alignment_map.astype(np.float32),
+        "hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_target_map": hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_target_map.astype(np.float32),
+        "hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_map": hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_map.astype(np.float32),
+        "hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_realization_map": hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_realization_map.astype(np.float32),
+        "hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_veto_map": hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_veto_map.astype(np.float32),
+        "hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_alignment_map": hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_alignment_map.astype(np.float32),
+        "hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_target_map": hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_target_map.astype(np.float32),
+        "hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_binding_map": hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_binding_map.astype(np.float32),
+        "hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_realization_map": hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_realization_map.astype(np.float32),
+        "hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_veto_map": hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_veto_map.astype(np.float32),
+        "hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_alignment_map": hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_alignment_map.astype(np.float32),
         "secondary_component_scores": decomposition["component_scores"],
         "rescue_strength": rescue_strength,
         "render_mode": (
+            "rehydrated_operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_binding_realization"
+            if is_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_binding_realization_variant
+            else
+            "rehydrated_operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_realization"
+            if is_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_realization_variant
+            else
             "rehydrated_operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_realization"
             if is_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_realization_variant
             else
@@ -17268,6 +18419,290 @@ def _build_proxy_variant_artifacts(
                 dtype=np.float32,
             )
 
+    proxy_config_operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_realization = {
+        **proxy_config_operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_realization,
+        "hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_radius_px": int(
+            proxy_config.get(
+                "hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_radius_px",
+                proxy_config_operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_realization.get(
+                    "hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_radius_px",
+                    8,
+                ) + 1,
+            )
+        ),
+        "hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_floor": float(
+            proxy_config.get(
+                "hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_floor",
+                max(
+                    float(
+                        proxy_config_operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_realization.get(
+                            "hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_floor",
+                            0.012,
+                        )
+                    )
+                    - 0.002,
+                    0.010,
+                ),
+            )
+        ),
+    }
+    operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_realization_artifact = _apply_rehydrated_operator_core_conflict_resolution(
+        inherited_image=np.asarray(
+            operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_realization["image"],
+            dtype=np.float32,
+        ),
+        inherited_alpha=np.asarray(
+            operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_realization.get(
+                "alpha_map",
+                operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_contract.get(
+                    "alpha_map",
+                    consensus_gate * medoid_margin_gate,
+                ),
+            ),
+            dtype=np.float32,
+        ),
+        inherited_baseline_image=np.asarray(baseline_image, dtype=np.float32),
+        fg_mask=fg_mask,
+        raw_support_weight=np.asarray(
+            operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_realization.get(
+                "raw_support_weight",
+                operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_realization[
+                    "support_weight"
+                ],
+            ),
+            dtype=np.float32,
+        ),
+        target01=np.asarray(target_image, dtype=np.float32),
+        source_top1_mass_map=np.asarray(
+            operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_realization.get(
+                "source_top1_mass_map",
+                medoid_support_map,
+            ),
+            dtype=np.float32,
+        ),
+        source_margin_map=np.asarray(
+            operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_realization.get(
+                "source_top1_top2_margin_map",
+                medoid_margin_map,
+            ),
+            dtype=np.float32,
+        ),
+        source_label_smoothness_map=np.asarray(
+            operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_realization.get(
+                "source_label_smoothness_map",
+                medoid_label_smoothness,
+            ),
+            dtype=np.float32,
+        ),
+        proxy_config=proxy_config_operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_realization,
+        variant_name="stablelead_rehydrated_operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_realization_v1",
+        before_variant_name="stablelead_rehydrated_operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_realization_v1",
+    )
+    operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_realization = {
+        **operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_realization,
+        "component_rank_table": list(
+            operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_realization_artifact[
+                "component_rank_table"
+            ]
+        ),
+        "secondary_component_scores": dict(
+            operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_realization_artifact[
+                "secondary_component_scores"
+            ]
+        ),
+        "pre_suppression_artifact": operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_realization_artifact["pre_suppression_artifact"],
+        "baseline_artifact": operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_realization_artifact["baseline_artifact"],
+        "post_artifact": operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_realization_artifact["post_artifact"],
+        "ranked_components": operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_realization_artifact["ranked_components"],
+        "before_variant_name": str(
+            operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_realization_artifact[
+                "before_variant_name"
+            ]
+        ),
+        "coverage_mask": np.asarray(
+            operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_realization_artifact["coverage_mask"],
+            dtype=bool,
+        ),
+        "primary_mask": np.asarray(
+            operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_realization_artifact["primary_mask"],
+            dtype=bool,
+        ),
+        "secondary_mask": np.asarray(
+            operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_realization_artifact["secondary_mask"],
+            dtype=bool,
+        ),
+        "rescue_strength": float(
+            operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_realization_artifact[
+                "rescue_strength"
+            ]
+        ),
+        "render_mode": str(
+            operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_realization_artifact[
+                "render_mode"
+            ]
+        ),
+        "suppressor_family": "rehydrated_operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_realization",
+        "proxy_config_override": proxy_config_operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_realization,
+        "prototype_parent_variant": "stablelead_rehydrated_operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_realization_v1",
+    }
+    for key, value in operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_realization_artifact.items():
+        if isinstance(value, np.ndarray):
+            operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_realization[key] = np.asarray(
+                value,
+                dtype=np.float32,
+            )
+
+    proxy_config_operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_binding_realization = {
+        **proxy_config_operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_realization,
+        "hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_floor": float(
+            proxy_config.get(
+                "hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_floor",
+                max(
+                    float(
+                        proxy_config_operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_realization.get(
+                            "hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_floor",
+                            0.010,
+                        )
+                    )
+                    - 0.003,
+                    0.006,
+                ),
+            )
+        ),
+        "hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_radius_px": int(
+            proxy_config.get(
+                "hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_radius_px",
+                int(
+                    proxy_config_operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_realization.get(
+                        "hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_radius_px",
+                        9,
+                    )
+                )
+                + 1,
+            )
+        ),
+        "hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_floor": float(
+            proxy_config.get(
+                "hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_floor",
+                max(
+                    float(
+                        proxy_config_operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_realization.get(
+                            "hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_floor",
+                            0.010,
+                        )
+                    )
+                    * 0.45,
+                    0.004,
+                ),
+            )
+        ),
+    }
+    operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_binding_realization_artifact = _apply_rehydrated_operator_core_conflict_resolution(
+        inherited_image=np.asarray(
+            operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_realization["image"],
+            dtype=np.float32,
+        ),
+        inherited_alpha=np.asarray(
+            operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_realization.get(
+                "alpha_map",
+                operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_realization.get(
+                    "alpha_map",
+                    consensus_gate * medoid_margin_gate,
+                ),
+            ),
+            dtype=np.float32,
+        ),
+        inherited_baseline_image=np.asarray(baseline_image, dtype=np.float32),
+        fg_mask=fg_mask,
+        raw_support_weight=np.asarray(
+            operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_realization.get(
+                "raw_support_weight",
+                operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_realization[
+                    "support_weight"
+                ],
+            ),
+            dtype=np.float32,
+        ),
+        target01=np.asarray(target_image, dtype=np.float32),
+        source_top1_mass_map=np.asarray(
+            operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_realization.get(
+                "source_top1_mass_map",
+                medoid_support_map,
+            ),
+            dtype=np.float32,
+        ),
+        source_margin_map=np.asarray(
+            operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_realization.get(
+                "source_top1_top2_margin_map",
+                medoid_margin_map,
+            ),
+            dtype=np.float32,
+        ),
+        source_label_smoothness_map=np.asarray(
+            operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_realization.get(
+                "source_label_smoothness_map",
+                medoid_label_smoothness,
+            ),
+            dtype=np.float32,
+        ),
+        proxy_config=proxy_config_operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_binding_realization,
+        variant_name="stablelead_rehydrated_operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_binding_realization_v1",
+        before_variant_name="stablelead_rehydrated_operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_realization_v1",
+    )
+    operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_binding_realization = {
+        **operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_realization,
+        "component_rank_table": list(
+            operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_binding_realization_artifact[
+                "component_rank_table"
+            ]
+        ),
+        "secondary_component_scores": dict(
+            operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_binding_realization_artifact[
+                "secondary_component_scores"
+            ]
+        ),
+        "pre_suppression_artifact": operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_binding_realization_artifact["pre_suppression_artifact"],
+        "baseline_artifact": operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_binding_realization_artifact["baseline_artifact"],
+        "post_artifact": operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_binding_realization_artifact["post_artifact"],
+        "ranked_components": operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_binding_realization_artifact["ranked_components"],
+        "before_variant_name": str(
+            operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_binding_realization_artifact[
+                "before_variant_name"
+            ]
+        ),
+        "coverage_mask": np.asarray(
+            operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_binding_realization_artifact["coverage_mask"],
+            dtype=bool,
+        ),
+        "primary_mask": np.asarray(
+            operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_binding_realization_artifact["primary_mask"],
+            dtype=bool,
+        ),
+        "secondary_mask": np.asarray(
+            operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_binding_realization_artifact["secondary_mask"],
+            dtype=bool,
+        ),
+        "rescue_strength": float(
+            operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_binding_realization_artifact[
+                "rescue_strength"
+            ]
+        ),
+        "render_mode": str(
+            operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_binding_realization_artifact[
+                "render_mode"
+            ]
+        ),
+        "suppressor_family": "rehydrated_operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_binding_realization",
+        "proxy_config_override": proxy_config_operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_binding_realization,
+        "prototype_parent_variant": "stablelead_rehydrated_operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_realization_v1",
+    }
+    for key, value in operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_binding_realization_artifact.items():
+        if isinstance(value, np.ndarray):
+            operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_binding_realization[key] = np.asarray(
+                value,
+                dtype=np.float32,
+            )
+
     return {
         **legacy_variants,
         "consensus_medoid_inside_fg": consensus_medoid,
@@ -17308,6 +18743,8 @@ def _build_proxy_variant_artifacts(
         "stablelead_rehydrated_operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_contract_v1": operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_contract,
         "stablelead_rehydrated_operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_contract_v1": operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_contract,
         "stablelead_rehydrated_operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_realization_v1": operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_realization,
+        "stablelead_rehydrated_operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_realization_v1": operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_realization,
+        "stablelead_rehydrated_operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_binding_realization_v1": operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_binding_realization,
     }
 
 
@@ -17635,7 +19072,7 @@ def _save_support_visuals(
         for row in rows:
             mosaic.paste(row, (0, cursor_y))
             cursor_y += row.height
-        mosaic.save(path)
+        mosaic.save(_native_io_path(path))
 
     def _support_overlay(support_weight: np.ndarray) -> np.ndarray:
         high_support = support_weight >= float(support_threshold)
@@ -17710,6 +19147,7 @@ def _save_support_visuals(
 
     per_variant = {}
     for variant_name, artifact in variant_artifacts.items():
+        variant_disk_token = _path_safe_variant_token(variant_name)
         image01 = np.asarray(artifact["image"], dtype=np.float32)
         support_weight = np.asarray(artifact["support_weight"], dtype=np.float32)
         alpha_map = np.asarray(artifact.get("alpha_map", support_weight), dtype=np.float32)
@@ -17729,12 +19167,12 @@ def _save_support_visuals(
         outside_support = np.where(outside_fg, support_weight, 0.0)
         bottom_support = np.where(bg_bottom, support_weight, 0.0)
 
-        inside_path = renders_dir / f"support_inside_fg_{variant_name}.png"
-        outside_path = renders_dir / f"support_outside_fg_{variant_name}.png"
-        overlay_path = renders_dir / f"support_overlay_on_fg_{variant_name}.png"
-        support_bottom_path = renders_dir / f"bg_bottom_support_{variant_name}.png"
-        coverage_path = renders_dir / f"fg_coverage_overlay_{variant_name}.png"
-        alpha_path = renders_dir / f"alpha_map_{variant_name}.png"
+        inside_path = renders_dir / f"support_inside_fg_{variant_disk_token}.png"
+        outside_path = renders_dir / f"support_outside_fg_{variant_disk_token}.png"
+        overlay_path = renders_dir / f"support_overlay_on_fg_{variant_disk_token}.png"
+        support_bottom_path = renders_dir / f"bg_bottom_support_{variant_disk_token}.png"
+        coverage_path = renders_dir / f"fg_coverage_overlay_{variant_disk_token}.png"
+        alpha_path = renders_dir / f"alpha_map_{variant_disk_token}.png"
         _save_rgb(inside_path, _apply_heatmap(inside_support).astype(np.float32) / 255.0)
         _save_rgb(outside_path, _apply_heatmap(outside_support).astype(np.float32) / 255.0)
         _save_rgb(overlay_path, _support_overlay(support_weight).astype(np.float32) / 255.0)
@@ -17747,212 +19185,224 @@ def _save_support_visuals(
         bg_bottom_nonblack = np.where(bg_bottom, mean_rgb, 0.0)
         bg_heat = _apply_heatmap(bg_nonblack / max(float(bg_nonblack.max()), 1e-8))
         bottom_heat = _apply_heatmap(bg_bottom_nonblack / max(float(bg_bottom_nonblack.max()), 1e-8))
-        bg_path = renders_dir / f"bg_nonblack_heatmap_{variant_name}.png"
-        bottom_path = renders_dir / f"bg_bottom_nonblack_heatmap_{variant_name}.png"
+        bg_path = renders_dir / f"bg_nonblack_heatmap_{variant_disk_token}.png"
+        bottom_path = renders_dir / f"bg_bottom_nonblack_heatmap_{variant_disk_token}.png"
         _save_rgb(bg_path, bg_heat.astype(np.float32) / 255.0)
         _save_rgb(bottom_path, bottom_heat.astype(np.float32) / 255.0)
 
-        source_top1_mass_path = renders_dir / f"source_top1_mass_{variant_name}.png"
-        source_margin_path = renders_dir / f"source_top1_margin_{variant_name}.png"
-        source_entropy_path = renders_dir / f"source_entropy_{variant_name}.png"
-        source_index_path = renders_dir / f"source_top1_index_{variant_name}.png"
-        source_medoid_path = renders_dir / f"source_medoid_support_{variant_name}.png"
-        consensus_path = renders_dir / f"correspondence_consensus_{variant_name}.png"
-        source_smooth_path = renders_dir / f"source_label_smoothness_{variant_name}.png"
-        source_label_map_path = renders_dir / f"source_label_map_{variant_name}.png"
-        renderdiff_panel_path = renders_dir / f"target_baseline_candidate_renderdiff_fgmask_{variant_name}.png"
-        visible_components_path = renders_dir / f"fg_visible_components_colored_{variant_name}.png"
-        primary_secondary_path = renders_dir / f"fg_primary_vs_secondary_lobe_{variant_name}.png"
-        multilayer_path = renders_dir / f"fg_multilayer_overlap_heatmap_{variant_name}.png"
-        peak_map_path = renders_dir / f"fg_peak_map_{variant_name}.png"
-        hole_bridge_path = renders_dir / f"fg_hole_bridge_panel_{variant_name}.png"
-        suppressor_score_path = renders_dir / f"secondary_lobe_score_map_{variant_name}.png"
-        before_after_primary_secondary_path = renders_dir / f"before_after_primary_secondary_overlay_{variant_name}.png"
-        before_after_duplicate_path = renders_dir / f"before_after_duplicate_lobe_heatmap_{variant_name}.png"
-        before_after_multilayer_path = renders_dir / f"before_after_multilayer_overlap_heatmap_{variant_name}.png"
-        before_after_peak_path = renders_dir / f"before_after_render_peak_map_{variant_name}.png"
-        before_after_hole_bridge_path = renders_dir / f"before_after_hole_bridge_panel_{variant_name}.png"
-        before_after_comparison_path = renders_dir / f"before_after_target_baseline_candidate_suppressed_{variant_name}.png"
-        suppression_alpha_delta_path = renders_dir / f"suppression_alpha_delta_map_{variant_name}.png"
-        suppression_rgb_blend_path = renders_dir / f"suppression_rgb_blend_map_{variant_name}.png"
-        coverage_loss_path = renders_dir / f"coverage_loss_inside_fg_map_{variant_name}.png"
-        masked_error_regression_path = renders_dir / f"masked_error_regression_map_{variant_name}.png"
-        baseline_primary_overlap_path = renders_dir / f"baseline_primary_overlap_map_{variant_name}.png"
-        thin_structure_protection_path = renders_dir / f"thin_structure_protection_map_{variant_name}.png"
-        residual_target_score_path = renders_dir / f"residual_target_score_map_{variant_name}.png"
-        detached_candidate_path = renders_dir / f"detached_candidate_map_{variant_name}.png"
-        residual_heavy_detached_path = renders_dir / f"residual_heavy_detached_lobe_map_{variant_name}.png"
-        rgb_eligibility_path = renders_dir / f"rgb_suppression_eligibility_map_{variant_name}.png"
-        alpha_eligibility_path = renders_dir / f"alpha_suppression_eligibility_map_{variant_name}.png"
-        topology_sensitive_region_path = renders_dir / f"topology_sensitive_region_map_{variant_name}.png"
-        topology_core_path = renders_dir / f"topology_sensitive_core_map_{variant_name}.png"
-        topology_edge_ring_path = renders_dir / f"topology_sensitive_edge_permissive_ring_map_{variant_name}.png"
-        bridge_core_path = renders_dir / f"bridge_sensitive_core_map_{variant_name}.png"
-        near_connected_actionable_path = renders_dir / f"near_connected_but_actionable_map_{variant_name}.png"
-        rgb_only_action_path = renders_dir / f"rgb_only_action_region_map_{variant_name}.png"
-        alpha_allowed_detached_path = renders_dir / f"alpha_allowed_detached_region_map_{variant_name}.png"
-        residual_target_after_topology_path = renders_dir / f"residual_target_after_topology_partition_map_{variant_name}.png"
-        protected_vs_actionable_overlay_path = renders_dir / f"protected_vs_actionable_overlay_{variant_name}.png"
-        before_after_topology_partition_path = renders_dir / f"before_after_topology_partition_panel_{variant_name}.png"
-        before_after_actionable_region_path = renders_dir / f"before_after_actionable_region_panel_{variant_name}.png"
-        composition_conflict_map_path = renders_dir / f"composition_conflict_map_{variant_name}.png"
-        primary_preferred_composition_map_path = renders_dir / f"primary_preferred_composition_map_{variant_name}.png"
-        secondary_penalty_map_path = renders_dir / f"secondary_penalty_map_{variant_name}.png"
-        composition_choice_map_path = renders_dir / f"composition_choice_map_{variant_name}.png"
-        composition_rule_delta_map_path = renders_dir / f"composition_rule_delta_map_{variant_name}.png"
-        before_after_composition_rule_panel_path = renders_dir / f"before_after_composition_rule_panel_{variant_name}.png"
-        before_after_conflict_resolution_panel_path = renders_dir / f"before_after_conflict_resolution_panel_{variant_name}.png"
-        primary_vs_secondary_conflict_overlay_path = renders_dir / f"primary_vs_secondary_conflict_overlay_{variant_name}.png"
-        composition_rule_guard_regression_map_path = renders_dir / f"composition_rule_guard_regression_map_{variant_name}.png"
-        rewrite_domain_map_path = renders_dir / f"rewrite_domain_map_{variant_name}.png"
-        rewrite_winner_map_path = renders_dir / f"rewrite_winner_map_{variant_name}.png"
-        rewrite_mix_coeff_map_path = renders_dir / f"rewrite_mix_coeff_map_{variant_name}.png"
-        continuity_protected_map_path = renders_dir / f"continuity_protected_map_{variant_name}.png"
-        component_merge_candidate_map_path = renders_dir / f"component_merge_candidate_map_{variant_name}.png"
-        post_competitive_composition_delta_map_path = renders_dir / f"post_competitive_composition_delta_map_{variant_name}.png"
-        before_after_competitive_composition_panel_path = renders_dir / f"before_after_competitive_composition_panel_{variant_name}.png"
-        rewrite_domain_overlay_path = renders_dir / f"rewrite_domain_overlay_{variant_name}.png"
-        rewrite_winner_overlay_path = renders_dir / f"rewrite_winner_overlay_{variant_name}.png"
-        continuity_protected_overlay_path = renders_dir / f"continuity_protected_overlay_{variant_name}.png"
-        before_after_component_merge_panel_path = renders_dir / f"before_after_component_merge_panel_{variant_name}.png"
-        before_after_peak_component_panel_path = renders_dir / f"before_after_peak_component_panel_{variant_name}.png"
-        component_rank_overlay_path = renders_dir / f"component_rank_overlay_{variant_name}.png"
-        component_touch_graph_path = renders_dir / f"component_touch_graph_overlay_{variant_name}.png"
-        post_component_colored_path = renders_dir / f"post_suppression_component_colored_{variant_name}.png"
-        before_after_entropy_path = renders_dir / f"before_after_component_entropy_panel_{variant_name}.png"
-        before_after_residual_target_path = renders_dir / f"before_after_residual_target_panel_{variant_name}.png"
-        before_after_detached_overlay_path = renders_dir / f"before_after_detached_lobe_overlay_{variant_name}.png"
-        component_rank_ledger_path = renders_dir / f"component_rank_ledger_{variant_name}.json"
-        ownership_primary_affinity_map_path = renders_dir / f"ownership_primary_affinity_map_{variant_name}.png"
-        ownership_secondary_affinity_map_path = renders_dir / f"ownership_secondary_affinity_map_{variant_name}.png"
-        ownership_margin_map_path = renders_dir / f"ownership_margin_map_{variant_name}.png"
-        ownership_choice_map_path = renders_dir / f"ownership_choice_map_{variant_name}.png"
-        ownership_primary_region_overlay_path = renders_dir / f"ownership_primary_region_overlay_{variant_name}.png"
-        ownership_secondary_region_overlay_path = renders_dir / f"ownership_secondary_region_overlay_{variant_name}.png"
-        ownership_abstain_region_overlay_path = renders_dir / f"ownership_abstain_region_overlay_{variant_name}.png"
-        before_after_ownership_rule_panel_path = renders_dir / f"before_after_ownership_rule_panel_{variant_name}.png"
-        render_operator_primary_contribution_map_path = renders_dir / f"render_operator_primary_contribution_map_{variant_name}.png"
-        render_operator_secondary_contribution_map_path = renders_dir / f"render_operator_secondary_contribution_map_{variant_name}.png"
-        render_operator_conflict_resolution_map_path = renders_dir / f"render_operator_conflict_resolution_map_{variant_name}.png"
-        render_operator_continuity_bypass_map_path = renders_dir / f"render_operator_continuity_bypass_map_{variant_name}.png"
-        render_operator_choice_map_path = renders_dir / f"render_operator_choice_map_{variant_name}.png"
-        render_operator_delta_map_path = renders_dir / f"render_operator_delta_map_{variant_name}.png"
-        before_after_render_operator_panel_path = renders_dir / f"before_after_render_operator_panel_{variant_name}.png"
-        render_operator_conflict_overlay_path = renders_dir / f"render_operator_conflict_overlay_{variant_name}.png"
-        render_operator_choice_overlay_path = renders_dir / f"render_operator_choice_overlay_{variant_name}.png"
-        render_operator_guard_regression_panel_path = renders_dir / f"render_operator_guard_regression_panel_{variant_name}.png"
-        render_operator_merge_intent_overlay_path = renders_dir / f"render_operator_merge_intent_overlay_{variant_name}.png"
-        render_operator_merge_adoption_overlay_path = renders_dir / f"render_operator_merge_adoption_overlay_{variant_name}.png"
-        render_operator_merge_veto_overlay_path = renders_dir / f"render_operator_merge_veto_overlay_{variant_name}.png"
-        render_operator_hard_anchor_failure_overlay_path = renders_dir / f"render_operator_hard_anchor_failure_overlay_{variant_name}.png"
-        render_operator_post_merge_peak_risk_overlay_path = renders_dir / f"render_operator_post_merge_peak_risk_overlay_{variant_name}.png"
-        render_operator_post_merge_peak_containment_overlay_path = renders_dir / f"render_operator_post_merge_peak_containment_overlay_{variant_name}.png"
-        render_operator_post_merge_realization_overlay_path = renders_dir / f"render_operator_post_merge_realization_overlay_{variant_name}.png"
-        before_after_post_merge_peak_panel_path = renders_dir / f"before_after_post_merge_peak_panel_{variant_name}.png"
-        before_after_post_merge_component_panel_path = renders_dir / f"before_after_post_merge_component_panel_{variant_name}.png"
-        render_operator_hard_anchor_peak_breakout_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_breakout_overlay_{variant_name}.png"
-        render_operator_post_merge_realization_eligibility_overlay_path = renders_dir / f"render_operator_post_merge_realization_eligibility_overlay_{variant_name}.png"
-        render_operator_post_merge_realization_binding_overlay_path = renders_dir / f"render_operator_post_merge_realization_binding_overlay_{variant_name}.png"
-        render_operator_post_merge_component_consolidation_overlay_path = renders_dir / f"render_operator_post_merge_component_consolidation_overlay_{variant_name}.png"
-        before_after_post_merge_realization_panel_path = renders_dir / f"before_after_post_merge_realization_panel_{variant_name}.png"
-        before_after_post_merge_component_consolidation_panel_path = renders_dir / f"before_after_post_merge_component_consolidation_panel_{variant_name}.png"
-        render_operator_hard_anchor_realization_breakout_overlay_path = renders_dir / f"render_operator_hard_anchor_realization_breakout_overlay_{variant_name}.png"
-        render_operator_post_merge_component_eligibility_overlay_path = renders_dir / f"render_operator_post_merge_component_eligibility_overlay_{variant_name}.png"
-        render_operator_post_merge_component_binding_overlay_path = renders_dir / f"render_operator_post_merge_component_binding_overlay_{variant_name}.png"
-        render_operator_post_merge_component_consolidation_contract_overlay_path = renders_dir / f"render_operator_post_merge_component_consolidation_contract_overlay_{variant_name}.png"
-        before_after_post_merge_component_binding_panel_path = renders_dir / f"before_after_post_merge_component_binding_panel_{variant_name}.png"
-        before_after_post_merge_component_consolidation_contract_panel_path = renders_dir / f"before_after_post_merge_component_consolidation_contract_panel_{variant_name}.png"
-        render_operator_hard_anchor_component_consolidation_breakout_overlay_path = renders_dir / f"render_operator_hard_anchor_component_consolidation_breakout_overlay_{variant_name}.png"
-        render_operator_post_merge_component_adjacency_overlay_path = renders_dir / f"render_operator_post_merge_component_adjacency_overlay_{variant_name}.png"
-        render_operator_post_merge_component_gap_closure_overlay_path = renders_dir / f"render_operator_post_merge_component_gap_closure_overlay_{variant_name}.png"
-        render_operator_post_merge_component_adjacency_contract_overlay_path = renders_dir / f"render_operator_post_merge_component_adjacency_contract_overlay_{variant_name}.png"
-        before_after_post_merge_component_adjacency_panel_path = renders_dir / f"before_after_post_merge_component_adjacency_panel_{variant_name}.png"
-        before_after_post_merge_component_gap_closure_panel_path = renders_dir / f"before_after_post_merge_component_gap_closure_panel_{variant_name}.png"
-        render_operator_hard_anchor_component_adjacency_breakout_overlay_path = renders_dir / f"render_operator_hard_anchor_component_adjacency_breakout_overlay_{variant_name}.png"
-        render_operator_post_merge_component_closure_realization_eligibility_overlay_path = renders_dir / f"render_operator_post_merge_component_closure_realization_eligibility_overlay_{variant_name}.png"
-        render_operator_post_merge_component_closure_realization_binding_overlay_path = renders_dir / f"render_operator_post_merge_component_closure_realization_binding_overlay_{variant_name}.png"
-        render_operator_post_merge_component_closure_realization_contract_overlay_path = renders_dir / f"render_operator_post_merge_component_closure_realization_contract_overlay_{variant_name}.png"
-        before_after_post_merge_component_closure_realization_panel_path = renders_dir / f"before_after_post_merge_component_closure_realization_panel_{variant_name}.png"
-        before_after_post_merge_component_closure_binding_panel_path = renders_dir / f"before_after_post_merge_component_closure_binding_panel_{variant_name}.png"
-        render_operator_hard_anchor_component_closure_realization_breakout_overlay_path = renders_dir / f"render_operator_hard_anchor_component_closure_realization_breakout_overlay_{variant_name}.png"
-        render_operator_hard_anchor_local_closure_focus_overlay_path = renders_dir / f"render_operator_hard_anchor_local_closure_focus_overlay_{variant_name}.png"
-        render_operator_hard_anchor_local_closure_binding_overlay_path = renders_dir / f"render_operator_hard_anchor_local_closure_binding_overlay_{variant_name}.png"
-        render_operator_hard_anchor_local_closure_veto_overlay_path = renders_dir / f"render_operator_hard_anchor_local_closure_veto_overlay_{variant_name}.png"
-        before_after_hard_anchor_local_closure_panel_path = renders_dir / f"before_after_hard_anchor_local_closure_panel_{variant_name}.png"
-        render_operator_hard_anchor_local_peak_rebound_guard_overlay_path = renders_dir / f"render_operator_hard_anchor_local_peak_rebound_guard_overlay_{variant_name}.png"
-        render_operator_hard_anchor_local_closure_breakout_overlay_path = renders_dir / f"render_operator_hard_anchor_local_closure_breakout_overlay_{variant_name}.png"
-        render_operator_hard_anchor_breakout_target_overlay_path = renders_dir / f"render_operator_hard_anchor_breakout_target_overlay_{variant_name}.png"
-        render_operator_hard_anchor_local_shrinkage_witness_overlay_path = renders_dir / f"render_operator_hard_anchor_local_shrinkage_witness_overlay_{variant_name}.png"
-        render_operator_hard_anchor_breakout_alignment_overlap_overlay_path = renders_dir / f"render_operator_hard_anchor_breakout_alignment_overlap_overlay_{variant_name}.png"
-        render_operator_hard_anchor_breakout_misalignment_veto_overlay_path = renders_dir / f"render_operator_hard_anchor_breakout_misalignment_veto_overlay_{variant_name}.png"
-        before_after_hard_anchor_breakout_alignment_panel_path = renders_dir / f"before_after_hard_anchor_breakout_alignment_panel_{variant_name}.png"
-        render_operator_hard_anchor_breakout_alignment_overlay_path = renders_dir / f"render_operator_hard_anchor_breakout_alignment_overlay_{variant_name}.png"
-        render_operator_hard_anchor_peak_rebound_focus_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_rebound_focus_overlay_{variant_name}.png"
-        render_operator_hard_anchor_peak_rebound_binding_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_rebound_binding_overlay_{variant_name}.png"
-        render_operator_hard_anchor_peak_rebound_veto_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_rebound_veto_overlay_{variant_name}.png"
-        before_after_hard_anchor_peak_rebound_suppression_panel_path = renders_dir / f"before_after_hard_anchor_peak_rebound_suppression_panel_{variant_name}.png"
-        render_operator_hard_anchor_peak_rebound_suppression_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_rebound_suppression_overlay_{variant_name}.png"
-        render_operator_hard_anchor_peak_rebound_residual_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_rebound_residual_overlay_{variant_name}.png"
-        render_operator_hard_anchor_peak_residual_activation_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_activation_overlay_{variant_name}.png"
-        render_operator_hard_anchor_peak_residual_binding_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_binding_overlay_{variant_name}.png"
-        render_operator_hard_anchor_peak_residual_veto_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_veto_overlay_{variant_name}.png"
-        before_after_hard_anchor_peak_residual_activation_panel_path = renders_dir / f"before_after_hard_anchor_peak_residual_activation_panel_{variant_name}.png"
-        render_operator_hard_anchor_peak_residual_contraction_witness_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_contraction_witness_overlay_{variant_name}.png"
-        render_operator_hard_anchor_peak_residual_guard_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_guard_overlay_{variant_name}.png"
-        render_operator_hard_anchor_peak_residual_contraction_target_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_contraction_target_overlay_{variant_name}.png"
-        render_operator_hard_anchor_peak_residual_contraction_binding_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_contraction_binding_overlay_{variant_name}.png"
-        render_operator_hard_anchor_peak_residual_contraction_realization_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_contraction_realization_overlay_{variant_name}.png"
-        before_after_hard_anchor_peak_residual_contraction_panel_path = renders_dir / f"before_after_hard_anchor_peak_residual_contraction_panel_{variant_name}.png"
-        render_operator_hard_anchor_peak_residual_contraction_veto_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_contraction_veto_overlay_{variant_name}.png"
-        render_operator_hard_anchor_peak_residual_contraction_guard_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_contraction_guard_overlay_{variant_name}.png"
-        render_operator_hard_anchor_peak_residual_overlap_target_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_overlap_target_overlay_{variant_name}.png"
-        render_operator_hard_anchor_peak_residual_overlap_binding_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_overlap_binding_overlay_{variant_name}.png"
-        render_operator_hard_anchor_peak_residual_overlap_realization_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_overlap_realization_overlay_{variant_name}.png"
-        before_after_hard_anchor_peak_residual_overlap_panel_path = renders_dir / f"before_after_hard_anchor_peak_residual_overlap_panel_{variant_name}.png"
-        render_operator_hard_anchor_peak_residual_overlap_veto_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_overlap_veto_overlay_{variant_name}.png"
-        render_operator_hard_anchor_peak_residual_overlap_alignment_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_overlap_alignment_overlay_{variant_name}.png"
-        render_operator_hard_anchor_peak_residual_overlap_gain_target_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_overlap_gain_target_overlay_{variant_name}.png"
-        render_operator_hard_anchor_peak_residual_overlap_gain_binding_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_overlap_gain_binding_overlay_{variant_name}.png"
-        render_operator_hard_anchor_peak_residual_overlap_gain_realization_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_overlap_gain_realization_overlay_{variant_name}.png"
-        before_after_hard_anchor_peak_residual_overlap_gain_panel_path = renders_dir / f"before_after_hard_anchor_peak_residual_overlap_gain_panel_{variant_name}.png"
-        render_operator_hard_anchor_peak_residual_overlap_gain_veto_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_overlap_gain_veto_overlay_{variant_name}.png"
-        render_operator_hard_anchor_peak_residual_overlap_gain_alignment_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_overlap_gain_alignment_overlay_{variant_name}.png"
-        render_operator_hard_anchor_peak_residual_overlap_gain_amplification_target_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_overlap_gain_amplification_target_overlay_{variant_name}.png"
-        render_operator_hard_anchor_peak_residual_overlap_gain_amplification_binding_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_overlap_gain_amplification_binding_overlay_{variant_name}.png"
-        render_operator_hard_anchor_peak_residual_overlap_gain_amplification_realization_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_overlap_gain_amplification_realization_overlay_{variant_name}.png"
-        before_after_hard_anchor_peak_residual_overlap_gain_amplification_panel_path = renders_dir / f"before_after_hard_anchor_peak_residual_overlap_gain_amplification_panel_{variant_name}.png"
-        render_operator_hard_anchor_peak_residual_overlap_gain_amplification_veto_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_overlap_gain_amplification_veto_overlay_{variant_name}.png"
-        render_operator_hard_anchor_peak_residual_overlap_gain_amplification_alignment_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_overlap_gain_amplification_alignment_overlay_{variant_name}.png"
-        render_operator_hard_anchor_peak_residual_overlap_gain_density_amplification_target_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_overlap_gain_density_amplification_target_overlay_{variant_name}.png"
-        render_operator_hard_anchor_peak_residual_overlap_gain_density_amplification_binding_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_overlap_gain_density_amplification_binding_overlay_{variant_name}.png"
-        render_operator_hard_anchor_peak_residual_overlap_gain_density_amplification_realization_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_overlap_gain_density_amplification_realization_overlay_{variant_name}.png"
-        before_after_hard_anchor_peak_residual_overlap_gain_density_amplification_panel_path = renders_dir / f"before_after_hard_anchor_peak_residual_overlap_gain_density_amplification_panel_{variant_name}.png"
-        render_operator_hard_anchor_peak_residual_overlap_gain_density_amplification_veto_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_overlap_gain_density_amplification_veto_overlay_{variant_name}.png"
-        render_operator_hard_anchor_peak_residual_overlap_gain_density_amplification_alignment_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_overlap_gain_density_amplification_alignment_overlay_{variant_name}.png"
-        render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_target_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_target_overlay_{variant_name}.png"
-        render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_binding_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_binding_overlay_{variant_name}.png"
-        render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_realization_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_realization_overlay_{variant_name}.png"
-        before_after_hard_anchor_peak_residual_overlap_gain_density_landing_panel_path = renders_dir / f"before_after_hard_anchor_peak_residual_overlap_gain_density_landing_panel_{variant_name}.png"
-        render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_veto_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_veto_overlay_{variant_name}.png"
-        render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_alignment_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_alignment_overlay_{variant_name}.png"
-        render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_target_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_target_overlay_{variant_name}.png"
-        render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_binding_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_binding_overlay_{variant_name}.png"
-        render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_contract_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_contract_overlay_{variant_name}.png"
-        before_after_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_panel_path = renders_dir / f"before_after_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_panel_{variant_name}.png"
-        render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_veto_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_veto_overlay_{variant_name}.png"
-        render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_alignment_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_alignment_overlay_{variant_name}.png"
-        render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_target_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_target_overlay_{variant_name}.png"
-        render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_binding_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_binding_overlay_{variant_name}.png"
-        render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_contract_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_contract_overlay_{variant_name}.png"
-        before_after_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_panel_path = renders_dir / f"before_after_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_panel_{variant_name}.png"
-        render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_veto_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_veto_overlay_{variant_name}.png"
-        render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_alignment_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_alignment_overlay_{variant_name}.png"
-        render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_target_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_target_overlay_{variant_name}.png"
-        render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_binding_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_binding_overlay_{variant_name}.png"
-        render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_realization_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_realization_overlay_{variant_name}.png"
-        before_after_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_panel_path = renders_dir / f"before_after_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_panel_{variant_name}.png"
-        render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_veto_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_veto_overlay_{variant_name}.png"
-        render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_alignment_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_alignment_overlay_{variant_name}.png"
+        source_top1_mass_path = renders_dir / f"source_top1_mass_{variant_disk_token}.png"
+        source_margin_path = renders_dir / f"source_top1_margin_{variant_disk_token}.png"
+        source_entropy_path = renders_dir / f"source_entropy_{variant_disk_token}.png"
+        source_index_path = renders_dir / f"source_top1_index_{variant_disk_token}.png"
+        source_medoid_path = renders_dir / f"source_medoid_support_{variant_disk_token}.png"
+        consensus_path = renders_dir / f"correspondence_consensus_{variant_disk_token}.png"
+        source_smooth_path = renders_dir / f"source_label_smoothness_{variant_disk_token}.png"
+        source_label_map_path = renders_dir / f"source_label_map_{variant_disk_token}.png"
+        renderdiff_panel_path = renders_dir / f"target_baseline_candidate_renderdiff_fgmask_{variant_disk_token}.png"
+        visible_components_path = renders_dir / f"fg_visible_components_colored_{variant_disk_token}.png"
+        primary_secondary_path = renders_dir / f"fg_primary_vs_secondary_lobe_{variant_disk_token}.png"
+        multilayer_path = renders_dir / f"fg_multilayer_overlap_heatmap_{variant_disk_token}.png"
+        peak_map_path = renders_dir / f"fg_peak_map_{variant_disk_token}.png"
+        hole_bridge_path = renders_dir / f"fg_hole_bridge_panel_{variant_disk_token}.png"
+        suppressor_score_path = renders_dir / f"secondary_lobe_score_map_{variant_disk_token}.png"
+        before_after_primary_secondary_path = renders_dir / f"before_after_primary_secondary_overlay_{variant_disk_token}.png"
+        before_after_duplicate_path = renders_dir / f"before_after_duplicate_lobe_heatmap_{variant_disk_token}.png"
+        before_after_multilayer_path = renders_dir / f"before_after_multilayer_overlap_heatmap_{variant_disk_token}.png"
+        before_after_peak_path = renders_dir / f"before_after_render_peak_map_{variant_disk_token}.png"
+        before_after_hole_bridge_path = renders_dir / f"before_after_hole_bridge_panel_{variant_disk_token}.png"
+        before_after_comparison_path = renders_dir / f"before_after_target_baseline_candidate_suppressed_{variant_disk_token}.png"
+        suppression_alpha_delta_path = renders_dir / f"suppression_alpha_delta_map_{variant_disk_token}.png"
+        suppression_rgb_blend_path = renders_dir / f"suppression_rgb_blend_map_{variant_disk_token}.png"
+        coverage_loss_path = renders_dir / f"coverage_loss_inside_fg_map_{variant_disk_token}.png"
+        masked_error_regression_path = renders_dir / f"masked_error_regression_map_{variant_disk_token}.png"
+        baseline_primary_overlap_path = renders_dir / f"baseline_primary_overlap_map_{variant_disk_token}.png"
+        thin_structure_protection_path = renders_dir / f"thin_structure_protection_map_{variant_disk_token}.png"
+        residual_target_score_path = renders_dir / f"residual_target_score_map_{variant_disk_token}.png"
+        detached_candidate_path = renders_dir / f"detached_candidate_map_{variant_disk_token}.png"
+        residual_heavy_detached_path = renders_dir / f"residual_heavy_detached_lobe_map_{variant_disk_token}.png"
+        rgb_eligibility_path = renders_dir / f"rgb_suppression_eligibility_map_{variant_disk_token}.png"
+        alpha_eligibility_path = renders_dir / f"alpha_suppression_eligibility_map_{variant_disk_token}.png"
+        topology_sensitive_region_path = renders_dir / f"topology_sensitive_region_map_{variant_disk_token}.png"
+        topology_core_path = renders_dir / f"topology_sensitive_core_map_{variant_disk_token}.png"
+        topology_edge_ring_path = renders_dir / f"topology_sensitive_edge_permissive_ring_map_{variant_disk_token}.png"
+        bridge_core_path = renders_dir / f"bridge_sensitive_core_map_{variant_disk_token}.png"
+        near_connected_actionable_path = renders_dir / f"near_connected_but_actionable_map_{variant_disk_token}.png"
+        rgb_only_action_path = renders_dir / f"rgb_only_action_region_map_{variant_disk_token}.png"
+        alpha_allowed_detached_path = renders_dir / f"alpha_allowed_detached_region_map_{variant_disk_token}.png"
+        residual_target_after_topology_path = renders_dir / f"residual_target_after_topology_partition_map_{variant_disk_token}.png"
+        protected_vs_actionable_overlay_path = renders_dir / f"protected_vs_actionable_overlay_{variant_disk_token}.png"
+        before_after_topology_partition_path = renders_dir / f"before_after_topology_partition_panel_{variant_disk_token}.png"
+        before_after_actionable_region_path = renders_dir / f"before_after_actionable_region_panel_{variant_disk_token}.png"
+        composition_conflict_map_path = renders_dir / f"composition_conflict_map_{variant_disk_token}.png"
+        primary_preferred_composition_map_path = renders_dir / f"primary_preferred_composition_map_{variant_disk_token}.png"
+        secondary_penalty_map_path = renders_dir / f"secondary_penalty_map_{variant_disk_token}.png"
+        composition_choice_map_path = renders_dir / f"composition_choice_map_{variant_disk_token}.png"
+        composition_rule_delta_map_path = renders_dir / f"composition_rule_delta_map_{variant_disk_token}.png"
+        before_after_composition_rule_panel_path = renders_dir / f"before_after_composition_rule_panel_{variant_disk_token}.png"
+        before_after_conflict_resolution_panel_path = renders_dir / f"before_after_conflict_resolution_panel_{variant_disk_token}.png"
+        primary_vs_secondary_conflict_overlay_path = renders_dir / f"primary_vs_secondary_conflict_overlay_{variant_disk_token}.png"
+        composition_rule_guard_regression_map_path = renders_dir / f"composition_rule_guard_regression_map_{variant_disk_token}.png"
+        rewrite_domain_map_path = renders_dir / f"rewrite_domain_map_{variant_disk_token}.png"
+        rewrite_winner_map_path = renders_dir / f"rewrite_winner_map_{variant_disk_token}.png"
+        rewrite_mix_coeff_map_path = renders_dir / f"rewrite_mix_coeff_map_{variant_disk_token}.png"
+        continuity_protected_map_path = renders_dir / f"continuity_protected_map_{variant_disk_token}.png"
+        component_merge_candidate_map_path = renders_dir / f"component_merge_candidate_map_{variant_disk_token}.png"
+        post_competitive_composition_delta_map_path = renders_dir / f"post_competitive_composition_delta_map_{variant_disk_token}.png"
+        before_after_competitive_composition_panel_path = renders_dir / f"before_after_competitive_composition_panel_{variant_disk_token}.png"
+        rewrite_domain_overlay_path = renders_dir / f"rewrite_domain_overlay_{variant_disk_token}.png"
+        rewrite_winner_overlay_path = renders_dir / f"rewrite_winner_overlay_{variant_disk_token}.png"
+        continuity_protected_overlay_path = renders_dir / f"continuity_protected_overlay_{variant_disk_token}.png"
+        before_after_component_merge_panel_path = renders_dir / f"before_after_component_merge_panel_{variant_disk_token}.png"
+        before_after_peak_component_panel_path = renders_dir / f"before_after_peak_component_panel_{variant_disk_token}.png"
+        component_rank_overlay_path = renders_dir / f"component_rank_overlay_{variant_disk_token}.png"
+        component_touch_graph_path = renders_dir / f"component_touch_graph_overlay_{variant_disk_token}.png"
+        post_component_colored_path = renders_dir / f"post_suppression_component_colored_{variant_disk_token}.png"
+        before_after_entropy_path = renders_dir / f"before_after_component_entropy_panel_{variant_disk_token}.png"
+        before_after_residual_target_path = renders_dir / f"before_after_residual_target_panel_{variant_disk_token}.png"
+        before_after_detached_overlay_path = renders_dir / f"before_after_detached_lobe_overlay_{variant_disk_token}.png"
+        component_rank_ledger_path = renders_dir / f"component_rank_ledger_{variant_disk_token}.json"
+        ownership_primary_affinity_map_path = renders_dir / f"ownership_primary_affinity_map_{variant_disk_token}.png"
+        ownership_secondary_affinity_map_path = renders_dir / f"ownership_secondary_affinity_map_{variant_disk_token}.png"
+        ownership_margin_map_path = renders_dir / f"ownership_margin_map_{variant_disk_token}.png"
+        ownership_choice_map_path = renders_dir / f"ownership_choice_map_{variant_disk_token}.png"
+        ownership_primary_region_overlay_path = renders_dir / f"ownership_primary_region_overlay_{variant_disk_token}.png"
+        ownership_secondary_region_overlay_path = renders_dir / f"ownership_secondary_region_overlay_{variant_disk_token}.png"
+        ownership_abstain_region_overlay_path = renders_dir / f"ownership_abstain_region_overlay_{variant_disk_token}.png"
+        before_after_ownership_rule_panel_path = renders_dir / f"before_after_ownership_rule_panel_{variant_disk_token}.png"
+        render_operator_primary_contribution_map_path = renders_dir / f"render_operator_primary_contribution_map_{variant_disk_token}.png"
+        render_operator_secondary_contribution_map_path = renders_dir / f"render_operator_secondary_contribution_map_{variant_disk_token}.png"
+        render_operator_conflict_resolution_map_path = renders_dir / f"render_operator_conflict_resolution_map_{variant_disk_token}.png"
+        render_operator_continuity_bypass_map_path = renders_dir / f"render_operator_continuity_bypass_map_{variant_disk_token}.png"
+        render_operator_choice_map_path = renders_dir / f"render_operator_choice_map_{variant_disk_token}.png"
+        render_operator_delta_map_path = renders_dir / f"render_operator_delta_map_{variant_disk_token}.png"
+        before_after_render_operator_panel_path = renders_dir / f"before_after_render_operator_panel_{variant_disk_token}.png"
+        render_operator_conflict_overlay_path = renders_dir / f"render_operator_conflict_overlay_{variant_disk_token}.png"
+        render_operator_choice_overlay_path = renders_dir / f"render_operator_choice_overlay_{variant_disk_token}.png"
+        render_operator_guard_regression_panel_path = renders_dir / f"render_operator_guard_regression_panel_{variant_disk_token}.png"
+        render_operator_merge_intent_overlay_path = renders_dir / f"render_operator_merge_intent_overlay_{variant_disk_token}.png"
+        render_operator_merge_adoption_overlay_path = renders_dir / f"render_operator_merge_adoption_overlay_{variant_disk_token}.png"
+        render_operator_merge_veto_overlay_path = renders_dir / f"render_operator_merge_veto_overlay_{variant_disk_token}.png"
+        render_operator_hard_anchor_failure_overlay_path = renders_dir / f"render_operator_hard_anchor_failure_overlay_{variant_disk_token}.png"
+        render_operator_post_merge_peak_risk_overlay_path = renders_dir / f"render_operator_post_merge_peak_risk_overlay_{variant_disk_token}.png"
+        render_operator_post_merge_peak_containment_overlay_path = renders_dir / f"render_operator_post_merge_peak_containment_overlay_{variant_disk_token}.png"
+        render_operator_post_merge_realization_overlay_path = renders_dir / f"render_operator_post_merge_realization_overlay_{variant_disk_token}.png"
+        before_after_post_merge_peak_panel_path = renders_dir / f"before_after_post_merge_peak_panel_{variant_disk_token}.png"
+        before_after_post_merge_component_panel_path = renders_dir / f"before_after_post_merge_component_panel_{variant_disk_token}.png"
+        render_operator_hard_anchor_peak_breakout_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_breakout_overlay_{variant_disk_token}.png"
+        render_operator_post_merge_realization_eligibility_overlay_path = renders_dir / f"render_operator_post_merge_realization_eligibility_overlay_{variant_disk_token}.png"
+        render_operator_post_merge_realization_binding_overlay_path = renders_dir / f"render_operator_post_merge_realization_binding_overlay_{variant_disk_token}.png"
+        render_operator_post_merge_component_consolidation_overlay_path = renders_dir / f"render_operator_post_merge_component_consolidation_overlay_{variant_disk_token}.png"
+        before_after_post_merge_realization_panel_path = renders_dir / f"before_after_post_merge_realization_panel_{variant_disk_token}.png"
+        before_after_post_merge_component_consolidation_panel_path = renders_dir / f"before_after_post_merge_component_consolidation_panel_{variant_disk_token}.png"
+        render_operator_hard_anchor_realization_breakout_overlay_path = renders_dir / f"render_operator_hard_anchor_realization_breakout_overlay_{variant_disk_token}.png"
+        render_operator_post_merge_component_eligibility_overlay_path = renders_dir / f"render_operator_post_merge_component_eligibility_overlay_{variant_disk_token}.png"
+        render_operator_post_merge_component_binding_overlay_path = renders_dir / f"render_operator_post_merge_component_binding_overlay_{variant_disk_token}.png"
+        render_operator_post_merge_component_consolidation_contract_overlay_path = renders_dir / f"render_operator_post_merge_component_consolidation_contract_overlay_{variant_disk_token}.png"
+        before_after_post_merge_component_binding_panel_path = renders_dir / f"before_after_post_merge_component_binding_panel_{variant_disk_token}.png"
+        before_after_post_merge_component_consolidation_contract_panel_path = renders_dir / f"before_after_post_merge_component_consolidation_contract_panel_{variant_disk_token}.png"
+        render_operator_hard_anchor_component_consolidation_breakout_overlay_path = renders_dir / f"render_operator_hard_anchor_component_consolidation_breakout_overlay_{variant_disk_token}.png"
+        render_operator_post_merge_component_adjacency_overlay_path = renders_dir / f"render_operator_post_merge_component_adjacency_overlay_{variant_disk_token}.png"
+        render_operator_post_merge_component_gap_closure_overlay_path = renders_dir / f"render_operator_post_merge_component_gap_closure_overlay_{variant_disk_token}.png"
+        render_operator_post_merge_component_adjacency_contract_overlay_path = renders_dir / f"render_operator_post_merge_component_adjacency_contract_overlay_{variant_disk_token}.png"
+        before_after_post_merge_component_adjacency_panel_path = renders_dir / f"before_after_post_merge_component_adjacency_panel_{variant_disk_token}.png"
+        before_after_post_merge_component_gap_closure_panel_path = renders_dir / f"before_after_post_merge_component_gap_closure_panel_{variant_disk_token}.png"
+        render_operator_hard_anchor_component_adjacency_breakout_overlay_path = renders_dir / f"render_operator_hard_anchor_component_adjacency_breakout_overlay_{variant_disk_token}.png"
+        render_operator_post_merge_component_closure_realization_eligibility_overlay_path = renders_dir / f"render_operator_post_merge_component_closure_realization_eligibility_overlay_{variant_disk_token}.png"
+        render_operator_post_merge_component_closure_realization_binding_overlay_path = renders_dir / f"render_operator_post_merge_component_closure_realization_binding_overlay_{variant_disk_token}.png"
+        render_operator_post_merge_component_closure_realization_contract_overlay_path = renders_dir / f"render_operator_post_merge_component_closure_realization_contract_overlay_{variant_disk_token}.png"
+        before_after_post_merge_component_closure_realization_panel_path = renders_dir / f"before_after_post_merge_component_closure_realization_panel_{variant_disk_token}.png"
+        before_after_post_merge_component_closure_binding_panel_path = renders_dir / f"before_after_post_merge_component_closure_binding_panel_{variant_disk_token}.png"
+        render_operator_hard_anchor_component_closure_realization_breakout_overlay_path = renders_dir / f"render_operator_hard_anchor_component_closure_realization_breakout_overlay_{variant_disk_token}.png"
+        render_operator_hard_anchor_local_closure_focus_overlay_path = renders_dir / f"render_operator_hard_anchor_local_closure_focus_overlay_{variant_disk_token}.png"
+        render_operator_hard_anchor_local_closure_binding_overlay_path = renders_dir / f"render_operator_hard_anchor_local_closure_binding_overlay_{variant_disk_token}.png"
+        render_operator_hard_anchor_local_closure_veto_overlay_path = renders_dir / f"render_operator_hard_anchor_local_closure_veto_overlay_{variant_disk_token}.png"
+        before_after_hard_anchor_local_closure_panel_path = renders_dir / f"before_after_hard_anchor_local_closure_panel_{variant_disk_token}.png"
+        render_operator_hard_anchor_local_peak_rebound_guard_overlay_path = renders_dir / f"render_operator_hard_anchor_local_peak_rebound_guard_overlay_{variant_disk_token}.png"
+        render_operator_hard_anchor_local_closure_breakout_overlay_path = renders_dir / f"render_operator_hard_anchor_local_closure_breakout_overlay_{variant_disk_token}.png"
+        render_operator_hard_anchor_breakout_target_overlay_path = renders_dir / f"render_operator_hard_anchor_breakout_target_overlay_{variant_disk_token}.png"
+        render_operator_hard_anchor_local_shrinkage_witness_overlay_path = renders_dir / f"render_operator_hard_anchor_local_shrinkage_witness_overlay_{variant_disk_token}.png"
+        render_operator_hard_anchor_breakout_alignment_overlap_overlay_path = renders_dir / f"render_operator_hard_anchor_breakout_alignment_overlap_overlay_{variant_disk_token}.png"
+        render_operator_hard_anchor_breakout_misalignment_veto_overlay_path = renders_dir / f"render_operator_hard_anchor_breakout_misalignment_veto_overlay_{variant_disk_token}.png"
+        before_after_hard_anchor_breakout_alignment_panel_path = renders_dir / f"before_after_hard_anchor_breakout_alignment_panel_{variant_disk_token}.png"
+        render_operator_hard_anchor_breakout_alignment_overlay_path = renders_dir / f"render_operator_hard_anchor_breakout_alignment_overlay_{variant_disk_token}.png"
+        render_operator_hard_anchor_peak_rebound_focus_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_rebound_focus_overlay_{variant_disk_token}.png"
+        render_operator_hard_anchor_peak_rebound_binding_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_rebound_binding_overlay_{variant_disk_token}.png"
+        render_operator_hard_anchor_peak_rebound_veto_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_rebound_veto_overlay_{variant_disk_token}.png"
+        before_after_hard_anchor_peak_rebound_suppression_panel_path = renders_dir / f"before_after_hard_anchor_peak_rebound_suppression_panel_{variant_disk_token}.png"
+        render_operator_hard_anchor_peak_rebound_suppression_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_rebound_suppression_overlay_{variant_disk_token}.png"
+        render_operator_hard_anchor_peak_rebound_residual_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_rebound_residual_overlay_{variant_disk_token}.png"
+        render_operator_hard_anchor_peak_residual_activation_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_activation_overlay_{variant_disk_token}.png"
+        render_operator_hard_anchor_peak_residual_binding_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_binding_overlay_{variant_disk_token}.png"
+        render_operator_hard_anchor_peak_residual_veto_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_veto_overlay_{variant_disk_token}.png"
+        before_after_hard_anchor_peak_residual_activation_panel_path = renders_dir / f"before_after_hard_anchor_peak_residual_activation_panel_{variant_disk_token}.png"
+        render_operator_hard_anchor_peak_residual_contraction_witness_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_contraction_witness_overlay_{variant_disk_token}.png"
+        render_operator_hard_anchor_peak_residual_guard_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_guard_overlay_{variant_disk_token}.png"
+        render_operator_hard_anchor_peak_residual_contraction_target_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_contraction_target_overlay_{variant_disk_token}.png"
+        render_operator_hard_anchor_peak_residual_contraction_binding_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_contraction_binding_overlay_{variant_disk_token}.png"
+        render_operator_hard_anchor_peak_residual_contraction_realization_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_contraction_realization_overlay_{variant_disk_token}.png"
+        before_after_hard_anchor_peak_residual_contraction_panel_path = renders_dir / f"before_after_hard_anchor_peak_residual_contraction_panel_{variant_disk_token}.png"
+        render_operator_hard_anchor_peak_residual_contraction_veto_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_contraction_veto_overlay_{variant_disk_token}.png"
+        render_operator_hard_anchor_peak_residual_contraction_guard_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_contraction_guard_overlay_{variant_disk_token}.png"
+        render_operator_hard_anchor_peak_residual_overlap_target_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_overlap_target_overlay_{variant_disk_token}.png"
+        render_operator_hard_anchor_peak_residual_overlap_binding_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_overlap_binding_overlay_{variant_disk_token}.png"
+        render_operator_hard_anchor_peak_residual_overlap_realization_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_overlap_realization_overlay_{variant_disk_token}.png"
+        before_after_hard_anchor_peak_residual_overlap_panel_path = renders_dir / f"before_after_hard_anchor_peak_residual_overlap_panel_{variant_disk_token}.png"
+        render_operator_hard_anchor_peak_residual_overlap_veto_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_overlap_veto_overlay_{variant_disk_token}.png"
+        render_operator_hard_anchor_peak_residual_overlap_alignment_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_overlap_alignment_overlay_{variant_disk_token}.png"
+        render_operator_hard_anchor_peak_residual_overlap_gain_target_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_overlap_gain_target_overlay_{variant_disk_token}.png"
+        render_operator_hard_anchor_peak_residual_overlap_gain_binding_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_overlap_gain_binding_overlay_{variant_disk_token}.png"
+        render_operator_hard_anchor_peak_residual_overlap_gain_realization_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_overlap_gain_realization_overlay_{variant_disk_token}.png"
+        before_after_hard_anchor_peak_residual_overlap_gain_panel_path = renders_dir / f"before_after_hard_anchor_peak_residual_overlap_gain_panel_{variant_disk_token}.png"
+        render_operator_hard_anchor_peak_residual_overlap_gain_veto_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_overlap_gain_veto_overlay_{variant_disk_token}.png"
+        render_operator_hard_anchor_peak_residual_overlap_gain_alignment_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_overlap_gain_alignment_overlay_{variant_disk_token}.png"
+        render_operator_hard_anchor_peak_residual_overlap_gain_amplification_target_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_overlap_gain_amplification_target_overlay_{variant_disk_token}.png"
+        render_operator_hard_anchor_peak_residual_overlap_gain_amplification_binding_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_overlap_gain_amplification_binding_overlay_{variant_disk_token}.png"
+        render_operator_hard_anchor_peak_residual_overlap_gain_amplification_realization_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_overlap_gain_amplification_realization_overlay_{variant_disk_token}.png"
+        before_after_hard_anchor_peak_residual_overlap_gain_amplification_panel_path = renders_dir / f"before_after_hard_anchor_peak_residual_overlap_gain_amplification_panel_{variant_disk_token}.png"
+        render_operator_hard_anchor_peak_residual_overlap_gain_amplification_veto_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_overlap_gain_amplification_veto_overlay_{variant_disk_token}.png"
+        render_operator_hard_anchor_peak_residual_overlap_gain_amplification_alignment_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_overlap_gain_amplification_alignment_overlay_{variant_disk_token}.png"
+        render_operator_hard_anchor_peak_residual_overlap_gain_density_amplification_target_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_overlap_gain_density_amplification_target_overlay_{variant_disk_token}.png"
+        render_operator_hard_anchor_peak_residual_overlap_gain_density_amplification_binding_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_overlap_gain_density_amplification_binding_overlay_{variant_disk_token}.png"
+        render_operator_hard_anchor_peak_residual_overlap_gain_density_amplification_realization_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_overlap_gain_density_amplification_realization_overlay_{variant_disk_token}.png"
+        before_after_hard_anchor_peak_residual_overlap_gain_density_amplification_panel_path = renders_dir / f"before_after_hard_anchor_peak_residual_overlap_gain_density_amplification_panel_{variant_disk_token}.png"
+        render_operator_hard_anchor_peak_residual_overlap_gain_density_amplification_veto_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_overlap_gain_density_amplification_veto_overlay_{variant_disk_token}.png"
+        render_operator_hard_anchor_peak_residual_overlap_gain_density_amplification_alignment_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_overlap_gain_density_amplification_alignment_overlay_{variant_disk_token}.png"
+        render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_target_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_target_overlay_{variant_disk_token}.png"
+        render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_binding_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_binding_overlay_{variant_disk_token}.png"
+        render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_realization_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_realization_overlay_{variant_disk_token}.png"
+        before_after_hard_anchor_peak_residual_overlap_gain_density_landing_panel_path = renders_dir / f"before_after_hard_anchor_peak_residual_overlap_gain_density_landing_panel_{variant_disk_token}.png"
+        render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_veto_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_veto_overlay_{variant_disk_token}.png"
+        render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_alignment_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_alignment_overlay_{variant_disk_token}.png"
+        render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_target_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_target_overlay_{variant_disk_token}.png"
+        render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_binding_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_binding_overlay_{variant_disk_token}.png"
+        render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_contract_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_contract_overlay_{variant_disk_token}.png"
+        before_after_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_panel_path = renders_dir / f"before_after_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_panel_{variant_disk_token}.png"
+        render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_veto_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_veto_overlay_{variant_disk_token}.png"
+        render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_alignment_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_alignment_overlay_{variant_disk_token}.png"
+        render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_target_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_target_overlay_{variant_disk_token}.png"
+        render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_binding_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_binding_overlay_{variant_disk_token}.png"
+        render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_contract_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_contract_overlay_{variant_disk_token}.png"
+        before_after_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_panel_path = renders_dir / f"before_after_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_panel_{variant_disk_token}.png"
+        render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_veto_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_veto_overlay_{variant_disk_token}.png"
+        render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_alignment_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_alignment_overlay_{variant_disk_token}.png"
+        render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_target_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_target_overlay_{variant_disk_token}.png"
+        render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_binding_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_binding_overlay_{variant_disk_token}.png"
+        render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_realization_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_realization_overlay_{variant_disk_token}.png"
+        before_after_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_panel_path = renders_dir / f"before_after_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_panel_{variant_disk_token}.png"
+        render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_veto_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_veto_overlay_{variant_disk_token}.png"
+        render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_alignment_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_alignment_overlay_{variant_disk_token}.png"
+        render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_target_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_target_overlay_{variant_disk_token}.png"
+        render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_overlay_{variant_disk_token}.png"
+        render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_realization_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_realization_overlay_{variant_disk_token}.png"
+        before_after_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_panel_path = renders_dir / f"before_after_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_panel_{variant_disk_token}.png"
+        render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_veto_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_veto_overlay_{variant_disk_token}.png"
+        render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_alignment_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_alignment_overlay_{variant_disk_token}.png"
+        render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_target_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_target_overlay_{variant_disk_token}.png"
+        render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_binding_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_binding_overlay_{variant_disk_token}.png"
+        render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_realization_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_realization_overlay_{variant_disk_token}.png"
+        before_after_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_panel_path = renders_dir / f"before_after_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_panel_{variant_disk_token}.png"
+        render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_veto_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_veto_overlay_{variant_disk_token}.png"
+        render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_alignment_overlay_path = renders_dir / f"render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_alignment_overlay_{variant_disk_token}.png"
         top1_mass_map = artifact.get("source_top1_mass_map", np.zeros_like(support_weight, dtype=np.float32))
         source_margin_map = artifact.get("source_top1_top2_margin_map", np.zeros_like(support_weight, dtype=np.float32))
         source_entropy_map = artifact.get("source_entropy_map", np.zeros_like(support_weight, dtype=np.float32))
@@ -18428,6 +19878,16 @@ def _save_support_visuals(
                 hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_realization_map=np.asarray(artifact.get("hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_realization_map", np.zeros_like(support_weight)), dtype=np.float32),
                 hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_veto_map=np.asarray(artifact.get("hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_veto_map", np.zeros_like(support_weight)), dtype=np.float32),
                 hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_alignment_map=np.asarray(artifact.get("hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_alignment_map", np.zeros_like(support_weight)), dtype=np.float32),
+                hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_target_map=np.asarray(artifact.get("hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_target_map", np.zeros_like(support_weight)), dtype=np.float32),
+                hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_map=np.asarray(artifact.get("hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_map", np.zeros_like(support_weight)), dtype=np.float32),
+                hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_realization_map=np.asarray(artifact.get("hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_realization_map", np.zeros_like(support_weight)), dtype=np.float32),
+                hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_veto_map=np.asarray(artifact.get("hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_veto_map", np.zeros_like(support_weight)), dtype=np.float32),
+                hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_alignment_map=np.asarray(artifact.get("hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_alignment_map", np.zeros_like(support_weight)), dtype=np.float32),
+                hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_target_map=np.asarray(artifact.get("hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_target_map", np.zeros_like(support_weight)), dtype=np.float32),
+                hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_binding_map=np.asarray(artifact.get("hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_binding_map", np.zeros_like(support_weight)), dtype=np.float32),
+                hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_realization_map=np.asarray(artifact.get("hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_realization_map", np.zeros_like(support_weight)), dtype=np.float32),
+                hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_veto_map=np.asarray(artifact.get("hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_veto_map", np.zeros_like(support_weight)), dtype=np.float32),
+                hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_alignment_map=np.asarray(artifact.get("hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_alignment_map", np.zeros_like(support_weight)), dtype=np.float32),
             )
             _save_rgb(
                 render_operator_primary_contribution_map_path,
@@ -18917,6 +20377,56 @@ def _save_support_visuals(
                 render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_alignment_overlay_path,
                 np.asarray(operator_visuals["render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_alignment_overlay"], dtype=np.float32),
             )
+            _save_rgb(
+                render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_target_overlay_path,
+                np.asarray(operator_visuals["render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_target_overlay"], dtype=np.float32),
+            )
+            _save_rgb(
+                render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_overlay_path,
+                np.asarray(operator_visuals["render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_overlay"], dtype=np.float32),
+            )
+            _save_rgb(
+                render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_realization_overlay_path,
+                np.asarray(operator_visuals["render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_realization_overlay"], dtype=np.float32),
+            )
+            _save_panel(
+                before_after_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_panel_path,
+                operator_visuals["before_after_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_panel"],
+                columns=2,
+            )
+            _save_rgb(
+                render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_veto_overlay_path,
+                np.asarray(operator_visuals["render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_veto_overlay"], dtype=np.float32),
+            )
+            _save_rgb(
+                render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_alignment_overlay_path,
+                np.asarray(operator_visuals["render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_alignment_overlay"], dtype=np.float32),
+            )
+            _save_rgb(
+                render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_target_overlay_path,
+                np.asarray(operator_visuals["render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_target_overlay"], dtype=np.float32),
+            )
+            _save_rgb(
+                render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_binding_overlay_path,
+                np.asarray(operator_visuals["render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_binding_overlay"], dtype=np.float32),
+            )
+            _save_rgb(
+                render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_realization_overlay_path,
+                np.asarray(operator_visuals["render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_realization_overlay"], dtype=np.float32),
+            )
+            _save_panel(
+                before_after_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_panel_path,
+                operator_visuals["before_after_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_panel"],
+                columns=2,
+            )
+            _save_rgb(
+                render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_veto_overlay_path,
+                np.asarray(operator_visuals["render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_veto_overlay"], dtype=np.float32),
+            )
+            _save_rgb(
+                render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_alignment_overlay_path,
+                np.asarray(operator_visuals["render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_alignment_overlay"], dtype=np.float32),
+            )
             ownership_primary_region = np.asarray(artifact.get("ownership_primary_region", np.zeros_like(fg_mask, dtype=bool)), dtype=bool)
             ownership_secondary_region = np.asarray(artifact.get("ownership_secondary_region", np.zeros_like(fg_mask, dtype=bool)), dtype=bool)
             ownership_abstain_region = np.asarray(artifact.get("ownership_abstain_region", np.zeros_like(fg_mask, dtype=bool)), dtype=bool)
@@ -19199,6 +20709,18 @@ def _save_support_visuals(
             "before_after_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_panel_png": before_after_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_panel_path.name if before_variant_name else "",
             "render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_veto_overlay_png": render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_veto_overlay_path.name if before_variant_name else "",
             "render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_alignment_overlay_png": render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_alignment_overlay_path.name if before_variant_name else "",
+            "render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_target_overlay_png": render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_target_overlay_path.name if before_variant_name else "",
+            "render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_overlay_png": render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_overlay_path.name if before_variant_name else "",
+            "render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_realization_overlay_png": render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_realization_overlay_path.name if before_variant_name else "",
+            "before_after_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_panel_png": before_after_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_panel_path.name if before_variant_name else "",
+            "render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_veto_overlay_png": render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_veto_overlay_path.name if before_variant_name else "",
+            "render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_alignment_overlay_png": render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_alignment_overlay_path.name if before_variant_name else "",
+            "render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_target_overlay_png": render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_target_overlay_path.name if before_variant_name else "",
+            "render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_binding_overlay_png": render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_binding_overlay_path.name if before_variant_name else "",
+            "render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_realization_overlay_png": render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_realization_overlay_path.name if before_variant_name else "",
+            "before_after_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_panel_png": before_after_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_panel_path.name if before_variant_name else "",
+            "render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_veto_overlay_png": render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_veto_overlay_path.name if before_variant_name else "",
+            "render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_alignment_overlay_png": render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_alignment_overlay_path.name if before_variant_name else "",
             "render_operator_guard_regression_panel_png": render_operator_guard_regression_panel_path.name if before_variant_name else "",
             "component_rank_ledger_json": component_rank_ledger_path.name if before_variant_name else "",
         }
@@ -19257,7 +20779,7 @@ def _make_case_panel(output_path: Path, target01: np.ndarray, point01: np.ndarra
     for row in rows:
         mosaic.paste(row, (0, cursor_y))
         cursor_y += row.height
-    mosaic.save(output_path)
+    mosaic.save(_native_io_path(output_path))
 
 
 def _rank_variants(case_results: list[dict]) -> list[dict]:
@@ -19372,7 +20894,7 @@ def _write_markdown(path: Path, payload: dict) -> None:
                 **row
             )
         )
-    path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    _write_text(path, "\n".join(lines) + "\n")
 
 
 def _infer_case_id(case: dict) -> str:
@@ -19452,8 +20974,8 @@ def _evaluate_case(
     centers_pred = camera_centers(np.asarray(outputs["extrinsic"], dtype=np.float64))
     centers_gt = camera_centers(np.stack([gt_cameras[camera]["extrinsic"] for camera in source_cameras], axis=0))
     scale, sim_rotation, sim_translation = umeyama_similarity(centers_pred, centers_gt)
-    point_map_aligned = apply_sim3_points(point_map.reshape(-1, 3), scale, sim_rotation, sim_translation).reshape(point_map.shape)
-    depth_points_aligned = apply_sim3_points(depth_points.reshape(-1, 3), scale, sim_rotation, sim_translation).reshape(depth_points.shape)
+    point_map_aligned = _apply_sim3_points_float32(point_map.reshape(-1, 3), scale, sim_rotation, sim_translation).reshape(point_map.shape)
+    depth_points_aligned = _apply_sim3_points_float32(depth_points.reshape(-1, 3), scale, sim_rotation, sim_translation).reshape(depth_points.shape)
 
     target_image_full = np.asarray(Image.open(target_image_path).convert("RGB"), dtype=np.float32) / 255.0
     target_image = np.asarray(
@@ -19493,6 +21015,7 @@ def _evaluate_case(
     point_image = _clamp_image(point_render["image"])
     weight01 = np.asarray(depth_render["weight"], dtype=np.float32)
     depth_raw_weight = np.asarray(depth_render["raw_weight"], dtype=np.float32)
+    baseline_render_stats = dict(depth_render["stats"])
 
     source_render_images = []
     source_render_raw_weights = []
@@ -19513,6 +21036,19 @@ def _evaluate_case(
         source_render_raw_weights.append(np.asarray(source_render["raw_weight"], dtype=np.float32))
     source_render_images = np.stack(source_render_images, axis=0).astype(np.float32)
     source_render_raw_weights = np.stack(source_render_raw_weights, axis=0).astype(np.float32)
+    del point_map_aligned
+    del depth_points_aligned
+    del point_map
+    del depth_points
+    del point_conf
+    del depth_conf
+    del depth_render
+    del outputs
+    del predictions
+    del images
+    del source_colors
+    del target_image_full
+    gc.collect()
 
     variant_artifacts = {
         "baseline_depth_unproject": {
@@ -19587,7 +21123,8 @@ def _evaluate_case(
     _save_gray(renders_dir / "depth_weight.png", weight01)
     _save_gray(renders_dir / "fg_mask.png", fg_mask.astype(np.float32))
     for variant_name, artifact in variant_artifacts.items():
-        _save_rgb(renders_dir / f"{variant_name}.png", artifact["image"])
+        variant_disk_token = _path_safe_variant_token(variant_name)
+        _save_rgb(renders_dir / f"{variant_disk_token}.png", artifact["image"])
 
     support_files = _save_support_visuals(
         renders_dir,
@@ -19610,6 +21147,7 @@ def _evaluate_case(
 
     rows = []
     for variant_name, artifact in variant_artifacts.items():
+        variant_disk_token = _path_safe_variant_token(variant_name)
         image01 = artifact["image"]
         subset = artifact.get("source_subset", [])
         if subset:
@@ -20108,6 +21646,54 @@ def _evaluate_case(
             ) if secondary_rows else 0.0,
             "hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_remaining_fraction": float(
                 sum(float(row.get("hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_remaining_fraction", 0.0)) * float(row.get("visible_mass_share", 0.0)) for row in secondary_rows)
+                / secondary_mass_total
+            ) if secondary_rows else 0.0,
+            "hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_target_fraction": float(
+                sum(float(row.get("hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_target_fraction", 0.0)) * float(row.get("visible_mass_share", 0.0)) for row in secondary_rows)
+                / secondary_mass_total
+            ) if secondary_rows else 0.0,
+            "hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_fraction": float(
+                sum(float(row.get("hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_fraction", 0.0)) * float(row.get("visible_mass_share", 0.0)) for row in secondary_rows)
+                / secondary_mass_total
+            ) if secondary_rows else 0.0,
+            "hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_realization_fraction": float(
+                sum(float(row.get("hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_realization_fraction", 0.0)) * float(row.get("visible_mass_share", 0.0)) for row in secondary_rows)
+                / secondary_mass_total
+            ) if secondary_rows else 0.0,
+            "hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_gain": float(
+                sum(float(row.get("hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_gain", 0.0)) * float(row.get("visible_mass_share", 0.0)) for row in secondary_rows)
+                / secondary_mass_total
+            ) if secondary_rows else 0.0,
+            "hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_alignment_score": float(
+                sum(float(row.get("hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_alignment_score", 0.0)) * float(row.get("visible_mass_share", 0.0)) for row in secondary_rows)
+                / secondary_mass_total
+            ) if secondary_rows else 0.0,
+            "hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_remaining_fraction": float(
+                sum(float(row.get("hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_remaining_fraction", 0.0)) * float(row.get("visible_mass_share", 0.0)) for row in secondary_rows)
+                / secondary_mass_total
+            ) if secondary_rows else 0.0,
+            "hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_target_fraction": float(
+                sum(float(row.get("hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_target_fraction", 0.0)) * float(row.get("visible_mass_share", 0.0)) for row in secondary_rows)
+                / secondary_mass_total
+            ) if secondary_rows else 0.0,
+            "hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_binding_fraction": float(
+                sum(float(row.get("hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_binding_fraction", 0.0)) * float(row.get("visible_mass_share", 0.0)) for row in secondary_rows)
+                / secondary_mass_total
+            ) if secondary_rows else 0.0,
+            "hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_realization_fraction": float(
+                sum(float(row.get("hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_realization_fraction", 0.0)) * float(row.get("visible_mass_share", 0.0)) for row in secondary_rows)
+                / secondary_mass_total
+            ) if secondary_rows else 0.0,
+            "hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_gain": float(
+                sum(float(row.get("hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_gain", 0.0)) * float(row.get("visible_mass_share", 0.0)) for row in secondary_rows)
+                / secondary_mass_total
+            ) if secondary_rows else 0.0,
+            "hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_alignment_score": float(
+                sum(float(row.get("hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_alignment_score", 0.0)) * float(row.get("visible_mass_share", 0.0)) for row in secondary_rows)
+                / secondary_mass_total
+            ) if secondary_rows else 0.0,
+            "hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_remaining_fraction": float(
+                sum(float(row.get("hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_remaining_fraction", 0.0)) * float(row.get("visible_mass_share", 0.0)) for row in secondary_rows)
                 / secondary_mass_total
             ) if secondary_rows else 0.0,
             "hard_anchor_peak_residual_remaining_fraction": float(
@@ -21066,6 +22652,66 @@ def _evaluate_case(
                         if support_files["per_variant"][variant_name]["render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_alignment_overlay_png"]
                         else ""
                     ),
+                    "render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_target_overlay_png": (
+                        str((renders_dir / support_files["per_variant"][variant_name]["render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_target_overlay_png"]).relative_to(output_dir))
+                        if support_files["per_variant"][variant_name]["render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_target_overlay_png"]
+                        else ""
+                    ),
+                    "render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_overlay_png": (
+                        str((renders_dir / support_files["per_variant"][variant_name]["render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_overlay_png"]).relative_to(output_dir))
+                        if support_files["per_variant"][variant_name]["render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_overlay_png"]
+                        else ""
+                    ),
+                    "render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_realization_overlay_png": (
+                        str((renders_dir / support_files["per_variant"][variant_name]["render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_realization_overlay_png"]).relative_to(output_dir))
+                        if support_files["per_variant"][variant_name]["render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_realization_overlay_png"]
+                        else ""
+                    ),
+                    "before_after_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_panel_png": (
+                        str((renders_dir / support_files["per_variant"][variant_name]["before_after_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_panel_png"]).relative_to(output_dir))
+                        if support_files["per_variant"][variant_name]["before_after_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_panel_png"]
+                        else ""
+                    ),
+                    "render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_veto_overlay_png": (
+                        str((renders_dir / support_files["per_variant"][variant_name]["render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_veto_overlay_png"]).relative_to(output_dir))
+                        if support_files["per_variant"][variant_name]["render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_veto_overlay_png"]
+                        else ""
+                    ),
+                    "render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_alignment_overlay_png": (
+                        str((renders_dir / support_files["per_variant"][variant_name]["render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_alignment_overlay_png"]).relative_to(output_dir))
+                        if support_files["per_variant"][variant_name]["render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_alignment_overlay_png"]
+                        else ""
+                    ),
+                    "render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_target_overlay_png": (
+                        str((renders_dir / support_files["per_variant"][variant_name]["render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_target_overlay_png"]).relative_to(output_dir))
+                        if support_files["per_variant"][variant_name]["render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_target_overlay_png"]
+                        else ""
+                    ),
+                    "render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_binding_overlay_png": (
+                        str((renders_dir / support_files["per_variant"][variant_name]["render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_binding_overlay_png"]).relative_to(output_dir))
+                        if support_files["per_variant"][variant_name]["render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_binding_overlay_png"]
+                        else ""
+                    ),
+                    "render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_realization_overlay_png": (
+                        str((renders_dir / support_files["per_variant"][variant_name]["render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_realization_overlay_png"]).relative_to(output_dir))
+                        if support_files["per_variant"][variant_name]["render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_realization_overlay_png"]
+                        else ""
+                    ),
+                    "before_after_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_panel_png": (
+                        str((renders_dir / support_files["per_variant"][variant_name]["before_after_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_panel_png"]).relative_to(output_dir))
+                        if support_files["per_variant"][variant_name]["before_after_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_panel_png"]
+                        else ""
+                    ),
+                    "render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_veto_overlay_png": (
+                        str((renders_dir / support_files["per_variant"][variant_name]["render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_veto_overlay_png"]).relative_to(output_dir))
+                        if support_files["per_variant"][variant_name]["render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_veto_overlay_png"]
+                        else ""
+                    ),
+                    "render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_alignment_overlay_png": (
+                        str((renders_dir / support_files["per_variant"][variant_name]["render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_alignment_overlay_png"]).relative_to(output_dir))
+                        if support_files["per_variant"][variant_name]["render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_alignment_overlay_png"]
+                        else ""
+                    ),
                     "render_operator_guard_regression_panel_png": (
                         str((renders_dir / support_files["per_variant"][variant_name]["render_operator_guard_regression_panel_png"]).relative_to(output_dir))
                         if support_files["per_variant"][variant_name]["render_operator_guard_regression_panel_png"]
@@ -21076,14 +22722,14 @@ def _evaluate_case(
                         if support_files["per_variant"][variant_name]["component_rank_ledger_json"]
                         else ""
                     ),
-                    "variant_png": str((renders_dir / f"{variant_name}.png").relative_to(output_dir)),
+                    "variant_png": str((renders_dir / f"{variant_disk_token}.png").relative_to(output_dir)),
                     "comparison_panel_png": str((renders_dir / "comparison_panel.png").relative_to(output_dir)),
                 },
                 "alignment": {
                     "scale": float(scale),
-                    "src_center_rmse_after": float(rmse(apply_sim3_points(centers_pred, scale, sim_rotation, sim_translation), centers_gt)),
+                    "src_center_rmse_after": float(rmse(_apply_sim3_points_float32(centers_pred, scale, sim_rotation, sim_translation), centers_gt)),
                 },
-                "baseline_render_stats": depth_render["stats"],
+                "baseline_render_stats": baseline_render_stats,
                 "proxy_config": proxy_config,
                 "proxy_config_case": artifact.get("proxy_config_override", proxy_config_case),
                 "case_partition_meta": case_rule_meta,
@@ -21201,3 +22847,4 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+

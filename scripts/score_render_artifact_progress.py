@@ -1,5 +1,6 @@
 import argparse
 import json
+import os
 import zipfile
 from datetime import datetime
 from pathlib import Path
@@ -18,6 +19,19 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--artifact-completeness-json")
     parser.add_argument("--zip-manifest-json")
     return parser.parse_args()
+
+
+def _native_io_path(path: Path) -> str:
+    resolved = str(path.resolve())
+    if os.name == "nt" and len(resolved) >= 240 and not resolved.startswith("\\\\?\\"):
+        if resolved.startswith("\\\\"):
+            return "\\\\?\\UNC\\" + resolved[2:]
+        return "\\\\?\\" + resolved
+    return resolved
+
+
+def _path_exists(path: Path) -> bool:
+    return os.path.exists(_native_io_path(path))
 
 
 def _rows_by_variant(summary: dict, variant: str) -> dict[str, dict]:
@@ -208,6 +222,24 @@ HARD_ANCHOR_PEAK_RESIDUAL_OVERLAP_GAIN_DENSITY_LANDING_TO_COMPONENT_COLLAPSE_CON
     "render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_alignment_overlay_png",
 ]
 
+HARD_ANCHOR_PEAK_RESIDUAL_OVERLAP_GAIN_DENSITY_LANDING_TO_COMPONENT_COLLAPSE_CONNECTIVITY_GRAPH_LANDING_REALIZATION_KEY_PANEL_KEYS = HARD_ANCHOR_PEAK_RESIDUAL_OVERLAP_GAIN_DENSITY_LANDING_TO_COMPONENT_COLLAPSE_CONNECTIVITY_GRAPH_REALIZATION_KEY_PANEL_KEYS + [
+    "render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_target_overlay_png",
+    "render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_overlay_png",
+    "render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_realization_overlay_png",
+    "before_after_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_panel_png",
+    "render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_veto_overlay_png",
+    "render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_alignment_overlay_png",
+]
+
+HARD_ANCHOR_PEAK_RESIDUAL_OVERLAP_GAIN_DENSITY_LANDING_TO_COMPONENT_COLLAPSE_CONNECTIVITY_GRAPH_LANDING_BINDING_REALIZATION_KEY_PANEL_KEYS = HARD_ANCHOR_PEAK_RESIDUAL_OVERLAP_GAIN_DENSITY_LANDING_TO_COMPONENT_COLLAPSE_CONNECTIVITY_GRAPH_LANDING_REALIZATION_KEY_PANEL_KEYS + [
+    "render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_target_overlay_png",
+    "render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_binding_overlay_png",
+    "render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_realization_overlay_png",
+    "before_after_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_panel_png",
+    "render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_veto_overlay_png",
+    "render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_alignment_overlay_png",
+]
+
 MEANINGFUL_HARD_ANCHOR_OVERLAP_GAIN_FLOOR = 1.0e-3
 MEANINGFUL_MEAN_OVERLAP_GAIN_FLOOR = 3.0e-4
 MEANINGFUL_HARD_ANCHOR_OVERLAP_GAIN_AMPLIFICATION_FLOOR = 1.5e-3
@@ -222,6 +254,10 @@ MEANINGFUL_HARD_ANCHOR_OVERLAP_GAIN_DENSITY_LANDING_COLLAPSE_CONNECTIVITY_FLOOR 
 MEANINGFUL_MEAN_OVERLAP_GAIN_DENSITY_LANDING_COLLAPSE_CONNECTIVITY_FLOOR = 3.5e-5
 MEANINGFUL_HARD_ANCHOR_OVERLAP_GAIN_DENSITY_LANDING_COLLAPSE_CONNECTIVITY_GRAPH_FLOOR = 5.0e-5
 MEANINGFUL_MEAN_OVERLAP_GAIN_DENSITY_LANDING_COLLAPSE_CONNECTIVITY_GRAPH_FLOOR = 2.0e-5
+MEANINGFUL_HARD_ANCHOR_OVERLAP_GAIN_DENSITY_LANDING_COLLAPSE_CONNECTIVITY_GRAPH_LANDING_FLOOR = 5.0e-5
+MEANINGFUL_MEAN_OVERLAP_GAIN_DENSITY_LANDING_COLLAPSE_CONNECTIVITY_GRAPH_LANDING_FLOOR = 2.0e-5
+MEANINGFUL_HARD_ANCHOR_OVERLAP_GAIN_DENSITY_LANDING_COLLAPSE_CONNECTIVITY_GRAPH_LANDING_BINDING_FLOOR = 5.0e-5
+MEANINGFUL_MEAN_OVERLAP_GAIN_DENSITY_LANDING_COLLAPSE_CONNECTIVITY_GRAPH_LANDING_BINDING_FLOOR = 2.0e-5
 
 
 def _is_peak_stabilization_family(*, family: str, variant: str) -> bool:
@@ -350,7 +386,25 @@ def _is_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_coll
     )
 
 
+def _is_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_binding_realization_family(*, family: str, variant: str) -> bool:
+    return bool(
+        "hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_binding_realization" in family
+        or variant == "stablelead_rehydrated_operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_binding_realization_v1"
+    )
+
+
+def _is_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_realization_family(*, family: str, variant: str) -> bool:
+    return bool(
+        "hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_realization" in family
+        or variant == "stablelead_rehydrated_operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_realization_v1"
+    )
+
+
 def _required_artifact_keys(*, family: str, variant: str) -> list[str]:
+    if _is_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_binding_realization_family(family=family, variant=variant):
+        return list(HARD_ANCHOR_PEAK_RESIDUAL_OVERLAP_GAIN_DENSITY_LANDING_TO_COMPONENT_COLLAPSE_CONNECTIVITY_GRAPH_LANDING_BINDING_REALIZATION_KEY_PANEL_KEYS)
+    if _is_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_realization_family(family=family, variant=variant):
+        return list(HARD_ANCHOR_PEAK_RESIDUAL_OVERLAP_GAIN_DENSITY_LANDING_TO_COMPONENT_COLLAPSE_CONNECTIVITY_GRAPH_LANDING_REALIZATION_KEY_PANEL_KEYS)
     if _is_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_realization_family(family=family, variant=variant):
         return list(HARD_ANCHOR_PEAK_RESIDUAL_OVERLAP_GAIN_DENSITY_LANDING_TO_COMPONENT_COLLAPSE_CONNECTIVITY_GRAPH_REALIZATION_KEY_PANEL_KEYS)
     if _is_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_contract_family(family=family, variant=variant):
@@ -415,7 +469,7 @@ def _build_artifact_completeness(
     zip_members: list[str] = []
     if key_panels_zip_path is not None:
         key_panels_zip_path.parent.mkdir(parents=True, exist_ok=True)
-        with zipfile.ZipFile(key_panels_zip_path, "w", compression=zipfile.ZIP_DEFLATED) as zf:
+        with zipfile.ZipFile(_native_io_path(key_panels_zip_path), "w", compression=zipfile.ZIP_DEFLATED) as zf:
             seen_members: set[str] = set()
             for row in candidate_rows:
                 files = row.get("files", {})
@@ -425,14 +479,14 @@ def _build_artifact_completeness(
                     if not (key.endswith("_png") or key.endswith("_json")):
                         continue
                     resolved = (base_dir / str(relative)).resolve()
-                    if not resolved.exists():
+                    if not _path_exists(resolved):
                         continue
                     arcname = _repo_relative_string(Path(str(relative)))
                     if arcname in seen_members:
                         continue
-                    zf.write(resolved, arcname=arcname)
+                    zf.write(_native_io_path(resolved), arcname=arcname)
                     seen_members.add(arcname)
-        with zipfile.ZipFile(key_panels_zip_path, "r") as zf:
+        with zipfile.ZipFile(_native_io_path(key_panels_zip_path), "r") as zf:
             zip_members = sorted(zf.namelist())
     zip_member_set = set(zip_members)
 
@@ -467,8 +521,8 @@ def _build_artifact_completeness(
                     all_required_present = False
                 continue
             resolved = (base_dir / relative).resolve()
-            exists = resolved.exists()
-            if resolved.exists():
+            exists = _path_exists(resolved)
+            if exists:
                 existing_panels.append(item)
             else:
                 missing_panels.append(item)
@@ -502,7 +556,7 @@ def _build_artifact_completeness(
         "summary_json": _repo_relative_string(summary_path),
         "key_panels_zip": (
             _repo_relative_string(key_panels_zip_path)
-            if key_panels_zip_path is not None and key_panels_zip_path.exists()
+            if key_panels_zip_path is not None and _path_exists(key_panels_zip_path)
             else ""
         ),
         "artifact_incomplete_fail": artifact_incomplete_fail,
@@ -517,7 +571,7 @@ def _build_artifact_completeness(
         "variant": variant,
         "zip_path": (
             _repo_relative_string(key_panels_zip_path)
-            if key_panels_zip_path is not None and key_panels_zip_path.exists()
+            if key_panels_zip_path is not None and _path_exists(key_panels_zip_path)
             else ""
         ),
         "member_count": len(zip_members),
@@ -564,6 +618,61 @@ def _dominant_artifact(rows: list[dict]) -> str:
 
 def _smoke_case_pass(row: dict, *, family: str, variant: str) -> bool:
     guard = row.get("guard_report", {})
+    if _is_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_binding_realization_family(family=family, variant=variant):
+        quality_guard = bool(
+            row["delta_masked_l1"] <= 0.0
+            and row["delta_masked_ssim"] >= 0.0
+            and row["delta_off_body_support_ratio"] <= 0.0
+            and not bool(guard.get("human_erasure_guard_violation", False))
+            and bool(guard.get("visible_mass_floor", {}).get("pass", True))
+            and bool(guard.get("largest_component_floor", {}).get("pass", True))
+            and bool(guard.get("fg_coverage_floor", {}).get("pass", True))
+            and bool(guard.get("masked_quality_guard", {}).get("pass", True))
+        )
+        if row.get("case_id") == "CoreView_390_frame_001170_Camera_B4":
+            return bool(
+                quality_guard
+                and not bool(row.get("local_rewrite_without_merge_rebound", False))
+                and row["delta_fg_connected_components"] < 0.0
+                and row["delta_fg_peak_count_after_render"] <= 0.0
+                and row["delta_hard_anchor_peak_residual"] <= 0.0
+                and row["delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_target_fraction"] > 0.0
+                and row["delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_fraction"] > 0.0
+                and row["delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_realization_fraction"] > 0.0
+                and row["delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_gain"] > MEANINGFUL_HARD_ANCHOR_OVERLAP_GAIN_DENSITY_LANDING_COLLAPSE_CONNECTIVITY_GRAPH_LANDING_FLOOR
+                and row["delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_alignment_score"] > 0.0
+                and row["delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_target_fraction"] > 0.0
+                and row["delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_binding_fraction"] > 0.0
+                and row["delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_realization_fraction"] > 0.0
+                and row["delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_gain"] > MEANINGFUL_HARD_ANCHOR_OVERLAP_GAIN_DENSITY_LANDING_COLLAPSE_CONNECTIVITY_GRAPH_LANDING_BINDING_FLOOR
+                and row["delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_alignment_score"] > 0.0
+            )
+        return quality_guard
+    if _is_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_realization_family(family=family, variant=variant):
+        quality_guard = bool(
+            row["delta_masked_l1"] <= 0.0
+            and row["delta_masked_ssim"] >= 0.0
+            and row["delta_off_body_support_ratio"] <= 0.0
+            and not bool(guard.get("human_erasure_guard_violation", False))
+            and bool(guard.get("visible_mass_floor", {}).get("pass", True))
+            and bool(guard.get("largest_component_floor", {}).get("pass", True))
+            and bool(guard.get("fg_coverage_floor", {}).get("pass", True))
+            and bool(guard.get("masked_quality_guard", {}).get("pass", True))
+        )
+        if row.get("case_id") == "CoreView_390_frame_001170_Camera_B4":
+            return bool(
+                quality_guard
+                and not bool(row.get("local_rewrite_without_merge_rebound", False))
+                and row["delta_fg_connected_components"] <= 0.0
+                and row["delta_fg_peak_count_after_render"] <= 0.0
+                and row["delta_hard_anchor_peak_residual"] <= 0.0
+                and row["delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_target_fraction"] > 0.0
+                and row["delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_fraction"] > 0.0
+                and row["delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_realization_fraction"] > 0.0
+                and row["delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_gain"] > MEANINGFUL_HARD_ANCHOR_OVERLAP_GAIN_DENSITY_LANDING_COLLAPSE_CONNECTIVITY_GRAPH_LANDING_FLOOR
+                and row["delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_alignment_score"] > 0.0
+            )
+        return quality_guard
     if _is_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_realization_family(family=family, variant=variant):
         quality_guard = bool(
             row["delta_masked_l1"] <= 0.0
@@ -1072,6 +1181,18 @@ def _local_rewrite_without_merge_rebound(row: dict) -> bool:
         or abs(float(row.get("delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_gain", 0.0))) > 0.02
         or abs(float(row.get("delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_alignment_score", 0.0))) > 0.02
         or abs(float(row.get("delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_remaining_fraction", 0.0))) > 0.02
+        or abs(float(row.get("delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_target_fraction", 0.0))) > 0.02
+        or abs(float(row.get("delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_fraction", 0.0))) > 0.02
+        or abs(float(row.get("delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_realization_fraction", 0.0))) > 0.02
+        or abs(float(row.get("delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_gain", 0.0))) > 0.02
+        or abs(float(row.get("delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_alignment_score", 0.0))) > 0.02
+        or abs(float(row.get("delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_remaining_fraction", 0.0))) > 0.02
+        or abs(float(row.get("delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_target_fraction", 0.0))) > 0.02
+        or abs(float(row.get("delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_binding_fraction", 0.0))) > 0.02
+        or abs(float(row.get("delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_realization_fraction", 0.0))) > 0.02
+        or abs(float(row.get("delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_gain", 0.0))) > 0.02
+        or abs(float(row.get("delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_alignment_score", 0.0))) > 0.02
+        or abs(float(row.get("delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_remaining_fraction", 0.0))) > 0.02
     )
     component_or_peak_rebound = bool(
         float(row.get("delta_post_operator_component_merge_gain", 0.0)) <= 0.0
@@ -1131,6 +1252,16 @@ def _local_rewrite_without_merge_rebound(row: dict) -> bool:
         or float(row.get("delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_realization_fraction", 0.0)) <= 0.0
         or float(row.get("delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_gain", 0.0)) <= MEANINGFUL_HARD_ANCHOR_OVERLAP_GAIN_DENSITY_LANDING_COLLAPSE_CONNECTIVITY_GRAPH_FLOOR
         or float(row.get("delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_alignment_score", 0.0)) <= 0.0
+        or float(row.get("delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_target_fraction", 0.0)) <= 0.0
+        or float(row.get("delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_fraction", 0.0)) <= 0.0
+        or float(row.get("delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_realization_fraction", 0.0)) <= 0.0
+        or float(row.get("delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_gain", 0.0)) <= MEANINGFUL_HARD_ANCHOR_OVERLAP_GAIN_DENSITY_LANDING_COLLAPSE_CONNECTIVITY_GRAPH_LANDING_FLOOR
+        or float(row.get("delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_alignment_score", 0.0)) <= 0.0
+        or float(row.get("delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_target_fraction", 0.0)) <= 0.0
+        or float(row.get("delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_binding_fraction", 0.0)) <= 0.0
+        or float(row.get("delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_realization_fraction", 0.0)) <= 0.0
+        or float(row.get("delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_gain", 0.0)) <= MEANINGFUL_HARD_ANCHOR_OVERLAP_GAIN_DENSITY_LANDING_COLLAPSE_CONNECTIVITY_GRAPH_LANDING_BINDING_FLOOR
+        or float(row.get("delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_alignment_score", 0.0)) <= 0.0
         or float(row.get("delta_hard_anchor_peak_residual", 0.0)) > 0.0
     )
     no_real_merge_gain = bool(
@@ -1281,6 +1412,18 @@ def _hard_anchor_operator_core_guard(rows: list[dict], *, family: str, variant: 
     anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_gain = float(anchor_row.get("delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_gain", 0.0))
     anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_alignment_score = float(anchor_row.get("delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_alignment_score", 0.0))
     anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_remaining_fraction = float(anchor_row.get("delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_remaining_fraction", 0.0))
+    anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_target_fraction = float(anchor_row.get("delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_target_fraction", 0.0))
+    anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_fraction = float(anchor_row.get("delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_fraction", 0.0))
+    anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_realization_fraction = float(anchor_row.get("delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_realization_fraction", 0.0))
+    anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_gain = float(anchor_row.get("delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_gain", 0.0))
+    anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_alignment_score = float(anchor_row.get("delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_alignment_score", 0.0))
+    anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_remaining_fraction = float(anchor_row.get("delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_remaining_fraction", 0.0))
+    anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_target_fraction = float(anchor_row.get("delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_target_fraction", 0.0))
+    anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_binding_fraction = float(anchor_row.get("delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_binding_fraction", 0.0))
+    anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_realization_fraction = float(anchor_row.get("delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_realization_fraction", 0.0))
+    anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_gain = float(anchor_row.get("delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_gain", 0.0))
+    anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_alignment_score = float(anchor_row.get("delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_alignment_score", 0.0))
+    anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_remaining_fraction = float(anchor_row.get("delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_remaining_fraction", 0.0))
     return {
         "anchor_case": anchor_case_id,
         "present": True,
@@ -1377,6 +1520,39 @@ def _hard_anchor_operator_core_guard(rows: list[dict], *, family: str, variant: 
         "delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_gain": anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_gain,
         "delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_alignment_score": anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_alignment_score,
         "delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_remaining_fraction": anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_remaining_fraction,
+        "delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_target_fraction": anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_target_fraction,
+        "delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_fraction": anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_fraction,
+        "delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_realization_fraction": anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_realization_fraction,
+        "delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_gain": anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_gain,
+        "delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_alignment_score": anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_alignment_score,
+        "delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_remaining_fraction": anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_remaining_fraction,
+        "delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_target_fraction": anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_target_fraction,
+        "delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_binding_fraction": anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_binding_fraction,
+        "delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_realization_fraction": anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_realization_fraction,
+        "delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_gain": anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_gain,
+        "delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_alignment_score": anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_alignment_score,
+        "delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_remaining_fraction": anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_remaining_fraction,
+        "graph_landing_target_live": bool(anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_target_fraction > 0.0),
+        "graph_landing_binding_live": bool(anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_fraction > 0.0),
+        "graph_landing_realization_live": bool(anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_realization_fraction > 0.0),
+        "graph_landing_gain_live": bool(
+            anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_gain
+            > MEANINGFUL_HARD_ANCHOR_OVERLAP_GAIN_DENSITY_LANDING_COLLAPSE_CONNECTIVITY_GRAPH_LANDING_FLOOR
+        ),
+        "graph_landing_alignment_live": bool(anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_alignment_score > 0.0),
+        "graph_landing_binding_target_live": bool(anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_target_fraction > 0.0),
+        "graph_landing_binding_binding_live": bool(anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_binding_fraction > 0.0),
+        "graph_landing_binding_realization_live": bool(anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_realization_fraction > 0.0),
+        "graph_landing_binding_gain_live": bool(
+            anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_gain
+            > MEANINGFUL_HARD_ANCHOR_OVERLAP_GAIN_DENSITY_LANDING_COLLAPSE_CONNECTIVITY_GRAPH_LANDING_BINDING_FLOOR
+        ),
+        "graph_landing_binding_alignment_live": bool(anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_alignment_score > 0.0),
+        "graph_landing_collapse_improved": bool(
+            anchor_connected_components < 0.0
+            and anchor_peak_count <= 0.0
+            and float(anchor_row.get("delta_hard_anchor_peak_residual", 0.0)) <= 0.0
+        ),
         "delta_post_merge_component_residual_split_fraction": float(anchor_row.get("delta_post_merge_component_residual_split_fraction", 0.0)),
         "delta_post_merge_peak_residual_after_realization": float(anchor_row.get("delta_post_merge_peak_residual_after_realization", 0.0)),
         "delta_hard_anchor_peak_residual": float(anchor_row.get("delta_hard_anchor_peak_residual", 0.0)),
@@ -1390,6 +1566,10 @@ def _hard_anchor_operator_core_guard(rows: list[dict], *, family: str, variant: 
                 and anchor_peak_count <= (
                     0.0
                     if (
+                        _is_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_binding_realization_family(family=family, variant=variant)
+                        or
+                        _is_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_realization_family(family=family, variant=variant)
+                        or
                         _is_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_realization_family(family=family, variant=variant)
                         or
                         _is_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_contract_family(family=family, variant=variant)
@@ -1423,6 +1603,10 @@ def _hard_anchor_operator_core_guard(rows: list[dict], *, family: str, variant: 
                     else -1e-12
                 )
                 and (
+                    _is_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_binding_realization_family(family=family, variant=variant)
+                    or
+                    _is_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_realization_family(family=family, variant=variant)
+                    or
                     _is_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_realization_family(family=family, variant=variant)
                     or
                     _is_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_contract_family(family=family, variant=variant)
@@ -1443,6 +1627,33 @@ def _hard_anchor_operator_core_guard(rows: list[dict], *, family: str, variant: 
                     or anchor_component_merge_gain > 0.0
                 )
                 and (
+                    (
+                        _is_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_binding_realization_family(family=family, variant=variant)
+                        and anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_target_fraction > 0.0
+                        and anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_fraction > 0.0
+                        and anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_realization_fraction > 0.0
+                        and anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_gain > MEANINGFUL_HARD_ANCHOR_OVERLAP_GAIN_DENSITY_LANDING_COLLAPSE_CONNECTIVITY_GRAPH_LANDING_FLOOR
+                        and anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_alignment_score > 0.0
+                        and anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_target_fraction > 0.0
+                        and anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_binding_fraction > 0.0
+                        and anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_realization_fraction > 0.0
+                        and anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_gain > MEANINGFUL_HARD_ANCHOR_OVERLAP_GAIN_DENSITY_LANDING_COLLAPSE_CONNECTIVITY_GRAPH_LANDING_BINDING_FLOOR
+                        and anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_alignment_score > 0.0
+                        and float(anchor_row.get("delta_hard_anchor_peak_residual", 0.0)) <= 0.0
+                        and anchor_connected_components < 0.0
+                    )
+                    or
+                    (
+                        _is_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_realization_family(family=family, variant=variant)
+                        and anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_target_fraction > 0.0
+                        and anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_fraction > 0.0
+                        and anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_realization_fraction > 0.0
+                        and anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_gain > MEANINGFUL_HARD_ANCHOR_OVERLAP_GAIN_DENSITY_LANDING_COLLAPSE_CONNECTIVITY_GRAPH_LANDING_FLOOR
+                        and anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_alignment_score > 0.0
+                        and float(anchor_row.get("delta_hard_anchor_peak_residual", 0.0)) <= 0.0
+                        and anchor_connected_components <= 0.0
+                    )
+                    or
                     (
                         _is_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_realization_family(family=family, variant=variant)
                         and anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_target_fraction > 0.0
@@ -1637,6 +1848,168 @@ def _failure_routing(
     family: str,
     variant: str,
 ) -> dict:
+    if _is_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_binding_realization_family(family=family, variant=variant):
+        if bool(aggregate.get("artifact_incomplete_fail", False)):
+            return {
+                "route": "GLB0",
+                "next_family": family,
+                "next_candidate": variant,
+                "reason": "graph-landing binding-realization packaging or required panels failed completeness, so the honest next move is to repair artifacts without changing families.",
+            }
+        target_binding_live = bool(
+            hard_anchor_guard.get("graph_landing_binding_target_live", False)
+            and hard_anchor_guard.get("graph_landing_binding_binding_live", False)
+        )
+        realization_live = bool(hard_anchor_guard.get("graph_landing_binding_realization_live", False))
+        gain_live = bool(
+            hard_anchor_guard.get("graph_landing_binding_gain_live", False)
+            and float(aggregate.get("mean_delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_gain", 0.0))
+            > MEANINGFUL_MEAN_OVERLAP_GAIN_DENSITY_LANDING_COLLAPSE_CONNECTIVITY_GRAPH_LANDING_BINDING_FLOOR
+        )
+        alignment_live = bool(hard_anchor_guard.get("graph_landing_binding_alignment_live", False))
+        aggregate_generalization_failed = bool(
+            aggregate.get("mean_delta_masked_l1", 0.0) > 0.0
+            or aggregate.get("mean_delta_masked_ssim", 0.0) < 0.0
+            or aggregate.get("worst_delta_off_body_support_ratio", 0.0) > 0.0
+            or aggregate.get("mean_delta_fg_connected_components", 0.0) >= 0.0
+            or aggregate.get("mean_delta_fg_peak_count_after_render", 0.0) > 0.0
+            or aggregate.get("mean_delta_hard_anchor_peak_residual", 0.0) > 0.0
+            or any(not bool(row.get("smoke_case_pass", False)) for row in rows)
+        )
+        if not target_binding_live:
+            return {
+                "route": "GLB1",
+                "next_family": family,
+                "next_candidate": variant,
+                "reason": "graph-landing binding target or binding stayed non-live on the hard anchor, so the honest next move is to repair the same binding-realization candidate rather than cut a sibling family.",
+            }
+        if (
+            aggregate.get("mean_delta_masked_l1", 0.0) > 0.0
+            or aggregate.get("mean_delta_masked_ssim", 0.0) < 0.0
+            or aggregate.get("worst_delta_off_body_support_ratio", 0.0) > 0.0
+        ):
+            return {
+                "route": "GLB4",
+                "next_family": "teacher_geometry_render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_guard_preservation_audit",
+                "next_candidate": "stablelead_rehydrated_operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_guard_preservation_v1",
+                "reason": "graph-landing binding target/binding turned live, but masked quality or off-body support regressed, so the next honest wall is guard-preserving graph landing.",
+            }
+        if bool(hard_anchor_guard.get("pass", False)) and aggregate_generalization_failed:
+            return {
+                "route": "GLB5",
+                "next_family": "teacher_geometry_render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_generalization_contract_audit",
+                "next_candidate": "stablelead_rehydrated_operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_generalization_contract_v1",
+                "reason": "the hard anchor cleared local graph-landing binding realization, but the remaining smoke cases still blocked honest aggregate generalization.",
+            }
+        if not realization_live or not gain_live or not alignment_live:
+            return {
+                "route": "GLB2",
+                "next_family": "teacher_geometry_render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_gain_realization_audit",
+                "next_candidate": "stablelead_rehydrated_operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_gain_realization_v1",
+                "reason": "graph-landing binding target/binding turned live, but binding realization, gain, or alignment still stayed too small to count as honest landed graph gain on the hard anchor.",
+            }
+        return {
+            "route": "GLB3",
+            "next_family": "teacher_geometry_render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_to_visible_component_collapse_contract_audit",
+            "next_candidate": "stablelead_rehydrated_operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_to_visible_component_collapse_contract_v1",
+            "reason": (
+                "graph-landing binding realization turned live, but the hard anchor still did not honestly collapse connected components, post-render peaks, or residual peaks."
+                if not bool(hard_anchor_guard.get("graph_landing_collapse_improved", False))
+                else "graph-landing binding realization became locally live, but its coupling to visible component collapse still needs a dedicated contract."
+            ),
+        }
+    if _is_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_realization_family(family=family, variant=variant):
+        if bool(aggregate.get("artifact_incomplete_fail", False)):
+            return {
+                "route": "GL0",
+                "next_family": family,
+                "next_candidate": variant,
+                "reason": "graph-landing-realization packaging or required panels failed completeness, so the honest next move is to repair artifacts without changing families.",
+            }
+        anchor_components_delta = float(hard_anchor_guard.get("delta_fg_connected_components", 0.0))
+        anchor_peak_delta = float(hard_anchor_guard.get("delta_fg_peak_count_after_render", 0.0))
+        anchor_peak_residual_delta = float(hard_anchor_guard.get("delta_hard_anchor_peak_residual", 0.0))
+        anchor_target_fraction = float(hard_anchor_guard.get("delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_target_fraction", 0.0))
+        anchor_binding_fraction = float(hard_anchor_guard.get("delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_fraction", 0.0))
+        anchor_realization_fraction = float(hard_anchor_guard.get("delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_realization_fraction", 0.0))
+        anchor_graph_gain = float(hard_anchor_guard.get("delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_gain", 0.0))
+        anchor_alignment_score = float(hard_anchor_guard.get("delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_alignment_score", 0.0))
+        anchor_binding_target_fraction = float(hard_anchor_guard.get("delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_target_fraction", 0.0))
+        anchor_binding_binding_fraction = float(hard_anchor_guard.get("delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_binding_fraction", 0.0))
+        anchor_binding_realization_fraction = float(hard_anchor_guard.get("delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_realization_fraction", 0.0))
+        anchor_binding_gain = float(hard_anchor_guard.get("delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_gain", 0.0))
+        anchor_binding_alignment_score = float(hard_anchor_guard.get("delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_alignment_score", 0.0))
+        graph_landing_moved = bool(
+            anchor_target_fraction > 0.0
+            or anchor_binding_fraction > 0.0
+            or anchor_realization_fraction > 0.0
+            or anchor_graph_gain > 0.0
+            or anchor_alignment_score > 0.0
+            or anchor_binding_target_fraction > 0.0
+            or anchor_binding_binding_fraction > 0.0
+            or anchor_binding_realization_fraction > 0.0
+            or anchor_binding_gain > 0.0
+            or anchor_binding_alignment_score > 0.0
+        )
+        aggregate_generalization_failed = bool(
+            aggregate.get("mean_delta_masked_l1", 0.0) > 0.0
+            or aggregate.get("mean_delta_masked_ssim", 0.0) < 0.0
+            or aggregate.get("worst_delta_off_body_support_ratio", 0.0) > 0.0
+            or aggregate.get("mean_delta_fg_connected_components", 0.0) > 0.0
+            or aggregate.get("mean_delta_fg_peak_count_after_render", 0.0) > 0.0
+            or aggregate.get("mean_delta_hard_anchor_peak_residual", 0.0) > 0.0
+            or any(not bool(row.get("smoke_case_pass", False)) for row in rows)
+        )
+        if not graph_landing_moved:
+            return {
+                "route": "GL1",
+                "next_family": "teacher_geometry_render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_binding_realization_audit",
+                "next_candidate": "stablelead_rehydrated_operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_binding_realization_v1",
+                "reason": "graph-landing target, binding, and realization stayed near zero, so the next honest wall is graph-landing binding realization rather than more graph pressure.",
+            }
+        if (
+            aggregate.get("mean_delta_masked_l1", 0.0) > 0.0
+            or aggregate.get("mean_delta_masked_ssim", 0.0) < 0.0
+            or aggregate.get("worst_delta_off_body_support_ratio", 0.0) > 0.0
+        ):
+            return {
+                "route": "GL4",
+                "next_family": "teacher_geometry_render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_guard_preservation_audit",
+                "next_candidate": "stablelead_rehydrated_operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_guard_preservation_v1",
+                "reason": "graph landing started to move, but masked quality or off-body support regressed, so the next honest wall is a guard-preserving landing contract.",
+            }
+        if bool(hard_anchor_guard.get("pass", False)) and aggregate_generalization_failed:
+            return {
+                "route": "GL5",
+                "next_family": "teacher_geometry_render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_generalization_contract_audit",
+                "next_candidate": "stablelead_rehydrated_operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_generalization_contract_v1",
+                "reason": "the hard anchor passed, but the remaining smoke cases still blocked honest generalization above graph landing.",
+            }
+        if (
+            anchor_graph_gain <= MEANINGFUL_HARD_ANCHOR_OVERLAP_GAIN_DENSITY_LANDING_COLLAPSE_CONNECTIVITY_GRAPH_LANDING_FLOOR
+            or float(aggregate.get("mean_delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_gain", 0.0))
+            <= MEANINGFUL_MEAN_OVERLAP_GAIN_DENSITY_LANDING_COLLAPSE_CONNECTIVITY_GRAPH_LANDING_FLOOR
+        ):
+            return {
+                "route": "GL2",
+                "next_family": "teacher_geometry_render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_pressure_realization_audit",
+                "next_candidate": "stablelead_rehydrated_operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_pressure_realization_v1",
+                "reason": "graph landing lit up locally, but landed graph pressure still stayed too small to count as honest collapse pressure on the hard anchor.",
+            }
+        return {
+            "route": "GL3",
+            "next_family": "teacher_geometry_render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_to_visible_component_collapse_contract_audit",
+            "next_candidate": "stablelead_rehydrated_operator_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_to_visible_component_collapse_contract_v1",
+            "reason": (
+                "graph landing gain became positive, but the hard anchor still did not honestly collapse connected components, post-render peaks, or residual peaks."
+                if (
+                    anchor_components_delta > 0.0
+                    or anchor_peak_delta > 0.0
+                    or anchor_peak_residual_delta > 0.0
+                )
+                else "graph landing pressure became positive locally, but its coupling to visible component collapse still failed to materialize honestly."
+            ),
+        }
     if _is_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_realization_family(family=family, variant=variant):
         if bool(aggregate.get("artifact_incomplete_fail", False)):
             return {
@@ -2945,6 +3318,18 @@ def build_summary(summary: dict, variant: str, baseline_variant: str, *, family:
             "delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_gain": float(cand_comp.get("hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_gain", 0.0) - base_comp.get("hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_gain", 0.0)),
             "delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_alignment_score": float(cand_comp.get("hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_alignment_score", 0.0) - base_comp.get("hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_alignment_score", 0.0)),
             "delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_remaining_fraction": float(cand_comp.get("hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_remaining_fraction", 0.0) - base_comp.get("hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_remaining_fraction", 0.0)),
+            "delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_target_fraction": float(cand_comp.get("hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_target_fraction", 0.0) - base_comp.get("hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_target_fraction", 0.0)),
+            "delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_fraction": float(cand_comp.get("hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_fraction", 0.0) - base_comp.get("hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_fraction", 0.0)),
+            "delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_realization_fraction": float(cand_comp.get("hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_realization_fraction", 0.0) - base_comp.get("hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_realization_fraction", 0.0)),
+            "delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_gain": float(cand_comp.get("hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_gain", 0.0) - base_comp.get("hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_gain", 0.0)),
+            "delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_alignment_score": float(cand_comp.get("hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_alignment_score", 0.0) - base_comp.get("hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_alignment_score", 0.0)),
+            "delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_remaining_fraction": float(cand_comp.get("hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_remaining_fraction", 0.0) - base_comp.get("hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_remaining_fraction", 0.0)),
+            "delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_target_fraction": float(cand_comp.get("hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_target_fraction", 0.0) - base_comp.get("hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_target_fraction", 0.0)),
+            "delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_binding_fraction": float(cand_comp.get("hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_binding_fraction", 0.0) - base_comp.get("hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_binding_fraction", 0.0)),
+            "delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_realization_fraction": float(cand_comp.get("hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_realization_fraction", 0.0) - base_comp.get("hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_realization_fraction", 0.0)),
+            "delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_gain": float(cand_comp.get("hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_gain", 0.0) - base_comp.get("hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_gain", 0.0)),
+            "delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_alignment_score": float(cand_comp.get("hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_alignment_score", 0.0) - base_comp.get("hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_alignment_score", 0.0)),
+            "delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_remaining_fraction": float(cand_comp.get("hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_remaining_fraction", 0.0) - base_comp.get("hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_remaining_fraction", 0.0)),
             "delta_post_operator_component_merge_gain": float(cand_comp.get("post_operator_component_merge_gain", 0.0) - base_comp.get("post_operator_component_merge_gain", 0.0)),
             "delta_post_operator_peak_gain": float(cand_comp.get("post_operator_peak_gain", 0.0) - base_comp.get("post_operator_peak_gain", 0.0)),
             "delta_ownership_primary_affinity": float(cand_comp.get("ownership_primary_affinity", 0.0) - base_comp.get("ownership_primary_affinity", 0.0)),
@@ -3081,6 +3466,18 @@ def build_summary(summary: dict, variant: str, baseline_variant: str, *, family:
             "hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_gain": float(cand_comp.get("hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_gain", 0.0)),
             "hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_alignment_score": float(cand_comp.get("hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_alignment_score", 0.0)),
             "hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_remaining_fraction": float(cand_comp.get("hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_remaining_fraction", 0.0)),
+            "hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_target_fraction": float(cand_comp.get("hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_target_fraction", 0.0)),
+            "hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_fraction": float(cand_comp.get("hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_fraction", 0.0)),
+            "hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_realization_fraction": float(cand_comp.get("hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_realization_fraction", 0.0)),
+            "hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_gain": float(cand_comp.get("hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_gain", 0.0)),
+            "hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_alignment_score": float(cand_comp.get("hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_alignment_score", 0.0)),
+            "hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_remaining_fraction": float(cand_comp.get("hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_remaining_fraction", 0.0)),
+            "hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_target_fraction": float(cand_comp.get("hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_target_fraction", 0.0)),
+            "hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_binding_fraction": float(cand_comp.get("hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_binding_fraction", 0.0)),
+            "hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_realization_fraction": float(cand_comp.get("hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_realization_fraction", 0.0)),
+            "hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_gain": float(cand_comp.get("hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_gain", 0.0)),
+            "hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_alignment_score": float(cand_comp.get("hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_alignment_score", 0.0)),
+            "hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_remaining_fraction": float(cand_comp.get("hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_remaining_fraction", 0.0)),
             "post_operator_component_merge_gain": float(cand_comp.get("post_operator_component_merge_gain", 0.0)),
             "post_operator_peak_gain": float(cand_comp.get("post_operator_peak_gain", 0.0)),
             "ownership_primary_affinity": float(cand_comp.get("ownership_primary_affinity", 0.0)),
@@ -3245,8 +3642,41 @@ def build_summary(summary: dict, variant: str, baseline_variant: str, *, family:
                 "before_after_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_panel_png": cand_row["files"].get("before_after_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_panel_png"),
                 "render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_veto_overlay_png": cand_row["files"].get("render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_veto_overlay_png"),
                 "render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_alignment_overlay_png": cand_row["files"].get("render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_alignment_overlay_png"),
+                "render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_target_overlay_png": cand_row["files"].get("render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_target_overlay_png"),
+                "render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_overlay_png": cand_row["files"].get("render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_overlay_png"),
+                "render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_realization_overlay_png": cand_row["files"].get("render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_realization_overlay_png"),
+                "before_after_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_panel_png": cand_row["files"].get("before_after_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_panel_png"),
+                "render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_veto_overlay_png": cand_row["files"].get("render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_veto_overlay_png"),
+                "render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_alignment_overlay_png": cand_row["files"].get("render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_alignment_overlay_png"),
+                "render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_target_overlay_png": cand_row["files"].get("render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_target_overlay_png"),
+                "render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_binding_overlay_png": cand_row["files"].get("render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_binding_overlay_png"),
+                "render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_realization_overlay_png": cand_row["files"].get("render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_realization_overlay_png"),
+                "before_after_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_panel_png": cand_row["files"].get("before_after_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_panel_png"),
+                "render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_veto_overlay_png": cand_row["files"].get("render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_veto_overlay_png"),
+                "render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_alignment_overlay_png": cand_row["files"].get("render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_alignment_overlay_png"),
                 "render_operator_guard_regression_panel_png": cand_row["files"].get("render_operator_guard_regression_panel_png"),
             },
+        }
+        row["graph_landing_binding_realization_panel_exports"] = {
+            "target_overlay_png": cand_row["files"].get("render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_target_overlay_png"),
+            "binding_overlay_png": cand_row["files"].get("render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_binding_overlay_png"),
+            "realization_overlay_png": cand_row["files"].get("render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_realization_overlay_png"),
+            "panel_png": cand_row["files"].get("before_after_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_panel_png"),
+            "veto_overlay_png": cand_row["files"].get("render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_veto_overlay_png"),
+            "alignment_overlay_png": cand_row["files"].get("render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_alignment_overlay_png"),
+            "graph_landing_target_overlay_png": cand_row["files"].get("render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_target_overlay_png"),
+            "graph_landing_binding_overlay_png": cand_row["files"].get("render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_overlay_png"),
+            "graph_landing_realization_overlay_png": cand_row["files"].get("render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_realization_overlay_png"),
+            "graph_landing_alignment_overlay_png": cand_row["files"].get("render_operator_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_alignment_overlay_png"),
+            "graph_landing_panel_png": cand_row["files"].get("before_after_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_panel_png"),
+            "comparison_panel_png": cand_row["files"].get("comparison_panel_png"),
+            "renderdiff_fgmask_png": cand_row["files"].get("target_baseline_candidate_renderdiff_fgmask_png"),
+            "fg_peak_map_png": cand_row["files"].get("fg_peak_map_png"),
+            "fg_visible_components_colored_png": cand_row["files"].get("fg_visible_components_colored_png"),
+            "fg_hole_bridge_panel_png": cand_row["files"].get("fg_hole_bridge_panel_png"),
+            "hard_anchor_failure_overlay_png": cand_row["files"].get("render_operator_hard_anchor_failure_overlay_png"),
+            "variant_png": cand_row["files"].get("variant_png"),
+            "guard_regression_panel_png": cand_row["files"].get("render_operator_guard_regression_panel_png"),
         }
         row["artifact_type"] = _artifact_type(row)
         row["local_rewrite_without_merge_rebound"] = _local_rewrite_without_merge_rebound(row)
@@ -3396,6 +3826,18 @@ def build_summary(summary: dict, variant: str, baseline_variant: str, *, family:
         "mean_delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_gain": float(sum(row["delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_gain"] for row in rows) / count),
         "mean_delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_alignment_score": float(sum(row["delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_alignment_score"] for row in rows) / count),
         "mean_delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_remaining_fraction": float(sum(row["delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_remaining_fraction"] for row in rows) / count),
+        "mean_delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_target_fraction": float(sum(row["delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_target_fraction"] for row in rows) / count),
+        "mean_delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_fraction": float(sum(row["delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_fraction"] for row in rows) / count),
+        "mean_delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_realization_fraction": float(sum(row["delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_realization_fraction"] for row in rows) / count),
+        "mean_delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_gain": float(sum(row["delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_gain"] for row in rows) / count),
+        "mean_delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_alignment_score": float(sum(row["delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_alignment_score"] for row in rows) / count),
+        "mean_delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_remaining_fraction": float(sum(row["delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_remaining_fraction"] for row in rows) / count),
+        "mean_delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_target_fraction": float(sum(row["delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_target_fraction"] for row in rows) / count),
+        "mean_delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_binding_fraction": float(sum(row["delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_binding_fraction"] for row in rows) / count),
+        "mean_delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_realization_fraction": float(sum(row["delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_realization_fraction"] for row in rows) / count),
+        "mean_delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_gain": float(sum(row["delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_gain"] for row in rows) / count),
+        "mean_delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_alignment_score": float(sum(row["delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_alignment_score"] for row in rows) / count),
+        "mean_delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_remaining_fraction": float(sum(row["delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_remaining_fraction"] for row in rows) / count),
         "mean_delta_post_operator_component_merge_gain": float(sum(row["delta_post_operator_component_merge_gain"] for row in rows) / count),
         "mean_delta_post_operator_peak_gain": float(sum(row["delta_post_operator_peak_gain"] for row in rows) / count),
         "mean_delta_ownership_primary_affinity": float(sum(row["delta_ownership_primary_affinity"] for row in rows) / count),
@@ -3419,7 +3861,100 @@ def build_summary(summary: dict, variant: str, baseline_variant: str, *, family:
     anchor_component_breakout = _anchor_component_breakout(rows)
     hard_anchor_operator_core_guard = _hard_anchor_operator_core_guard(rows, family=family, variant=variant)
     all_guard_pass = all(bool(row.get("guard_report", {}).get("all_pass", True)) for row in rows)
-    if _is_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_realization_family(family=family, variant=variant):
+    aggregate.update(
+        {
+            "hard_anchor_graph_landing_target_live": bool(hard_anchor_operator_core_guard.get("graph_landing_target_live", False)),
+            "hard_anchor_graph_landing_binding_live": bool(hard_anchor_operator_core_guard.get("graph_landing_binding_live", False)),
+            "hard_anchor_graph_landing_realization_live": bool(hard_anchor_operator_core_guard.get("graph_landing_realization_live", False)),
+            "hard_anchor_graph_landing_gain_live": bool(hard_anchor_operator_core_guard.get("graph_landing_gain_live", False)),
+            "hard_anchor_graph_landing_alignment_live": bool(hard_anchor_operator_core_guard.get("graph_landing_alignment_live", False)),
+            "hard_anchor_graph_landing_binding_target_live": bool(hard_anchor_operator_core_guard.get("graph_landing_binding_target_live", False)),
+            "hard_anchor_graph_landing_binding_binding_live": bool(hard_anchor_operator_core_guard.get("graph_landing_binding_binding_live", False)),
+            "hard_anchor_graph_landing_binding_realization_live": bool(hard_anchor_operator_core_guard.get("graph_landing_binding_realization_live", False)),
+            "hard_anchor_graph_landing_binding_gain_live": bool(hard_anchor_operator_core_guard.get("graph_landing_binding_gain_live", False)),
+            "hard_anchor_graph_landing_binding_alignment_live": bool(hard_anchor_operator_core_guard.get("graph_landing_binding_alignment_live", False)),
+            "hard_anchor_graph_landing_collapse_improved": bool(hard_anchor_operator_core_guard.get("graph_landing_collapse_improved", False)),
+            "aggregate_graph_landing_target_live": bool(
+                aggregate["mean_delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_target_fraction"] > 0.0
+            ),
+            "aggregate_graph_landing_binding_live": bool(
+                aggregate["mean_delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_fraction"] > 0.0
+            ),
+            "aggregate_graph_landing_realization_live": bool(
+                aggregate["mean_delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_realization_fraction"] > 0.0
+            ),
+            "aggregate_graph_landing_gain_live": bool(
+                aggregate["mean_delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_gain"]
+                > MEANINGFUL_MEAN_OVERLAP_GAIN_DENSITY_LANDING_COLLAPSE_CONNECTIVITY_GRAPH_LANDING_FLOOR
+            ),
+            "aggregate_graph_landing_alignment_live": bool(
+                aggregate["mean_delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_alignment_score"] > 0.0
+            ),
+            "aggregate_graph_landing_binding_target_live": bool(
+                aggregate["mean_delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_target_fraction"] > 0.0
+            ),
+            "aggregate_graph_landing_binding_binding_live": bool(
+                aggregate["mean_delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_binding_fraction"] > 0.0
+            ),
+            "aggregate_graph_landing_binding_realization_live": bool(
+                aggregate["mean_delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_realization_fraction"] > 0.0
+            ),
+            "aggregate_graph_landing_binding_gain_live": bool(
+                aggregate["mean_delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_gain"]
+                > MEANINGFUL_MEAN_OVERLAP_GAIN_DENSITY_LANDING_COLLAPSE_CONNECTIVITY_GRAPH_LANDING_BINDING_FLOOR
+            ),
+            "aggregate_graph_landing_binding_alignment_live": bool(
+                aggregate["mean_delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_alignment_score"] > 0.0
+            ),
+            "aggregate_graph_landing_collapse_improved": bool(
+                aggregate["mean_delta_fg_connected_components"] < 0.0
+                and aggregate["mean_delta_fg_peak_count_after_render"] <= 0.0
+                and aggregate["mean_delta_hard_anchor_peak_residual"] <= 0.0
+            ),
+        }
+    )
+    if _is_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_binding_realization_family(family=family, variant=variant):
+        smoke_1x3_pass = bool(
+            len(rows) == 3
+            and honest_primary_count == len(rows)
+            and bool(hard_anchor_operator_core_guard["pass"])
+            and aggregate["mean_delta_masked_l1"] <= 0.0
+            and aggregate["mean_delta_masked_ssim"] >= 0.0
+            and aggregate["worst_delta_off_body_support_ratio"] <= 0.0
+            and aggregate["mean_delta_fg_connected_components"] < 0.0
+            and aggregate["mean_delta_fg_peak_count_after_render"] <= 0.0
+            and aggregate["mean_delta_hard_anchor_peak_residual"] <= 0.0
+            and aggregate["mean_delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_target_fraction"] > 0.0
+            and aggregate["mean_delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_fraction"] > 0.0
+            and aggregate["mean_delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_realization_fraction"] > 0.0
+            and aggregate["mean_delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_gain"] > MEANINGFUL_MEAN_OVERLAP_GAIN_DENSITY_LANDING_COLLAPSE_CONNECTIVITY_GRAPH_LANDING_FLOOR
+            and aggregate["mean_delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_alignment_score"] > 0.0
+            and aggregate["mean_delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_target_fraction"] > 0.0
+            and aggregate["mean_delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_binding_fraction"] > 0.0
+            and aggregate["mean_delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_realization_fraction"] > 0.0
+            and aggregate["mean_delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_gain"] > MEANINGFUL_MEAN_OVERLAP_GAIN_DENSITY_LANDING_COLLAPSE_CONNECTIVITY_GRAPH_LANDING_BINDING_FLOOR
+            and aggregate["mean_delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_alignment_score"] > 0.0
+            and all_guard_pass
+        )
+    elif _is_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_landing_realization_family(family=family, variant=variant):
+        smoke_1x3_pass = bool(
+            len(rows) == 3
+            and honest_primary_count == len(rows)
+            and bool(hard_anchor_operator_core_guard["pass"])
+            and aggregate["mean_delta_masked_l1"] <= 0.0
+            and aggregate["mean_delta_masked_ssim"] >= 0.0
+            and aggregate["worst_delta_off_body_support_ratio"] <= 0.0
+            and aggregate["mean_delta_fg_connected_components"] <= 0.0
+            and aggregate["mean_delta_fg_peak_count_after_render"] <= 0.0
+            and aggregate["mean_delta_hard_anchor_peak_residual"] <= 0.0
+            and aggregate["mean_delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_target_fraction"] > 0.0
+            and aggregate["mean_delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_binding_fraction"] > 0.0
+            and aggregate["mean_delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_realization_fraction"] > 0.0
+            and aggregate["mean_delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_gain"] > MEANINGFUL_MEAN_OVERLAP_GAIN_DENSITY_LANDING_COLLAPSE_CONNECTIVITY_GRAPH_LANDING_FLOOR
+            and aggregate["mean_delta_hard_anchor_peak_residual_overlap_gain_density_landing_collapse_connectivity_graph_landing_alignment_score"] > 0.0
+            and all_guard_pass
+        )
+    elif _is_hard_anchor_peak_residual_overlap_gain_density_landing_to_component_collapse_connectivity_graph_realization_family(family=family, variant=variant):
         smoke_1x3_pass = bool(
             len(rows) == 3
             and honest_primary_count == len(rows)
