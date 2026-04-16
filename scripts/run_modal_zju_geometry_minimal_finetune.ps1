@@ -1,5 +1,6 @@
 param(
     [string]$ModalExe = "",
+    [string]$ModalAppName = "",
     [string]$ZjuSubdir = "zju_mocap",
     [string]$SeqNames = "CoreView_390",
     [string]$GeomSubdir = "vggt_geom",
@@ -118,7 +119,15 @@ $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
 $modal = Resolve-ModalExe $ModalExe
 $entryScript = Join-Path $repoRoot "modal_zju_geometry_minimal_finetune.py"
 $preflightScript = Join-Path $repoRoot "scripts\\invoke_modal_zju_preflight.ps1"
-$modalAppDescription = "vggt-zju-geometry-minimal-finetune"
+$modalAppDescription = if (-not [string]::IsNullOrWhiteSpace($ModalAppName)) {
+    $ModalAppName
+} elseif (-not [string]::IsNullOrWhiteSpace($env:VGGT_ZJU_MODAL_APP_NAME)) {
+    $env:VGGT_ZJU_MODAL_APP_NAME
+} elseif (-not [string]::IsNullOrWhiteSpace($env:VGGT_MODAL_APP_NAME)) {
+    $env:VGGT_MODAL_APP_NAME
+} else {
+    "vggt-zju-geometry-minimal-finetune"
+}
 $isA100Profile = $ModalGpu -like "A100*"
 
 if ($EnableCompile -and $DisableCompile) {
@@ -203,6 +212,9 @@ if ($Detach) {
 if (-not [string]::IsNullOrWhiteSpace($ModalGpu)) {
     $env:VGGT_ZJU_MODAL_GPU = $ModalGpu
 }
+if (-not [string]::IsNullOrWhiteSpace($ModalAppName)) {
+    $env:VGGT_ZJU_MODAL_APP_NAME = $ModalAppName
+}
 if ($ModalCpu -gt 0) {
     $env:VGGT_ZJU_MODAL_CPU = [string]$ModalCpu
 }
@@ -230,6 +242,9 @@ if (-not [string]::IsNullOrWhiteSpace($LocalCheckpoint)) {
 }
 if (-not [string]::IsNullOrWhiteSpace($env:VGGT_ZJU_MODAL_GPU)) {
     Write-Host "[modal-zju-geometry] modal_gpu=$env:VGGT_ZJU_MODAL_GPU"
+}
+if (-not [string]::IsNullOrWhiteSpace($modalAppDescription)) {
+    Write-Host "[modal-zju-geometry] modal_app_name=$modalAppDescription"
 }
 if (-not [string]::IsNullOrWhiteSpace($env:VGGT_ZJU_MODAL_CPU)) {
     Write-Host "[modal-zju-geometry] modal_cpu=$env:VGGT_ZJU_MODAL_CPU"
@@ -305,8 +320,14 @@ $cfg = [ordered]@{
 $cfgJsonRaw = $cfg | ConvertTo-Json -Compress
 $cfgJson = "base64:" + [Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes($cfgJsonRaw))
 
+$entrypointTarget = if ($Detach) {
+    "$entryScript::spawn_remote_zju_geometry_finetune"
+} else {
+    "$entryScript::run_remote_zju_geometry_finetune"
+}
+
 $argList += @(
-    "$entryScript::run_remote_zju_geometry_finetune",
+    $entrypointTarget,
     "--cfg-json", $cfgJson
 )
 

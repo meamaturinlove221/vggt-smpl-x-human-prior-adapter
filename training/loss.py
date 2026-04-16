@@ -818,6 +818,18 @@ def compute_unproject_geometry_loss(
     use_foreground_region_mask=False,
     foreground_erode_px=0,
     foreground_drop_bottom_ratio=0.0,
+    human_prior_mask_key=None,
+    human_prior_feature_map_key=None,
+    human_prior_mask_floor=0.35,
+    human_prior_scale=1.0,
+    human_prior_train_only=True,
+    human_prior_anchor_view_only=False,
+    human_prior_conf_floor_weight=0.0,
+    human_prior_conf_floor=0.35,
+    human_prior_depth_presence_weight=0.0,
+    human_prior_pseudo_mask_key=None,
+    human_prior_pseudo_world_key=None,
+    human_prior_pseudo_weight=0.0,
     support_pull_to_fg_weight=0.0,
     support_pull_bottom_band_extra_scale=2.0,
     bg_black_weight=0.0,
@@ -848,6 +860,18 @@ def compute_unproject_geometry_loss(
     gt_mask = batch["point_masks"].clone()
     valid_mask = gt_mask & pred_depth_mask & torch.isfinite(pred_world_points).all(dim=-1)
     conf_weights = None
+    zero = (0.0 * predictions["depth"]).mean()
+    region_mask = None
+    human_prior_pseudo_mask, _, human_prior_pseudo_world_points = _build_human_prior_pseudo_supervision_components(
+        batch,
+        gt_mask,
+        human_prior_pseudo_mask_key=human_prior_pseudo_mask_key,
+        human_prior_pseudo_world_key=human_prior_pseudo_world_key,
+        human_prior_train_only=human_prior_train_only,
+        human_prior_anchor_view_only=human_prior_anchor_view_only,
+    )
+    if human_prior_pseudo_mask is not None:
+        human_prior_pseudo_mask = human_prior_pseudo_mask & ~gt_mask
 
     if use_foreground_region_mask:
         foreground_masks = batch.get("foreground_masks", None)
@@ -860,6 +884,8 @@ def compute_unproject_geometry_loss(
             drop_bottom_ratio=float(foreground_drop_bottom_ratio),
         )
         valid_mask = valid_mask & region_mask
+        if human_prior_pseudo_mask is not None:
+            human_prior_pseudo_mask = human_prior_pseudo_mask & region_mask
 
     if use_depth_conf_gate:
         pred_depth_conf = predictions.get("depth_conf", None)
@@ -872,35 +898,148 @@ def compute_unproject_geometry_loss(
         if depth_conf_threshold > 0:
             valid_mask = valid_mask & (pred_depth_conf >= depth_conf_threshold)
 
-    if valid_mask.sum() < min_valid_points:
-        dummy_loss = (0.0 * predictions["depth"]).mean()
-        return {"loss_unproject_geometry": dummy_loss}
+    has_gt_supervision = int(valid_mask.sum().item()) >= int(min_valid_points)
+    has_pseudo_supervision = human_prior_pseudo_mask is not None and bool(human_prior_pseudo_mask.any().item())
+    if not has_gt_supervision and not has_pseudo_supervision:
+        return {
+            "loss_unproject_geometry": zero,
+            "loss_unproject_geometry_base": zero,
+            "loss_support_pull_to_fg": zero,
+            "loss_bg_black": zero,
+            "loss_fg_support_spread": zero,
+            "loss_fg_profile_peak_surrogate": zero,
+            "loss_human_prior_conf_floor": zero,
+            "loss_human_prior_depth_presence": zero,
+            "loss_human_prior_pseudo_unproject": zero,
+        }
 
-    diff = pred_world_points[valid_mask] - gt_world_points[valid_mask]
-    if use_depth_conf_gate:
-        conf_weights = pred_depth_conf[valid_mask].clamp_min(eps).pow(depth_conf_power)
-    if loss_type == "l1":
-        loss_values = diff.abs().mean(dim=-1)
-    elif loss_type == "l2":
-        loss_values = diff.norm(dim=-1)
-    else:
-        raise ValueError(f"Unknown loss_type for unproject geometry loss: {loss_type}")
+    human_prior_mask, human_prior_feature_map = _build_human_prior_region_components(
+        batch,
+        valid_mask,
+        human_prior_mask_key=human_prior_mask_key,
+        human_prior_feature_map_key=human_prior_feature_map_key,
+        human_prior_train_only=human_prior_train_only,
+        human_prior_anchor_view_only=human_prior_anchor_view_only,
+    )
+    human_prior_scale_map = _build_human_prior_scale_map(
+        batch,
+        predictions["depth"][..., 0],
+        human_prior_mask_key=human_prior_mask_key,
+        human_prior_feature_map_key=human_prior_feature_map_key,
+        human_prior_mask_floor=human_prior_mask_floor,
+        human_prior_scale=human_prior_scale,
+        human_prior_train_only=human_prior_train_only,
+        human_prior_anchor_view_only=human_prior_anchor_view_only,
+    )
+    human_prior_target_mask = _build_human_prior_target_mask(
+        human_prior_mask,
+        human_prior_feature_map,
+    )
 
-    loss_values = check_and_fix_inf_nan(loss_values, "loss_unproject_geometry")
-    if valid_range > 0:
-        quantile_mask = build_quantile_mask(loss_values, valid_range)
-        if quantile_mask is not None:
-            loss_values = loss_values[quantile_mask]
-            if conf_weights is not None:
-                conf_weights = conf_weights[quantile_mask]
+    loss = zero
+    if has_gt_supervision:
+        diff = pred_world_points[valid_mask] - gt_world_points[valid_mask]
+        if use_depth_conf_gate:
+            conf_weights = pred_depth_conf[valid_mask].clamp_min(eps).pow(depth_conf_power)
+        if loss_type == "l1":
+            loss_values = diff.abs().mean(dim=-1)
+        elif loss_type == "l2":
+            loss_values = diff.norm(dim=-1)
+        else:
+            raise ValueError(f"Unknown loss_type for unproject geometry loss: {loss_type}")
 
-    if loss_values.numel() == 0:
-        loss = (0.0 * predictions["depth"]).mean()
-    elif conf_weights is not None:
-        conf_weights = check_and_fix_inf_nan(conf_weights, "loss_unproject_geometry_conf_weights")
-        loss = (loss_values * conf_weights).sum() / conf_weights.sum().clamp_min(eps)
-    else:
-        loss = loss_values.mean()
+        loss_values = check_and_fix_inf_nan(loss_values, "loss_unproject_geometry")
+        human_prior_loss_scale = None
+        if human_prior_scale_map is not None:
+            human_prior_loss_scale = check_and_fix_inf_nan(
+                human_prior_scale_map[valid_mask],
+                "loss_unproject_geometry_human_prior_scale",
+            ).clamp_min(1e-6)
+        if valid_range > 0:
+            quantile_mask = build_quantile_mask(loss_values, valid_range)
+            if quantile_mask is not None:
+                loss_values = loss_values[quantile_mask]
+                if conf_weights is not None:
+                    conf_weights = conf_weights[quantile_mask]
+                if human_prior_loss_scale is not None:
+                    human_prior_loss_scale = human_prior_loss_scale[quantile_mask]
+
+        if human_prior_loss_scale is not None:
+            loss_values = loss_values * human_prior_loss_scale
+
+        if loss_values.numel() == 0:
+            loss = zero
+        elif conf_weights is not None:
+            conf_weights = check_and_fix_inf_nan(conf_weights, "loss_unproject_geometry_conf_weights")
+            loss = (loss_values * conf_weights).sum() / conf_weights.sum().clamp_min(eps)
+        else:
+            loss = loss_values.mean()
+
+    human_prior_pseudo_unproject_loss = zero
+    if (
+        float(human_prior_pseudo_weight) > 0.0
+        and human_prior_pseudo_mask is not None
+        and human_prior_pseudo_world_points is not None
+    ):
+        pseudo_valid_mask = human_prior_pseudo_mask & pred_depth_mask & torch.isfinite(pred_world_points).all(dim=-1)
+        if use_depth_conf_gate:
+            pseudo_valid_mask = pseudo_valid_mask & torch.isfinite(pred_depth_conf)
+        if bool(pseudo_valid_mask.any().item()):
+            pseudo_diff = pred_world_points[pseudo_valid_mask] - human_prior_pseudo_world_points[pseudo_valid_mask]
+            if loss_type == "l1":
+                pseudo_loss_values = pseudo_diff.abs().mean(dim=-1)
+            elif loss_type == "l2":
+                pseudo_loss_values = pseudo_diff.norm(dim=-1)
+            else:
+                raise ValueError(f"Unknown loss_type for unproject geometry loss: {loss_type}")
+
+            pseudo_loss_values = check_and_fix_inf_nan(
+                pseudo_loss_values,
+                "loss_human_prior_pseudo_unproject",
+            )
+            if human_prior_scale_map is not None:
+                pseudo_scale = check_and_fix_inf_nan(
+                    human_prior_scale_map[pseudo_valid_mask],
+                    "loss_human_prior_pseudo_unproject_scale",
+                ).clamp_min(1e-6)
+                pseudo_loss_values = pseudo_loss_values * pseudo_scale
+            if valid_range > 0:
+                pseudo_quantile_mask = build_quantile_mask(pseudo_loss_values, valid_range)
+                if pseudo_quantile_mask is not None:
+                    pseudo_loss_values = pseudo_loss_values[pseudo_quantile_mask]
+            if pseudo_loss_values.numel() > 0:
+                human_prior_pseudo_unproject_loss = pseudo_loss_values.mean()
+
+    human_prior_supervision_mask = gt_mask
+    if human_prior_pseudo_mask is not None:
+        human_prior_supervision_mask = human_prior_supervision_mask | human_prior_pseudo_mask
+
+    human_prior_conf_floor_loss = zero
+    if float(human_prior_conf_floor_weight) > 0.0:
+        pred_depth_conf = predictions.get("depth_conf", None)
+        if pred_depth_conf is None:
+            raise ValueError(
+                "human_prior_conf_floor_weight > 0 requires predictions['depth_conf']."
+            )
+        if human_prior_target_mask is not None:
+            conf_target_mask = human_prior_target_mask & human_prior_supervision_mask & torch.isfinite(pred_depth_conf)
+            if bool(conf_target_mask.any().item()):
+                pred_depth_conf = check_and_fix_inf_nan(
+                    pred_depth_conf,
+                    "human_prior_conf_floor_depth_conf",
+                ).clamp(0.0, 1.0)
+                human_prior_conf_floor_loss = F.relu(
+                    float(human_prior_conf_floor) - pred_depth_conf[conf_target_mask]
+                ).mean()
+
+    human_prior_depth_presence_loss = zero
+    if float(human_prior_depth_presence_weight) > 0.0 and human_prior_target_mask is not None:
+        presence_target_mask = human_prior_target_mask & human_prior_supervision_mask
+        if bool(presence_target_mask.any().item()):
+            human_prior_depth_presence_loss = (
+                ~pred_depth_mask[presence_target_mask]
+            ).to(dtype=predictions["depth"].dtype).mean()
+
     support_pull_loss, bg_black_loss, fg_spread_loss, fg_peak_loss = _compute_anchor_projection_alignment_losses(
         pred_world_points,
         predictions,
@@ -928,6 +1067,12 @@ def compute_unproject_geometry_loss(
         total_loss = total_loss + float(fg_support_spread_weight) * fg_spread_loss
     if float(fg_profile_peak_surrogate_weight) > 0.0:
         total_loss = total_loss + float(fg_profile_peak_surrogate_weight) * fg_peak_loss
+    if float(human_prior_conf_floor_weight) > 0.0:
+        total_loss = total_loss + float(human_prior_conf_floor_weight) * human_prior_conf_floor_loss
+    if float(human_prior_depth_presence_weight) > 0.0:
+        total_loss = total_loss + float(human_prior_depth_presence_weight) * human_prior_depth_presence_loss
+    if float(human_prior_pseudo_weight) > 0.0:
+        total_loss = total_loss + float(human_prior_pseudo_weight) * human_prior_pseudo_unproject_loss
 
     return {
         "loss_unproject_geometry": total_loss,
@@ -936,6 +1081,9 @@ def compute_unproject_geometry_loss(
         "loss_bg_black": bg_black_loss,
         "loss_fg_support_spread": fg_spread_loss,
         "loss_fg_profile_peak_surrogate": fg_peak_loss,
+        "loss_human_prior_conf_floor": human_prior_conf_floor_loss,
+        "loss_human_prior_depth_presence": human_prior_depth_presence_loss,
+        "loss_human_prior_pseudo_unproject": human_prior_pseudo_unproject_loss,
     }
 
 
@@ -1184,6 +1332,16 @@ def compute_depth_loss(
     anchor_conditioned_unproject_consistency_conf_scale=1.0,
     anchor_conditioned_unproject_consistency_reg_scale=1.0,
     anchor_conditioned_unproject_consistency_train_only=True,
+    human_prior_mask_key=None,
+    human_prior_feature_map_key=None,
+    human_prior_mask_floor=0.35,
+    human_prior_reg_scale=1.0,
+    human_prior_conf_scale=1.0,
+    human_prior_train_only=True,
+    human_prior_anchor_view_only=False,
+    human_prior_pseudo_depth_key=None,
+    human_prior_pseudo_mask_key=None,
+    human_prior_pseudo_weight=0.0,
     **kwargs,
 ):
     """
@@ -1223,12 +1381,28 @@ def compute_depth_loss(
         # the underlying gt_depth mask unchanged for the regression branch.
         conf_depth_mask = conf_depth_mask & ~anchor_conditioned_conf_mask_drop_map
 
-    if gt_depth_mask.sum() < 100:
+    human_prior_pseudo_mask, human_prior_pseudo_depth, _ = _build_human_prior_pseudo_supervision_components(
+        batch,
+        gt_depth_mask,
+        human_prior_pseudo_mask_key=human_prior_pseudo_mask_key,
+        human_prior_pseudo_depth_key=human_prior_pseudo_depth_key,
+        human_prior_train_only=human_prior_train_only,
+        human_prior_anchor_view_only=human_prior_anchor_view_only,
+    )
+    if human_prior_pseudo_mask is not None:
+        human_prior_pseudo_mask = human_prior_pseudo_mask & ~gt_depth_mask
+
+    if gt_depth_mask.sum() < 100 and (
+        human_prior_pseudo_mask is None or not bool(human_prior_pseudo_mask.any().item())
+    ):
         # If there are less than 100 valid points, skip this batch
         dummy_loss = (0.0 * pred_depth).mean()
-        loss_dict = {f"loss_conf_depth": dummy_loss,
-                    f"loss_reg_depth": dummy_loss,
-                    f"loss_grad_depth": dummy_loss,}
+        loss_dict = {
+            f"loss_conf_depth": dummy_loss,
+            f"loss_reg_depth": dummy_loss,
+            f"loss_grad_depth": dummy_loss,
+            f"loss_human_prior_pseudo_depth": dummy_loss,
+        }
         return loss_dict
 
     # NOTE: we put conf inside regression_loss so that we can also apply conf loss to the gradient loss in a multi-scale manner
@@ -1291,13 +1465,41 @@ def compute_depth_loss(
         anchor_conditioned_unproject_consistency_train_only=anchor_conditioned_unproject_consistency_train_only,
         anchor_conditioned_unproject_consistency_pred_pose_enc=predictions.get("pose_enc", None),
         anchor_conditioned_unproject_consistency_image_size_hw=batch["images"].shape[-2:] if "images" in batch else None,
+        human_prior_mask_key=human_prior_mask_key,
+        human_prior_feature_map_key=human_prior_feature_map_key,
+        human_prior_mask_floor=human_prior_mask_floor,
+        human_prior_reg_scale=human_prior_reg_scale,
+        human_prior_conf_scale=human_prior_conf_scale,
+        human_prior_train_only=human_prior_train_only,
+        human_prior_anchor_view_only=human_prior_anchor_view_only,
         **regression_loss_extra_kwargs,
     )
 
+    human_prior_pseudo_depth_loss = (0.0 * pred_depth).mean()
+    if (
+        float(human_prior_pseudo_weight) > 0.0
+        and human_prior_pseudo_mask is not None
+        and human_prior_pseudo_depth is not None
+        and bool(human_prior_pseudo_mask.any().item())
+    ):
+        pseudo_depth_loss_values = (
+            pred_depth[..., 0][human_prior_pseudo_mask] - human_prior_pseudo_depth[human_prior_pseudo_mask]
+        ).abs()
+        if pseudo_depth_loss_values.numel() > 0:
+            if valid_range > 0:
+                pseudo_depth_loss_values = filter_by_quantile(pseudo_depth_loss_values, valid_range)
+            pseudo_depth_loss_values = check_and_fix_inf_nan(
+                pseudo_depth_loss_values,
+                "loss_human_prior_pseudo_depth",
+            )
+            if pseudo_depth_loss_values.numel() > 0:
+                human_prior_pseudo_depth_loss = pseudo_depth_loss_values.mean()
+
     loss_dict = {
         f"loss_conf_depth": loss_conf,
-        f"loss_reg_depth": loss_reg,    
+        f"loss_reg_depth": loss_reg + float(human_prior_pseudo_weight) * human_prior_pseudo_depth_loss,
         f"loss_grad_depth": loss_grad,
+        f"loss_human_prior_pseudo_depth": human_prior_pseudo_depth_loss,
     }
 
     return loss_dict
@@ -1411,6 +1613,266 @@ def _build_anchor_view_only_mask(batch, reference_mask):
     if not bool(anchor_view_mask.any().item()):
         return None
     return anchor_view_mask
+
+
+def _should_apply_human_prior(batch, human_prior_train_only):
+    if not bool(human_prior_train_only):
+        return True
+    phase = str(batch.get("_loss_phase", "")).lower()
+    return phase == "train"
+
+
+def _build_human_prior_region_components(
+    batch,
+    reference_mask,
+    *,
+    human_prior_mask_key=None,
+    human_prior_feature_map_key=None,
+    human_prior_train_only=True,
+    human_prior_anchor_view_only=False,
+):
+    if batch is None or reference_mask is None:
+        return None, None
+    if not human_prior_mask_key and not human_prior_feature_map_key:
+        return None, None
+
+    if not _should_apply_human_prior(batch, human_prior_train_only):
+        return None, None
+
+    prior_mask = None
+    if human_prior_mask_key:
+        prior_mask = batch.get(human_prior_mask_key, None)
+        if prior_mask is None:
+            raise ValueError(
+                f"human prior mask key '{human_prior_mask_key}' requires batch['{human_prior_mask_key}']."
+            )
+        prior_mask = prior_mask.to(device=reference_mask.device, dtype=torch.bool)
+        if tuple(prior_mask.shape) != tuple(reference_mask.shape):
+            raise ValueError(
+                f"batch['{human_prior_mask_key}'] shape {tuple(prior_mask.shape)} does not match "
+                f"reference shape {tuple(reference_mask.shape)}."
+            )
+
+    prior_feature_map = None
+    if human_prior_feature_map_key:
+        prior_feature_map = batch.get(human_prior_feature_map_key, None)
+        if prior_feature_map is None:
+            raise ValueError(
+                "human prior feature map key "
+                f"'{human_prior_feature_map_key}' requires batch['{human_prior_feature_map_key}']."
+            )
+        prior_feature_map = prior_feature_map.to(device=reference_mask.device, dtype=torch.float32)
+        if tuple(prior_feature_map.shape) != tuple(reference_mask.shape):
+            raise ValueError(
+                f"batch['{human_prior_feature_map_key}'] shape {tuple(prior_feature_map.shape)} does not match "
+                f"reference shape {tuple(reference_mask.shape)}."
+            )
+        prior_feature_map = check_and_fix_inf_nan(
+            prior_feature_map,
+            f"{human_prior_feature_map_key}_human_prior_feature_map",
+        ).clamp_min(0.0)
+        max_per_view = prior_feature_map.reshape(prior_feature_map.shape[0], prior_feature_map.shape[1], -1).amax(
+            dim=-1,
+            keepdim=True,
+        ).unsqueeze(-1)
+        prior_feature_map = torch.where(
+            max_per_view > 0.0,
+            prior_feature_map / max_per_view.clamp_min(1e-6),
+            torch.zeros_like(prior_feature_map),
+        )
+
+    if human_prior_anchor_view_only:
+        anchor_view_mask = _build_anchor_view_only_mask(batch, reference_mask)
+        if anchor_view_mask is None:
+            return None, None
+        prior_mask = anchor_view_mask if prior_mask is None else (prior_mask & anchor_view_mask)
+        if prior_feature_map is not None:
+            prior_feature_map = prior_feature_map * anchor_view_mask.to(dtype=prior_feature_map.dtype)
+
+    if prior_mask is not None and not bool(prior_mask.any().item()) and prior_feature_map is None:
+        return None, None
+    if prior_feature_map is not None and float(prior_feature_map.detach().amax().item()) <= 0.0 and prior_mask is None:
+        return None, None
+    return prior_mask, prior_feature_map
+
+
+def _build_human_prior_pseudo_supervision_components(
+    batch,
+    reference_mask,
+    *,
+    human_prior_pseudo_mask_key=None,
+    human_prior_pseudo_depth_key=None,
+    human_prior_pseudo_world_key=None,
+    human_prior_train_only=True,
+    human_prior_anchor_view_only=False,
+):
+    if batch is None or reference_mask is None:
+        return None, None, None
+    if not human_prior_pseudo_mask_key and not human_prior_pseudo_depth_key and not human_prior_pseudo_world_key:
+        return None, None, None
+    if not _should_apply_human_prior(batch, human_prior_train_only):
+        return None, None, None
+
+    pseudo_mask = None
+    if human_prior_pseudo_mask_key:
+        pseudo_mask = batch.get(human_prior_pseudo_mask_key, None)
+        if pseudo_mask is None:
+            raise ValueError(
+                "human prior pseudo mask key "
+                f"'{human_prior_pseudo_mask_key}' requires batch['{human_prior_pseudo_mask_key}']."
+            )
+        pseudo_mask = pseudo_mask.to(device=reference_mask.device, dtype=torch.bool)
+        if tuple(pseudo_mask.shape) != tuple(reference_mask.shape):
+            raise ValueError(
+                f"batch['{human_prior_pseudo_mask_key}'] shape {tuple(pseudo_mask.shape)} does not match "
+                f"reference shape {tuple(reference_mask.shape)}."
+            )
+
+    pseudo_depth = None
+    if human_prior_pseudo_depth_key:
+        pseudo_depth = batch.get(human_prior_pseudo_depth_key, None)
+        if pseudo_depth is None:
+            raise ValueError(
+                "human prior pseudo depth key "
+                f"'{human_prior_pseudo_depth_key}' requires batch['{human_prior_pseudo_depth_key}']."
+            )
+        pseudo_depth = pseudo_depth.to(device=reference_mask.device, dtype=torch.float32)
+        if tuple(pseudo_depth.shape) != tuple(reference_mask.shape):
+            raise ValueError(
+                f"batch['{human_prior_pseudo_depth_key}'] shape {tuple(pseudo_depth.shape)} does not match "
+                f"reference shape {tuple(reference_mask.shape)}."
+            )
+        pseudo_depth = check_and_fix_inf_nan(
+            pseudo_depth,
+            f"{human_prior_pseudo_depth_key}_human_prior_pseudo_depth",
+        )
+
+    pseudo_world = None
+    if human_prior_pseudo_world_key:
+        pseudo_world = batch.get(human_prior_pseudo_world_key, None)
+        if pseudo_world is None:
+            raise ValueError(
+                "human prior pseudo world key "
+                f"'{human_prior_pseudo_world_key}' requires batch['{human_prior_pseudo_world_key}']."
+            )
+        pseudo_world = pseudo_world.to(device=reference_mask.device, dtype=torch.float32)
+        expected_shape = tuple(reference_mask.shape) + (3,)
+        if tuple(pseudo_world.shape) != expected_shape:
+            raise ValueError(
+                f"batch['{human_prior_pseudo_world_key}'] shape {tuple(pseudo_world.shape)} does not match "
+                f"reference shape {expected_shape}."
+            )
+        pseudo_world = check_and_fix_inf_nan(
+            pseudo_world,
+            f"{human_prior_pseudo_world_key}_human_prior_pseudo_world",
+            hard_max=None,
+        )
+
+    if human_prior_anchor_view_only:
+        anchor_view_mask = _build_anchor_view_only_mask(batch, reference_mask)
+        if anchor_view_mask is None:
+            return None, None, None
+        pseudo_mask = anchor_view_mask if pseudo_mask is None else (pseudo_mask & anchor_view_mask)
+        if pseudo_depth is not None:
+            pseudo_depth = torch.where(anchor_view_mask, pseudo_depth, torch.zeros_like(pseudo_depth))
+        if pseudo_world is not None:
+            pseudo_world = torch.where(
+                anchor_view_mask.unsqueeze(-1),
+                pseudo_world,
+                torch.zeros_like(pseudo_world),
+            )
+
+    resolved_mask = pseudo_mask
+    if pseudo_depth is not None:
+        depth_valid_mask = torch.isfinite(pseudo_depth) & (pseudo_depth > 0.0)
+        resolved_mask = depth_valid_mask if resolved_mask is None else (resolved_mask & depth_valid_mask)
+    if pseudo_world is not None:
+        world_valid_mask = torch.isfinite(pseudo_world).all(dim=-1)
+        resolved_mask = world_valid_mask if resolved_mask is None else (resolved_mask & world_valid_mask)
+
+    if resolved_mask is None or not bool(resolved_mask.any().item()):
+        return None, None, None
+
+    if pseudo_depth is not None:
+        pseudo_depth = torch.where(resolved_mask, pseudo_depth, torch.zeros_like(pseudo_depth))
+    if pseudo_world is not None:
+        pseudo_world = torch.where(
+            resolved_mask.unsqueeze(-1),
+            pseudo_world,
+            torch.zeros_like(pseudo_world),
+        )
+    return resolved_mask, pseudo_depth, pseudo_world
+
+
+def _build_human_prior_weight_map(
+    reference_map,
+    *,
+    prior_mask=None,
+    prior_feature_map=None,
+    human_prior_mask_floor=0.35,
+):
+    if prior_mask is None and prior_feature_map is None:
+        return None
+
+    mask_floor = float(max(0.0, min(1.0, human_prior_mask_floor)))
+    weight_map = torch.zeros_like(reference_map, dtype=reference_map.dtype)
+    if prior_feature_map is not None:
+        weight_map = torch.maximum(
+            weight_map,
+            prior_feature_map.to(device=reference_map.device, dtype=reference_map.dtype),
+        )
+    if prior_mask is not None and mask_floor > 0.0:
+        weight_map = torch.maximum(
+            weight_map,
+            prior_mask.to(device=reference_map.device, dtype=reference_map.dtype) * mask_floor,
+        )
+    return weight_map.clamp(0.0, 1.0)
+
+
+def _build_human_prior_scale_map(
+    batch,
+    reference_map,
+    *,
+    human_prior_mask_key=None,
+    human_prior_feature_map_key=None,
+    human_prior_mask_floor=0.35,
+    human_prior_scale=1.0,
+    human_prior_train_only=True,
+    human_prior_anchor_view_only=False,
+):
+    scale_value = float(human_prior_scale)
+    if scale_value == 1.0:
+        return None
+    prior_mask, prior_feature_map = _build_human_prior_region_components(
+        batch,
+        reference_map,
+        human_prior_mask_key=human_prior_mask_key,
+        human_prior_feature_map_key=human_prior_feature_map_key,
+        human_prior_train_only=human_prior_train_only,
+        human_prior_anchor_view_only=human_prior_anchor_view_only,
+    )
+    prior_weight_map = _build_human_prior_weight_map(
+        reference_map,
+        prior_mask=prior_mask,
+        prior_feature_map=prior_feature_map,
+        human_prior_mask_floor=human_prior_mask_floor,
+    )
+    if prior_weight_map is None:
+        return None
+    return 1.0 + prior_weight_map * (scale_value - 1.0)
+
+
+def _build_human_prior_target_mask(
+    prior_mask,
+    prior_feature_map,
+    *,
+    feature_threshold=1e-6,
+):
+    target_mask = prior_mask
+    if prior_feature_map is not None:
+        feature_mask = prior_feature_map > float(feature_threshold)
+        target_mask = feature_mask if target_mask is None else (target_mask | feature_mask)
+    return target_mask
 
 
 def _build_anchor_conditioned_disagreement_scale_maps(
@@ -1985,6 +2447,13 @@ def regression_loss(
     anchor_conditioned_unproject_consistency_pred_pose_enc=None,
     anchor_conditioned_unproject_consistency_image_size_hw=None,
     anchor_conditioned_unproject_consistency_pose_encoding_type="absT_quaR_FoV",
+    human_prior_mask_key=None,
+    human_prior_feature_map_key=None,
+    human_prior_mask_floor=0.35,
+    human_prior_reg_scale=1.0,
+    human_prior_conf_scale=1.0,
+    human_prior_train_only=True,
+    human_prior_anchor_view_only=False,
 ):
     """
     Core regression loss function with confidence weighting and optional gradient loss.
@@ -2097,6 +2566,31 @@ def regression_loss(
         reg_target_map = reg_target_map * unproject_consistency_reg_scale_map
     if unproject_consistency_conf_scale_map is not None:
         conf_reg_map = conf_reg_map * unproject_consistency_conf_scale_map
+
+    human_prior_reg_scale_map = _build_human_prior_scale_map(
+        batch,
+        reg_target_map,
+        human_prior_mask_key=human_prior_mask_key,
+        human_prior_feature_map_key=human_prior_feature_map_key,
+        human_prior_mask_floor=human_prior_mask_floor,
+        human_prior_scale=human_prior_reg_scale,
+        human_prior_train_only=human_prior_train_only,
+        human_prior_anchor_view_only=human_prior_anchor_view_only,
+    )
+    human_prior_conf_scale_map = _build_human_prior_scale_map(
+        batch,
+        conf_reg_map,
+        human_prior_mask_key=human_prior_mask_key,
+        human_prior_feature_map_key=human_prior_feature_map_key,
+        human_prior_mask_floor=human_prior_mask_floor,
+        human_prior_scale=human_prior_conf_scale,
+        human_prior_train_only=human_prior_train_only,
+        human_prior_anchor_view_only=human_prior_anchor_view_only,
+    )
+    if human_prior_reg_scale_map is not None:
+        reg_target_map = reg_target_map * human_prior_reg_scale_map
+    if human_prior_conf_scale_map is not None:
+        conf_reg_map = conf_reg_map * human_prior_conf_scale_map
 
     # Compute L2 distance between predicted and ground truth points
     loss_reg = reg_target_map[mask]

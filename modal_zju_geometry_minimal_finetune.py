@@ -1014,6 +1014,16 @@ def upload_checkpoint(
 
 
 @app.local_entrypoint()
+def spawn_remote_zju_geometry_finetune(cfg_json: str) -> None:
+    cfg = ZjuFinetuneConfig.from_json(cfg_json)
+    print("[modal-zju-geometry] spawn config:")
+    print(json.dumps(asdict(cfg), indent=2, ensure_ascii=False))
+    call = run_remote_zju_geometry_finetune.spawn(cfg.to_json())
+    call_id = getattr(call, "object_id", "") or getattr(call, "function_call_id", "")
+    print(f"[modal-zju-geometry] spawned remote finetune call_id={call_id}")
+
+
+@app.local_entrypoint()
 def run_zju_geometry_finetune(
     zju_subdir: str,
     seq_names: str = "CoreView_390",

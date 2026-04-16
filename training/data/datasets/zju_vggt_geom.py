@@ -403,6 +403,242 @@ def _build_source_only_geometry(target_hw):
     return depth_map, zero_points, zero_points.copy(), point_mask
 
 
+def _morph_kernel(radius):
+    radius = int(max(0, radius))
+    if radius <= 0:
+        return None
+    return cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (2 * radius + 1, 2 * radius + 1))
+
+
+def _binary_dilate_mask(mask, radius):
+    kernel = _morph_kernel(radius)
+    if kernel is None:
+        return np.asarray(mask, dtype=bool)
+    return cv2.dilate(np.asarray(mask, dtype=np.uint8), kernel, iterations=1).astype(bool)
+
+
+def _binary_erode_mask(mask, radius):
+    kernel = _morph_kernel(radius)
+    if kernel is None:
+        return np.asarray(mask, dtype=bool)
+    return cv2.erode(np.asarray(mask, dtype=np.uint8), kernel, iterations=1).astype(bool)
+
+
+def _binary_close_mask(mask, radius):
+    kernel = _morph_kernel(radius)
+    if kernel is None:
+        return np.asarray(mask, dtype=bool)
+    return cv2.morphologyEx(np.asarray(mask, dtype=np.uint8), cv2.MORPH_CLOSE, kernel).astype(bool)
+
+
+def _build_edge_band_mask(mask, radius):
+    radius = int(max(0, radius))
+    if radius <= 0:
+        return np.zeros_like(np.asarray(mask, dtype=bool), dtype=bool)
+    dilated = _binary_dilate_mask(mask, radius)
+    eroded = _binary_erode_mask(mask, radius)
+    return dilated & ~eroded
+
+
+def _project_smpl_vertices_to_feature_map(
+    vertices_world,
+    extrinsic,
+    intrinsic,
+    target_hw,
+    *,
+    point_radius_px=2,
+    close_px=4,
+    gaussian_sigma=2.5,
+    eps=1e-6,
+):
+    hh, ww = int(target_hw[0]), int(target_hw[1])
+    feature_map = np.zeros((hh, ww), dtype=np.float32)
+    empty_mask = np.zeros((hh, ww), dtype=bool)
+    empty_depth_map = np.zeros((hh, ww), dtype=np.float32)
+    empty_world_points = np.zeros((hh, ww, 3), dtype=np.float32)
+    if vertices_world is None:
+        return empty_mask, feature_map, empty_mask, empty_depth_map, empty_world_points
+
+    world_points = np.asarray(vertices_world, dtype=np.float32).reshape(-1, 3)
+    if world_points.size == 0:
+        return empty_mask, feature_map, empty_mask, empty_depth_map, empty_world_points
+
+    rotation = np.asarray(extrinsic[:, :3], dtype=np.float32)
+    translation = np.asarray(extrinsic[:, 3], dtype=np.float32).reshape(1, 3)
+    cam_points = world_points @ rotation.T + translation
+    finite_mask = np.isfinite(cam_points).all(axis=1) & np.isfinite(world_points).all(axis=1)
+    cam_points = cam_points[finite_mask]
+    world_points = world_points[finite_mask]
+    if cam_points.size == 0:
+        return empty_mask, feature_map, empty_mask, empty_depth_map, empty_world_points
+
+    valid_depth = cam_points[:, 2] > float(eps)
+    cam_points = cam_points[valid_depth]
+    world_points = world_points[valid_depth]
+    if cam_points.size == 0:
+        return empty_mask, feature_map, empty_mask, empty_depth_map, empty_world_points
+
+    fx = float(intrinsic[0, 0])
+    fy = float(intrinsic[1, 1])
+    cx = float(intrinsic[0, 2])
+    cy = float(intrinsic[1, 2])
+    z = np.clip(cam_points[:, 2], float(eps), None)
+    u = fx * cam_points[:, 0] / z + cx
+    v = fy * cam_points[:, 1] / z + cy
+    in_view = (
+        np.isfinite(u)
+        & np.isfinite(v)
+        & (u >= 0.0)
+        & (u <= float(max(ww - 1, 0)))
+        & (v >= 0.0)
+        & (v <= float(max(hh - 1, 0)))
+    )
+    if not np.any(in_view):
+        return empty_mask, feature_map, empty_mask, empty_depth_map, empty_world_points
+
+    xx = np.rint(u[in_view]).astype(np.int32)
+    yy = np.rint(v[in_view]).astype(np.int32)
+    depth_values = z[in_view].astype(np.float32)
+    world_points = world_points[in_view]
+    np.add.at(feature_map, (yy, xx), 1.0)
+
+    sparse_depth_map = np.full((hh, ww), np.inf, dtype=np.float32)
+    sparse_world_points = np.zeros((hh, ww, 3), dtype=np.float32)
+    sparse_mask = np.zeros((hh, ww), dtype=bool)
+    for point_idx in np.argsort(depth_values, kind="stable"):
+        x = int(xx[point_idx])
+        y = int(yy[point_idx])
+        depth_value = float(depth_values[point_idx])
+        if sparse_mask[y, x] and depth_value >= float(sparse_depth_map[y, x]):
+            continue
+        sparse_mask[y, x] = True
+        sparse_depth_map[y, x] = depth_value
+        sparse_world_points[y, x] = world_points[point_idx]
+
+    sparse_depth_map = np.where(sparse_mask, sparse_depth_map, 0.0).astype(np.float32)
+
+    prior_mask = feature_map > 0.0
+    prior_mask = _binary_dilate_mask(prior_mask, point_radius_px)
+    prior_mask = _binary_close_mask(prior_mask, close_px)
+
+    if gaussian_sigma > 0.0 and np.any(feature_map > 0.0):
+        feature_map = cv2.GaussianBlur(
+            feature_map,
+            (0, 0),
+            sigmaX=float(gaussian_sigma),
+            sigmaY=float(gaussian_sigma),
+        )
+    max_value = float(feature_map.max()) if feature_map.size > 0 else 0.0
+    if max_value > 0.0:
+        feature_map = feature_map / max_value
+    feature_map = np.maximum(feature_map, prior_mask.astype(np.float32))
+    return (
+        prior_mask.astype(bool),
+        feature_map.astype(np.float32),
+        sparse_mask.astype(bool),
+        sparse_depth_map,
+        sparse_world_points.astype(np.float32),
+    )
+
+
+def _densify_smpl_prior_geometry(
+    sparse_mask,
+    sparse_depth_map,
+    sparse_world_points,
+    target_mask,
+    *,
+    max_fill_distance_px=24.0,
+):
+    target_mask = np.asarray(target_mask, dtype=bool)
+    hh, ww = target_mask.shape
+    dense_mask = np.zeros((hh, ww), dtype=bool)
+    dense_depth_map = np.zeros((hh, ww), dtype=np.float32)
+    dense_world_points = np.zeros((hh, ww, 3), dtype=np.float32)
+
+    sparse_mask = np.asarray(sparse_mask, dtype=bool)
+    if not np.any(target_mask) or not np.any(sparse_mask):
+        return dense_mask, dense_depth_map, dense_world_points
+
+    source = (~sparse_mask).astype(np.uint8)
+    distance_map, labels = cv2.distanceTransformWithLabels(
+        source,
+        cv2.DIST_L2,
+        5,
+        labelType=cv2.DIST_LABEL_PIXEL,
+    )
+    fill_mask = target_mask & (labels > 0)
+    max_fill_distance_px = float(max_fill_distance_px)
+    if np.isfinite(max_fill_distance_px):
+        if max_fill_distance_px <= 0.0:
+            fill_mask &= sparse_mask
+        else:
+            fill_mask &= distance_map <= max_fill_distance_px
+    if not np.any(fill_mask):
+        return dense_mask, dense_depth_map, dense_world_points
+
+    seed_coords = np.argwhere(sparse_mask)
+    if seed_coords.size == 0:
+        return dense_mask, dense_depth_map, dense_world_points
+
+    fill_coords = np.argwhere(fill_mask)
+    label_indices = labels[fill_mask].astype(np.int64) - 1
+    valid_label_mask = (label_indices >= 0) & (label_indices < len(seed_coords))
+    if not np.any(valid_label_mask):
+        return dense_mask, dense_depth_map, dense_world_points
+
+    fill_coords = fill_coords[valid_label_mask]
+    source_coords = seed_coords[label_indices[valid_label_mask]]
+    fill_ys = fill_coords[:, 0]
+    fill_xs = fill_coords[:, 1]
+    source_ys = source_coords[:, 0]
+    source_xs = source_coords[:, 1]
+
+    dense_mask[fill_ys, fill_xs] = True
+    dense_depth_map[fill_ys, fill_xs] = sparse_depth_map[source_ys, source_xs]
+    dense_world_points[fill_ys, fill_xs] = sparse_world_points[source_ys, source_xs]
+    return dense_mask, dense_depth_map, dense_world_points
+
+
+def _build_human_prior_masks(
+    raw_foreground_mask,
+    smpl_prior_mask,
+    *,
+    completion_dilate_px=5,
+    head_hair_top_ratio=0.30,
+    head_hair_horizontal_expand_ratio=0.15,
+    head_hair_top_expand_ratio=0.10,
+    head_hair_dilate_px=7,
+    head_hair_edge_band_px=5,
+    min_region_pixels=32,
+):
+    base_mask = np.asarray(raw_foreground_mask, dtype=bool) | np.asarray(smpl_prior_mask, dtype=bool)
+    completion_mask = _binary_dilate_mask(base_mask, completion_dilate_px).astype(bool)
+    if int(base_mask.sum()) < int(max(1, min_region_pixels)):
+        zeros = np.zeros_like(base_mask, dtype=bool)
+        return completion_mask, zeros, zeros
+
+    ys, xs = np.where(base_mask)
+    y0, y1 = int(ys.min()), int(ys.max()) + 1
+    x0, x1 = int(xs.min()), int(xs.max()) + 1
+    box_h = max(1, y1 - y0)
+    box_w = max(1, x1 - x0)
+    top_height = max(1, int(round(box_h * float(head_hair_top_ratio))))
+    top_pad = int(round(box_h * float(head_hair_top_expand_ratio)))
+    side_pad = int(round(box_w * float(head_hair_horizontal_expand_ratio)))
+
+    head_region = np.zeros_like(base_mask, dtype=bool)
+    head_region[
+        max(0, y0 - top_pad) : min(base_mask.shape[0], y0 + top_height),
+        max(0, x0 - side_pad) : min(base_mask.shape[1], x1 + side_pad),
+    ] = True
+    support_mask = _binary_dilate_mask(base_mask, head_hair_dilate_px)
+    head_region = (head_region & support_mask).astype(bool)
+    detail_mask = (head_region & _build_edge_band_mask(support_mask, head_hair_edge_band_px)).astype(bool)
+    if int(detail_mask.sum()) < int(max(1, min_region_pixels)):
+        detail_mask = head_region.copy()
+    return completion_mask.astype(bool), head_region.astype(bool), detail_mask.astype(bool)
+
+
 class ZjuVggtGeomDataset(BaseDataset):
     def __init__(
         self,
@@ -433,6 +669,18 @@ class ZjuVggtGeomDataset(BaseDataset):
         sample_manifest_use_entry_camera_set: bool = False,
         sample_manifest_camera_list_field: str = "selected_camera_names",
         sample_manifest_supervised_camera_field: str = "selected_supervised_camera_names",
+        use_smpl_vertices_prior: bool = True,
+        smpl_vertices_subdir: str = "new_vertices,vertices",
+        smpl_prior_point_radius_px: int = 2,
+        smpl_prior_close_px: int = 4,
+        smpl_prior_gaussian_sigma: float = 2.5,
+        smpl_completion_dilate_px: int = 5,
+        smpl_completion_max_fill_px: float = 24.0,
+        head_hair_top_ratio: float = 0.30,
+        head_hair_horizontal_expand_ratio: float = 0.15,
+        head_hair_top_expand_ratio: float = 0.10,
+        head_hair_dilate_px: int = 7,
+        head_hair_edge_band_px: int = 5,
     ):
         super().__init__(common_conf=common_conf)
 
@@ -502,6 +750,18 @@ class ZjuVggtGeomDataset(BaseDataset):
         self.sample_manifest_supervised_camera_field = str(
             sample_manifest_supervised_camera_field or "selected_supervised_camera_names"
         ).strip()
+        self.use_smpl_vertices_prior = bool(use_smpl_vertices_prior)
+        self.smpl_vertices_subdirs = _ensure_list(smpl_vertices_subdir) or ["new_vertices", "vertices"]
+        self.smpl_prior_point_radius_px = int(max(0, smpl_prior_point_radius_px))
+        self.smpl_prior_close_px = int(max(0, smpl_prior_close_px))
+        self.smpl_prior_gaussian_sigma = float(max(0.0, smpl_prior_gaussian_sigma))
+        self.smpl_completion_dilate_px = int(max(0, smpl_completion_dilate_px))
+        self.smpl_completion_max_fill_px = float(max(0.0, smpl_completion_max_fill_px))
+        self.head_hair_top_ratio = float(max(0.05, min(0.75, head_hair_top_ratio)))
+        self.head_hair_horizontal_expand_ratio = float(max(0.0, min(0.75, head_hair_horizontal_expand_ratio)))
+        self.head_hair_top_expand_ratio = float(max(0.0, min(0.5, head_hair_top_expand_ratio)))
+        self.head_hair_dilate_px = int(max(0, head_hair_dilate_px))
+        self.head_hair_edge_band_px = int(max(0, head_hair_edge_band_px))
         self.sample_manifest_applied = False
         self.sample_manifest_entry_count = 0
         self.sample_manifest_entry_by_key = {}
@@ -509,6 +769,8 @@ class ZjuVggtGeomDataset(BaseDataset):
         self.camera_store = {}
         self.camera_ring_orders = {}
         self.raw_source_camera_pools = {}
+        self.smpl_vertices_dirs = {}
+        self.smpl_vertices_cache = {}
         self.sequence_list = []
 
         for seq_name in self.seq_names:
@@ -523,6 +785,21 @@ class ZjuVggtGeomDataset(BaseDataset):
                 for camera_name in self.camera_ring_orders[seq_name]
                 if (seq_dir / camera_name).is_dir()
             ]
+            if self.use_smpl_vertices_prior:
+                self.smpl_vertices_dirs[seq_name] = [
+                    subdir_name
+                    for subdir_name in self.smpl_vertices_subdirs
+                    if (seq_dir / subdir_name).is_dir()
+                ]
+                if not self.smpl_vertices_dirs[seq_name]:
+                    logging.warning(
+                        "ZJU VGGT-Geom could not find requested SMPL vertices dirs for seq=%s under %s: %s",
+                        seq_name,
+                        seq_dir,
+                        self.smpl_vertices_subdirs,
+                    )
+            else:
+                self.smpl_vertices_dirs[seq_name] = []
             frame_sources = {}
             valid_geom_subdirs = []
             for geom_subdir_name in self.geom_subdirs:
@@ -637,6 +914,31 @@ class ZjuVggtGeomDataset(BaseDataset):
         status = "Training" if self.training else "Testing"
         logging.info(f"{status}: ZJU VGGT-Geom sequence count: {self.sequence_list_len}")
         logging.info(f"{status}: ZJU VGGT-Geom dataset length: {len(self)}")
+
+    def _load_smpl_vertices(self, entry):
+        if not self.use_smpl_vertices_prior:
+            return None
+
+        cache_key = (str(entry["seq_name"]), int(entry["frame_id"]))
+        if cache_key in self.smpl_vertices_cache:
+            return self.smpl_vertices_cache[cache_key]
+
+        seq_name = str(entry["seq_name"])
+        seq_dir = Path(entry["seq_dir"])
+        frame_id = int(entry["frame_id"])
+        candidate_names = [f"{frame_id}.npy", f"{frame_id:06d}.npy"]
+        for subdir_name in self.smpl_vertices_dirs.get(seq_name, []):
+            subdir = seq_dir / subdir_name
+            for file_name in candidate_names:
+                path = subdir / file_name
+                if not path.is_file():
+                    continue
+                vertices = np.asarray(np.load(path, allow_pickle=False), dtype=np.float32)
+                self.smpl_vertices_cache[cache_key] = vertices
+                return vertices
+
+        self.smpl_vertices_cache[cache_key] = None
+        return None
 
     def _resolve_source_view_pool_meta(self):
         requested_source_view_pool = self.source_view_pool
@@ -1055,11 +1357,20 @@ class ZjuVggtGeomDataset(BaseDataset):
         foreground_masks = []
         conf_depth_point_masks = []
         depth_conf_maps = []
+        smpl_prior_masks = []
+        smpl_prior_feature_maps = []
+        human_prior_completion_masks = []
+        human_prior_completion_depths = []
+        human_prior_completion_world_points = []
+        human_prior_completion_point_masks = []
+        head_hair_region_masks = []
+        head_hair_detail_masks = []
         extrinsics = []
         intrinsics = []
         image_paths = []
         original_sizes = []
         conf_depth_active_supervised_camera_names = set(quality_meta["conf_depth_active_supervised_camera_names"])
+        smpl_vertices_world = self._load_smpl_vertices(entry)
 
         for item_idx, cam_name in enumerate(selected_camera_names):
             local_idx = int(ids[item_idx]) if item_idx < len(ids) else -1
@@ -1102,6 +1413,50 @@ class ZjuVggtGeomDataset(BaseDataset):
                 extri_opencv = np.asarray(geom["extrinsic"][local_idx], dtype=np.float32)
                 intri_opencv = np.asarray(geom["intrinsic"][local_idx], dtype=np.float32)
 
+            if smpl_vertices_world is not None:
+                (
+                    smpl_prior_mask,
+                    smpl_prior_feature_map,
+                    smpl_prior_sparse_mask,
+                    smpl_prior_sparse_depth_map,
+                    smpl_prior_sparse_world_points,
+                ) = _project_smpl_vertices_to_feature_map(
+                    smpl_vertices_world,
+                    extri_opencv,
+                    intri_opencv,
+                    target_hw,
+                    point_radius_px=self.smpl_prior_point_radius_px,
+                    close_px=self.smpl_prior_close_px,
+                    gaussian_sigma=self.smpl_prior_gaussian_sigma,
+                )
+            else:
+                smpl_prior_mask = np.zeros(target_hw, dtype=bool)
+                smpl_prior_feature_map = np.zeros(target_hw, dtype=np.float32)
+                smpl_prior_sparse_mask = np.zeros(target_hw, dtype=bool)
+                smpl_prior_sparse_depth_map = np.zeros(target_hw, dtype=np.float32)
+                smpl_prior_sparse_world_points = np.zeros((*target_hw, 3), dtype=np.float32)
+            human_prior_completion_mask, head_hair_region_mask, head_hair_detail_mask = _build_human_prior_masks(
+                raw_fg_mask,
+                smpl_prior_mask,
+                completion_dilate_px=self.smpl_completion_dilate_px,
+                head_hair_top_ratio=self.head_hair_top_ratio,
+                head_hair_horizontal_expand_ratio=self.head_hair_horizontal_expand_ratio,
+                head_hair_top_expand_ratio=self.head_hair_top_expand_ratio,
+                head_hair_dilate_px=self.head_hair_dilate_px,
+                head_hair_edge_band_px=self.head_hair_edge_band_px,
+            )
+            (
+                human_prior_completion_point_mask,
+                human_prior_completion_depth_map,
+                human_prior_completion_world_point_map,
+            ) = _densify_smpl_prior_geometry(
+                smpl_prior_sparse_mask,
+                smpl_prior_sparse_depth_map,
+                smpl_prior_sparse_world_points,
+                human_prior_completion_mask,
+                max_fill_distance_px=self.smpl_completion_max_fill_px,
+            )
+
             if is_supervised_camera:
                 world_coords_points, cam_coords_points, point_mask = depth_to_world_coords_points(
                     depth_map, extri_opencv, intri_opencv
@@ -1126,6 +1481,14 @@ class ZjuVggtGeomDataset(BaseDataset):
             foreground_masks.append(raw_fg_mask.astype(bool))
             conf_depth_point_masks.append(conf_depth_point_mask)
             depth_conf_maps.append(depth_conf_map)
+            smpl_prior_masks.append(smpl_prior_mask.astype(bool))
+            smpl_prior_feature_maps.append(smpl_prior_feature_map.astype(np.float32))
+            human_prior_completion_masks.append(human_prior_completion_mask.astype(bool))
+            human_prior_completion_depths.append(human_prior_completion_depth_map.astype(np.float32))
+            human_prior_completion_world_points.append(human_prior_completion_world_point_map.astype(np.float32))
+            human_prior_completion_point_masks.append(human_prior_completion_point_mask.astype(bool))
+            head_hair_region_masks.append(head_hair_region_mask.astype(bool))
+            head_hair_detail_masks.append(head_hair_detail_mask.astype(bool))
             extrinsics.append(extri_opencv.astype(np.float32))
             intrinsics.append(intri_opencv.astype(np.float32))
             image_paths.append(str(image_path))
@@ -1174,6 +1537,14 @@ class ZjuVggtGeomDataset(BaseDataset):
             "conf_depth_point_masks": conf_depth_point_masks,
             "depth_conf_maps": depth_conf_maps,
             "foreground_masks": foreground_masks,
+            "smpl_prior_masks": smpl_prior_masks,
+            "smpl_prior_feature_maps": smpl_prior_feature_maps,
+            "human_prior_completion_masks": human_prior_completion_masks,
+            "human_prior_completion_depths": human_prior_completion_depths,
+            "human_prior_completion_world_points": human_prior_completion_world_points,
+            "human_prior_completion_point_masks": human_prior_completion_point_masks,
+            "head_hair_region_masks": head_hair_region_masks,
+            "head_hair_detail_masks": head_hair_detail_masks,
             "image_paths": image_paths,
             "original_sizes": original_sizes,
         }

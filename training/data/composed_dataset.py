@@ -127,6 +127,38 @@ class ComposedDataset(Dataset, ABC):
         foreground_masks = None
         if "foreground_masks" in batch and batch["foreground_masks"] is not None:
             foreground_masks = torch.from_numpy(np.stack(batch["foreground_masks"]).astype(bool))
+        smpl_prior_masks = None
+        if "smpl_prior_masks" in batch and batch["smpl_prior_masks"] is not None:
+            smpl_prior_masks = torch.from_numpy(np.stack(batch["smpl_prior_masks"]).astype(bool))
+        smpl_prior_feature_maps = None
+        if "smpl_prior_feature_maps" in batch and batch["smpl_prior_feature_maps"] is not None:
+            smpl_prior_feature_maps = torch.from_numpy(np.stack(batch["smpl_prior_feature_maps"]).astype(np.float32))
+        human_prior_completion_masks = None
+        if "human_prior_completion_masks" in batch and batch["human_prior_completion_masks"] is not None:
+            human_prior_completion_masks = torch.from_numpy(
+                np.stack(batch["human_prior_completion_masks"]).astype(bool)
+            )
+        human_prior_completion_depths = None
+        if "human_prior_completion_depths" in batch and batch["human_prior_completion_depths"] is not None:
+            human_prior_completion_depths = torch.from_numpy(
+                np.stack(batch["human_prior_completion_depths"]).astype(np.float32)
+            )
+        human_prior_completion_world_points = None
+        if "human_prior_completion_world_points" in batch and batch["human_prior_completion_world_points"] is not None:
+            human_prior_completion_world_points = torch.from_numpy(
+                np.stack(batch["human_prior_completion_world_points"]).astype(np.float32)
+            )
+        human_prior_completion_point_masks = None
+        if "human_prior_completion_point_masks" in batch and batch["human_prior_completion_point_masks"] is not None:
+            human_prior_completion_point_masks = torch.from_numpy(
+                np.stack(batch["human_prior_completion_point_masks"]).astype(bool)
+            )
+        head_hair_region_masks = None
+        if "head_hair_region_masks" in batch and batch["head_hair_region_masks"] is not None:
+            head_hair_region_masks = torch.from_numpy(np.stack(batch["head_hair_region_masks"]).astype(bool))
+        head_hair_detail_masks = None
+        if "head_hair_detail_masks" in batch and batch["head_hair_detail_masks"] is not None:
+            head_hair_detail_masks = torch.from_numpy(np.stack(batch["head_hair_detail_masks"]).astype(bool))
 
 
         # --- Apply Color Augmentation (training mode only) ---
@@ -158,6 +190,22 @@ class ComposedDataset(Dataset, ABC):
             sample["depth_conf_maps"] = depth_conf_maps
         if foreground_masks is not None:
             sample["foreground_masks"] = foreground_masks
+        if smpl_prior_masks is not None:
+            sample["smpl_prior_masks"] = smpl_prior_masks
+        if smpl_prior_feature_maps is not None:
+            sample["smpl_prior_feature_maps"] = smpl_prior_feature_maps
+        if human_prior_completion_masks is not None:
+            sample["human_prior_completion_masks"] = human_prior_completion_masks
+        if human_prior_completion_depths is not None:
+            sample["human_prior_completion_depths"] = human_prior_completion_depths
+        if human_prior_completion_world_points is not None:
+            sample["human_prior_completion_world_points"] = human_prior_completion_world_points
+        if human_prior_completion_point_masks is not None:
+            sample["human_prior_completion_point_masks"] = human_prior_completion_point_masks
+        if head_hair_region_masks is not None:
+            sample["head_hair_region_masks"] = head_hair_region_masks
+        if head_hair_detail_masks is not None:
+            sample["head_hair_detail_masks"] = head_hair_detail_masks
         if "selection_anchor_camera" in batch:
             anchor_camera = batch["selection_anchor_camera"]
             sample["selection_anchor_camera"] = "" if anchor_camera is None else str(anchor_camera)

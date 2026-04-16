@@ -226,13 +226,37 @@ class Trainer:
             logging.info(f"Model state loaded. Missing keys: {missing or 'None'}. Unexpected keys: {unexpected or 'None'}.")
 
         # Load optimizer state if available and in training mode
-        if "optimizer" in checkpoint:
+        if "optimizer" in checkpoint and getattr(self, "optims", None) is not None:
             logging.info(f"Loading optimizer state dict (rank {self.rank})")
-            self.optims.optimizer.load_state_dict(checkpoint["optimizer"])
+            optimizer_wrappers = (
+                list(self.optims)
+                if isinstance(self.optims, (list, tuple))
+                else [self.optims]
+            )
+            optimizer_states = checkpoint["optimizer"]
+            if not isinstance(optimizer_states, list):
+                optimizer_states = [optimizer_states]
+
+            if len(optimizer_wrappers) == len(optimizer_states):
+                for optim_wrapper, optimizer_state in zip(optimizer_wrappers, optimizer_states):
+                    optimizer = getattr(optim_wrapper, "optimizer", optim_wrapper)
+                    optimizer.load_state_dict(optimizer_state)
+            elif len(optimizer_wrappers) == 1 and len(optimizer_states) == 1:
+                optimizer = getattr(optimizer_wrappers[0], "optimizer", optimizer_wrappers[0])
+                optimizer.load_state_dict(optimizer_states[0])
+            else:
+                logging.warning(
+                    "Skipping optimizer state load because checkpoint stores %d optimizer state(s) "
+                    "but trainer initialized %d optimizer wrapper(s).",
+                    len(optimizer_states),
+                    len(optimizer_wrappers),
+                )
 
         # Load training progress
         if "epoch" in checkpoint:
             self.epoch = checkpoint["epoch"]
+        elif "prev_epoch" in checkpoint:
+            self.epoch = int(checkpoint["prev_epoch"]) + 1
         self.steps = checkpoint["steps"] if "steps" in checkpoint else {"train": 0, "val": 0}
         self.ckpt_time_elapsed = checkpoint.get("time_elapsed", 0)
 
@@ -770,6 +794,7 @@ class Trainer:
         tensor_keys = [
             "images", "depths", "extrinsics", "intrinsics", 
             "cam_points", "world_points", "point_masks", "foreground_masks", "conf_depth_point_masks",
+            "human_prior_completion_depths", "human_prior_completion_world_points", "human_prior_completion_point_masks",
             "selection_anchor_quality_score",
             "selection_sample_manifest_applied",
         ]        
@@ -807,6 +832,49 @@ class Trainer:
         
         return batch
 
+    def _compute_batch_scene_normalization_stats(self, batch: Mapping):
+        extrinsics = batch["extrinsics"]
+        world_points = batch["world_points"]
+        point_masks = batch["point_masks"]
+
+        first_cam_rotation = extrinsics[:, 0, :3, :3]
+        first_cam_translation = extrinsics[:, 0, :3, 3]
+        normalized_world_points = (
+            world_points @ first_cam_rotation.transpose(-1, -2).unsqueeze(1).unsqueeze(2)
+        ) + first_cam_translation.unsqueeze(1).unsqueeze(2).unsqueeze(3)
+        dist = normalized_world_points.norm(dim=-1)
+        dist_sum = (dist * point_masks).sum(dim=[1, 2, 3])
+        valid_count = point_masks.sum(dim=[1, 2, 3])
+        avg_scale = (dist_sum / (valid_count + 1e-3)).clamp(min=1e-6, max=1e6)
+        return first_cam_rotation, first_cam_translation, avg_scale
+
+    def _normalize_human_prior_completion_batch_tensors(self, batch: Mapping) -> None:
+        prior_point_masks = batch.get("human_prior_completion_point_masks", None)
+        prior_world_points = batch.get("human_prior_completion_world_points", None)
+        prior_depths = batch.get("human_prior_completion_depths", None)
+        if prior_point_masks is None or (prior_world_points is None and prior_depths is None):
+            return
+
+        first_cam_rotation, first_cam_translation, avg_scale = self._compute_batch_scene_normalization_stats(batch)
+        if prior_world_points is not None:
+            normalized_prior_world_points = (
+                prior_world_points @ first_cam_rotation.transpose(-1, -2).unsqueeze(1).unsqueeze(2)
+            ) + first_cam_translation.unsqueeze(1).unsqueeze(2).unsqueeze(3)
+            normalized_prior_world_points = normalized_prior_world_points / avg_scale.view(-1, 1, 1, 1, 1)
+            batch["human_prior_completion_world_points"] = torch.where(
+                prior_point_masks.unsqueeze(-1),
+                normalized_prior_world_points,
+                torch.zeros_like(normalized_prior_world_points),
+            )
+
+        if prior_depths is not None:
+            normalized_prior_depths = prior_depths / avg_scale.view(-1, 1, 1, 1)
+            batch["human_prior_completion_depths"] = torch.where(
+                prior_point_masks,
+                normalized_prior_depths,
+                torch.zeros_like(normalized_prior_depths),
+            )
+
     def _process_batch(self, batch: Mapping):      
         if self.data_conf.train.common_config.repeat_batch:
             batch = self._apply_batch_repetition(batch)
@@ -820,6 +888,8 @@ class Trainer:
                 depths=batch["depths"],
                 point_masks=batch["point_masks"],
             )
+
+        self._normalize_human_prior_completion_batch_tensors(batch)
 
         # Replace the original values in the batch with the normalized ones.
         batch["extrinsics"] = normalized_extrinsics

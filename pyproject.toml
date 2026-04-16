@@ -25,6 +25,7 @@ demo = [
     "requests",
     "trimesh",
     "matplotlib",
+    "h5py",
 ]
 
 # Using setuptools as the build backend

@@ -1,0 +1,74 @@
+defaults:
+  - zju_vggt_geom_unproject_source_policy_nearestplusuniformtail_rawpool_confdepth_dropworst_gradconfmask_humansupportcollapsemaskedbg_minimal
+  - _self_
+
+exp_name: zju_vggt_geom_unproject_source_policy_nearestplusuniformtail_rawpool_confdepth_dropworst_gradconfmask_smplprior_headhair_longrun
+zju_source_anchor_policy: max_depth_conf
+
+logging:
+  scalar_keys_to_log:
+    train:
+      keys_to_log:
+        - loss_objective
+        - loss_camera
+        - loss_T
+        - loss_R
+        - loss_FL
+        - loss_conf_depth
+        - loss_reg_depth
+        - loss_grad_depth
+        - loss_unproject_geometry
+        - loss_support_pull_to_fg
+        - loss_bg_black
+        - loss_fg_support_spread
+        - loss_fg_profile_peak_surrogate
+        - loss_human_prior_conf_floor
+        - loss_human_prior_depth_presence
+        - loss_human_prior_pseudo_depth
+        - loss_human_prior_pseudo_unproject
+    val:
+      keys_to_log:
+        - loss_objective
+        - loss_camera
+        - loss_T
+        - loss_R
+        - loss_FL
+        - loss_conf_depth
+        - loss_reg_depth
+        - loss_grad_depth
+        - loss_unproject_geometry
+        - loss_support_pull_to_fg
+        - loss_bg_black
+        - loss_fg_support_spread
+        - loss_fg_profile_peak_surrogate
+        - loss_human_prior_conf_floor
+        - loss_human_prior_depth_presence
+        - loss_human_prior_pseudo_depth
+        - loss_human_prior_pseudo_unproject
+
+loss:
+  depth:
+    human_prior_mask_key: head_hair_detail_masks
+    human_prior_feature_map_key: smpl_prior_feature_maps
+    human_prior_mask_floor: 0.40
+    human_prior_reg_scale: 2.25
+    human_prior_conf_scale: 1.75
+    human_prior_pseudo_depth_key: human_prior_completion_depths
+    human_prior_pseudo_mask_key: human_prior_completion_point_masks
+    human_prior_pseudo_weight: 0.20
+  unproject_geometry:
+    warmup_end: 0.15
+    warmup_init_factor: 0.35
+    weight_stage2_start: 0.55
+    weight_stage2_end: 0.85
+    weight_stage2_value: 0.28
+    human_prior_mask_key: human_prior_completion_masks
+    human_prior_feature_map_key: smpl_prior_feature_maps
+    human_prior_mask_floor: 0.45
+    human_prior_scale: 1.60
+    human_prior_conf_floor_weight: 0.04
+    human_prior_conf_floor: 0.35
+    human_prior_depth_presence_weight: 0.10
+    human_prior_pseudo_world_key: human_prior_completion_world_points
+    human_prior_pseudo_mask_key: human_prior_completion_point_masks
+    human_prior_pseudo_weight: 0.35
