@@ -17,42 +17,17 @@
 ## Current Guarded Run
 
 - Modal app name: `vggt-zju-geometry-smplprior-headhair`
-- Active app id: `ap-5cYQCMNnm7VO9VhpD9g6hb`
-- App created at: `2026-04-16 15:05:04 +08:00`
+- Active app id: `ap-JNBeCmUzyjYfRNIaINlmYz`
+- App created at: `2026-04-16 13:46:21 +08:00`
 - Current state at last check: `ephemeral (detached)` with `Tasks=1`
 - Resume checkpoint:
   - `/mnt/out/20260415_smplprior_headhair_longrun_eager_shmsafe_resume2/ckpts/checkpoint_6.pt`
 - New output root:
-  - `/mnt/out/20260416_smplprior_headhair_longrun_eager_shmsafe_resume5_guarded`
-
-## Resume4 Failure And Fix
-
-- First guarded relaunch output root:
   - `/mnt/out/20260416_smplprior_headhair_longrun_eager_shmsafe_resume4_guarded`
-- App id:
-  - `ap-JNBeCmUzyjYfRNIaINlmYz`
-- It made real progress through approximately:
-  - `Train Epoch: [7][350/1000000]`
-- It then stopped at:
-  - `2026-04-16 14:27:31 +08:00`
-- Launcher tail showed:
-  - `Stopping app - user stopped from CLI.`
-
-Interpretation:
-
-- The prior PowerShell launcher used `modal ...::run_remote_zju_geometry_finetune` directly.
-- That path still tied the remote run lifetime to the local `modal run` client, even under `--detach`.
-- Fix landed:
-  - `modal_zju_geometry_minimal_finetune.py`
-    - added local entrypoint `spawn_remote_zju_geometry_finetune`
-  - `scripts/run_modal_zju_geometry_minimal_finetune.ps1`
-    - `-Detach` now routes to the new local spawn entrypoint instead of binding directly to the remote function
-  - `scripts/run_modal_zju_geometry_guard_daemon.py`
-    - updated to treat a fast launcher exit as normal for the new spawn-based detach flow
 
 ## Verified Progress
 
-- The current remote output root already contains:
+- The new remote output root already contains:
   - `dataset_probe/summary.json`
   - `dataset_probe/aggregate_summary.json`
   - `dataset_probe/sample_human_prior_completion_depths.png`
@@ -63,18 +38,17 @@ Interpretation:
   - `logs/log.txt`
   - `driver_live.log`
 - Resume entered the real training loop again, not just initialization.
-- The fixed detached-spawn path has now been verified on `resume5_guarded`:
-  - local launcher exited cleanly with return code `0`
-  - the Modal app remained active after launcher exit
-  - remote training logs continued to advance after launcher exit
-- Latest verified progress at last manual check:
-  - `Train Epoch: [7][44/1000000]` at `2026-04-16 07:11:46 UTC`
+- Latest verified launcher log tail at last manual check:
+  - `Train Epoch: [7][0]` at `2026-04-16 05:49:03 UTC`
+  - `Train Epoch: [7][1]` at `2026-04-16 05:49:34 UTC`
+  - `Train Epoch: [7][2]` at `2026-04-16 05:50:06 UTC`
+  - `Train Epoch: [7][3]` at `2026-04-16 05:50:07 UTC`
 - No `Traceback`, `RuntimeError`, `Exception`, or `KeyboardInterrupt` was seen in the checked guard/launcher tail.
 
 ## Guard Daemon
 
 - Guard session dir:
-  - `output/modal_zju_geometry_guard_daemon/20260416_150457_smplprior_headhair_resume_guard`
+  - `output/modal_zju_geometry_guard_daemon/20260416_134608_smplprior_headhair_resume_guard`
 - Guard status snapshot:
   - `output/modal_zju_geometry_guard_daemon/latest_session.json`
 - Active lock:

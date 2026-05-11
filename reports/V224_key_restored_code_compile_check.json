@@ -1,0 +1,60 @@
+{
+  "timestamp": "2026-05-09T04:54:13+0800",
+  "results": [
+    {
+      "path": "tools/v223_mentor_final_controller.py",
+      "exists": true,
+      "py_compile": "pass"
+    },
+    {
+      "path": "tools/v223_candidate_immutability_monitor.py",
+      "exists": true,
+      "py_compile": "pass"
+    },
+    {
+      "path": "tools/v121_v220_release_controller.py",
+      "exists": true,
+      "py_compile": "pass"
+    },
+    {
+      "path": "tools/v62_v120_multibranch_controller.py",
+      "exists": true,
+      "py_compile": "pass"
+    },
+    {
+      "path": "tools/v221_release_supplement_finalizer.py",
+      "exists": true,
+      "py_compile": "pass"
+    },
+    {
+      "path": "tools/recover_code_from_codex_sessions.py",
+      "exists": true,
+      "py_compile": "pass"
+    },
+    {
+      "path": "modal_v62_formal_candidate_finetune.py",
+      "exists": true,
+      "py_compile": "pass"
+    },
+    {
+      "path": "modal_v42_prior_enabled_predictions.py",
+      "exists": true,
+      "py_compile": "pass"
+    },
+    {
+      "path": "modal_v53_formal_cloud_unlock_smoke.py",
+      "exists": true,
+      "py_compile": "pass"
+    },
+    {
+      "path": "training/loss_smplx_native_prior.py",
+      "exists": true,
+      "py_compile": "pass"
+    },
+    {
+      "path": "vggt/utils/human_prior.py",
+      "exists": true,
+      "py_compile": "pass"
+    }
+  ]
+}

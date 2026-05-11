@@ -1,0 +1,66 @@
+{
+  "blockers": [],
+  "candidate_hash_invariant_pass": true,
+  "created_utc": "2026-05-09T02:57:36Z",
+  "forbidden_scan": {
+    "forbidden_hit_count": 0,
+    "forbidden_hits": [],
+    "pass": true
+  },
+  "formal_cloud_unblocked": true,
+  "process_scan": {
+    "local_python_or_modal_processes": [],
+    "modal_apps": [],
+    "modal_containers": [],
+    "pass": true,
+    "raw": {
+      "local": {
+        "cmd": [
+          "powershell",
+          "-NoProfile",
+          "-Command",
+          "Get-CimInstance Win32_Process | Where-Object { $_.Name -match 'python|modal' -and $_.CommandLine -notmatch 'v223_v50r2_completion_supplement' } | Select-Object ProcessId,Name,CommandLine | ConvertTo-Json -Compress"
+        ],
+        "returncode": 0,
+        "stderr": "",
+        "stdout": ""
+      },
+      "modal_apps": {
+        "cmd": [
+          "modal",
+          "app",
+          "list",
+          "--json"
+        ],
+        "returncode": 0,
+        "stderr": "",
+        "stdout": "[]\n"
+      },
+      "modal_containers": {
+        "cmd": [
+          "modal",
+          "container",
+          "list",
+          "--json"
+        ],
+        "returncode": 0,
+        "stderr": "",
+        "stdout": "[]\n"
+      }
+    }
+  },
+  "required_paths": {
+    "final_controller": "D:\\vggt\\vggt-main\\reports\\V399_v50r2_final_promotion_controller.json",
+    "v280": "D:\\vggt\\vggt-main\\reports\\V280_F1_60view_replay_V50R2.json",
+    "v290": "D:\\vggt\\vggt-main\\reports\\V290_G2_temporal_stress_V50R2.json",
+    "v310": "D:\\vggt\\vggt-main\\reports\\V310_I2_kinect_teacher_resurrection.json",
+    "v350": "D:\\vggt\\vggt-main\\reports\\V350_K_release_archive_handoff.json"
+  },
+  "residual_process": 0,
+  "right_hand_decision": "PASS_WITH_RISK",
+  "status": "ALL_BRANCHES_TERMINAL_V50R2_SUPPLEMENTED",
+  "strict_candidate_passes": 1,
+  "strict_teacher_passes": 0,
+  "task": "V223_A_to_L_completion_audit",
+  "teacher_decision": "FAIL_FROZEN"
+}

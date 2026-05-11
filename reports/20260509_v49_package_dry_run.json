@@ -1,0 +1,36 @@
+{
+  "blockers": [],
+  "candidate_package_dryrun": {
+    "exists": true,
+    "mtime": 1778276873.6487727,
+    "path": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V49_package_dry_run\\candidate_package_dryrun\\manifest_dryrun.json",
+    "size": 1290
+  },
+  "created_utc": "2026-05-08T21:47:53Z",
+  "decision": "V49 dry-run passed; final promotion may evaluate strict conditions.",
+  "forbidden_hit_count": 0,
+  "registry_entry_dryrun": {
+    "exists": true,
+    "mtime": 1778276873.6487727,
+    "path": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V49_package_dry_run\\registry_entry_dryrun.json",
+    "size": 1290
+  },
+  "research_only": true,
+  "stage_statuses": {
+    "v44_strict_visual_pre_promotion_gate": "DONE_PASS",
+    "v45_head_face_correction": "DONE_PASS",
+    "v46_hand_correction": "DONE_PASS",
+    "v47_60view_correction": "DONE_PASS",
+    "v48_temporal_correction": "DONE_PASS"
+  },
+  "status": "DONE_PASS",
+  "task": "v49_package_dry_run",
+  "teacher_package_dryrun": {
+    "exists": true,
+    "mtime": 1778276873.6502578,
+    "path": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V49_package_dry_run\\teacher_package_dryrun\\manifest_dryrun.json",
+    "size": 1290
+  },
+  "writes_formal_package": false,
+  "writes_strict_registry": false
+}

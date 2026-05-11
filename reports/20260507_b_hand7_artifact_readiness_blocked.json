@@ -1,0 +1,100 @@
+{
+  "task": "B_hand7_continuous_connected_hand_surface_review_artifact_readiness",
+  "created_date": "2026-05-07",
+  "workspace": "D:\\vggt\\vggt-main",
+  "status": "blocked",
+  "decision": "not_feasible_from_current_local_artifacts",
+  "can_produce_B_hand7_continuous_connected_hand_surface_review_from_current_artifacts": false,
+  "strict_candidate_passes": 0,
+  "strict_teacher_passes": 0,
+  "formal_cloud_train_infer_export": "blocked",
+  "teacher_export": "blocked",
+  "candidate_export": "blocked",
+  "predictions_export": "blocked",
+  "strict_registry_write": "blocked",
+  "summary": "Current B-hand artifacts prove ROI/token evidence, a decoder skeleton, a scaffold-connected proxy, weak label/depth diagnostics, and a joint contract probe. They do not prove a continuous left/right hand surface connected to wrists/arms. The only connected mesh artifact on disk is B_hand4, and its own summary records pass=false because the upstream B_hand3 raw SMPL-X hand gate failed.",
+  "missing_artifact": {
+    "name": "B_hand7_continuous_connected_hand_surface_review",
+    "required_content": [
+      "one local summary JSON",
+      "one local markdown report",
+      "left Open3D screenshots: front, side, top, iso",
+      "right Open3D screenshots: front, side, top, iso",
+      "combined hands+wrist+forearm Open3D screenshots: front, side, top, iso",
+      "largest connected component and fragmentation stats per side",
+      "explicit left/right hand presence, wrist-to-forearm connection, palm continuity, and finger-structure readout",
+      "explicit labeling that any SMPL-X, MediaPipe, or connected-template contribution is weak support only"
+    ],
+    "must_not_be_replaced_by": [
+      "B_hand4 connected-template or SMPL-X scaffold proxy",
+      "ROI boxes only",
+      "bbox-level COLMAP depth presence only",
+      "MediaPipe hand landmarks or patches only",
+      "sparse query proposals without wrist/palm/finger surface continuity",
+      "numeric-only pass without Open3D visual review"
+    ]
+  },
+  "blocking_evidence": {
+    "no_existing_B_hand7_artifact_or_report": true,
+    "B_hand3_raw_anchor": {
+      "summary_path": "output\\surface_research_preflight_local\\B_hand3_smplx_wrist_arm_connected_precheck_hybrid6\\raw_smplx_mesh_hand_anchor_summary.json",
+      "body_gate_pass": true,
+      "views_passing_body_anchor": 60,
+      "hand_gate_pass": false,
+      "eligible_views_with_hand_candidates": 60,
+      "views_passing_raw_hand_anchor": 0,
+      "views_with_compact_3d_hand_boxes": 0,
+      "top_level_pass": false
+    },
+    "B_hand4_connected_mesh_precheck": {
+      "summary_path": "output\\surface_research_preflight_local\\B_hand4_connected_mesh_precheck_hybrid6\\b_hand_connected_mesh_precheck_summary.json",
+      "connected_proxy_built": true,
+      "pass": false,
+      "truthful_status": "fail_precheck_only_not_candidate_not_teacher",
+      "gate_decision": "fail_hand_gate_not_passed",
+      "upstream_hand_gate_pass": false,
+      "combined_mesh_exists": true,
+      "combined_pointcloud_exists": true,
+      "combined_open3d_renders_existing": 4,
+      "left_single_component_scaffold": true,
+      "right_single_component_scaffold": true,
+      "blockers": [
+        "B-hand3 upstream raw SMPL-X hand gate did not pass, so this is fail.",
+        "Connected template/SMPL-X hand topology is a scaffold only, not hand success.",
+        "No teacher, candidate, predictions, registry, training, inference, or cloud export was created.",
+        "Open3D-readable connected proxy still requires human visual review before any future gate claim."
+      ]
+    },
+    "B_hand6_colmap_depth_evidence": {
+      "summary_path": "output\\surface_research_preflight_local\\B_hand6_colmap_depth_evidence_probe_hybrid12\\b_hand_colmap_depth_evidence_summary.json",
+      "roi_count": 14,
+      "mapped_depth_roi_count": 12,
+      "missing_depth_roi_count": 2,
+      "colmap_depth_present_for_both_hands": true,
+      "interpretation": "bbox_level_depth_signal_exists_but_not_connected_hand_surface"
+    },
+    "B_joint_surface_hand_contract": {
+      "summary_path": "output\\surface_research_preflight_local\\B_joint_surface_hand_contract_probe_hybrid6\\b_joint_surface_hand_contract_summary.json",
+      "status": "research_only_joint_contract_probe_not_decoder_not_teacher_not_candidate",
+      "combined_beats_hand_only": false,
+      "combined_no_absolute_x_survives": false
+    }
+  },
+  "data_needed_to_unblock": [
+    "A same-frame dense hand/arm surface mesh, pointcloud, or signed-surface artifact with left and right hands present.",
+    "The dense artifact must include wrists and enough forearm/arm context to verify hands are connected to arms, not detached sheets or floating blobs.",
+    "The dense artifact must provide palm continuity and visible finger surface structure, or explicitly report missing fingers as a failure.",
+    "The artifact must be independent of pure SMPL-X/template/MediaPipe topology success; those sources may only be weak support/provenance.",
+    "Camera/provenance mapping to the same local frame used by the B-hand evidence cache and existing predictions."
+  ],
+  "commands_needed_after_data_available": [
+    "Test-Path -LiteralPath '<same_frame_dense_connected_hand_arm_surface.ply>'",
+    "D:\\anaconda\\envs\\g3splat\\python.exe -B tools\\render_teacher_surface_review.py --teacher-mesh <same_frame_dense_connected_hand_arm_surface.ply> --predictions-npz output\\local_inference_results\\r34_raw518_r27_on6v_fullbody\\predictions.npz --output-dir output\\surface_research_preflight_local\\B_hand7_continuous_connected_hand_surface_review --roi hands --camera-view-indices 0,24,36,45,57 --sample-points 160000",
+    "Create the B_hand7 summary JSON/markdown only after the render output includes front/side/top/iso views for left, right, and combined hands, plus per-side connected-component statistics."
+  ],
+  "allowed_current_action": "blocked_readiness_report_only",
+  "changed_paths": [
+    "reports\\20260507_b_hand7_artifact_readiness_blocked.json",
+    "reports\\20260507_b_hand7_artifact_readiness_blocked.md"
+  ]
+}

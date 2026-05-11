@@ -1,0 +1,7 @@
+# V32 Candidate Open3D Review
+
+status: `DONE_PASS`
+
+ply: `D:\vggt\vggt-main\output\surface_research_preflight_local\V32_candidate_inference_research\v32_candidate_open3d_review_points.ply`
+
+sampled_vertex_count: `120000`

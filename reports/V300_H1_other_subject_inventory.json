@@ -1,0 +1,56 @@
+{
+  "case_rows": [
+    {
+      "exists": false,
+      "root": "D:\\vggt\\vggt-main\\data",
+      "sample": []
+    },
+    {
+      "exists": false,
+      "root": "D:\\vggt\\vggt-main\\datasets",
+      "sample": []
+    },
+    {
+      "exists": true,
+      "root": "G:\\数据集\\datasets",
+      "sample": [
+        "G:\\数据集\\datasets\\0012_11-018.smc",
+        "G:\\数据集\\datasets\\0013_01-004.smc",
+        "G:\\数据集\\datasets\\0013_03(1)-019.smc",
+        "G:\\数据集\\datasets\\0013_03-020.smc",
+        "G:\\数据集\\datasets\\0013_09-005.smc",
+        "G:\\数据集\\datasets\\0013_11-006.smc",
+        "G:\\数据集\\datasets\\0019_08-002.smc",
+        "G:\\数据集\\datasets\\0021_03-007.smc",
+        "G:\\数据集\\datasets\\0023_06-021.smc",
+        "G:\\数据集\\datasets\\cifar10_if",
+        "G:\\数据集\\datasets\\data_used_in_4K4D",
+        "G:\\数据集\\datasets\\data_used_in_4K4D-20260204T055307Z-3-001.zip",
+        "G:\\数据集\\datasets\\data_used_in_4K4D-20260204T055307Z-3-003.zip",
+        "G:\\数据集\\datasets\\data_used_in_4K4D-20260204T055307Z-3-008.zip",
+        "G:\\数据集\\datasets\\data_used_in_4K4D-20260204T055307Z-3-009.zip",
+        "G:\\数据集\\datasets\\data_used_in_4K4D-20260204T055307Z-3-010.zip",
+        "G:\\数据集\\datasets\\data_used_in_4K4D-20260204T055307Z-3-011",
+        "G:\\数据集\\datasets\\data_used_in_4K4D-20260204T055307Z-3-011.zip",
+        "G:\\数据集\\datasets\\data_used_in_4K4D-20260204T055307Z-3-012.zip",
+        "G:\\数据集\\datasets\\data_used_in_4K4D-20260204T055307Z-3-013.zip",
+        "G:\\数据集\\datasets\\data_used_in_4K4D-20260204T055307Z-3-014.zip",
+        "G:\\数据集\\datasets\\data_used_in_4K4D-20260204T055307Z-3-015.zip",
+        "G:\\数据集\\datasets\\data_used_in_4K4D-20260204T055307Z-3-016.zip",
+        "G:\\数据集\\datasets\\data_used_in_4K4D-20260204T055307Z-3-017.zip",
+        "G:\\数据集\\datasets\\Flickr30k",
+        "G:\\数据集\\datasets\\smplx",
+        "G:\\数据集\\datasets\\ZJU_MoCap"
+      ]
+    },
+    {
+      "exists": false,
+      "root": "D:\\body_models",
+      "sample": []
+    }
+  ],
+  "created_utc": "2026-05-08T21:11:00Z",
+  "decision": "No verified other-subject VGGT-compatible scene was built in this recovery pass; do not claim cross-subject generalization.",
+  "status": "BLOCKED_WITH_EVIDENCE",
+  "task": "V300_H1_other_subject_inventory"
+}

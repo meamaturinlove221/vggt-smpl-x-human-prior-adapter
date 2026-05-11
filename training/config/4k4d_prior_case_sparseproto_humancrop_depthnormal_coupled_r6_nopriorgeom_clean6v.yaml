@@ -1,0 +1,10 @@
+defaults:
+  - 4k4d_prior_case_sparseproto_humancrop_depthnormal_coupled_r2_depthpoint
+  - _self_
+
+exp_name: 4k4d_prior_case_sparseproto_humancrop_depthnormal_coupled_r6_nopriorgeom_clean6v
+
+loss:
+  human_prior:
+    depth: null
+    point: null

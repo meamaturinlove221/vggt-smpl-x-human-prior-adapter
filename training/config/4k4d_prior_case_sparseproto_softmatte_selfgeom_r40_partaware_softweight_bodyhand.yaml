@@ -1,0 +1,99 @@
+defaults:
+  - 4k4d_prior_case_sparseproto_softmatte_selfgeom_r27_depth_point_normal_direct
+  - _self_
+
+exp_name: 4k4d_prior_case_sparseproto_softmatte_selfgeom_r40_partaware_softweight_bodyhand
+
+# Local diagnostic only.
+# This variant keeps the r27 direct depth-point-normal coupling, but fixes two
+# implementation gaps from the pivot audit:
+# - softmatte is used as a continuous loss weight instead of being reduced to a
+#   binary support mask;
+# - raw SMPL-X is used only as a part-aware weak body/left-hand/right-hand
+#   topology anchor, never as head/face/hair/clothing teacher.
+
+max_img_per_gpu: 6
+num_workers: 0
+limit_train_batches: 4
+limit_val_batches: 1
+max_epochs: 1
+
+distributed:
+  backend: single
+
+data:
+  train:
+    common_config:
+      fix_img_num: 6
+      img_nums: [6, 6]
+      repeat_batch: False
+      prior_pose_noise:
+        enabled: False
+    dataset:
+      dataset_configs:
+        - _target_: data.datasets.dna4k4d_pseudo.DNA4K4DPseudoDataset
+          split: train
+          len_train: 16
+          len_test: 4
+          case_roots:
+            - D:/vggt/vggt-main/output/training_cases/0012_11_frame0000_6views_preprocess_crop_softmatte_v2_b40_r40_partaware_softweight_bodyhand_anchor
+  val:
+    common_config:
+      fix_img_num: 6
+      img_nums: [6, 6]
+      repeat_batch: False
+      prior_pose_noise:
+        enabled: False
+    dataset:
+      dataset_configs:
+        - _target_: data.datasets.dna4k4d_pseudo.DNA4K4DPseudoDataset
+          split: test
+          len_train: 16
+          len_test: 4
+          case_roots:
+            - D:/vggt/vggt-main/output/training_cases/0012_11_frame0000_6views_preprocess_crop_softmatte_v2_b40_r40_partaware_softweight_bodyhand_anchor
+
+checkpoint:
+  save_dir: output/local_training_results/r40_partaware_softweight_bodyhand_smoke1/ckpts
+  save_freq: 1
+  save_optimizer_state: False
+  resume_checkpoint_path: D:/vggt/vggt-main/output/modal_training_results/20260429_normal_r20_point_to_point_xview_smoke20_from_ckpt4/inference_model.pt
+  strict: False
+
+optim:
+  frozen_module_names:
+    - aggregator
+    - camera_head
+    - normal_head
+  optimizer:
+    lr: 5e-7
+
+loss:
+  human_prior:
+    weight: 0.10
+    depth_point:
+      use_soft_weight: true
+      soft_weight_source: soft_alpha
+      soft_weight_min: 0.05
+    depth_point_normal:
+      use_soft_weight: true
+      soft_weight_source: soft_alpha
+      soft_weight_min: 0.05
+    smplx_weak_anchor:
+      body_weight: 0.25
+      hand_weight: 0.50
+      depth_loss_weight: 0.25
+      point_loss_weight: 0.50
+      gamma: 1.0
+      alpha: 0.0
+      valid_range: 0.96
+      min_pixels: 64
+      supervise_conf: false
+      use_separate_hand_masks: true
+      use_soft_weight: true
+      soft_weight_source: soft_alpha
+      soft_weight_min: 0.05
+      exclude_head_roi: true
+      exclude_face_roi: true
+      exclude_hairline_roi: true
+      exclude_ear_band_roi: true

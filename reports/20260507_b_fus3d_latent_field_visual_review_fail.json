@@ -1,0 +1,47 @@
+{
+  "name": "B_Fus3D16_latent_field_fixed_smoke",
+  "status": "visual_fail_frozen",
+  "strict_candidate_pass": false,
+  "strict_teacher_pass": false,
+  "cloud_unblock": false,
+  "reviewed_paths": {
+    "full": "output/surface_research_preflight_local/B_Fus3D16_real_open3d_review_full/",
+    "head": "output/surface_research_preflight_local/B_Fus3D16_real_open3d_review_head/",
+    "hands": "output/surface_research_preflight_local/B_Fus3D16_real_open3d_review_hands/"
+  },
+  "mesh_stats": {
+    "real": {
+      "vertices": 2233,
+      "faces": 4140,
+      "component_count": 22,
+      "largest_component_ratio": 0.9507246376811594
+    },
+    "shuffle": {
+      "vertices": 2265,
+      "faces": 4232,
+      "component_count": 20,
+      "largest_component_ratio": 0.9546313799621928
+    },
+    "zero": {
+      "vertices": 1430,
+      "faces": 2752,
+      "component_count": 13,
+      "largest_component_ratio": 0.9636627906976745
+    }
+  },
+  "visual_findings": {
+    "full_body": "fragmented slab/shell, not a normal human surface",
+    "head_face_hairline": "hollow fragmented surface with no modeled face or hairline",
+    "hands": "no connected wrist, palm, or finger surface",
+    "controls": "real and shuffle meshes are too similar to support a token-driven surface claim"
+  },
+  "blocked_actions": [
+    "do_not_tune_hidden_dim",
+    "do_not_tune_steps",
+    "do_not_tune_extraction_level",
+    "do_not_export_teacher",
+    "do_not_export_candidate",
+    "do_not_unblock_cloud"
+  ],
+  "next_allowed_direction": "surface-token/SDF backend with visibility-aware aggregation and differentiable rendering supervision"
+}

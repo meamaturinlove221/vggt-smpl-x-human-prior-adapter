@@ -1,0 +1,7 @@
+{
+  "created_utc": "2026-05-08T21:10:58Z",
+  "decision": "Unattended controller cannot mark soft-review-only right hand as hard pass.",
+  "required_human_decision": "accept V50R candidate with right-hand risk, provide original V50 package, provide more same-subject right-hand views, or authorize a new hand-specific route.",
+  "status": "BLOCKED_WITH_EVIDENCE",
+  "task": "V254_C5_right_hand_mentor_decision_packet"
+}

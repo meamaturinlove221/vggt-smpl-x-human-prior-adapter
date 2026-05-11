@@ -1,0 +1,186 @@
+{
+  "task": "v9_dline_final_guard_refresh",
+  "agent": "D-line",
+  "created_local": "2026-05-07T23:32:15+08:00",
+  "created_utc": "2026-05-07T15:32:15Z",
+  "repo": "D:\\vggt\\vggt-main",
+  "write_scope": {
+    "reports": [
+      "D:\\vggt\\vggt-main\\reports\\20260507_v9_dline_final_guard_refresh.json",
+      "D:\\vggt\\vggt-main\\reports\\20260507_v9_dline_final_guard_refresh.md"
+    ],
+    "output_root": "D:\\vggt\\vggt-main\\output\\surface_research_cloud_preflight\\V9_dline_final_guard_refresh"
+  },
+  "inputs_read": {
+    "backend_dependency_smoke": "D:\\vggt\\vggt-main\\reports\\20260507_v9_backend_dependency_smoke_status.json",
+    "reality_audit": "D:\\vggt\\vggt-main\\reports\\20260507_v9_reality_audit.json",
+    "cloud_a_status": "D:\\vggt\\vggt-main\\reports\\20260507_v8_cloud_a_b_fus3d2_status.json",
+    "cloud_a_v9_real_asset_preflight": "D:\\vggt\\vggt-main\\output\\surface_research_cloud_preflight\\Cloud_A_V9\\b_fus3d3_real_asset_train_preflight\\v9_cloud_a_real_asset_wrapper_summary.json",
+    "a5x2_must3r_artifact_audit": "D:\\vggt\\vggt-main\\reports\\20260507_v9_a5x2_must3r_artifact_audit.json",
+    "a5x2_true_backend_precheck": "D:\\vggt\\vggt-main\\output\\surface_research_cloud_preflight\\V9_A5X2_true_backend_precheck\\summary.json",
+    "hand_hair_real_module_status": "D:\\vggt\\vggt-main\\reports\\20260507_v9_hand_hair_real_module_status.json",
+    "unified_surface_precheck": "D:\\vggt\\vggt-main\\reports\\20260507_v9_unified_surface_precheck_status.json",
+    "research_cloud_gate": "D:\\vggt\\vggt-main\\reports\\20260507_v8_research_cloud_gate_status.json"
+  },
+  "commands_run": [
+    {
+      "command": "python tools/check_cloud_gate_status.py --json",
+      "result": "blocked",
+      "note": "Guard returns nonzero for blocked status; evidence is strict_candidate_passes=0."
+    },
+    {
+      "command": "python tools/check_cloud_gate_status.py --teacher-supervised --json",
+      "result": "blocked",
+      "note": "Teacher-supervised guard returns nonzero for blocked status; evidence is strict_candidate_passes=0 and strict_teacher_passes=0."
+    },
+    {
+      "command": "python tools/check_research_cloud_gate_status.py --output-dir output/surface_research_cloud_preflight/V9_dline_final_guard_refresh/research_gate_probe --report-md output/surface_research_cloud_preflight/V9_dline_final_guard_refresh/research_gate_status.md --report-json output/surface_research_cloud_preflight/V9_dline_final_guard_refresh/research_gate_status.json --json",
+      "result": "research_cloud_preflight_allowed"
+    },
+    {
+      "command": "python tools/unified_surface_candidate_precheck_v9.py --output-dir output/surface_research_cloud_preflight/V9_dline_final_guard_refresh/unified_precheck --status-json output/surface_research_cloud_preflight/V9_dline_final_guard_refresh/unified_precheck_status.json --status-report output/surface_research_cloud_preflight/V9_dline_final_guard_refresh/unified_precheck_status.md --overwrite",
+      "result": "blocked_no_unified_surface_candidate_precheck"
+    }
+  ],
+  "formal_guard": {
+    "formal_cloud_unblocked": false,
+    "candidate_route": {
+      "cloud_allowed": false,
+      "strict_candidate_passes": 0,
+      "strict_teacher_passes": 0,
+      "reasons": [
+        "strict_candidate_passes is 0"
+      ],
+      "registry": "D:\\vggt\\vggt-main\\reports\\20260504_strict_gate_registry.json",
+      "schema_version": "20260504_visual_fullbody_hands_v2",
+      "registry_age_hours_at_refresh": 11.542
+    },
+    "teacher_supervised_route": {
+      "cloud_allowed": false,
+      "strict_candidate_passes": 0,
+      "strict_teacher_passes": 0,
+      "reasons": [
+        "strict_candidate_passes is 0",
+        "teacher-supervised route requested but strict_teacher_passes is 0"
+      ],
+      "registry": "D:\\vggt\\vggt-main\\reports\\20260504_strict_gate_registry.json",
+      "schema_version": "20260504_visual_fullbody_hands_v2",
+      "registry_age_hours_at_refresh": 11.542
+    }
+  },
+  "research_gate": {
+    "status": "research_cloud_preflight_allowed",
+    "allowed": true,
+    "formal_guard_still_blocked": true,
+    "forbidden_outputs": [
+      "predictions.npz",
+      "candidate package",
+      "teacher package",
+      "strict registry write",
+      "strict pass write"
+    ],
+    "required_post_job_referee": true,
+    "report_json": "D:\\vggt\\vggt-main\\output\\surface_research_cloud_preflight\\V9_dline_final_guard_refresh\\research_gate_status.json",
+    "report_md": "D:\\vggt\\vggt-main\\output\\surface_research_cloud_preflight\\V9_dline_final_guard_refresh\\research_gate_status.md"
+  },
+  "research_only_output_scan": {
+    "root": "D:\\vggt\\vggt-main\\output\\surface_research_cloud_preflight",
+    "predictions_npz_count": 0,
+    "promotion_package_or_registry_file_count": 0,
+    "json_research_flag_violations": 0,
+    "json_formal_unblock_violations": 0,
+    "note": "Path-token hits containing words such as teacher_intake or candidate_points are research labels in V8/V9 output names, not promotion packages or registry/pass writes."
+  },
+  "backend_status": {
+    "available_research_or_dependency": [
+      {
+        "backend": "V9 cloud asset staging",
+        "status": "ready",
+        "evidence": "v9_cloud_assets_verified with 60 images, 60 masks, query cache, template payload, prior maps, token cache, and remote verification."
+      },
+      {
+        "backend": "Cloud-A V9 B-Fus3D3 body/head/face real-asset preflight",
+        "status": "research_ready_not_candidate",
+        "evidence": "completed with query_cache_exists=true, template_payload_exists=true, allow_procedural_fallback=false, procedural_fallback_used=false; still no export."
+      },
+      {
+        "backend": "A5-X2 MUSt3R",
+        "status": "weak_pool_only",
+        "evidence": "real MUSt3R backend produced non-empty pointcloud, best_vertex_count=301056, strict_teacher_ready=false."
+      },
+      {
+        "backend": "2DGS cloud dependency smoke",
+        "status": "dependency_import_ready_needs_colmap_scene",
+        "evidence": "2DGS cloud dependencies imported; next blocker is preparing a COLMAP-format 4K4D scene."
+      }
+    ],
+    "blocked": [
+      {
+        "backend": "A5-X2 MUSt3R strict teacher intake",
+        "status": "blocked_weak_pool_only",
+        "blocker": "Known-camera alignment, original 6-view reprojection/depth residual audit, and region visual gates have not passed."
+      },
+      {
+        "backend": "MASt3R-SLAM",
+        "status": "blocked_dependency_build_or_import_failed",
+        "blocker": "mast3r import missing; imgui build requires clang++; curope build missed torch; lietorch hit CUDA 11.8 vs PyTorch 12.4 mismatch."
+      },
+      {
+        "backend": "Hair-GS",
+        "status": "blocked_dependency_build_or_import_failed",
+        "blocker": "diff_gaussian_rasterization build failed; import also missing pytorch3d; pip found no pytorch3d wheel."
+      },
+      {
+        "backend": "NeuS2",
+        "status": "blocked_missing_runnable_backend_and_checkpoint",
+        "blocker": "No neus2/instant-ngp command, Python module, repo evidence, or checkpoint was found in V9 A5X2 precheck."
+      },
+      {
+        "backend": "B-hand11 real VGGT hand-token decoder",
+        "status": "blocked_missing_real_hand_token_decoder",
+        "blocker": "B-hand10 remains a synthetic/proxy HGGT-style smoke; no true B-hand11 VGGT-token/HGGT hand decoder asset."
+      },
+      {
+        "backend": "B-hair4 real HairGS/topology module",
+        "status": "blocked_missing_real_hair_topology_module",
+        "blocker": "B-hair3 remains a synthetic/proxy HairGS-style topology smoke; no true B-hair4 module asset."
+      }
+    ]
+  },
+  "unified_surface_precheck": {
+    "status": "blocked_no_unified_surface_candidate_precheck",
+    "can_merge_unified_surface": false,
+    "component_readiness": {
+      "cloud_asset_staging": true,
+      "a5x2_true_dense_backend": true,
+      "a5x2_strict_teacher_intake": false,
+      "b_fus3d3_body_head_face": true,
+      "b_hand11_real_decoder": false,
+      "b_hair4_real_topology": false
+    },
+    "blockers": [
+      "A5-X2 MUSt3R is real and non-empty but weak-pool only; known-camera/reprojection/region gates have not passed.",
+      "B-hand11 real VGGT+hand-token decoder is unavailable; B-hand10 proxy cannot satisfy hand ownership.",
+      "B-hair4 real HairGS topology backend is unavailable; B-hair3 proxy cannot satisfy hairline/head-top ownership."
+    ]
+  },
+  "guard_conclusion": {
+    "verdict": "FORMAL_CLOUD_STILL_BLOCKED_RESEARCH_ONLY_ALLOWED",
+    "formal_cloud_unblocked": false,
+    "research_only_outputs_clean": true,
+    "strict_candidate_passes": 0,
+    "strict_teacher_passes": 0,
+    "no_predictions_write": true,
+    "no_teacher_export": true,
+    "no_candidate_export": true,
+    "no_registry_write": true,
+    "no_strict_pass_write": true,
+    "next_valid_actions": [
+      "Do not promote V8/V9 research outputs to teacher, candidate, predictions, registry, or strict pass.",
+      "Keep MUSt3R as weak-pool evidence only until camera alignment, reprojection/depth residual, and region visual gates pass.",
+      "Prepare COLMAP-format 4K4D scene for 2DGS if pursuing that dependency-ready lane.",
+      "Fix MASt3R-SLAM and Hair-GS dependency stacks before claiming those backends available.",
+      "Implement true B-hand11 and B-hair4 modules before unified surface candidate precheck can pass."
+    ]
+  }
+}

@@ -1,0 +1,85 @@
+defaults:
+  - 4k4d_prior_case_sparseproto_softmatte_selfgeom_r21_teacherless_signed
+  - _self_
+
+exp_name: 4k4d_prior_case_sparseproto_softmatte_selfgeom_r23_roi_bodyrehearsal
+
+# Local diagnostic only.
+# r21 had ROI weights configured but the softmatte case lacked ROI masks, so the
+# head/face/hairline emphasis was effectively inactive.  This variant uses a
+# copied/augmented case with ROI masks plus pseudo prior_depths/prior_points.
+# The pseudo targets are excluded from head/face/hairline/ear regions and serve
+# only as body/hands rehearsal.  Head/face geometry remains teacherless
+# normal-depth-point coupling, avoiding a pull back to the old signfix shell.
+
+data:
+  train:
+    dataset:
+      dataset_configs:
+        - _target_: data.datasets.dna4k4d_pseudo.DNA4K4DPseudoDataset
+          split: train
+          len_train: 40
+          len_test: 4
+          case_roots:
+            - D:/vggt/vggt-main/output/training_cases/0012_11_frame0000_6views_preprocess_crop_softmatte_v2_b40_r23_roi_bodyrehearsal
+  val:
+    dataset:
+      dataset_configs:
+        - _target_: data.datasets.dna4k4d_pseudo.DNA4K4DPseudoDataset
+          split: test
+          len_train: 40
+          len_test: 4
+          case_roots:
+            - D:/vggt/vggt-main/output/training_cases/0012_11_frame0000_6views_preprocess_crop_softmatte_v2_b40_r23_roi_bodyrehearsal
+
+loss:
+  human_prior:
+    weight: 0.12
+    depth:
+      gamma: 1.0
+      alpha: 0.005
+      gradient_loss_fn: grad
+      valid_range: 0.96
+      supervise_conf: true
+      loss_weight: 0.12
+      boundary_boost: 1.0
+      exclude_head_roi: true
+      exclude_face_roi: true
+      exclude_hairline_roi: true
+      exclude_ear_band_roi: true
+    point:
+      gamma: 1.0
+      alpha: 0.005
+      gradient_loss_fn: normal
+      valid_range: 0.96
+      supervise_conf: true
+      loss_weight: 0.18
+      boundary_boost: 1.0
+      exclude_head_roi: true
+      exclude_face_roi: true
+      exclude_hairline_roi: true
+      exclude_ear_band_roi: true
+    point_normal:
+      head_roi_weight: 3.0
+      face_roi_weight: 6.0
+      hairline_roi_weight: 6.0
+      ear_band_roi_weight: 3.0
+      boundary_boost: 2.5
+    depth_normal:
+      head_roi_weight: 3.0
+      face_roi_weight: 6.0
+      hairline_roi_weight: 6.0
+      ear_band_roi_weight: 3.0
+      boundary_boost: 2.5
+    depth_point:
+      head_roi_weight: 3.0
+      face_roi_weight: 6.0
+      hairline_roi_weight: 6.0
+      ear_band_roi_weight: 3.0
+      boundary_boost: 2.5
+    cross_view:
+      head_roi_weight: 3.0
+      face_roi_weight: 6.0
+      hairline_roi_weight: 6.0
+      ear_band_roi_weight: 3.0
+      boundary_boost: 2.5

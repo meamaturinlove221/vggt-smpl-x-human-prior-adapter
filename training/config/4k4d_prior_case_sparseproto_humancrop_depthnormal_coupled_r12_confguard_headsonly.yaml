@@ -1,0 +1,57 @@
+defaults:
+  - 4k4d_prior_case_sparseproto_humancrop_depthnormal_coupled_r6_nopriorgeom_clean6v
+  - _self_
+
+exp_name: 4k4d_prior_case_sparseproto_humancrop_depthnormal_coupled_r12_confguard_headsonly
+
+loss:
+  human_prior:
+    weight: 0.18
+    normal:
+      gamma: 1.2
+      alpha: 0.0
+      valid_range: 0.96
+      supervise_conf: false
+      head_roi_weight: 2.0
+      face_roi_weight: 3.0
+      hairline_roi_weight: 3.0
+      ear_band_roi_weight: 2.0
+      boundary_boost: 2.0
+    point_normal:
+      gamma: 1.0
+      alpha: 0.0
+      supervise_conf: false
+      normal_target_detach: true
+      valid_range: 0.96
+      consistency_weight: 0.35
+      head_roi_weight: 2.0
+      face_roi_weight: 3.0
+      hairline_roi_weight: 3.0
+      ear_band_roi_weight: 2.0
+      boundary_boost: 2.0
+    depth_normal:
+      consistency_weight: 0.06
+      valid_range: 0.96
+      orientation: unoriented
+      normal_target_detach: true
+      head_roi_weight: 2.0
+      face_roi_weight: 3.0
+      hairline_roi_weight: 3.0
+      ear_band_roi_weight: 2.0
+      boundary_boost: 2.0
+    depth_point:
+      consistency_weight: 0.08
+      xyz_weight: 0.35
+      z_weight: 0.7
+      valid_range: 0.96
+      relative_scale: true
+      head_roi_weight: 2.0
+      face_roi_weight: 3.0
+      hairline_roi_weight: 3.0
+      ear_band_roi_weight: 2.0
+      boundary_boost: 2.0
+
+optim:
+  frozen_module_names:
+    - aggregator
+    - camera_head

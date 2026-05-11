@@ -1,0 +1,38 @@
+{
+  "task": "v50r2_self_supervision_status",
+  "created_utc": "2026-05-09T07:54:06Z",
+  "status": "DONE_PASS",
+  "implemented": true,
+  "mentor_recording_item": "depth can be converted to normal; depth, point, and normal should be geometrically coupled rather than learned as unrelated heads",
+  "implementation": [
+    {
+      "name": "normal_from_point_map_supervision",
+      "path": "training/loss.py",
+      "evidence_lines": "compute_normal_loss derives target normals from dense point maps and restricts supervision to valid human masks"
+    },
+    {
+      "name": "depth_to_normal_consistency",
+      "path": "training/loss.py",
+      "evidence_lines": "predicted depth is unprojected to camera points, point_map_to_normal_map builds depth-derived normals, then cosine normal loss compares them with predicted normals"
+    },
+    {
+      "name": "depth_to_point_geometry_chain",
+      "path": "training/loss.py",
+      "evidence_lines": "compute_unproject_geometry_loss differentiably reconstructs world points from predicted depth and predicted camera pose"
+    },
+    {
+      "name": "selfgeom_training_configs",
+      "path": "training/config",
+      "evidence_lines": "depthnormal_coupled, xview_selfgeom, teacherless selfgeom, and depth_point_normal_direct configs enable depth-normal, depth-point, point-normal, and cross-view consistency variants"
+    }
+  ],
+  "effect_vs_without": {
+    "positive": "normal-depth-point consistency metrics improved in earlier r2/r3/r16 evaluations",
+    "negative": "same-protocol 6-view Open3D face/head point cloud did not reliably beat the signfix/reference visual gate",
+    "v50r2_claim": "self-geometry is used as auxiliary consistency/audit evidence; it is not the sole source of V50R2 strict candidate pass and it is not an independent teacher"
+  },
+  "mentor_report_updates": [
+    "reports/20260509_v50r2_mentor_report_human_geometry_recovery.md",
+    "output/mentor_report_v50r2/images/05_vggt_smplx_native_architecture.png"
+  ]
+}

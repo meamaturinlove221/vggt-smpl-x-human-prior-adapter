@@ -1,0 +1,51 @@
+defaults:
+  - 4k4d_prior_case_sparseproto_humancrop_depthnormal_coupled_r2_depthpoint
+  - _self_
+
+exp_name: 4k4d_prior_case_sparseproto_humancrop_depthnormal_coupled_r7_aligned_priormetric
+
+loss:
+  human_prior:
+    weight: 0.16
+    depth:
+      gamma: 1.0
+      alpha: 0.0
+      gradient_loss_fn: null
+      valid_range: 0.96
+      supervise_conf: false
+      target_align: batch_scale_shift
+      target_align_min_valid: 300
+      loss_weight: 0.35
+      head_roi_weight: 2.0
+      face_roi_weight: 3.0
+      hairline_roi_weight: 3.0
+      ear_band_roi_weight: 2.0
+      boundary_boost: 2.0
+    point:
+      gamma: 1.0
+      alpha: 0.0
+      gradient_loss_fn: null
+      valid_range: 0.96
+      supervise_conf: false
+      target_align: batch_similarity
+      target_align_min_valid: 300
+      loss_weight: 0.35
+      head_roi_weight: 2.0
+      face_roi_weight: 3.0
+      hairline_roi_weight: 3.0
+      ear_band_roi_weight: 2.0
+      boundary_boost: 2.0
+    point_normal:
+      consistency_weight: 0.45
+      normal_target_detach: true
+    depth_normal:
+      consistency_weight: 0.08
+      orientation: unoriented
+      normal_target_detach: true
+      valid_range: 0.96
+    depth_point:
+      consistency_weight: 0.10
+      xyz_weight: 0.4
+      z_weight: 0.8
+      valid_range: 0.96
+      relative_scale: true

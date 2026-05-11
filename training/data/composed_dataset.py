@@ -133,6 +133,14 @@ class ComposedDataset(Dataset, ABC):
         smpl_prior_feature_maps = None
         if "smpl_prior_feature_maps" in batch and batch["smpl_prior_feature_maps"] is not None:
             smpl_prior_feature_maps = torch.from_numpy(np.stack(batch["smpl_prior_feature_maps"]).astype(np.float32))
+        smpl_vertex_feature_maps = None
+        if "smpl_vertex_feature_maps" in batch and batch["smpl_vertex_feature_maps"] is not None:
+            smpl_vertex_feature_maps = torch.from_numpy(
+                np.stack(batch["smpl_vertex_feature_maps"]).astype(np.float32)
+            )
+        smpl_summary_tokens = None
+        if "smpl_summary_tokens" in batch and batch["smpl_summary_tokens"] is not None:
+            smpl_summary_tokens = torch.from_numpy(np.asarray(batch["smpl_summary_tokens"], dtype=np.float32))
         human_prior_completion_masks = None
         if "human_prior_completion_masks" in batch and batch["human_prior_completion_masks"] is not None:
             human_prior_completion_masks = torch.from_numpy(
@@ -194,6 +202,10 @@ class ComposedDataset(Dataset, ABC):
             sample["smpl_prior_masks"] = smpl_prior_masks
         if smpl_prior_feature_maps is not None:
             sample["smpl_prior_feature_maps"] = smpl_prior_feature_maps
+        if smpl_vertex_feature_maps is not None:
+            sample["smpl_vertex_feature_maps"] = smpl_vertex_feature_maps
+        if smpl_summary_tokens is not None:
+            sample["smpl_summary_tokens"] = smpl_summary_tokens
         if human_prior_completion_masks is not None:
             sample["human_prior_completion_masks"] = human_prior_completion_masks
         if human_prior_completion_depths is not None:

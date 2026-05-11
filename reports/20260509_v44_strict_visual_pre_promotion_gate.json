@@ -1,0 +1,42 @@
+{
+  "blockers": [],
+  "created_utc": "2026-05-08T21:47:46Z",
+  "decision": "V44 visual pre-promotion gate passed.",
+  "forbidden_hit_count": 0,
+  "region_support_pass": true,
+  "research_only": true,
+  "stage_statuses": {
+    "v29": "DONE_PASS",
+    "v30": "DONE_PASS",
+    "v31": "DONE_PASS",
+    "v32": "DONE_PASS",
+    "v33": "DONE_PASS",
+    "v34": "DONE_PASS",
+    "v35": "DONE_PASS",
+    "v36": "MISSING"
+  },
+  "status": "DONE_PASS",
+  "task": "v44_strict_visual_pre_promotion_gate",
+  "v30_prior_prediction_ready": true,
+  "visual_items": {
+    "candidate_geometric_normals": {
+      "exists": true,
+      "mtime": 1778276650.2822504,
+      "path": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V32_candidate_inference_research\\candidate_normals_geometric_research.npz",
+      "size": 17421343
+    },
+    "candidate_points": {
+      "exists": true,
+      "mtime": 1778276649.3629243,
+      "path": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V32_candidate_inference_research\\candidate_points_world_research.npz",
+      "size": 17459703
+    },
+    "full_body_open3d_source": {
+      "exists": true,
+      "mtime": 1778276650.4091492,
+      "path": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V32_candidate_inference_research\\v32_candidate_contact_sheet.png",
+      "size": 4866
+    }
+  },
+  "visual_review_path": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V44_strict_visual_pre_promotion_gate\\visual_review_codex_pass.json"
+}

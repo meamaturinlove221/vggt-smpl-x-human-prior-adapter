@@ -1,0 +1,141 @@
+{
+  "agent": "Agent E / D-line referee refresh",
+  "date_local": "2026-05-07",
+  "cwd": "D:\\vggt\\vggt-main",
+  "scope": "Inspect B-GS1, B-hair1, and B-hand8 v6 backend artifacts; run existing referee and strict cloud guard checks; do not train, infer, export, or create pass state.",
+  "paths_checked": {
+    "b_gs1": "output\\surface_research_preflight_local\\B_GS1_visibility_aware_free_gaussian_backend",
+    "b_hair1": "output\\surface_research_preflight_local\\B_hair1_backend_smoke_v6",
+    "b_hand8": "output\\surface_research_preflight_local\\B_hand8_connected_hand_arm_surface_backend_smoke",
+    "strict_registry": "reports\\20260504_strict_gate_registry.json",
+    "referee_report": "reports\\20260507_v6_dline_referee_refresh_agent.md"
+  },
+  "artifact_inventory": {
+    "b_gs1": {
+      "file_count": 595,
+      "suffix_counts": {
+        ".json": 3,
+        ".md": 1,
+        ".npz": 1,
+        ".ply": 5,
+        ".png": 585
+      },
+      "status": "research_only_visibility_backend_no_export",
+      "decision": "B-GS1 produced new visibility-aware Gaussian artifacts, but did not satisfy IoU/overfill/control criteria; keep direction active but freeze this scoring recipe.",
+      "strict_candidate_passes": 0,
+      "strict_teacher_passes": 0,
+      "formal_cloud_train_infer_export": "blocked",
+      "candidate_export": "blocked",
+      "teacher_export": "blocked",
+      "no_predictions_write": true,
+      "no_candidate_export": true,
+      "no_teacher_export": true,
+      "no_strict_pass_write": true,
+      "no_cloud": true
+    },
+    "b_hair1": {
+      "file_count": 81,
+      "suffix_counts": {
+        ".json": 1,
+        ".md": 1,
+        ".npz": 1,
+        ".ply": 5,
+        ".png": 73
+      },
+      "status": "research_only_b_hair1_backend_smoke_no_export_gate_red",
+      "gate_color": "red",
+      "decision": "B-hair1 real does not beat the requested controls strongly enough; keep gates red and do not promote this backend.",
+      "strict_candidate_passes": 0,
+      "strict_teacher_passes": 0,
+      "formal_cloud_train_infer_export": "blocked",
+      "candidate_export": "blocked",
+      "teacher_export": "blocked",
+      "no_predictions_write": true,
+      "no_candidate_export": true,
+      "no_teacher_export": true,
+      "no_strict_pass_write": true,
+      "no_cloud": true,
+      "no_train": true
+    },
+    "b_hand8": {
+      "file_count": 21,
+      "suffix_counts": {
+        ".json": 1,
+        ".md": 1,
+        ".ply": 6,
+        ".png": 13
+      },
+      "status": "research_only_backend_smoke_no_export",
+      "decision": "FAIL: B-hand8 produced new Open3D-readable connected hand-arm backend artifacts, including left/right/combined mesh and pointcloud outputs, but this is still a research-only scaffold smoke. It does not satisfy the learned connected hand surface gate because fingers are not reconstructed by a real hand decoder and the template scaffold remains the dominant support.",
+      "report_strict_candidate_passes": 0,
+      "report_strict_teacher_passes": 0,
+      "report_formal_cloud_train_infer_export": "blocked",
+      "report_teacher_candidate_predictions_registry": "none",
+      "no_cloud": true,
+      "no_train": true
+    }
+  },
+  "strict_cloud_guard": {
+    "candidate": {
+      "command": "python tools\\check_cloud_gate_status.py --json",
+      "exit_code": 2,
+      "cloud_allowed": false,
+      "reasons": [
+        "strict_candidate_passes is 0"
+      ],
+      "schema_version": "20260504_visual_fullbody_hands_v2",
+      "generated_at": "2026-05-07T03:58:35.809940+00:00",
+      "strict_candidate_passes": 0,
+      "strict_teacher_passes": 0
+    },
+    "teacher_supervised": {
+      "command": "python tools\\check_cloud_gate_status.py --teacher-supervised --json",
+      "exit_code": 2,
+      "cloud_allowed": false,
+      "reasons": [
+        "strict_candidate_passes is 0",
+        "teacher-supervised route requested but strict_teacher_passes is 0"
+      ],
+      "schema_version": "20260504_visual_fullbody_hands_v2",
+      "generated_at": "2026-05-07T03:58:35.809940+00:00",
+      "strict_candidate_passes": 0,
+      "strict_teacher_passes": 0
+    },
+    "guard_tests": {
+      "command": "python tools\\test_cloud_gate_status_guard.py",
+      "exit_code": 0,
+      "result": "cloud gate status guard tests passed"
+    }
+  },
+  "existing_referee": {
+    "command": "python tools\\research_artifact_referee.py --output-dir output\\surface_research_preflight_local\\research_artifact_referee_20260507_v6_dline_agent --status-report reports\\20260507_v6_dline_referee_refresh_agent.md",
+    "exit_code": 0,
+    "status": "research_only_referee_strict_gate_red",
+    "artifact_count": 67,
+    "verdict": "strict gate red; research artifacts remain blocked from formal cloud/export",
+    "cleanup": "Removed the transient output\\surface_research_preflight_local\\research_artifact_referee_20260507_v6_dline_agent directory created by the referee; kept only the allowed reports/ evidence."
+  },
+  "forbidden_artifact_name_scan": {
+    "patterns": "strict_pass, pass, candidate except B-GS1 raw_free_candidates diagnostic name, teacher, predictions",
+    "b_gs1": "no disallowed pass/teacher/predictions/candidate filename hits",
+    "b_hair1": "no disallowed pass/teacher/predictions/candidate filename hits",
+    "b_hand8": "no disallowed pass/teacher/predictions/candidate filename hits"
+  },
+  "verdict": {
+    "strict_candidate_passes": 0,
+    "strict_teacher_passes": 0,
+    "formal_cloud_train_infer_export": "blocked",
+    "candidate_export": "blocked",
+    "teacher_export": "blocked",
+    "cloud_train_infer_export_action_taken": false,
+    "strict_pass_created": false,
+    "candidate_or_teacher_or_predictions_created": false
+  },
+  "files_changed_by_agent_e": [
+    "reports\\20260507_v6_dline_referee_refresh_agent.md",
+    "reports\\20260507_v6_dline_referee_refresh_agent.json"
+  ],
+  "files_not_changed_by_agent_e": [
+    "tools\\research_artifact_referee.py"
+  ]
+}

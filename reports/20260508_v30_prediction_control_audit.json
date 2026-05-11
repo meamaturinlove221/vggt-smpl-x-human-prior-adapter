@@ -1,0 +1,779 @@
+{
+  "controls": {
+    "prior-dropout": {
+      "depth_point_normal_metrics_available": true,
+      "source": "restored_V42_control_audit",
+      "status": "DONE_PASS"
+    },
+    "random-region": {
+      "depth_point_normal_metrics_available": true,
+      "source": "restored_V42_control_audit",
+      "status": "DONE_PASS"
+    },
+    "real": {
+      "depth_point_normal_metrics_available": true,
+      "source": "restored_V42_control_audit",
+      "status": "DONE_PASS"
+    },
+    "shuffle": {
+      "depth_point_normal_metrics_available": true,
+      "source": "restored_V42_control_audit",
+      "status": "DONE_PASS"
+    },
+    "zero": {
+      "depth_point_normal_metrics_available": true,
+      "source": "restored_V42_control_audit",
+      "status": "DONE_PASS"
+    }
+  },
+  "raw_v42_control_audit": {
+    "controls": {},
+    "frames": {
+      "frame0000": {
+        "prior-dropout": {
+          "delta_from_real_l2": 0.015258940868079662,
+          "delta_from_real_maxabs": 0.0006914138793945312,
+          "depth": {
+            "dtype": "float32",
+            "finite_count": 3219888,
+            "max": 1.476807951927185,
+            "mean": 1.0509543418884277,
+            "min": 0.4104163646697998,
+            "p50": 1.1300931572914124,
+            "shape": [
+              12,
+              518,
+              518,
+              1
+            ],
+            "total_count": 3219888
+          },
+          "normal": {
+            "dtype": "float32",
+            "finite_count": 9659664,
+            "max": 0.9301655888557434,
+            "mean": 0.1580294817686081,
+            "min": -0.6274174451828003,
+            "p50": 0.1876513808965683,
+            "shape": [
+              12,
+              518,
+              518,
+              3
+            ],
+            "total_count": 9659664
+          },
+          "world_points": {
+            "dtype": "float32",
+            "finite_count": 9659664,
+            "max": 1.4770092964172363,
+            "mean": 0.2997891902923584,
+            "min": -0.7734025716781616,
+            "p50": 0.22506538033485413,
+            "shape": [
+              12,
+              518,
+              518,
+              3
+            ],
+            "total_count": 9659664
+          }
+        },
+        "random-region": {
+          "delta_from_real_l2": 0.03132052719593048,
+          "delta_from_real_maxabs": 0.001058816909790039,
+          "depth": {
+            "dtype": "float32",
+            "finite_count": 3219888,
+            "max": 1.477507472038269,
+            "mean": 1.0505669116973877,
+            "min": 0.409773051738739,
+            "p50": 1.1296148896217346,
+            "shape": [
+              12,
+              518,
+              518,
+              1
+            ],
+            "total_count": 3219888
+          },
+          "normal": {
+            "dtype": "float32",
+            "finite_count": 9659664,
+            "max": 0.9302374720573425,
+            "mean": 0.1580534428358078,
+            "min": -0.6273713707923889,
+            "p50": 0.1876685991883278,
+            "shape": [
+              12,
+              518,
+              518,
+              3
+            ],
+            "total_count": 9659664
+          },
+          "world_points": {
+            "dtype": "float32",
+            "finite_count": 9659664,
+            "max": 1.4773329496383667,
+            "mean": 0.299773633480072,
+            "min": -0.7737455368041992,
+            "p50": 0.22508016973733902,
+            "shape": [
+              12,
+              518,
+              518,
+              3
+            ],
+            "total_count": 9659664
+          }
+        },
+        "real": {
+          "delta_from_real_l2": 0.0,
+          "delta_from_real_maxabs": 0.0,
+          "depth": {
+            "dtype": "float32",
+            "finite_count": 3219888,
+            "max": 1.476786494255066,
+            "mean": 1.0508143901824951,
+            "min": 0.41003546118736267,
+            "p50": 1.129854142665863,
+            "shape": [
+              12,
+              518,
+              518,
+              1
+            ],
+            "total_count": 3219888
+          },
+          "normal": {
+            "dtype": "float32",
+            "finite_count": 9659664,
+            "max": 0.9301949739456177,
+            "mean": 0.1580507606267929,
+            "min": -0.6274083852767944,
+            "p50": 0.18769250810146332,
+            "shape": [
+              12,
+              518,
+              518,
+              3
+            ],
+            "total_count": 9659664
+          },
+          "world_points": {
+            "dtype": "float32",
+            "finite_count": 9659664,
+            "max": 1.4767510890960693,
+            "mean": 0.29981738328933716,
+            "min": -0.7733497023582458,
+            "p50": 0.22509048134088516,
+            "shape": [
+              12,
+              518,
+              518,
+              3
+            ],
+            "total_count": 9659664
+          }
+        },
+        "shuffle": {
+          "delta_from_real_l2": 0.020669588819146156,
+          "delta_from_real_maxabs": 0.0007154941558837891,
+          "depth": {
+            "dtype": "float32",
+            "finite_count": 3219888,
+            "max": 1.4767282009124756,
+            "mean": 1.0507992506027222,
+            "min": 0.40998518466949463,
+            "p50": 1.1298014521598816,
+            "shape": [
+              12,
+              518,
+              518,
+              1
+            ],
+            "total_count": 3219888
+          },
+          "normal": {
+            "dtype": "float32",
+            "finite_count": 9659664,
+            "max": 0.930232048034668,
+            "mean": 0.15804384648799896,
+            "min": -0.6274785399436951,
+            "p50": 0.18766771256923676,
+            "shape": [
+              12,
+              518,
+              518,
+              3
+            ],
+            "total_count": 9659664
+          },
+          "world_points": {
+            "dtype": "float32",
+            "finite_count": 9659664,
+            "max": 1.4768024682998657,
+            "mean": 0.2997281849384308,
+            "min": -0.7735132575035095,
+            "p50": 0.22504372149705887,
+            "shape": [
+              12,
+              518,
+              518,
+              3
+            ],
+            "total_count": 9659664
+          }
+        },
+        "zero": {
+          "delta_from_real_l2": 0.061682384461164474,
+          "delta_from_real_maxabs": 0.0017441511154174805,
+          "depth": {
+            "dtype": "float32",
+            "finite_count": 3219888,
+            "max": 1.4776432514190674,
+            "mean": 1.0514945983886719,
+            "min": 0.4106345772743225,
+            "p50": 1.130723774433136,
+            "shape": [
+              12,
+              518,
+              518,
+              1
+            ],
+            "total_count": 3219888
+          },
+          "normal": {
+            "dtype": "float32",
+            "finite_count": 9659664,
+            "max": 0.9301877617835999,
+            "mean": 0.15803231298923492,
+            "min": -0.6273468732833862,
+            "p50": 0.1877300664782524,
+            "shape": [
+              12,
+              518,
+              518,
+              3
+            ],
+            "total_count": 9659664
+          },
+          "world_points": {
+            "dtype": "float32",
+            "finite_count": 9659664,
+            "max": 1.477803349494934,
+            "mean": 0.2997504770755768,
+            "min": -0.7744324207305908,
+            "p50": 0.2251686379313469,
+            "shape": [
+              12,
+              518,
+              518,
+              3
+            ],
+            "total_count": 9659664
+          }
+        }
+      },
+      "frame0001": {
+        "prior-dropout": {
+          "delta_from_real_l2": 0.014895015396177769,
+          "delta_from_real_maxabs": 0.0006505250930786133,
+          "depth": {
+            "dtype": "float32",
+            "finite_count": 3219888,
+            "max": 1.472380518913269,
+            "mean": 1.0504250526428223,
+            "min": 0.4135715961456299,
+            "p50": 1.1296716332435608,
+            "shape": [
+              12,
+              518,
+              518,
+              1
+            ],
+            "total_count": 3219888
+          },
+          "normal": {
+            "dtype": "float32",
+            "finite_count": 9659664,
+            "max": 0.930063784122467,
+            "mean": 0.1579539030790329,
+            "min": -0.6267690062522888,
+            "p50": 0.1878586709499359,
+            "shape": [
+              12,
+              518,
+              518,
+              3
+            ],
+            "total_count": 9659664
+          },
+          "world_points": {
+            "dtype": "float32",
+            "finite_count": 9659664,
+            "max": 1.4752676486968994,
+            "mean": 0.3002813160419464,
+            "min": -0.7709728479385376,
+            "p50": 0.2253815457224846,
+            "shape": [
+              12,
+              518,
+              518,
+              3
+            ],
+            "total_count": 9659664
+          }
+        },
+        "random-region": {
+          "delta_from_real_l2": 0.025819936767220497,
+          "delta_from_real_maxabs": 0.0011081695556640625,
+          "depth": {
+            "dtype": "float32",
+            "finite_count": 3219888,
+            "max": 1.4720540046691895,
+            "mean": 1.0500463247299194,
+            "min": 0.41347959637641907,
+            "p50": 1.1292290091514587,
+            "shape": [
+              12,
+              518,
+              518,
+              1
+            ],
+            "total_count": 3219888
+          },
+          "normal": {
+            "dtype": "float32",
+            "finite_count": 9659664,
+            "max": 0.9300811886787415,
+            "mean": 0.15797112882137299,
+            "min": -0.626708984375,
+            "p50": 0.18786726146936417,
+            "shape": [
+              12,
+              518,
+              518,
+              3
+            ],
+            "total_count": 9659664
+          },
+          "world_points": {
+            "dtype": "float32",
+            "finite_count": 9659664,
+            "max": 1.4750864505767822,
+            "mean": 0.3003541827201843,
+            "min": -0.7703139781951904,
+            "p50": 0.22536499053239822,
+            "shape": [
+              12,
+              518,
+              518,
+              3
+            ],
+            "total_count": 9659664
+          }
+        },
+        "real": {
+          "delta_from_real_l2": 0.0,
+          "delta_from_real_maxabs": 0.0,
+          "depth": {
+            "dtype": "float32",
+            "finite_count": 3219888,
+            "max": 1.4722163677215576,
+            "mean": 1.050845980644226,
+            "min": 0.4136143624782562,
+            "p50": 1.13008713722229,
+            "shape": [
+              12,
+              518,
+              518,
+              1
+            ],
+            "total_count": 3219888
+          },
+          "normal": {
+            "dtype": "float32",
+            "finite_count": 9659664,
+            "max": 0.9300981760025024,
+            "mean": 0.15796588361263275,
+            "min": -0.6268116235733032,
+            "p50": 0.1878589168190956,
+            "shape": [
+              12,
+              518,
+              518,
+              3
+            ],
+            "total_count": 9659664
+          },
+          "world_points": {
+            "dtype": "float32",
+            "finite_count": 9659664,
+            "max": 1.4750853776931763,
+            "mean": 0.30022430419921875,
+            "min": -0.7714514136314392,
+            "p50": 0.2253907322883606,
+            "shape": [
+              12,
+              518,
+              518,
+              3
+            ],
+            "total_count": 9659664
+          }
+        },
+        "shuffle": {
+          "delta_from_real_l2": 0.019377445802092552,
+          "delta_from_real_maxabs": 0.0007259845733642578,
+          "depth": {
+            "dtype": "float32",
+            "finite_count": 3219888,
+            "max": 1.472157597541809,
+            "mean": 1.050075888633728,
+            "min": 0.4136282503604889,
+            "p50": 1.1292864680290222,
+            "shape": [
+              12,
+              518,
+              518,
+              1
+            ],
+            "total_count": 3219888
+          },
+          "normal": {
+            "dtype": "float32",
+            "finite_count": 9659664,
+            "max": 0.9299083948135376,
+            "mean": 0.15796494483947754,
+            "min": -0.6267751455307007,
+            "p50": 0.18784092366695404,
+            "shape": [
+              12,
+              518,
+              518,
+              3
+            ],
+            "total_count": 9659664
+          },
+          "world_points": {
+            "dtype": "float32",
+            "finite_count": 9659664,
+            "max": 1.4751217365264893,
+            "mean": 0.30027493834495544,
+            "min": -0.7702775001525879,
+            "p50": 0.2253456860780716,
+            "shape": [
+              12,
+              518,
+              518,
+              3
+            ],
+            "total_count": 9659664
+          }
+        },
+        "zero": {
+          "delta_from_real_l2": 0.024030281230807304,
+          "delta_from_real_maxabs": 0.0012252330780029297,
+          "depth": {
+            "dtype": "float32",
+            "finite_count": 3219888,
+            "max": 1.4724829196929932,
+            "mean": 1.0505943298339844,
+            "min": 0.41384774446487427,
+            "p50": 1.1298856735229492,
+            "shape": [
+              12,
+              518,
+              518,
+              1
+            ],
+            "total_count": 3219888
+          },
+          "normal": {
+            "dtype": "float32",
+            "finite_count": 9659664,
+            "max": 0.9301650524139404,
+            "mean": 0.15795493125915527,
+            "min": -0.6267539262771606,
+            "p50": 0.18789786845445633,
+            "shape": [
+              12,
+              518,
+              518,
+              3
+            ],
+            "total_count": 9659664
+          },
+          "world_points": {
+            "dtype": "float32",
+            "finite_count": 9659664,
+            "max": 1.4758813381195068,
+            "mean": 0.3002745807170868,
+            "min": -0.7704942226409912,
+            "p50": 0.22534513473510742,
+            "shape": [
+              12,
+              518,
+              518,
+              3
+            ],
+            "total_count": 9659664
+          }
+        }
+      },
+      "frame0002": {
+        "prior-dropout": {
+          "delta_from_real_l2": 0.02612309344112873,
+          "delta_from_real_maxabs": 0.0010172128677368164,
+          "depth": {
+            "dtype": "float32",
+            "finite_count": 3219888,
+            "max": 1.5279831886291504,
+            "mean": 1.0540951490402222,
+            "min": 0.4154804050922394,
+            "p50": 1.1336828470230103,
+            "shape": [
+              12,
+              518,
+              518,
+              1
+            ],
+            "total_count": 3219888
+          },
+          "normal": {
+            "dtype": "float32",
+            "finite_count": 9659664,
+            "max": 0.9305323958396912,
+            "mean": 0.15813736617565155,
+            "min": -0.6264286041259766,
+            "p50": 0.18776650726795197,
+            "shape": [
+              12,
+              518,
+              518,
+              3
+            ],
+            "total_count": 9659664
+          },
+          "world_points": {
+            "dtype": "float32",
+            "finite_count": 9659664,
+            "max": 1.516197919845581,
+            "mean": 0.30023249983787537,
+            "min": -0.7709423303604126,
+            "p50": 0.22592338174581528,
+            "shape": [
+              12,
+              518,
+              518,
+              3
+            ],
+            "total_count": 9659664
+          }
+        },
+        "random-region": {
+          "delta_from_real_l2": 0.041405126452445984,
+          "delta_from_real_maxabs": 0.0011718273162841797,
+          "depth": {
+            "dtype": "float32",
+            "finite_count": 3219888,
+            "max": 1.5295732021331787,
+            "mean": 1.0543947219848633,
+            "min": 0.4154045581817627,
+            "p50": 1.1340647339820862,
+            "shape": [
+              12,
+              518,
+              518,
+              1
+            ],
+            "total_count": 3219888
+          },
+          "normal": {
+            "dtype": "float32",
+            "finite_count": 9659664,
+            "max": 0.9304823875427246,
+            "mean": 0.15815585851669312,
+            "min": -0.6264639496803284,
+            "p50": 0.1877581551671028,
+            "shape": [
+              12,
+              518,
+              518,
+              3
+            ],
+            "total_count": 9659664
+          },
+          "world_points": {
+            "dtype": "float32",
+            "finite_count": 9659664,
+            "max": 1.5177773237228394,
+            "mean": 0.30018433928489685,
+            "min": -0.7715431451797485,
+            "p50": 0.22596242278814316,
+            "shape": [
+              12,
+              518,
+              518,
+              3
+            ],
+            "total_count": 9659664
+          }
+        },
+        "real": {
+          "delta_from_real_l2": 0.0,
+          "delta_from_real_maxabs": 0.0,
+          "depth": {
+            "dtype": "float32",
+            "finite_count": 3219888,
+            "max": 1.5268194675445557,
+            "mean": 1.0535396337509155,
+            "min": 0.4148617684841156,
+            "p50": 1.1330736875534058,
+            "shape": [
+              12,
+              518,
+              518,
+              1
+            ],
+            "total_count": 3219888
+          },
+          "normal": {
+            "dtype": "float32",
+            "finite_count": 9659664,
+            "max": 0.9305212497711182,
+            "mean": 0.15812942385673523,
+            "min": -0.6264513731002808,
+            "p50": 0.1877506747841835,
+            "shape": [
+              12,
+              518,
+              518,
+              3
+            ],
+            "total_count": 9659664
+          },
+          "world_points": {
+            "dtype": "float32",
+            "finite_count": 9659664,
+            "max": 1.515575885772705,
+            "mean": 0.30029284954071045,
+            "min": -0.7702153325080872,
+            "p50": 0.22593165189027786,
+            "shape": [
+              12,
+              518,
+              518,
+              3
+            ],
+            "total_count": 9659664
+          }
+        },
+        "shuffle": {
+          "delta_from_real_l2": 0.036104243248701096,
+          "delta_from_real_maxabs": 0.0011484622955322266,
+          "depth": {
+            "dtype": "float32",
+            "finite_count": 3219888,
+            "max": 1.5283876657485962,
+            "mean": 1.0543757677078247,
+            "min": 0.41589224338531494,
+            "p50": 1.1340289115905762,
+            "shape": [
+              12,
+              518,
+              518,
+              1
+            ],
+            "total_count": 3219888
+          },
+          "normal": {
+            "dtype": "float32",
+            "finite_count": 9659664,
+            "max": 0.9305981993675232,
+            "mean": 0.158148393034935,
+            "min": -0.626404881477356,
+            "p50": 0.18776533752679825,
+            "shape": [
+              12,
+              518,
+              518,
+              3
+            ],
+            "total_count": 9659664
+          },
+          "world_points": {
+            "dtype": "float32",
+            "finite_count": 9659664,
+            "max": 1.515643835067749,
+            "mean": 0.30018922686576843,
+            "min": -0.7707455158233643,
+            "p50": 0.2259756475687027,
+            "shape": [
+              12,
+              518,
+              518,
+              3
+            ],
+            "total_count": 9659664
+          }
+        },
+        "zero": {
+          "delta_from_real_l2": 0.033958785235881805,
+          "delta_from_real_maxabs": 0.0013141632080078125,
+          "depth": {
+            "dtype": "float32",
+            "finite_count": 3219888,
+            "max": 1.529133677482605,
+            "mean": 1.054451584815979,
+            "min": 0.41564828157424927,
+            "p50": 1.1341191530227661,
+            "shape": [
+              12,
+              518,
+              518,
+              1
+            ],
+            "total_count": 3219888
+          },
+          "normal": {
+            "dtype": "float32",
+            "finite_count": 9659664,
+            "max": 0.9305457472801208,
+            "mean": 0.15811973810195923,
+            "min": -0.6264840364456177,
+            "p50": 0.18782074749469757,
+            "shape": [
+              12,
+              518,
+              518,
+              3
+            ],
+            "total_count": 9659664
+          },
+          "world_points": {
+            "dtype": "float32",
+            "finite_count": 9659664,
+            "max": 1.5183011293411255,
+            "mean": 0.3001866340637207,
+            "min": -0.7711707949638367,
+            "p50": 0.2259833663702011,
+            "shape": [
+              12,
+              518,
+              518,
+              3
+            ],
+            "total_count": 9659664
+          }
+        }
+      }
+    },
+    "note": "This audit measures prior-conditioned prediction deltas, not strict visual pass.",
+    "real_differs_from_all_controls": true,
+    "status": "DONE_PASS"
+  },
+  "status": "DONE_PASS"
+}

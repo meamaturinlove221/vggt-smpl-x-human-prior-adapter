@@ -1,0 +1,786 @@
+[
+  {
+    "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\ply\\rgb_camera_view_cam01_full_surface.ply",
+    "name": "rgb_camera_view_cam01_full_surface.ply",
+    "bytes": 1131294,
+    "vertex": 14928,
+    "face": 28434,
+    "mtime": 1778301088.9364374
+  },
+  {
+    "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\ply\\rgb_camera_view_cam45_full_surface.ply",
+    "name": "rgb_camera_view_cam45_full_surface.ply",
+    "bytes": 889372,
+    "vertex": 11696,
+    "face": 22504,
+    "mtime": 1778301091.5195754
+  },
+  {
+    "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\ply\\rgb_camera_view_cam00_full_surface.ply",
+    "name": "rgb_camera_view_cam00_full_surface.ply",
+    "bytes": 882713,
+    "vertex": 11647,
+    "face": 22184,
+    "mtime": 1778301087.8975172
+  },
+  {
+    "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\ply\\rgb_camera_view_cam59_full_surface.ply",
+    "name": "rgb_camera_view_cam59_full_surface.ply",
+    "bytes": 845242,
+    "vertex": 11132,
+    "face": 21322,
+    "mtime": 1778301092.3930893
+  },
+  {
+    "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\ply\\rgb_camera_view_cam30_full_surface.ply",
+    "name": "rgb_camera_view_cam30_full_surface.ply",
+    "bytes": 746062,
+    "vertex": 9873,
+    "face": 18632,
+    "mtime": 1778301090.6528733
+  },
+  {
+    "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\ply\\rgb_camera_view_cam15_full_surface.ply",
+    "name": "rgb_camera_view_cam15_full_surface.ply",
+    "bytes": 719778,
+    "vertex": 9559,
+    "face": 17842,
+    "mtime": 1778301089.8152804
+  },
+  {
+    "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\ply\\rgb_camera_view_cam59_upper_surface.ply",
+    "name": "rgb_camera_view_cam59_upper_surface.ply",
+    "bytes": 549852,
+    "vertex": 7261,
+    "face": 13786,
+    "mtime": 1778301096.6227024
+  },
+  {
+    "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\ply\\rgb_camera_view_cam30_upper_surface.ply",
+    "name": "rgb_camera_view_cam30_upper_surface.ply",
+    "bytes": 489036,
+    "vertex": 6483,
+    "face": 12160,
+    "mtime": 1778301094.94771
+  },
+  {
+    "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\ply\\rgb_camera_view_cam15_upper_surface.ply",
+    "name": "rgb_camera_view_cam15_upper_surface.ply",
+    "bytes": 483188,
+    "vertex": 6429,
+    "face": 11922,
+    "mtime": 1778301093.2247477
+  },
+  {
+    "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\ply\\rgb_camera_view_cam59_hand_left_image_surface.ply",
+    "name": "rgb_camera_view_cam59_hand_left_image_surface.ply",
+    "bytes": 299971,
+    "vertex": 3979,
+    "face": 7440,
+    "mtime": 1778301100.9327607
+  },
+  {
+    "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\ply\\rgb_camera_view_cam30_hand_left_image_surface.ply",
+    "name": "rgb_camera_view_cam30_hand_left_image_surface.ply",
+    "bytes": 294766,
+    "vertex": 3906,
+    "face": 7326,
+    "mtime": 1778301099.5907583
+  },
+  {
+    "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\ply\\rgb_camera_view_cam59_head_surface.ply",
+    "name": "rgb_camera_view_cam59_head_surface.ply",
+    "bytes": 279917,
+    "vertex": 3727,
+    "face": 6886,
+    "mtime": 1778301097.446415
+  },
+  {
+    "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\ply\\rgb_camera_view_cam15_head_surface.ply",
+    "name": "rgb_camera_view_cam15_head_surface.ply",
+    "bytes": 257691,
+    "vertex": 3437,
+    "face": 6314,
+    "mtime": 1778301094.0860527
+  },
+  {
+    "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\ply\\rgb_camera_view_cam30_head_surface.ply",
+    "name": "rgb_camera_view_cam30_head_surface.ply",
+    "bytes": 251440,
+    "vertex": 3318,
+    "face": 6300,
+    "mtime": 1778301095.7737806
+  },
+  {
+    "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\ply\\rgb_camera_view_cam59_hand_right_image_surface.ply",
+    "name": "rgb_camera_view_cam59_hand_right_image_surface.ply",
+    "bytes": 161491,
+    "vertex": 2163,
+    "face": 3912,
+    "mtime": 1778301101.5917466
+  },
+  {
+    "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\ply\\rgb_camera_view_cam15_hand_right_image_surface.ply",
+    "name": "rgb_camera_view_cam15_hand_right_image_surface.ply",
+    "bytes": 150219,
+    "vertex": 2047,
+    "face": 3500,
+    "mtime": 1778301098.9296656
+  },
+  {
+    "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\ply\\rgb_camera_view_cam15_hand_left_image_surface.ply",
+    "name": "rgb_camera_view_cam15_hand_left_image_surface.ply",
+    "bytes": 134123,
+    "vertex": 1815,
+    "face": 3172,
+    "mtime": 1778301098.2648978
+  },
+  {
+    "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\ply\\rgb_camera_view_cam30_hand_right_image_surface.ply",
+    "name": "rgb_camera_view_cam30_hand_right_image_surface.ply",
+    "bytes": 116277,
+    "vertex": 1591,
+    "face": 2678,
+    "mtime": 1778301100.2479763
+  },
+  {
+    "path": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V32_candidate_inference_research\\v32_candidate_open3d_review_points.ply",
+    "name": "v32_candidate_open3d_review_points.ply",
+    "bytes": 4770522,
+    "vertex": 120000,
+    "face": null,
+    "mtime": 1778276669.6830213
+  },
+  {
+    "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_clear_human\\ply\\open3d_smplx_native_full_body_clear.ply",
+    "name": "open3d_smplx_native_full_body_clear.ply",
+    "bytes": 2970209,
+    "vertex": 110000,
+    "face": null,
+    "mtime": 1778299635.619565
+  },
+  {
+    "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_human_pointcloud\\ply\\rgb_v50r2_full_body.ply",
+    "name": "rgb_v50r2_full_body.ply",
+    "bytes": 2153836,
+    "vertex": 79764,
+    "face": null,
+    "mtime": 1778299836.980589
+  },
+  {
+    "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_clear_human\\ply\\open3d_60view_support_centered.ply",
+    "name": "open3d_60view_support_centered.ply",
+    "bytes": 2055421,
+    "vertex": 76119,
+    "face": null,
+    "mtime": 1778299638.4821546
+  },
+  {
+    "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_clear_human\\ply\\open3d_full_body_centered.ply",
+    "name": "open3d_full_body_centered.ply",
+    "bytes": 2055421,
+    "vertex": 76119,
+    "face": null,
+    "mtime": 1778299636.200266
+  },
+  {
+    "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_human_pointcloud\\ply\\rgb_v50r2_head_shoulders.ply",
+    "name": "rgb_v50r2_head_shoulders.ply",
+    "bytes": 2032957,
+    "vertex": 75287,
+    "face": null,
+    "mtime": 1778299837.7208674
+  },
+  {
+    "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\pointcloud_sources\\invalid_do_not_send\\v50r2_human_only_candidate_world_merged6v.ply",
+    "name": "v50r2_human_only_candidate_world_merged6v.ply",
+    "bytes": 2740922,
+    "vertex": 68130,
+    "face": null,
+    "mtime": 1778305372.8152697
+  },
+  {
+    "path": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V23_residual_surface_v2\\v23_prior_region_sample_points.ply",
+    "name": "v23_prior_region_sample_points.ply",
+    "bytes": 4667379,
+    "vertex": 67218,
+    "face": null,
+    "mtime": 1778276384.1715345
+  },
+  {
+    "path": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V23_residual_surface_v2\\v23_residual_surface_v2_points.ply",
+    "name": "v23_residual_surface_v2_points.ply",
+    "bytes": 4660190,
+    "vertex": 67218,
+    "face": null,
+    "mtime": 1778276384.030404
+  },
+  {
+    "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_clear_human\\ply\\open3d_temporal_centered.ply",
+    "name": "open3d_temporal_centered.ply",
+    "bytes": 1767871,
+    "vertex": 65469,
+    "face": null,
+    "mtime": 1778299638.0980227
+  },
+  {
+    "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\ply\\rgb_camera_view_cam01_full_points.ply",
+    "name": "rgb_camera_view_cam01_full_points.ply",
+    "bytes": 403264,
+    "vertex": 14928,
+    "face": null,
+    "mtime": 1778301088.9331641
+  },
+  {
+    "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\pointcloud_sources\\v50r2_human_only_candidate_world_cam01.ply",
+    "name": "v50r2_human_only_candidate_world_cam01.ply",
+    "bytes": 592402,
+    "vertex": 14720,
+    "face": null,
+    "mtime": 1778305997.7582066
+  },
+  {
+    "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\pointcloud_sources\\v50r2_human_only_depth_unprojected_cam01.ply",
+    "name": "v50r2_human_only_depth_unprojected_cam01.ply",
+    "bytes": 595945,
+    "vertex": 14720,
+    "face": null,
+    "mtime": 1778305997.780896
+  },
+  {
+    "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\ply\\rgb_camera_view_cam01_full.ply",
+    "name": "rgb_camera_view_cam01_full.ply",
+    "bytes": 397648,
+    "vertex": 14720,
+    "face": null,
+    "mtime": 1778300264.052894
+  },
+  {
+    "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_human_pointcloud\\ply\\rgb_v50r2_target_view.ply",
+    "name": "rgb_v50r2_target_view.ply",
+    "bytes": 354502,
+    "vertex": 13122,
+    "face": null,
+    "mtime": 1778299837.490499
+  },
+  {
+    "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\ply\\rgb_camera_view_cam45_full_points.ply",
+    "name": "rgb_camera_view_cam45_full_points.ply",
+    "bytes": 316000,
+    "vertex": 11696,
+    "face": null,
+    "mtime": 1778301091.51654
+  },
+  {
+    "path": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V34_smplx_native_hand_route\\v34_hand_wrist_bridge_merged_research.ply",
+    "name": "v34_hand_wrist_bridge_merged_research.ply",
+    "bytes": 468284,
+    "vertex": 11696,
+    "face": null,
+    "mtime": 1778276724.5757277
+  },
+  {
+    "path": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V34_smplx_native_hand_route\\v34_smplx_native_hand_continuity_patch.ply",
+    "name": "v34_smplx_native_hand_continuity_patch.ply",
+    "bytes": 468284,
+    "vertex": 11696,
+    "face": null,
+    "mtime": 1778276713.7525191
+  },
+  {
+    "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\ply\\rgb_camera_view_cam00_full_points.ply",
+    "name": "rgb_camera_view_cam00_full_points.ply",
+    "bytes": 314677,
+    "vertex": 11647,
+    "face": null,
+    "mtime": 1778301087.8955054
+  },
+  {
+    "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\pointcloud_sources\\v50r2_human_only_candidate_world_cam45.ply",
+    "name": "v50r2_human_only_candidate_world_cam45.ply",
+    "bytes": 460924,
+    "vertex": 11538,
+    "face": null,
+    "mtime": 1778305997.869493
+  },
+  {
+    "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\pointcloud_sources\\v50r2_human_only_depth_unprojected_cam45.ply",
+    "name": "v50r2_human_only_depth_unprojected_cam45.ply",
+    "bytes": 473959,
+    "vertex": 11538,
+    "face": null,
+    "mtime": 1778305997.8866203
+  },
+  {
+    "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\ply\\rgb_camera_view_cam45_full.ply",
+    "name": "rgb_camera_view_cam45_full.ply",
+    "bytes": 311734,
+    "vertex": 11538,
+    "face": null,
+    "mtime": 1778300264.78944
+  },
+  {
+    "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\pointcloud_sources\\v50r2_human_only_candidate_world_cam00.ply",
+    "name": "v50r2_human_only_candidate_world_cam00.ply",
+    "bytes": 463033,
+    "vertex": 11490,
+    "face": null,
+    "mtime": 1778305997.71541
+  },
+  {
+    "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\pointcloud_sources\\v50r2_human_only_depth_unprojected_cam00.ply",
+    "name": "v50r2_human_only_depth_unprojected_cam00.ply",
+    "bytes": 462744,
+    "vertex": 11490,
+    "face": null,
+    "mtime": 1778305997.7335553
+  },
+  {
+    "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\ply\\rgb_camera_view_cam00_full.ply",
+    "name": "rgb_camera_view_cam00_full.ply",
+    "bytes": 310438,
+    "vertex": 11490,
+    "face": null,
+    "mtime": 1778300263.665818
+  },
+  {
+    "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\ply\\rgb_camera_view_cam59_full_points.ply",
+    "name": "rgb_camera_view_cam59_full_points.ply",
+    "bytes": 300772,
+    "vertex": 11132,
+    "face": null,
+    "mtime": 1778301092.3907561
+  },
+  {
+    "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\pointcloud_sources\\v50r2_human_only_candidate_world_cam59.ply",
+    "name": "v50r2_human_only_candidate_world_cam59.ply",
+    "bytes": 440635,
+    "vertex": 11048,
+    "face": null,
+    "mtime": 1778305997.9067574
+  },
+  {
+    "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\pointcloud_sources\\v50r2_human_only_depth_unprojected_cam59.ply",
+    "name": "v50r2_human_only_depth_unprojected_cam59.ply",
+    "bytes": 452367,
+    "vertex": 11048,
+    "face": null,
+    "mtime": 1778305997.9248774
+  },
+  {
+    "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\pointcloud_sources\\send_to_mentor\\v50r2_SEND_full_body_cam59_depth.ply",
+    "name": "v50r2_SEND_full_body_cam59_depth.ply",
+    "bytes": 452367,
+    "vertex": 11048,
+    "face": null,
+    "mtime": 1778305997.986366
+  },
+  {
+    "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\ply\\rgb_camera_view_cam59_full.ply",
+    "name": "rgb_camera_view_cam59_full.ply",
+    "bytes": 298504,
+    "vertex": 11048,
+    "face": null,
+    "mtime": 1778300265.0373192
+  },
+  {
+    "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\ply\\rgb_camera_view_cam30_full_points.ply",
+    "name": "rgb_camera_view_cam30_full_points.ply",
+    "bytes": 266778,
+    "vertex": 9873,
+    "face": null,
+    "mtime": 1778301090.6508663
+  },
+  {
+    "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\pointcloud_sources\\v50r2_human_only_candidate_world_cam30.ply",
+    "name": "v50r2_human_only_candidate_world_cam30.ply",
+    "bytes": 401037,
+    "vertex": 9819,
+    "face": null,
+    "mtime": 1778305997.8336205
+  },
+  {
+    "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\pointcloud_sources\\v50r2_human_only_depth_unprojected_cam30.ply",
+    "name": "v50r2_human_only_depth_unprojected_cam30.ply",
+    "bytes": 402560,
+    "vertex": 9819,
+    "face": null,
+    "mtime": 1778305997.84883
+  },
+  {
+    "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\pointcloud_sources\\send_to_mentor\\v50r2_SEND_full_body_cam30_depth.ply",
+    "name": "v50r2_SEND_full_body_cam30_depth.ply",
+    "bytes": 402560,
+    "vertex": 9819,
+    "face": null,
+    "mtime": 1778305997.9455214
+  },
+  {
+    "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\ply\\rgb_camera_view_cam30_full.ply",
+    "name": "rgb_camera_view_cam30_full.ply",
+    "bytes": 265320,
+    "vertex": 9819,
+    "face": null,
+    "mtime": 1778300264.5498788
+  },
+  {
+    "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\ply\\rgb_camera_view_cam15_full_points.ply",
+    "name": "rgb_camera_view_cam15_full_points.ply",
+    "bytes": 258300,
+    "vertex": 9559,
+    "face": null,
+    "mtime": 1778301089.8131852
+  },
+  {
+    "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\pointcloud_sources\\v50r2_human_only_candidate_world_cam15.ply",
+    "name": "v50r2_human_only_candidate_world_cam15.ply",
+    "bytes": 383709,
+    "vertex": 9515,
+    "face": null,
+    "mtime": 1778305997.7978566
+  },
+  {
+    "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\pointcloud_sources\\v50r2_human_only_depth_unprojected_cam15.ply",
+    "name": "v50r2_human_only_depth_unprojected_cam15.ply",
+    "bytes": 384477,
+    "vertex": 9515,
+    "face": null,
+    "mtime": 1778305997.8134832
+  },
+  {
+    "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\pointcloud_sources\\send_to_mentor\\v50r2_SEND_full_body_cam15_depth.ply",
+    "name": "v50r2_SEND_full_body_cam15_depth.ply",
+    "bytes": 384477,
+    "vertex": 9515,
+    "face": null,
+    "mtime": 1778305997.9646268
+  },
+  {
+    "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\ply\\rgb_camera_view_cam15_full.ply",
+    "name": "rgb_camera_view_cam15_full.ply",
+    "bytes": 257112,
+    "vertex": 9515,
+    "face": null,
+    "mtime": 1778300264.2980065
+  },
+  {
+    "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\ply\\rgb_camera_view_cam59_upper_points.ply",
+    "name": "rgb_camera_view_cam59_upper_points.ply",
+    "bytes": 196254,
+    "vertex": 7261,
+    "face": null,
+    "mtime": 1778301096.62128
+  },
+  {
+    "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\ply\\rgb_camera_view_cam59_upper.ply",
+    "name": "rgb_camera_view_cam59_upper.ply",
+    "bytes": 195633,
+    "vertex": 7238,
+    "face": null,
+    "mtime": 1778300266.362094
+  },
+  {
+    "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_clear_human\\ply\\open3d_right_hand_centered.ply",
+    "name": "open3d_right_hand_centered.ply",
+    "bytes": 185670,
+    "vertex": 6869,
+    "face": null,
+    "mtime": 1778299637.7045443
+  },
+  {
+    "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_human_pointcloud\\ply\\rgb_v50r2_right_hand.ply",
+    "name": "rgb_v50r2_right_hand.ply",
+    "bytes": 184941,
+    "vertex": 6842,
+    "face": null,
+    "mtime": 1778299838.899643
+  },
+  {
+    "path": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V33_head_face_detail_route\\v33_candidate_face_patch_merged_research.ply",
+    "name": "v33_candidate_face_patch_merged_research.ply",
+    "bytes": 270809,
+    "vertex": 6782,
+    "face": null,
+    "mtime": 1778276724.620943
+  },
+  {
+    "path": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V33_head_face_detail_route\\v33_head_face_refined_teacher_points.ply",
+    "name": "v33_head_face_refined_teacher_points.ply",
+    "bytes": 270809,
+    "vertex": 6782,
+    "face": null,
+    "mtime": 1778276713.1453612
+  },
+  {
+    "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_clear_human\\ply\\open3d_hairline_centered.ply",
+    "name": "open3d_hairline_centered.ply",
+    "bytes": 180135,
+    "vertex": 6664,
+    "face": null,
+    "mtime": 1778299636.8723574
+  },
+  {
+    "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_clear_human\\ply\\open3d_head_face_centered.ply",
+    "name": "open3d_head_face_centered.ply",
+    "bytes": 180135,
+    "vertex": 6664,
+    "face": null,
+    "mtime": 1778299636.5392277
+  },
+  {
+    "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_human_pointcloud\\ply\\rgb_v50r2_head_face.ply",
+    "name": "rgb_v50r2_head_face.ply",
+    "bytes": 178677,
+    "vertex": 6610,
+    "face": null,
+    "mtime": 1778299838.0845273
+  },
+  {
+    "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\ply\\rgb_camera_view_cam30_upper_points.ply",
+    "name": "rgb_camera_view_cam30_upper_points.ply",
+    "bytes": 175248,
+    "vertex": 6483,
+    "face": null,
+    "mtime": 1778301094.9466171
+  },
+  {
+    "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\ply\\rgb_camera_view_cam30_upper.ply",
+    "name": "rgb_camera_view_cam30_upper.ply",
+    "bytes": 174600,
+    "vertex": 6459,
+    "face": null,
+    "mtime": 1778300265.8306136
+  },
+  {
+    "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\ply\\rgb_camera_view_cam15_upper_points.ply",
+    "name": "rgb_camera_view_cam15_upper_points.ply",
+    "bytes": 173790,
+    "vertex": 6429,
+    "face": null,
+    "mtime": 1778301093.223644
+  },
+  {
+    "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\ply\\rgb_camera_view_cam15_upper.ply",
+    "name": "rgb_camera_view_cam15_upper.ply",
+    "bytes": 173034,
+    "vertex": 6401,
+    "face": null,
+    "mtime": 1778300265.2803192
+  },
+  {
+    "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_clear_human\\ply\\open3d_left_hand_centered.ply",
+    "name": "open3d_left_hand_centered.ply",
+    "bytes": 125568,
+    "vertex": 4643,
+    "face": null,
+    "mtime": 1778299637.236509
+  },
+  {
+    "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_human_pointcloud\\ply\\rgb_v50r2_left_hand.ply",
+    "name": "rgb_v50r2_left_hand.ply",
+    "bytes": 125001,
+    "vertex": 4622,
+    "face": null,
+    "mtime": 1778299838.6510289
+  },
+  {
+    "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\ply\\rgb_camera_view_cam59_hand_left_image_points.ply",
+    "name": "rgb_camera_view_cam59_hand_left_image_points.ply",
+    "bytes": 107640,
+    "vertex": 3979,
+    "face": null,
+    "mtime": 1778301100.931757
+  },
+  {
+    "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\ply\\rgb_camera_view_cam59_hand_left_image.ply",
+    "name": "rgb_camera_view_cam59_hand_left_image.ply",
+    "bytes": 106992,
+    "vertex": 3955,
+    "face": null,
+    "mtime": 1778300267.4363618
+  },
+  {
+    "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\ply\\rgb_camera_view_cam30_hand_left_image_points.ply",
+    "name": "rgb_camera_view_cam30_hand_left_image_points.ply",
+    "bytes": 105669,
+    "vertex": 3906,
+    "face": null,
+    "mtime": 1778301099.5892563
+  },
+  {
+    "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\ply\\rgb_camera_view_cam30_hand_left_image.ply",
+    "name": "rgb_camera_view_cam30_hand_left_image.ply",
+    "bytes": 105210,
+    "vertex": 3889,
+    "face": null,
+    "mtime": 1778300267.154511
+  },
+  {
+    "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\ply\\rgb_camera_view_cam59_head_points.ply",
+    "name": "rgb_camera_view_cam59_head_points.ply",
+    "bytes": 100836,
+    "vertex": 3727,
+    "face": null,
+    "mtime": 1778301097.4454114
+  },
+  {
+    "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\ply\\rgb_camera_view_cam59_head.ply",
+    "name": "rgb_camera_view_cam59_head.ply",
+    "bytes": 100512,
+    "vertex": 3715,
+    "face": null,
+    "mtime": 1778300266.6271644
+  },
+  {
+    "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\ply\\rgb_camera_view_cam15_head_points.ply",
+    "name": "rgb_camera_view_cam15_head_points.ply",
+    "bytes": 93006,
+    "vertex": 3437,
+    "face": null,
+    "mtime": 1778301094.0850527
+  },
+  {
+    "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\ply\\rgb_camera_view_cam15_head.ply",
+    "name": "rgb_camera_view_cam15_head.ply",
+    "bytes": 92574,
+    "vertex": 3421,
+    "face": null,
+    "mtime": 1778300265.554948
+  },
+  {
+    "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\ply\\rgb_camera_view_cam30_head_points.ply",
+    "name": "rgb_camera_view_cam30_head_points.ply",
+    "bytes": 89793,
+    "vertex": 3318,
+    "face": null,
+    "mtime": 1778301095.77278
+  },
+  {
+    "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\ply\\rgb_camera_view_cam30_head.ply",
+    "name": "rgb_camera_view_cam30_head.ply",
+    "bytes": 89388,
+    "vertex": 3303,
+    "face": null,
+    "mtime": 1778300266.097427
+  },
+  {
+    "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_human_pointcloud\\ply\\rgb_v50r2_face_close.ply",
+    "name": "rgb_v50r2_face_close.ply",
+    "bytes": 67383,
+    "vertex": 2488,
+    "face": null,
+    "mtime": 1778299838.4057503
+  },
+  {
+    "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\pointcloud_sources\\send_to_mentor\\v50r2_SEND_left_hand_cam15_depth.ply",
+    "name": "v50r2_SEND_left_hand_cam15_depth.ply",
+    "bytes": 96190,
+    "vertex": 2378,
+    "face": null,
+    "mtime": 1778305998.0131881
+  },
+  {
+    "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\pointcloud_sources\\send_to_mentor\\v50r2_SEND_left_hand_cam15_refined_world.ply",
+    "name": "v50r2_SEND_left_hand_cam15_refined_world.ply",
+    "bytes": 97368,
+    "vertex": 2378,
+    "face": null,
+    "mtime": 1778305998.0222487
+  },
+  {
+    "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\ply\\rgb_camera_view_cam59_hand_right_image_points.ply",
+    "name": "rgb_camera_view_cam59_hand_right_image_points.ply",
+    "bytes": 58608,
+    "vertex": 2163,
+    "face": null,
+    "mtime": 1778301101.5917466
+  },
+  {
+    "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\ply\\rgb_camera_view_cam59_hand_right_image.ply",
+    "name": "rgb_camera_view_cam59_hand_right_image.ply",
+    "bytes": 58419,
+    "vertex": 2156,
+    "face": null,
+    "mtime": 1778300267.5783014
+  },
+  {
+    "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\ply\\rgb_camera_view_cam15_hand_right_image_points.ply",
+    "name": "rgb_camera_view_cam15_hand_right_image_points.ply",
+    "bytes": 55476,
+    "vertex": 2047,
+    "face": null,
+    "mtime": 1778301098.9281943
+  },
+  {
+    "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\ply\\rgb_camera_view_cam15_hand_right_image.ply",
+    "name": "rgb_camera_view_cam15_hand_right_image.ply",
+    "bytes": 55341,
+    "vertex": 2042,
+    "face": null,
+    "mtime": 1778300267.026874
+  },
+  {
+    "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\pointcloud_sources\\send_to_mentor\\v50r2_SEND_right_hand_cam30_depth.ply",
+    "name": "v50r2_SEND_right_hand_cam30_depth.ply",
+    "bytes": 79371,
+    "vertex": 1907,
+    "face": null,
+    "mtime": 1778305998.0312808
+  },
+  {
+    "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\pointcloud_sources\\send_to_mentor\\v50r2_SEND_right_hand_cam30_refined_world.ply",
+    "name": "v50r2_SEND_right_hand_cam30_refined_world.ply",
+    "bytes": 78070,
+    "vertex": 1907,
+    "face": null,
+    "mtime": 1778305998.0383272
+  },
+  {
+    "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\ply\\rgb_camera_view_cam15_hand_left_image_points.ply",
+    "name": "rgb_camera_view_cam15_hand_left_image_points.ply",
+    "bytes": 49212,
+    "vertex": 1815,
+    "face": null,
+    "mtime": 1778301098.263894
+  },
+  {
+    "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\ply\\rgb_camera_view_cam15_hand_left_image.ply",
+    "name": "rgb_camera_view_cam15_hand_left_image.ply",
+    "bytes": 48834,
+    "vertex": 1801,
+    "face": null,
+    "mtime": 1778300266.8923492
+  },
+  {
+    "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\ply\\rgb_camera_view_cam30_hand_right_image_points.ply",
+    "name": "rgb_camera_view_cam30_hand_right_image_points.ply",
+    "bytes": 43164,
+    "vertex": 1591,
+    "face": null,
+    "mtime": 1778301100.2469723
+  },
+  {
+    "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\ply\\rgb_camera_view_cam30_hand_right_image.ply",
+    "name": "rgb_camera_view_cam30_hand_right_image.ply",
+    "bytes": 42867,
+    "vertex": 1580,
+    "face": null,
+    "mtime": 1778300267.282914
+  },
+  {
+    "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\pointcloud_sources\\send_to_mentor\\v50r2_SEND_head_face_cam30_depth.ply",
+    "name": "v50r2_SEND_head_face_cam30_depth.ply",
+    "bytes": 46591,
+    "vertex": 1135,
+    "face": null,
+    "mtime": 1778305997.9964125
+  },
+  {
+    "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\pointcloud_sources\\send_to_mentor\\v50r2_SEND_head_face_cam30_refined_world.ply",
+    "name": "v50r2_SEND_head_face_cam30_refined_world.ply",
+    "bytes": 46383,
+    "vertex": 1135,
+    "face": null,
+    "mtime": 1778305998.0036707
+  }
+]

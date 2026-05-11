@@ -1,0 +1,54 @@
+name: 4k4d_smplx_residual_teacher_candidate_v31
+stage: V31_teacher_supervised_candidate_research
+research_only: true
+no_formal_predictions: true
+no_candidate_package: true
+no_teacher_package: true
+no_strict_registry_write: true
+
+inputs:
+  v24_teacher_npz: output/surface_research_preflight_local/V24_residual_teacher_v2/v24_residual_teacher_targets_v2.npz
+  v26_temporal_npz: output/surface_research_preflight_local/V26_temporal_canonical_teacher/v26_temporal_canonical_teacher_targets.npz
+  v29_normal_npz: output/surface_research_preflight_local/V29_normal_route_rescue/v29_teacher_normals_world.npz
+
+outputs:
+  root: output/surface_research_preflight_local/V31_teacher_supervised_candidate_train
+  checkpoint: output/surface_research_preflight_local/V31_teacher_supervised_candidate_train/v31_candidate_research_checkpoint.npz
+  training_curve: output/surface_research_preflight_local/V31_teacher_supervised_candidate_train/v31_training_curve.jsonl
+
+model:
+  minimal_research_candidate: true
+  trainable_parameters:
+    - temporal_blend_logit
+    - control_bias
+    - depth_scale
+    - region_offsets
+    - normal_blend_logit
+  frozen:
+    - formal_vggt_backbone
+    - formal_export_paths
+
+controls:
+  - real_teacher_real_prior
+  - zero_prior_same_teacher
+  - shuffle_prior_same_teacher
+  - smplx_template_teacher_only
+  - no_teacher_baseline
+
+training:
+  steps: 80
+  learning_rate: 0.08
+  sample_stride: 6
+  region_names:
+    - body
+    - head
+    - face
+    - left_hand
+    - right_hand
+
+losses:
+  point_l1: 1.0
+  depth_l1: 0.35
+  normal_cosine: 0.2
+  region_balance: 0.15
+  temporal_consistency: 0.1

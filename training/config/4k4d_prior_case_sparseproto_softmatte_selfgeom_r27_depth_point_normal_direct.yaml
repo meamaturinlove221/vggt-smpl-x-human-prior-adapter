@@ -1,0 +1,48 @@
+defaults:
+  - 4k4d_prior_case_sparseproto_softmatte_selfgeom_r26_weakbody_nophoto_signed_pointbranch
+  - _self_
+
+exp_name: 4k4d_prior_case_sparseproto_softmatte_selfgeom_r27_depth_point_normal_direct
+
+# Local diagnostic only.
+# r21-r26 already proved that depth/point can chase the frozen predicted-normal
+# head without producing mentor-grade face/head geometry. This variant tests the
+# narrower mentor hypothesis directly: depth-derived normals and point-derived
+# normals should be signed-consistent with each other, without the predicted
+# normal head as the teacher middleman.
+
+loss:
+  human_prior:
+    weight: 0.10
+    point_normal:
+      teacher_weight: 0.0
+      consistency_weight: 0.0
+      supervise_conf: false
+    depth_normal:
+      consistency_weight: 0.0
+    depth_point:
+      consistency_weight: 0.04
+      xyz_weight: 0.35
+      z_weight: 0.50
+      valid_range: 0.96
+      min_depth: 0.0001
+      relative_scale: true
+      head_roi_weight: 2.5
+      face_roi_weight: 4.0
+      hairline_roi_weight: 4.0
+      ear_band_roi_weight: 2.5
+      boundary_boost: 2.0
+    depth_point_normal:
+      consistency_weight: 0.08
+      orientation: oriented
+      flip_depth_normal: true
+      flip_point_normal: true
+      detach_depth_normal: true
+      detach_point_normal: false
+      valid_range: 0.96
+      min_depth: 0.0001
+      head_roi_weight: 3.0
+      face_roi_weight: 5.0
+      hairline_roi_weight: 5.0
+      ear_band_roi_weight: 3.0
+      boundary_boost: 2.0

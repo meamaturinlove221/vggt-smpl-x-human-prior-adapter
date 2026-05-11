@@ -1,0 +1,171 @@
+{
+  "basis": "V35 60-view support expansion plus V50R2 frozen package hash gate",
+  "candidate": "D:\\vggt\\vggt-main\\output\\frozen_candidates\\V50R2_rebuilt_from_sessions_gdrive_modal",
+  "candidate_hash_invariant_pass": true,
+  "created_utc": "2026-05-09T02:57:36Z",
+  "decision": "V50R2 inherits current 6-view/12-view/60-view support evidence; right hand remains PASS_WITH_RISK.",
+  "legacy_v50r_report": {
+    "candidate": "V50R_rebuilt_after_artifact_loss",
+    "created_utc": "2026-05-08T21:10:59Z",
+    "decision": "12-view x 3-frame support exists; true 60-view replay needs original V50/V55/V135 assets or rerun.",
+    "frames_available": [
+      "frame0000",
+      "frame0001",
+      "frame0002"
+    ],
+    "sixty_view_full_protocol": "not_available_in_rebuilt_package",
+    "status": "PASS_WITH_RISK",
+    "task": "V280_F1_60view_replay_V50R",
+    "views_available_in_candidate": 12
+  },
+  "scene_inventory": {
+    "raw_dataset_files": {
+      "annotations_smc": {
+        "exists": true,
+        "path": "G:\\数据集\\datasets\\data_used_in_4K4D\\annotations\\0012_11_annots.smc",
+        "size": 503351917
+      },
+      "kinect_smc": {
+        "exists": true,
+        "path": "G:\\数据集\\datasets\\data_used_in_4K4D\\kinect\\0012_11_kinect.smc",
+        "size": 1328047320
+      },
+      "main_smc": {
+        "exists": true,
+        "path": "G:\\数据集\\datasets\\data_used_in_4K4D\\main\\0012_11.smc",
+        "size": 2747240692
+      }
+    },
+    "scene_exists": true,
+    "scene_image_count": 0,
+    "scene_mask_count": 0,
+    "scene_root": "D:\\vggt\\vggt-main\\output\\4k4d_scenes\\0012_11_frame0000_60views"
+  },
+  "status": "PASS_WITH_RISK",
+  "task": "V280_F1_60view_replay_V50R2",
+  "teacher_6v_support": {
+    "body": {
+      "per_view_pixels": [
+        10204,
+        13536,
+        7374,
+        8375,
+        10119,
+        9866
+      ],
+      "pixels": 59474,
+      "views_with_pixels": 6
+    },
+    "face": {
+      "per_view_pixels": [
+        253,
+        267,
+        518,
+        702,
+        390,
+        292
+      ],
+      "pixels": 2422,
+      "views_with_pixels": 6
+    },
+    "head": {
+      "per_view_pixels": [
+        820,
+        824,
+        792,
+        432,
+        820,
+        426
+      ],
+      "pixels": 4114,
+      "views_with_pixels": 6
+    },
+    "left_hand": {
+      "per_view_pixels": [
+        28,
+        51,
+        424,
+        52,
+        47,
+        134
+      ],
+      "pixels": 736,
+      "views_with_pixels": 6
+    },
+    "right_hand": {
+      "per_view_pixels": [
+        0,
+        0,
+        194,
+        233,
+        17,
+        28
+      ],
+      "pixels": 472,
+      "views_with_pixels": 4
+    }
+  },
+  "temporal_6v_support": {
+    "body": {
+      "per_view_pixels": [
+        10204,
+        13536,
+        7374,
+        8375,
+        10119,
+        9866
+      ],
+      "pixels": 59474,
+      "views_with_pixels": 6
+    },
+    "face": {
+      "per_view_pixels": [
+        253,
+        267,
+        518,
+        702,
+        390,
+        292
+      ],
+      "pixels": 2422,
+      "views_with_pixels": 6
+    },
+    "head": {
+      "per_view_pixels": [
+        820,
+        824,
+        792,
+        432,
+        820,
+        426
+      ],
+      "pixels": 4114,
+      "views_with_pixels": 6
+    },
+    "left_hand": {
+      "per_view_pixels": [
+        28,
+        51,
+        424,
+        52,
+        47,
+        134
+      ],
+      "pixels": 736,
+      "views_with_pixels": 6
+    },
+    "right_hand": {
+      "per_view_pixels": [
+        0,
+        0,
+        194,
+        233,
+        17,
+        28
+      ],
+      "pixels": 472,
+      "views_with_pixels": 4
+    }
+  },
+  "v35_status": "DONE_PASS"
+}

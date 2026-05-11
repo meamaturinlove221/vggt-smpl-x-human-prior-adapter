@@ -1,0 +1,216 @@
+{
+  "blockers": [
+    "V25 loaded model has no normal_head; temporal normals unavailable and not fabricated"
+  ],
+  "created_utc": "2026-05-08T21:40:25Z",
+  "decision": "V26 constructed a three-frame research-only temporal residual accumulator. It is usable as research evidence but remains blocked for strict teacher promotion until normal evidence is available.",
+  "inputs": {
+    "v24_targets": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V24_residual_teacher_v2\\v24_residual_teacher_targets_v2.npz",
+    "v25_root": "D:\\vggt\\vggt-main\\output\\surface_research_cloud_preflight\\V25_research_vggt_predictions"
+  },
+  "metrics": {
+    "canonical_residual_norm": {
+      "count": 67218,
+      "finite": 67218,
+      "max": 1.4342215061187744,
+      "mean": 0.373203307390213,
+      "median": 0.20886877179145813,
+      "min": 0.007028824649751186,
+      "p95": 0.8179078102111816
+    },
+    "canonical_support_pixels": 67218,
+    "frame_keys": [
+      "frame0000",
+      "frame0001",
+      "frame0002"
+    ],
+    "normal_available": false,
+    "shared_view_count": 6,
+    "temporal_variance": {
+      "count": 67218,
+      "finite": 67218,
+      "max": 0.04053320735692978,
+      "mean": 0.0009709821897558868,
+      "median": 3.565386919035518e-07,
+      "min": 8.939198714585928e-09,
+      "p95": 3.004518111993093e-05
+    }
+  },
+  "no_candidate_export": true,
+  "no_predictions_write": true,
+  "no_registry_write": true,
+  "no_teacher_export": true,
+  "outputs": {
+    "report_json": "reports\\20260508_v26_temporal_canonical_teacher.json",
+    "report_md": "reports\\20260508_v26_temporal_canonical_teacher.md",
+    "summary_json": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V26_temporal_canonical_teacher\\summary.json",
+    "temporal_targets_npz": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V26_temporal_canonical_teacher\\v26_temporal_canonical_teacher_targets.npz"
+  },
+  "per_frame": {
+    "frame0000": {
+      "depth": {
+        "count": 67218,
+        "finite": 67218,
+        "max": 1.447065830230713,
+        "mean": 0.9532145261764526,
+        "median": 0.800407886505127,
+        "min": 0.6551948189735413,
+        "p95": 1.4055016040802002
+      },
+      "finite_support": 67218,
+      "residual_norm": {
+        "count": 67218,
+        "finite": 67218,
+        "max": 1.4341474771499634,
+        "mean": 0.3760238587856293,
+        "median": 0.20708730816841125,
+        "min": 0.051796805113554,
+        "p95": 0.8032110333442688
+      }
+    },
+    "frame0001": {
+      "depth": {
+        "count": 67218,
+        "finite": 67218,
+        "max": 1.4533426761627197,
+        "mean": 0.9525499939918518,
+        "median": 0.8010423183441162,
+        "min": 0.6535027027130127,
+        "p95": 1.40067458152771
+      },
+      "finite_support": 67218,
+      "residual_norm": {
+        "count": 67218,
+        "finite": 67218,
+        "max": 1.4346996545791626,
+        "mean": 0.37390685081481934,
+        "median": 0.2035679817199707,
+        "min": 0.050654564052820206,
+        "p95": 0.8065806031227112
+      }
+    },
+    "frame0002": {
+      "depth": {
+        "count": 67218,
+        "finite": 67218,
+        "max": 1.4873625040054321,
+        "mean": 0.9581048488616943,
+        "median": 0.8039553165435791,
+        "min": 0.6556701064109802,
+        "p95": 1.4033257961273193
+      },
+      "finite_support": 67218,
+      "residual_norm": {
+        "count": 67218,
+        "finite": 67218,
+        "max": 1.4337613582611084,
+        "mean": 0.375787615776062,
+        "median": 0.2051781266927719,
+        "min": 0.044728320091962814,
+        "p95": 0.815186619758606
+      }
+    }
+  },
+  "region_support": {
+    "body": {
+      "canonical_support": 59474,
+      "frames_with_support": 3,
+      "per_frame_support": [
+        59474,
+        59474,
+        59474
+      ],
+      "temporal_variance": {
+        "count": 59474,
+        "finite": 59474,
+        "max": 0.03808095306158066,
+        "mean": 0.0009736426291055977,
+        "median": 3.1815875445317943e-07,
+        "min": 9.373075648966278e-09,
+        "p95": 3.4296357625862584e-05
+      },
+      "temporal_variance_mean": 0.0009736426291055977
+    },
+    "face": {
+      "canonical_support": 2422,
+      "frames_with_support": 3,
+      "per_frame_support": [
+        2422,
+        2422,
+        2422
+      ],
+      "temporal_variance": {
+        "count": 2422,
+        "finite": 2422,
+        "max": 0.03818376362323761,
+        "mean": 0.0012917023850604892,
+        "median": 1.2062166661053197e-06,
+        "min": 4.129420361209668e-08,
+        "p95": 1.4616274711443111e-05
+      },
+      "temporal_variance_mean": 0.0012917023850604892
+    },
+    "head": {
+      "canonical_support": 4114,
+      "frames_with_support": 3,
+      "per_frame_support": [
+        4114,
+        4114,
+        4114
+      ],
+      "temporal_variance": {
+        "count": 4114,
+        "finite": 4114,
+        "max": 0.04053320735692978,
+        "mean": 0.0007855163421481848,
+        "median": 1.0040666893473826e-06,
+        "min": 1.8146897318160882e-08,
+        "p95": 3.72238991985796e-06
+      },
+      "temporal_variance_mean": 0.0007855163421481848
+    },
+    "left_hand": {
+      "canonical_support": 736,
+      "frames_with_support": 3,
+      "per_frame_support": [
+        736,
+        736,
+        736
+      ],
+      "temporal_variance": {
+        "count": 736,
+        "finite": 736,
+        "max": 0.03260551020503044,
+        "mean": 0.0005766559625044465,
+        "median": 2.33381598491178e-07,
+        "min": 8.939198714585928e-09,
+        "p95": 1.8210612324764952e-05
+      },
+      "temporal_variance_mean": 0.0005766559625044465
+    },
+    "right_hand": {
+      "canonical_support": 472,
+      "frames_with_support": 3,
+      "per_frame_support": [
+        472,
+        472,
+        472
+      ],
+      "temporal_variance": {
+        "count": 472,
+        "finite": 472,
+        "max": 0.03471697121858597,
+        "mean": 0.0012214314192533493,
+        "median": 6.305257329586311e-07,
+        "min": 6.801784735444016e-08,
+        "p95": 9.397380381415132e-06
+      },
+      "temporal_variance_mean": 0.0012214314192533493
+    }
+  },
+  "research_only": true,
+  "status": "DONE_PASS",
+  "strict_candidate_passes": 0,
+  "strict_teacher_passes": 0,
+  "task": "v26_temporal_canonical_smplx_residual_teacher"
+}

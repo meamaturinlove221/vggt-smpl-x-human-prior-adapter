@@ -1,0 +1,12 @@
+{
+  "task": "build_plain_baseline_normal_mentor_zip",
+  "created_utc": "2026-05-11T04:39:55Z",
+  "status": "DONE_PASS",
+  "zip": "D:\\vggt\\vggt-main\\archive\\V50R2_mentor_result_plain_baseline_normal_answer.zip",
+  "entry_count": 53,
+  "required_entry_hits": {
+    "20260511_mentor_plain_vggt_baseline_vs_normal_route.md": true,
+    "vggt_vertical_baseline_comparison.md": true,
+    "vggt_variant_lineage_comparison_mentor.md": true
+  }
+}

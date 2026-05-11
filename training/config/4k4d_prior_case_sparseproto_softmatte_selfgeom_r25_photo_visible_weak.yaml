@@ -1,0 +1,29 @@
+defaults:
+  - 4k4d_prior_case_sparseproto_softmatte_selfgeom_r24_photometric_roi
+  - _self_
+
+exp_name: 4k4d_prior_case_sparseproto_softmatte_selfgeom_r25_photo_visible_weak
+
+# Local diagnostic only.
+# r24 showed that a strong, un-occluded photometric term reaches the point branch
+# but does not improve mentor gates.  This variant changes only the photometric
+# evidence path: weaker weight, lower ROI boundary pull, coarser stride, stronger
+# outlier trimming, and target-depth visibility filtering.
+
+loss:
+  human_prior:
+    photometric:
+      consistency_weight: 0.02
+      source: world_points
+      valid_range: 0.70
+      stride: 8
+      max_pairs: 12
+      min_depth: 0.0001
+      detach_projection: false
+      robust: charbonnier
+      occlusion_tolerance: 0.015
+      head_roi_weight: 2.0
+      face_roi_weight: 4.0
+      hairline_roi_weight: 4.0
+      ear_band_roi_weight: 2.0
+      boundary_boost: 1.5

@@ -1,0 +1,268 @@
+{
+  "blockers": [],
+  "created_utc": "2026-05-08T21:37:51Z",
+  "decision": "SMPL-X native mesh was rasterized into bounded synthetic camera depth/point/normal/part maps for audit use only.",
+  "inputs": {
+    "gender": "neutral",
+    "model_path": "G:\\数据集\\datasets\\smplx\\SMPLX_NEUTRAL.npz",
+    "smplx_root": "G:\\数据集\\datasets\\smplx"
+  },
+  "metrics": {
+    "face_count": 20908,
+    "image_size": 256,
+    "normal_valid_pixels": 70943,
+    "vertex_count": 10475,
+    "view_count": 6,
+    "visible_pixels_total": 70943,
+    "visible_ratio_mean": 0.1804173787434896,
+    "visible_ratio_min": 0.167755126953125
+  },
+  "no_candidate_export": true,
+  "no_predictions_write": true,
+  "no_registry_write": true,
+  "no_strict_pass_claim": true,
+  "no_teacher_export": true,
+  "outputs": {
+    "raster_npz": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V15_SMPLX_native_camera_raster_export\\v15_smplx_camera_raster_export.npz",
+    "summary": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V15_SMPLX_native_camera_raster_export\\summary.json"
+  },
+  "parameters": {
+    "focal_ratio": 1.35,
+    "image_size": 256,
+    "view_count": 6
+  },
+  "per_view": [
+    {
+      "depth": {
+        "count": 13067,
+        "finite": 13067,
+        "max": 2.36018443107605,
+        "mean": 2.1489577293395996,
+        "median": 2.138406276702881,
+        "min": 2.012434959411621,
+        "p10": 2.0553033351898193,
+        "p90": 2.2719483375549316
+      },
+      "index": 0,
+      "name": "synthetic_cam_00",
+      "normal_length": {
+        "count": 13067,
+        "finite": 13067,
+        "max": 1.0000001192092896,
+        "mean": 1.0,
+        "median": 1.0,
+        "min": 0.9999998807907104,
+        "p10": 0.9999999403953552,
+        "p90": 1.0
+      },
+      "preview_depth_png": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V15_SMPLX_native_camera_raster_export\\synthetic_cam_00_depth.png",
+      "preview_mask_png": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V15_SMPLX_native_camera_raster_export\\synthetic_cam_00_mask.png",
+      "preview_normal_png": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V15_SMPLX_native_camera_raster_export\\synthetic_cam_00_normal.png",
+      "raster_meta": {
+        "completed_pixels": 13067,
+        "faces_rasterized": 6904,
+        "faces_total": 20908,
+        "filled_pixels": 0,
+        "rasterized_pixels": 13067,
+        "valid_vertices": 10475
+      },
+      "rasterized_pixels": 13067,
+      "visible_pixels": 13067,
+      "visible_ratio": 0.1993865966796875
+    },
+    {
+      "depth": {
+        "count": 11007,
+        "finite": 11007,
+        "max": 2.899362564086914,
+        "mean": 2.093184232711792,
+        "median": 2.077505111694336,
+        "min": 1.4596987962722778,
+        "p10": 1.9207532405853271,
+        "p90": 2.329777717590332
+      },
+      "index": 1,
+      "name": "synthetic_cam_01",
+      "normal_length": {
+        "count": 11007,
+        "finite": 11007,
+        "max": 1.0000001192092896,
+        "mean": 1.0,
+        "median": 1.0,
+        "min": 0.9999998807907104,
+        "p10": 0.9999999403953552,
+        "p90": 1.0
+      },
+      "preview_depth_png": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V15_SMPLX_native_camera_raster_export\\synthetic_cam_01_depth.png",
+      "preview_mask_png": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V15_SMPLX_native_camera_raster_export\\synthetic_cam_01_mask.png",
+      "preview_normal_png": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V15_SMPLX_native_camera_raster_export\\synthetic_cam_01_normal.png",
+      "raster_meta": {
+        "completed_pixels": 11007,
+        "faces_rasterized": 5947,
+        "faces_total": 20908,
+        "filled_pixels": 0,
+        "rasterized_pixels": 11007,
+        "valid_vertices": 10475
+      },
+      "rasterized_pixels": 11007,
+      "visible_pixels": 11007,
+      "visible_ratio": 0.1679534912109375
+    },
+    {
+      "depth": {
+        "count": 11152,
+        "finite": 11152,
+        "max": 2.8586456775665283,
+        "mean": 2.077911376953125,
+        "median": 2.0827317237854004,
+        "min": 1.420478105545044,
+        "p10": 1.869620680809021,
+        "p90": 2.2886054515838623
+      },
+      "index": 2,
+      "name": "synthetic_cam_02",
+      "normal_length": {
+        "count": 11152,
+        "finite": 11152,
+        "max": 1.0000001192092896,
+        "mean": 1.0,
+        "median": 1.0,
+        "min": 0.9999998807907104,
+        "p10": 0.9999999403953552,
+        "p90": 1.0
+      },
+      "preview_depth_png": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V15_SMPLX_native_camera_raster_export\\synthetic_cam_02_depth.png",
+      "preview_mask_png": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V15_SMPLX_native_camera_raster_export\\synthetic_cam_02_mask.png",
+      "preview_normal_png": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V15_SMPLX_native_camera_raster_export\\synthetic_cam_02_normal.png",
+      "raster_meta": {
+        "completed_pixels": 11152,
+        "faces_rasterized": 5998,
+        "faces_total": 20908,
+        "filled_pixels": 0,
+        "rasterized_pixels": 11152,
+        "valid_vertices": 10475
+      },
+      "rasterized_pixels": 11152,
+      "visible_pixels": 11152,
+      "visible_ratio": 0.170166015625
+    },
+    {
+      "depth": {
+        "count": 13580,
+        "finite": 13580,
+        "max": 2.4036548137664795,
+        "mean": 2.1101436614990234,
+        "median": 2.0915307998657227,
+        "min": 2.0108156204223633,
+        "p10": 2.0418152809143066,
+        "p90": 2.1913845539093018
+      },
+      "index": 3,
+      "name": "synthetic_cam_03",
+      "normal_length": {
+        "count": 13580,
+        "finite": 13580,
+        "max": 1.0000001192092896,
+        "mean": 1.0,
+        "median": 1.0,
+        "min": 0.9999998807907104,
+        "p10": 0.9999999403953552,
+        "p90": 1.0
+      },
+      "preview_depth_png": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V15_SMPLX_native_camera_raster_export\\synthetic_cam_03_depth.png",
+      "preview_mask_png": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V15_SMPLX_native_camera_raster_export\\synthetic_cam_03_mask.png",
+      "preview_normal_png": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V15_SMPLX_native_camera_raster_export\\synthetic_cam_03_normal.png",
+      "raster_meta": {
+        "completed_pixels": 13580,
+        "faces_rasterized": 6778,
+        "faces_total": 20908,
+        "filled_pixels": 0,
+        "rasterized_pixels": 13580,
+        "valid_vertices": 10475
+      },
+      "rasterized_pixels": 13580,
+      "visible_pixels": 13580,
+      "visible_ratio": 0.20721435546875
+    },
+    {
+      "depth": {
+        "count": 11143,
+        "finite": 11143,
+        "max": 2.8637819290161133,
+        "mean": 2.0787084102630615,
+        "median": 2.083509922027588,
+        "min": 1.421065330505371,
+        "p10": 1.8699407577514648,
+        "p90": 2.289346694946289
+      },
+      "index": 4,
+      "name": "synthetic_cam_04",
+      "normal_length": {
+        "count": 11143,
+        "finite": 11143,
+        "max": 1.0000001192092896,
+        "mean": 1.0,
+        "median": 1.0,
+        "min": 0.9999998807907104,
+        "p10": 0.9999999403953552,
+        "p90": 1.0
+      },
+      "preview_depth_png": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V15_SMPLX_native_camera_raster_export\\synthetic_cam_04_depth.png",
+      "preview_mask_png": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V15_SMPLX_native_camera_raster_export\\synthetic_cam_04_mask.png",
+      "preview_normal_png": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V15_SMPLX_native_camera_raster_export\\synthetic_cam_04_normal.png",
+      "raster_meta": {
+        "completed_pixels": 11143,
+        "faces_rasterized": 6744,
+        "faces_total": 20908,
+        "filled_pixels": 0,
+        "rasterized_pixels": 11143,
+        "valid_vertices": 10475
+      },
+      "rasterized_pixels": 11143,
+      "visible_pixels": 11143,
+      "visible_ratio": 0.1700286865234375
+    },
+    {
+      "depth": {
+        "count": 10994,
+        "finite": 10994,
+        "max": 2.903639078140259,
+        "mean": 2.093914270401001,
+        "median": 2.0783374309539795,
+        "min": 1.4600372314453125,
+        "p10": 1.9203851222991943,
+        "p90": 2.3306050300598145
+      },
+      "index": 5,
+      "name": "synthetic_cam_05",
+      "normal_length": {
+        "count": 10994,
+        "finite": 10994,
+        "max": 1.0000001192092896,
+        "mean": 1.0,
+        "median": 1.0,
+        "min": 0.9999998807907104,
+        "p10": 0.9999999403953552,
+        "p90": 1.0
+      },
+      "preview_depth_png": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V15_SMPLX_native_camera_raster_export\\synthetic_cam_05_depth.png",
+      "preview_mask_png": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V15_SMPLX_native_camera_raster_export\\synthetic_cam_05_mask.png",
+      "preview_normal_png": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V15_SMPLX_native_camera_raster_export\\synthetic_cam_05_normal.png",
+      "raster_meta": {
+        "completed_pixels": 10994,
+        "faces_rasterized": 6596,
+        "faces_total": 20908,
+        "filled_pixels": 0,
+        "rasterized_pixels": 10994,
+        "valid_vertices": 10475
+      },
+      "rasterized_pixels": 10994,
+      "visible_pixels": 10994,
+      "visible_ratio": 0.167755126953125
+    }
+  ],
+  "research_only": true,
+  "smplx_native_only": true,
+  "status": "v15_smplx_camera_raster_ready",
+  "task": "v15_smplx_camera_raster_export"
+}

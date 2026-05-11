@@ -1,0 +1,23 @@
+{
+  "candidate_unaffected": true,
+  "created_utc": "2026-05-09T02:57:36Z",
+  "policy": "Teacher route may reopen only with independent dense sensor/MVS geometry that passes bidirectional geometry, depth/normal, reprojection, region ownership, and visual gates.",
+  "reason": "No independent dense Kinect/MVS/2DGS teacher source passed protocol after recovery; V50R2 is candidate-derived and cannot be promoted as teacher.",
+  "source_teacher_policy_report": {
+    "blocked_sources": [
+      "candidate-derived target",
+      "VGGT shell teacher",
+      "2D overlay teacher",
+      "point-count-only teacher"
+    ],
+    "created_utc": "2026-05-08T21:11:00Z",
+    "decision": "Teacher route remains frozen until an independent same-frame dense source passes strict depth/normal/visual ownership.",
+    "independent_dense_source_available": false,
+    "status": "FAIL_FROZEN",
+    "strict_teacher_passes": 0,
+    "task": "V310_I_teacher_resurrection"
+  },
+  "status": "FAIL_FROZEN",
+  "strict_teacher_passes": 0,
+  "task": "V310_I2_kinect_teacher_resurrection"
+}

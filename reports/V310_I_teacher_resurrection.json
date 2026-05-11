@@ -1,0 +1,14 @@
+{
+  "blocked_sources": [
+    "candidate-derived target",
+    "VGGT shell teacher",
+    "2D overlay teacher",
+    "point-count-only teacher"
+  ],
+  "created_utc": "2026-05-08T21:11:00Z",
+  "decision": "Teacher route remains frozen until an independent same-frame dense source passes strict depth/normal/visual ownership.",
+  "independent_dense_source_available": false,
+  "status": "FAIL_FROZEN",
+  "strict_teacher_passes": 0,
+  "task": "V310_I_teacher_resurrection"
+}

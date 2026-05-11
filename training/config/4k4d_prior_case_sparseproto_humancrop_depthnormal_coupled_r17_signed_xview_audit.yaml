@@ -1,0 +1,22 @@
+defaults:
+  - 4k4d_prior_case_sparseproto_humancrop_depthnormal_coupled_r16_xview_selfgeom
+  - _self_
+
+exp_name: 4k4d_prior_case_sparseproto_humancrop_depthnormal_coupled_r17_signed_xview_audit
+
+loss:
+  human_prior:
+    depth_normal:
+      # Local sign audit shows predicted normals are opposite to raw
+      # depth/point-map winding, while -raw matches the predicted/prior
+      # convention. Use an oriented loss after flipping derived depth normals so
+      # signed metrics and gradients have a single convention.
+      orientation: oriented
+      flip_depth_normal: true
+      normal_target_detach: false
+    cross_view:
+      # Keep cross-view normal unoriented for this audit variant because it
+      # compares predicted camera-space normals across views, not derived
+      # point-map normals. The individual cross-view depth/point/normal terms
+      # are now logged by the base config.
+      orientation: unoriented

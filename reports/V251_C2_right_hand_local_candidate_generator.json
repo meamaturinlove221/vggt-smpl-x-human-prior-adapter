@@ -1,0 +1,19 @@
+{
+  "created_utc": "2026-05-08T21:10:58Z",
+  "decision": "Generated local-only SMPL-X-native right-hand patch candidate; not hard-merged.",
+  "merged_into_active_candidate": false,
+  "outputs": {
+    "npz": "output/V251_C2_right_hand_patch_candidates/right_hand_patch_candidate.npz",
+    "ply": "output/V251_C2_right_hand_patch_candidates/right_hand_patch_candidate.ply",
+    "visual": {
+      "exists": true,
+      "path": "output/V251_C2_right_hand_patch_candidates/right_hand_patch_visual_board.png",
+      "point_count": 124,
+      "size": 47880
+    }
+  },
+  "patch_point_count": 124,
+  "patch_source": "smplx_right_hand_anchor_mask",
+  "status": "PASS_WITH_RISK",
+  "task": "V251_C2_right_hand_local_candidate_generator"
+}

@@ -1,0 +1,23 @@
+{
+  "active_candidate": "V50R_rebuilt_after_artifact_loss",
+  "created_utc": "2026-05-08T21:10:56Z",
+  "decision": "Visual truth audit is sufficient for mentor risk disclosure, not for silently claiming original V50 strict pass.",
+  "face_close": "PASS_WITH_RISK",
+  "full_body": "PASS_WITH_RISK",
+  "hairline_close": "SOFT_REVIEW_ONLY",
+  "head_close": "PASS_WITH_RISK",
+  "left_hand": "PASS_WITH_RISK",
+  "outputs": {
+    "visual_truth_board": "output/V225_A2_visual_truth_board"
+  },
+  "right_hand": "SOFT_REVIEW_ONLY",
+  "risks": [
+    "Original V50 was not recovered; V50R is rebuilt from V42/V25/V16 evidence.",
+    "Right hand remains soft-review-only without original V50 hand patch.",
+    "Hairline remains candidate-level risk."
+  ],
+  "sixty_view_support": "PASS_WITH_RISK",
+  "status": "PASS_WITH_RISK",
+  "task": "V225_A2_visual_truth_audit",
+  "temporal_overlay": "PASS_WITH_RISK"
+}

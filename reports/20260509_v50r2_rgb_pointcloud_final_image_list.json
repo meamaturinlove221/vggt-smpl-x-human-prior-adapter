@@ -1,0 +1,91 @@
+{
+  "task": "v223_rgb_pointcloud_final_image_list",
+  "created_utc": "2026-05-09T04:57:23Z",
+  "policy": "Main mentor report images now use RGB human point-cloud screenshots. Monochrome SMPL-X prior silhouette images are not used as main result figures.",
+  "records": [
+    {
+      "name": "01_full_body.png",
+      "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\images\\01_full_body.png",
+      "exists": true,
+      "bytes": 267842,
+      "note": "main report full-body RGB point-cloud contact sheet"
+    },
+    {
+      "name": "02_head_face.png",
+      "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\images\\02_head_face.png",
+      "exists": true,
+      "bytes": 135166,
+      "note": "main report head/face RGB point-cloud contact sheet"
+    },
+    {
+      "name": "03_hairline.png",
+      "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\images\\03_hairline.png",
+      "exists": true,
+      "bytes": 23587,
+      "note": "main report head/hairline close RGB point-cloud view"
+    },
+    {
+      "name": "04_left_hand.png",
+      "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\images\\04_left_hand.png",
+      "exists": true,
+      "bytes": 124526,
+      "note": "main report left-hand RGB point-cloud view"
+    },
+    {
+      "name": "05_right_hand.png",
+      "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\images\\05_right_hand.png",
+      "exists": true,
+      "bytes": 124526,
+      "note": "main report right-hand RGB point-cloud view"
+    },
+    {
+      "name": "06_60view_support.png",
+      "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\images\\06_60view_support.png",
+      "exists": true,
+      "bytes": 67173,
+      "note": "main report 60-view/support RGB point-cloud view"
+    },
+    {
+      "name": "07_temporal.png",
+      "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\images\\07_temporal.png",
+      "exists": true,
+      "bytes": 73652,
+      "note": "main report temporal/support RGB point-cloud view"
+    },
+    {
+      "name": "08_vggt_smplx_native_architecture.png",
+      "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\images\\08_vggt_smplx_native_architecture.png",
+      "exists": true,
+      "bytes": 316406,
+      "note": "architecture diagram based on original VGGT"
+    },
+    {
+      "name": "rgb_camera_view_full_body_contact_sheet.png",
+      "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\images\\rgb_camera_view_full_body_contact_sheet.png",
+      "exists": true,
+      "bytes": 169782,
+      "note": "source Open3D RGB full-body point-cloud sheet"
+    },
+    {
+      "name": "rgb_camera_view_head_face_contact_sheet.png",
+      "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\images\\rgb_camera_view_head_face_contact_sheet.png",
+      "exists": true,
+      "bytes": 221106,
+      "note": "source Open3D RGB head/face point-cloud sheet"
+    },
+    {
+      "name": "rgb_camera_view_hand_contact_sheet.png",
+      "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\images\\rgb_camera_view_hand_contact_sheet.png",
+      "exists": true,
+      "bytes": 130654,
+      "note": "source Open3D RGB hand point-cloud sheet"
+    },
+    {
+      "name": "rgb_camera_view_human_pointcloud_report_sheet.png",
+      "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\images\\rgb_camera_view_human_pointcloud_report_sheet.png",
+      "exists": true,
+      "bytes": 249939,
+      "note": "combined Open3D RGB point-cloud report sheet"
+    }
+  ]
+}

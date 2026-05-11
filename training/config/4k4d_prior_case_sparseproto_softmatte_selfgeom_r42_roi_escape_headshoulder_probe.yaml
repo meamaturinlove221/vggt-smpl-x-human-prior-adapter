@@ -1,0 +1,81 @@
+defaults:
+  - 4k4d_prior_case_sparseproto_softmatte_selfgeom_r41_mixed_headshoulder_fullbody
+  - _self_
+
+exp_name: 4k4d_prior_case_sparseproto_softmatte_selfgeom_r42_roi_escape_headshoulder_probe
+
+# Local diagnostic only.
+# r40/r41 kept more 2D face pixels but fewer of those points landed inside the
+# fused 3D face ROI. This probe changes the mechanism, not the epoch/threshold:
+# add a small teacherless ROI-3D-escape loss so face/head evidence is discouraged
+# from escaping the fused head/face volume. SMPL-X remains weak body/hand only.
+
+limit_train_batches: 4
+limit_val_batches: 1
+max_epochs: 1
+
+data:
+  train:
+    dataset:
+      dataset_configs:
+        - _target_: data.datasets.dna4k4d_pseudo.DNA4K4DPseudoDataset
+          split: train
+          len_train: 20
+          len_test: 4
+          case_roots:
+            - D:/vggt/vggt-main/output/training_cases/0012_11_frame0000_6views_sparseproto_headshoulder_r41_partaware_softweight_bodyhand_anchor
+        - _target_: data.datasets.dna4k4d_pseudo.DNA4K4DPseudoDataset
+          split: train
+          len_train: 12
+          len_test: 4
+          case_roots:
+            - D:/vggt/vggt-main/output/training_cases/0012_11_frame0000_6views_preprocess_crop_softmatte_v2_b40_r40_partaware_softweight_bodyhand_anchor
+  val:
+    dataset:
+      dataset_configs:
+        - _target_: data.datasets.dna4k4d_pseudo.DNA4K4DPseudoDataset
+          split: test
+          len_train: 20
+          len_test: 4
+          case_roots:
+            - D:/vggt/vggt-main/output/training_cases/0012_11_frame0000_6views_sparseproto_headshoulder_r41_partaware_softweight_bodyhand_anchor
+        - _target_: data.datasets.dna4k4d_pseudo.DNA4K4DPseudoDataset
+          split: test
+          len_train: 12
+          len_test: 4
+          case_roots:
+            - D:/vggt/vggt-main/output/training_cases/0012_11_frame0000_6views_preprocess_crop_softmatte_v2_b40_r40_partaware_softweight_bodyhand_anchor
+
+checkpoint:
+  save_dir: output/local_training_results/r42_roi_escape_headshoulder_probe_smoke1/ckpts
+  save_freq: 1
+  save_optimizer_state: False
+  resume_checkpoint_path: D:/vggt/vggt-main/output/modal_training_results/20260429_normal_r20_point_to_point_xview_smoke20_from_ckpt4/inference_model.pt
+  strict: False
+
+logging:
+  log_dir: output/local_training_results/r42_roi_escape_headshoulder_probe_smoke1/logs
+
+optim:
+  frozen_module_names:
+    - aggregator
+    - camera_head
+    - normal_head
+  optimizer:
+    lr: 3e-7
+
+loss:
+  human_prior:
+    roi_3d_escape:
+      consistency_weight: 0.050
+      head_weight: 0.25
+      face_weight: 1.0
+      height_margin: 0.005
+      face_x_margin: 0.005
+      face_z_margin: 0.005
+      min_pixels: 256
+      detach_roi_bounds: true
+      valid_range: 0.98
+      use_soft_weight: true
+      soft_weight_source: soft_alpha
+      soft_weight_min: 0.05

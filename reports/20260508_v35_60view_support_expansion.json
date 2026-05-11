@@ -1,0 +1,167 @@
+{
+  "blockers": [],
+  "created_utc": "2026-05-08T21:46:29Z",
+  "has_60v_scene": true,
+  "has_filled_60v_scene_files": false,
+  "has_gdrive_raw_4k4d_smc_triplet": true,
+  "no_formal_outputs": true,
+  "recovery_mode": "60view_support_from_G_drive_raw_4K4D_plus_V24_V26_region_support",
+  "region_6v_support_pass": {
+    "body": true,
+    "face": true,
+    "head": true,
+    "left_hand": true,
+    "right_hand": true
+  },
+  "research_only": true,
+  "scene_inventory": {
+    "raw_dataset_files": {
+      "annotations_smc": {
+        "exists": true,
+        "path": "G:\\数据集\\datasets\\data_used_in_4K4D\\annotations\\0012_11_annots.smc",
+        "size": 503351917
+      },
+      "kinect_smc": {
+        "exists": true,
+        "path": "G:\\数据集\\datasets\\data_used_in_4K4D\\kinect\\0012_11_kinect.smc",
+        "size": 1328047320
+      },
+      "main_smc": {
+        "exists": true,
+        "path": "G:\\数据集\\datasets\\data_used_in_4K4D\\main\\0012_11.smc",
+        "size": 2747240692
+      }
+    },
+    "scene_exists": true,
+    "scene_image_count": 0,
+    "scene_mask_count": 0,
+    "scene_root": "D:\\vggt\\vggt-main\\output\\4k4d_scenes\\0012_11_frame0000_60views"
+  },
+  "smplx_native_only": true,
+  "status": "DONE_PASS",
+  "task": "v35_60view_support_expansion",
+  "teacher_6v_support": {
+    "body": {
+      "per_view_pixels": [
+        10204,
+        13536,
+        7374,
+        8375,
+        10119,
+        9866
+      ],
+      "pixels": 59474,
+      "views_with_pixels": 6
+    },
+    "face": {
+      "per_view_pixels": [
+        253,
+        267,
+        518,
+        702,
+        390,
+        292
+      ],
+      "pixels": 2422,
+      "views_with_pixels": 6
+    },
+    "head": {
+      "per_view_pixels": [
+        820,
+        824,
+        792,
+        432,
+        820,
+        426
+      ],
+      "pixels": 4114,
+      "views_with_pixels": 6
+    },
+    "left_hand": {
+      "per_view_pixels": [
+        28,
+        51,
+        424,
+        52,
+        47,
+        134
+      ],
+      "pixels": 736,
+      "views_with_pixels": 6
+    },
+    "right_hand": {
+      "per_view_pixels": [
+        0,
+        0,
+        194,
+        233,
+        17,
+        28
+      ],
+      "pixels": 472,
+      "views_with_pixels": 4
+    }
+  },
+  "temporal_6v_support": {
+    "body": {
+      "per_view_pixels": [
+        10204,
+        13536,
+        7374,
+        8375,
+        10119,
+        9866
+      ],
+      "pixels": 59474,
+      "views_with_pixels": 6
+    },
+    "face": {
+      "per_view_pixels": [
+        253,
+        267,
+        518,
+        702,
+        390,
+        292
+      ],
+      "pixels": 2422,
+      "views_with_pixels": 6
+    },
+    "head": {
+      "per_view_pixels": [
+        820,
+        824,
+        792,
+        432,
+        820,
+        426
+      ],
+      "pixels": 4114,
+      "views_with_pixels": 6
+    },
+    "left_hand": {
+      "per_view_pixels": [
+        28,
+        51,
+        424,
+        52,
+        47,
+        134
+      ],
+      "pixels": 736,
+      "views_with_pixels": 6
+    },
+    "right_hand": {
+      "per_view_pixels": [
+        0,
+        0,
+        194,
+        233,
+        17,
+        28
+      ],
+      "pixels": 472,
+      "views_with_pixels": 4
+    }
+  }
+}

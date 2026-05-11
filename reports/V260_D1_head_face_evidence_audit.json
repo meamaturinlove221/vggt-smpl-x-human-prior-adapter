@@ -1,0 +1,12 @@
+{
+  "created_utc": "2026-05-08T21:10:59Z",
+  "face_core_coverage": "available_from_SMPLX_native_visible_mask_and_V42_points",
+  "hairline_coverage": "SOFT_REVIEW_ONLY",
+  "head_point_support": 25046,
+  "risks": [
+    "No FLAME/HairGS route authorized",
+    "hairline remains SMPL-X-native/candidate-level support"
+  ],
+  "status": "PASS_WITH_RISK",
+  "task": "V260_D1_head_face_evidence_audit"
+}

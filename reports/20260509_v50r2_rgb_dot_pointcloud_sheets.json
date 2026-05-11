@@ -1,0 +1,147 @@
+{
+  "task": "v223_make_rgb_dot_pointcloud_sheets",
+  "created_utc": "2026-05-09T04:51:04Z",
+  "point_source": "D:\\vggt\\vggt-main\\output\\frozen_candidates\\V50R2_rebuilt_from_sessions_gdrive_modal\\package_files\\candidate_files__candidate_points.npz",
+  "rgb_source": "D:\\vggt\\vggt-main\\output\\training_cases\\0012_11_frame0000_6views_smplx_native_prior_v15\\inputs.npz",
+  "output_dir": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\rgb_dot_pointcloud\\images",
+  "sheets": {
+    "full_body": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\rgb_dot_pointcloud\\images\\dot_pointcloud_full_body_sheet.png",
+    "head_face": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\rgb_dot_pointcloud\\images\\dot_pointcloud_head_face_sheet.png",
+    "hands": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\rgb_dot_pointcloud\\images\\dot_pointcloud_hand_sheet.png"
+  },
+  "records": [
+    {
+      "image": "dot_pointcloud_cam00_full.png",
+      "camera": "00",
+      "region": "full",
+      "points": 10595,
+      "green_spill_removed": 0
+    },
+    {
+      "image": "dot_pointcloud_cam01_full.png",
+      "camera": "01",
+      "region": "full",
+      "points": 13670,
+      "green_spill_removed": 15
+    },
+    {
+      "image": "dot_pointcloud_cam15_full.png",
+      "camera": "15",
+      "region": "full",
+      "points": 8680,
+      "green_spill_removed": 1
+    },
+    {
+      "image": "dot_pointcloud_cam30_full.png",
+      "camera": "30",
+      "region": "full",
+      "points": 9026,
+      "green_spill_removed": 0
+    },
+    {
+      "image": "dot_pointcloud_cam45_full.png",
+      "camera": "45",
+      "region": "full",
+      "points": 10647,
+      "green_spill_removed": 12
+    },
+    {
+      "image": "dot_pointcloud_cam59_full.png",
+      "camera": "59",
+      "region": "full",
+      "points": 10108,
+      "green_spill_removed": 7
+    },
+    {
+      "image": "dot_pointcloud_cam15_face.png",
+      "camera": "15",
+      "region": "face",
+      "points": 527,
+      "green_spill_removed": 0
+    },
+    {
+      "image": "dot_pointcloud_cam15_head.png",
+      "camera": "15",
+      "region": "head",
+      "points": 1327,
+      "green_spill_removed": 18
+    },
+    {
+      "image": "dot_pointcloud_cam30_face.png",
+      "camera": "30",
+      "region": "face",
+      "points": 695,
+      "green_spill_removed": 7
+    },
+    {
+      "image": "dot_pointcloud_cam30_head.png",
+      "camera": "30",
+      "region": "head",
+      "points": 1100,
+      "green_spill_removed": 35
+    },
+    {
+      "image": "dot_pointcloud_cam59_face.png",
+      "camera": "59",
+      "region": "face",
+      "points": 359,
+      "green_spill_removed": 17
+    },
+    {
+      "image": "dot_pointcloud_cam59_head.png",
+      "camera": "59",
+      "region": "head",
+      "points": 772,
+      "green_spill_removed": 48
+    },
+    {
+      "image": "dot_pointcloud_cam15_left_hand.png",
+      "camera": "15",
+      "region": "left_hand",
+      "points": 2374,
+      "source": "V50R2 hand_patch",
+      "green_spill_removed": 4
+    },
+    {
+      "image": "dot_pointcloud_cam15_right_hand.png",
+      "camera": "15",
+      "region": "right_hand",
+      "points": 697,
+      "source": "V50R2 hand_patch",
+      "green_spill_removed": 25
+    },
+    {
+      "image": "dot_pointcloud_cam30_left_hand.png",
+      "camera": "30",
+      "region": "left_hand",
+      "points": 131,
+      "source": "V50R2 hand_patch",
+      "green_spill_removed": 16
+    },
+    {
+      "image": "dot_pointcloud_cam30_right_hand.png",
+      "camera": "30",
+      "region": "right_hand",
+      "points": 1896,
+      "source": "V50R2 hand_patch",
+      "green_spill_removed": 11
+    },
+    {
+      "image": "dot_pointcloud_cam59_left_hand.png",
+      "camera": "59",
+      "region": "left_hand",
+      "points": 478,
+      "source": "V50R2 hand_patch",
+      "green_spill_removed": 10
+    },
+    {
+      "image": "dot_pointcloud_cam59_right_hand.png",
+      "camera": "59",
+      "region": "right_hand",
+      "points": 1285,
+      "source": "V50R2 hand_patch",
+      "green_spill_removed": 34
+    }
+  ],
+  "render_policy": "actual RGB-colored dots sampled from valid V50R2 point-map pixels; full body uses candidate_points, head/face uses head_face_patch, hands use hand_patch when available; saturated green-screen spill pixels are removed from dot colors; no continuous RGB cutout, no filled surface, no SMPL-X template mesh."
+}

@@ -1,0 +1,7 @@
+{
+  "created_utc": "2026-05-08T21:11:00Z",
+  "decision": "Mentor package generated with explicit rebuilt-candidate provenance and risk matrix.",
+  "mentor_dir": "output/V330_mentor_final_package",
+  "status": "PASS_WITH_RISK",
+  "task": "V330_J_mentor_final_package"
+}

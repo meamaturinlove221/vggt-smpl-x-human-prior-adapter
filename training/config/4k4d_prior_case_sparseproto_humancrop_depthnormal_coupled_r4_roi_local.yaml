@@ -1,0 +1,31 @@
+defaults:
+  - 4k4d_prior_case_sparseproto_humancrop_depthnormal_coupled_r2_depthpoint
+  - _self_
+
+exp_name: 4k4d_prior_case_sparseproto_humancrop_depthnormal_coupled_r4_roi_local
+
+loss:
+  human_prior:
+    weight: 0.30
+    depth_normal:
+      consistency_weight: 0.16
+      valid_range: 0.95
+      orientation: unoriented
+      min_depth: 0.0001
+      head_roi_weight: 3.0
+      face_roi_weight: 5.0
+      hairline_roi_weight: 6.0
+      ear_band_roi_weight: 3.5
+      boundary_boost: 4.0
+    depth_point:
+      consistency_weight: 0.32
+      xyz_weight: 0.4
+      z_weight: 1.2
+      valid_range: 0.95
+      min_depth: 0.0001
+      relative_scale: true
+      head_roi_weight: 3.0
+      face_roi_weight: 5.0
+      hairline_roi_weight: 6.0
+      ear_band_roi_weight: 3.5
+      boundary_boost: 4.0

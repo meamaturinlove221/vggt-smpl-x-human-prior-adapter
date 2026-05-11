@@ -1,0 +1,50 @@
+defaults:
+  - 4k4d_prior_case_sparseproto_humancrop_depthnormal_coupled_r15_selfgeom_headsonly
+  - _self_
+
+exp_name: 4k4d_prior_case_sparseproto_humancrop_depthnormal_coupled_r16_xview_selfgeom
+
+loss:
+  human_prior:
+    weight: 0.16
+    normal: null
+    point_normal: null
+    depth_normal:
+      consistency_weight: 0.08
+      valid_range: 0.96
+      orientation: unoriented
+      normal_target_detach: false
+      min_depth: 0.0001
+      head_roi_weight: 2.0
+      face_roi_weight: 3.0
+      hairline_roi_weight: 3.0
+      ear_band_roi_weight: 2.0
+      boundary_boost: 2.0
+    depth_point:
+      consistency_weight: 0.08
+      xyz_weight: 0.35
+      z_weight: 0.7
+      valid_range: 0.96
+      min_depth: 0.0001
+      relative_scale: true
+      head_roi_weight: 2.0
+      face_roi_weight: 3.0
+      hairline_roi_weight: 3.0
+      ear_band_roi_weight: 2.0
+      boundary_boost: 2.0
+    cross_view:
+      consistency_weight: 0.12
+      depth_weight: 1.0
+      point_weight: 0.5
+      normal_weight: 0.25
+      valid_range: 0.96
+      stride: 8
+      max_pairs: 12
+      min_depth: 0.0001
+      orientation: unoriented
+      detach_projection: true
+      head_roi_weight: 2.0
+      face_roi_weight: 3.0
+      hairline_roi_weight: 3.0
+      ear_band_roi_weight: 2.0
+      boundary_boost: 2.0

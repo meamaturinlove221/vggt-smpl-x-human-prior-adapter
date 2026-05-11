@@ -1,0 +1,8 @@
+{
+  "created_utc": "2026-05-08T21:10:59Z",
+  "decision": "Conservative SMPL-X-native head/face support generated for review only.",
+  "merged_into_active_candidate": false,
+  "patch_point_count": 25046,
+  "status": "PASS_WITH_RISK",
+  "task": "V261_D2_head_face_patch_candidates"
+}

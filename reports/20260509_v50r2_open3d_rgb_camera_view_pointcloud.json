@@ -1,0 +1,239 @@
+{
+  "task": "v223_rgb_camera_view_pointcloud_screenshots",
+  "created_utc": "2026-05-09T04:31:42Z",
+  "open3d_version": "0.19.0",
+  "rgb_source": "D:\\vggt\\vggt-main\\output\\training_cases\\0012_11_frame0000_6views_smplx_native_prior_v15\\inputs.npz",
+  "point_source": "D:\\vggt\\vggt-main\\output\\frozen_candidates\\V50R2_rebuilt_from_sessions_gdrive_modal\\package_files\\candidate_files__candidate_points.npz",
+  "output_dir": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud",
+  "image_dir": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\images",
+  "ply_dir": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\ply",
+  "camera_ids": [
+    "00",
+    "01",
+    "15",
+    "30",
+    "45",
+    "59"
+  ],
+  "cases": [
+    {
+      "name": "rgb_camera_view_cam00_full",
+      "title": "V50R2 RGB point cloud cam00 full body",
+      "ply": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\ply\\rgb_camera_view_cam00_full_points.ply",
+      "surface_ply": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\ply\\rgb_camera_view_cam00_full_surface.ply",
+      "images": [
+        "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\images\\rgb_camera_view_cam00_full_front.png",
+        "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\images\\rgb_camera_view_cam00_full_iso.png"
+      ],
+      "point_count": 11647,
+      "triangle_count": 22184
+    },
+    {
+      "name": "rgb_camera_view_cam01_full",
+      "title": "V50R2 RGB point cloud cam01 full body",
+      "ply": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\ply\\rgb_camera_view_cam01_full_points.ply",
+      "surface_ply": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\ply\\rgb_camera_view_cam01_full_surface.ply",
+      "images": [
+        "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\images\\rgb_camera_view_cam01_full_front.png",
+        "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\images\\rgb_camera_view_cam01_full_iso.png"
+      ],
+      "point_count": 14928,
+      "triangle_count": 28434
+    },
+    {
+      "name": "rgb_camera_view_cam15_full",
+      "title": "V50R2 RGB point cloud cam15 full body",
+      "ply": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\ply\\rgb_camera_view_cam15_full_points.ply",
+      "surface_ply": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\ply\\rgb_camera_view_cam15_full_surface.ply",
+      "images": [
+        "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\images\\rgb_camera_view_cam15_full_front.png",
+        "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\images\\rgb_camera_view_cam15_full_iso.png"
+      ],
+      "point_count": 9559,
+      "triangle_count": 17842
+    },
+    {
+      "name": "rgb_camera_view_cam30_full",
+      "title": "V50R2 RGB point cloud cam30 full body",
+      "ply": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\ply\\rgb_camera_view_cam30_full_points.ply",
+      "surface_ply": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\ply\\rgb_camera_view_cam30_full_surface.ply",
+      "images": [
+        "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\images\\rgb_camera_view_cam30_full_front.png",
+        "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\images\\rgb_camera_view_cam30_full_iso.png"
+      ],
+      "point_count": 9873,
+      "triangle_count": 18632
+    },
+    {
+      "name": "rgb_camera_view_cam45_full",
+      "title": "V50R2 RGB point cloud cam45 full body",
+      "ply": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\ply\\rgb_camera_view_cam45_full_points.ply",
+      "surface_ply": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\ply\\rgb_camera_view_cam45_full_surface.ply",
+      "images": [
+        "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\images\\rgb_camera_view_cam45_full_front.png",
+        "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\images\\rgb_camera_view_cam45_full_iso.png"
+      ],
+      "point_count": 11696,
+      "triangle_count": 22504
+    },
+    {
+      "name": "rgb_camera_view_cam59_full",
+      "title": "V50R2 RGB point cloud cam59 full body",
+      "ply": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\ply\\rgb_camera_view_cam59_full_points.ply",
+      "surface_ply": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\ply\\rgb_camera_view_cam59_full_surface.ply",
+      "images": [
+        "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\images\\rgb_camera_view_cam59_full_front.png",
+        "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\images\\rgb_camera_view_cam59_full_iso.png"
+      ],
+      "point_count": 11132,
+      "triangle_count": 21322
+    },
+    {
+      "name": "rgb_camera_view_cam15_upper",
+      "title": "V50R2 RGB point cloud cam15 upper",
+      "ply": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\ply\\rgb_camera_view_cam15_upper_points.ply",
+      "surface_ply": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\ply\\rgb_camera_view_cam15_upper_surface.ply",
+      "images": [
+        "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\images\\rgb_camera_view_cam15_upper_front.png",
+        "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\images\\rgb_camera_view_cam15_upper_iso.png"
+      ],
+      "point_count": 6429,
+      "triangle_count": 11922
+    },
+    {
+      "name": "rgb_camera_view_cam15_head",
+      "title": "V50R2 RGB point cloud cam15 head",
+      "ply": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\ply\\rgb_camera_view_cam15_head_points.ply",
+      "surface_ply": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\ply\\rgb_camera_view_cam15_head_surface.ply",
+      "images": [
+        "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\images\\rgb_camera_view_cam15_head_front.png",
+        "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\images\\rgb_camera_view_cam15_head_iso.png"
+      ],
+      "point_count": 3437,
+      "triangle_count": 6314
+    },
+    {
+      "name": "rgb_camera_view_cam30_upper",
+      "title": "V50R2 RGB point cloud cam30 upper",
+      "ply": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\ply\\rgb_camera_view_cam30_upper_points.ply",
+      "surface_ply": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\ply\\rgb_camera_view_cam30_upper_surface.ply",
+      "images": [
+        "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\images\\rgb_camera_view_cam30_upper_front.png",
+        "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\images\\rgb_camera_view_cam30_upper_iso.png"
+      ],
+      "point_count": 6483,
+      "triangle_count": 12160
+    },
+    {
+      "name": "rgb_camera_view_cam30_head",
+      "title": "V50R2 RGB point cloud cam30 head",
+      "ply": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\ply\\rgb_camera_view_cam30_head_points.ply",
+      "surface_ply": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\ply\\rgb_camera_view_cam30_head_surface.ply",
+      "images": [
+        "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\images\\rgb_camera_view_cam30_head_front.png",
+        "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\images\\rgb_camera_view_cam30_head_iso.png"
+      ],
+      "point_count": 3318,
+      "triangle_count": 6300
+    },
+    {
+      "name": "rgb_camera_view_cam59_upper",
+      "title": "V50R2 RGB point cloud cam59 upper",
+      "ply": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\ply\\rgb_camera_view_cam59_upper_points.ply",
+      "surface_ply": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\ply\\rgb_camera_view_cam59_upper_surface.ply",
+      "images": [
+        "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\images\\rgb_camera_view_cam59_upper_front.png",
+        "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\images\\rgb_camera_view_cam59_upper_iso.png"
+      ],
+      "point_count": 7261,
+      "triangle_count": 13786
+    },
+    {
+      "name": "rgb_camera_view_cam59_head",
+      "title": "V50R2 RGB point cloud cam59 head",
+      "ply": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\ply\\rgb_camera_view_cam59_head_points.ply",
+      "surface_ply": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\ply\\rgb_camera_view_cam59_head_surface.ply",
+      "images": [
+        "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\images\\rgb_camera_view_cam59_head_front.png",
+        "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\images\\rgb_camera_view_cam59_head_iso.png"
+      ],
+      "point_count": 3727,
+      "triangle_count": 6886
+    },
+    {
+      "name": "rgb_camera_view_cam15_hand_left_image",
+      "title": "V50R2 RGB point cloud cam15 left-side hand area",
+      "ply": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\ply\\rgb_camera_view_cam15_hand_left_image_points.ply",
+      "surface_ply": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\ply\\rgb_camera_view_cam15_hand_left_image_surface.ply",
+      "images": [
+        "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\images\\rgb_camera_view_cam15_hand_left_image_front.png"
+      ],
+      "point_count": 1815,
+      "triangle_count": 3172
+    },
+    {
+      "name": "rgb_camera_view_cam15_hand_right_image",
+      "title": "V50R2 RGB point cloud cam15 right-side hand area",
+      "ply": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\ply\\rgb_camera_view_cam15_hand_right_image_points.ply",
+      "surface_ply": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\ply\\rgb_camera_view_cam15_hand_right_image_surface.ply",
+      "images": [
+        "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\images\\rgb_camera_view_cam15_hand_right_image_front.png"
+      ],
+      "point_count": 2047,
+      "triangle_count": 3500
+    },
+    {
+      "name": "rgb_camera_view_cam30_hand_left_image",
+      "title": "V50R2 RGB point cloud cam30 left-side hand area",
+      "ply": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\ply\\rgb_camera_view_cam30_hand_left_image_points.ply",
+      "surface_ply": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\ply\\rgb_camera_view_cam30_hand_left_image_surface.ply",
+      "images": [
+        "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\images\\rgb_camera_view_cam30_hand_left_image_front.png"
+      ],
+      "point_count": 3906,
+      "triangle_count": 7326
+    },
+    {
+      "name": "rgb_camera_view_cam30_hand_right_image",
+      "title": "V50R2 RGB point cloud cam30 right-side hand area",
+      "ply": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\ply\\rgb_camera_view_cam30_hand_right_image_points.ply",
+      "surface_ply": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\ply\\rgb_camera_view_cam30_hand_right_image_surface.ply",
+      "images": [
+        "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\images\\rgb_camera_view_cam30_hand_right_image_front.png"
+      ],
+      "point_count": 1591,
+      "triangle_count": 2678
+    },
+    {
+      "name": "rgb_camera_view_cam59_hand_left_image",
+      "title": "V50R2 RGB point cloud cam59 left-side hand area",
+      "ply": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\ply\\rgb_camera_view_cam59_hand_left_image_points.ply",
+      "surface_ply": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\ply\\rgb_camera_view_cam59_hand_left_image_surface.ply",
+      "images": [
+        "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\images\\rgb_camera_view_cam59_hand_left_image_front.png"
+      ],
+      "point_count": 3979,
+      "triangle_count": 7440
+    },
+    {
+      "name": "rgb_camera_view_cam59_hand_right_image",
+      "title": "V50R2 RGB point cloud cam59 right-side hand area",
+      "ply": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\ply\\rgb_camera_view_cam59_hand_right_image_points.ply",
+      "surface_ply": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\ply\\rgb_camera_view_cam59_hand_right_image_surface.ply",
+      "images": [
+        "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\images\\rgb_camera_view_cam59_hand_right_image_front.png"
+      ],
+      "point_count": 2163,
+      "triangle_count": 3912
+    }
+  ],
+  "sheets": {
+    "full_body": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\images\\rgb_camera_view_full_body_contact_sheet.png",
+    "head_face": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\images\\rgb_camera_view_head_face_contact_sheet.png",
+    "hands": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\images\\rgb_camera_view_hand_contact_sheet.png",
+    "report": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud\\images\\rgb_camera_view_human_pointcloud_report_sheet.png"
+  },
+  "note": "These are RGB-colored camera-view point-map surface figures. Front/report views use a crack-free hard-mask projection from the candidate point map; PLY and ISO review views are still exported through Open3D.",
+  "mask_policy": "hard point_masks only; soft_alpha and weak prior masks are excluded to avoid ghost/afterimage trails.",
+  "surface_policy": "front views: hard-mask camera projection with conservative crack repair; ISO/PLY views: z-consistent 2x2 neighbor triangles from candidate point map; no SMPL-X template surface is used."
+}

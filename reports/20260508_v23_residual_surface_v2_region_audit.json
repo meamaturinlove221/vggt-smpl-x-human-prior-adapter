@@ -1,0 +1,152 @@
+{
+  "blockers": [],
+  "created_utc": "2026-05-08T21:39:55Z",
+  "formal_pass": false,
+  "inputs": {
+    "case_root": "D:\\vggt\\vggt-main\\output\\training_cases\\0012_11_frame0000_6views_smplx_native_prior_v15",
+    "mask_npz": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V23_residual_surface_v2\\v23_repaired_region_evidence_masks.npz",
+    "roi_npz": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V16_smplx_native_region_roi_builder\\v16_smplx_native_region_roi_maps.npz",
+    "summary_json": "D:\\vggt\\vggt-main\\reports\\20260508_v23_residual_surface_v2.json",
+    "surface_npz": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V23_residual_surface_v2\\v23_residual_surface_v2_points.npz",
+    "surface_ply": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V23_residual_surface_v2\\v23_residual_surface_v2_points.ply"
+  },
+  "no_candidate_export": true,
+  "no_package_write": true,
+  "no_predictions_write": true,
+  "no_registry_write": true,
+  "no_strict_pass_claim": true,
+  "no_teacher_export": true,
+  "ply": {
+    "format": "ascii",
+    "npz_sample_count": 67218,
+    "path": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V23_residual_surface_v2\\v23_residual_surface_v2_points.ply",
+    "vertex_count": 67218
+  },
+  "regions": {
+    "body": {
+      "native_visible_overlap_pixels": 25046,
+      "per_view_pixels": [
+        10204,
+        13536,
+        7374,
+        8375,
+        10119,
+        9866
+      ],
+      "persisted_mask_matches_rebuild": true,
+      "raw_silhouette_overlap_pixels": 67218,
+      "repaired_pixels": 59474,
+      "sample_applied_residual_norm": {
+        "count": 59474,
+        "finite": 59474,
+        "max": 0.003992401994764805,
+        "mean": 0.001958321314305067,
+        "median": 0.0018608944956213236,
+        "min": 7.087027915986255e-05,
+        "p95": 0.0032420125789940357
+      },
+      "sampled_points": 59474
+    },
+    "face": {
+      "native_visible_overlap_pixels": 0,
+      "per_view_pixels": [
+        253,
+        267,
+        518,
+        702,
+        390,
+        292
+      ],
+      "persisted_mask_matches_rebuild": true,
+      "raw_silhouette_overlap_pixels": 2422,
+      "repaired_pixels": 2422,
+      "sample_applied_residual_norm": {
+        "count": 2422,
+        "finite": 2422,
+        "max": 0.005499664694070816,
+        "mean": 0.0036797290667891502,
+        "median": 0.0035359568428248167,
+        "min": 0.00025983003433793783,
+        "p95": 0.005187907721847296
+      },
+      "sampled_points": 2422
+    },
+    "head": {
+      "native_visible_overlap_pixels": 0,
+      "per_view_pixels": [
+        820,
+        824,
+        792,
+        432,
+        820,
+        426
+      ],
+      "persisted_mask_matches_rebuild": true,
+      "raw_silhouette_overlap_pixels": 6536,
+      "repaired_pixels": 4114,
+      "sample_applied_residual_norm": {
+        "count": 4114,
+        "finite": 4114,
+        "max": 0.005199951585382223,
+        "mean": 0.0038778989110141993,
+        "median": 0.004341483116149902,
+        "min": 0.0003208424604963511,
+        "p95": 0.005139493383467197
+      },
+      "sampled_points": 4114
+    },
+    "left_hand": {
+      "native_visible_overlap_pixels": 614,
+      "per_view_pixels": [
+        28,
+        51,
+        424,
+        52,
+        47,
+        134
+      ],
+      "persisted_mask_matches_rebuild": true,
+      "raw_silhouette_overlap_pixels": 736,
+      "repaired_pixels": 736,
+      "sample_applied_residual_norm": {
+        "count": 736,
+        "finite": 736,
+        "max": 0.00923246145248413,
+        "mean": 0.0061115967109799385,
+        "median": 0.006500315852463245,
+        "min": 0.0008300970657728612,
+        "p95": 0.008692210540175438
+      },
+      "sampled_points": 736
+    },
+    "right_hand": {
+      "native_visible_overlap_pixels": 130,
+      "per_view_pixels": [
+        0,
+        0,
+        194,
+        233,
+        17,
+        28
+      ],
+      "persisted_mask_matches_rebuild": true,
+      "raw_silhouette_overlap_pixels": 485,
+      "repaired_pixels": 472,
+      "sample_applied_residual_norm": {
+        "count": 472,
+        "finite": 472,
+        "max": 0.009395855478942394,
+        "mean": 0.007451782003045082,
+        "median": 0.008328987285494804,
+        "min": 0.004051330033689737,
+        "p95": 0.009119796566665173
+      },
+      "sampled_points": 472
+    }
+  },
+  "research_only": true,
+  "route_token": "DONE_PASS",
+  "status": "DONE_PASS",
+  "summary_status": "DONE_PASS",
+  "task": "v23_residual_region_audit"
+}

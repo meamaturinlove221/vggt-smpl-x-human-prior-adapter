@@ -1,0 +1,74 @@
+defaults:
+  - 4k4d_prior_case_sparseproto_softmatte_selfgeom_r23_roi_bodyrehearsal
+  - _self_
+
+exp_name: 4k4d_prior_case_sparseproto_softmatte_selfgeom_r24_photometric_roi
+
+# Local diagnostic only.
+# r23 proved ROI masks/body rehearsal were wired, but the face loss remained
+# geometry-self-consistent and did not add new image evidence.  This variant
+# adds a small ROI-weighted multi-view photometric term so point/depth geometry
+# must also project to consistent RGB across views.  SMPL/body rehearsal stays
+# weak and excludes head/face/hairline/ear regions.
+
+loss:
+  human_prior:
+    weight: 0.10
+    depth:
+      supervise_conf: false
+      alpha: 0.0
+      loss_weight: 0.04
+    point:
+      supervise_conf: false
+      alpha: 0.0
+      loss_weight: 0.06
+    point_normal:
+      consistency_weight: 0.06
+      head_roi_weight: 3.0
+      face_roi_weight: 7.0
+      hairline_roi_weight: 7.0
+      ear_band_roi_weight: 3.0
+      boundary_boost: 2.5
+    depth_normal:
+      consistency_weight: 0.04
+      head_roi_weight: 3.0
+      face_roi_weight: 7.0
+      hairline_roi_weight: 7.0
+      ear_band_roi_weight: 3.0
+      boundary_boost: 2.5
+    depth_point:
+      consistency_weight: 0.05
+      xyz_weight: 0.40
+      z_weight: 0.70
+      head_roi_weight: 3.0
+      face_roi_weight: 7.0
+      hairline_roi_weight: 7.0
+      ear_band_roi_weight: 3.0
+      boundary_boost: 2.5
+    cross_view:
+      consistency_weight: 0.07
+      depth_weight: 0.25
+      point_weight: 0.90
+      normal_weight: 0.0
+      stride: 8
+      max_pairs: 12
+      head_roi_weight: 3.0
+      face_roi_weight: 7.0
+      hairline_roi_weight: 7.0
+      ear_band_roi_weight: 3.0
+      boundary_boost: 2.5
+    photometric:
+      consistency_weight: 0.08
+      source: world_points
+      valid_range: 0.85
+      stride: 4
+      max_pairs: 12
+      min_depth: 0.0001
+      detach_projection: false
+      robust: charbonnier
+      occlusion_tolerance: -1.0
+      head_roi_weight: 3.0
+      face_roi_weight: 8.0
+      hairline_roi_weight: 8.0
+      ear_band_roi_weight: 3.0
+      boundary_boost: 2.5

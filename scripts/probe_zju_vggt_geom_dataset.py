@@ -4,6 +4,9 @@ import random
 import sys
 from pathlib import Path
 
+import matplotlib
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
 import numpy as np
 from omegaconf import OmegaConf
 from PIL import Image
@@ -83,6 +86,10 @@ def parse_args():
     parser.add_argument("--allow_duplicate_img", action="store_true", help="Allow duplicate view sampling in the probe.")
     parser.add_argument("--min_depth_conf", type=float, default=0.0)
     parser.add_argument("--holdout_stride", type=int, default=10)
+    parser.add_argument("--smpl_prior_pose_noise_prob", type=float, default=0.0)
+    parser.add_argument("--smpl_prior_pose_noise_rot_deg", type=float, default=0.0)
+    parser.add_argument("--smpl_prior_pose_noise_trans_scale", type=float, default=0.0)
+    parser.add_argument("--smpl_prior_pose_noise_scale_std", type=float, default=0.0)
     parser.add_argument("--output_dir", type=str, default="output/zju_vggt_geom_probe")
     return parser.parse_args()
 
@@ -185,6 +192,10 @@ def apply_config_defaults(args):
         "zju_conf_depth_view_quality_filter": "conf_depth_view_quality_filter",
         "zju_min_depth_conf": "min_depth_conf",
         "zju_holdout_stride": "holdout_stride",
+        "zju_smpl_prior_pose_noise_prob": "smpl_prior_pose_noise_prob",
+        "zju_smpl_prior_pose_noise_rot_deg": "smpl_prior_pose_noise_rot_deg",
+        "zju_smpl_prior_pose_noise_trans_scale": "smpl_prior_pose_noise_trans_scale",
+        "zju_smpl_prior_pose_noise_scale_std": "smpl_prior_pose_noise_scale_std",
         "zju_geom_subdir": "geom_subdir",
         "zju_camera_source": "camera_source",
         "zju_mask_source": "mask_source",
@@ -307,6 +318,139 @@ def write_binary_ply(path, points, colors):
     with open(path, "wb") as handle:
         handle.write(header.encode("ascii"))
         vertex_data.tofile(handle)
+
+
+def normalize_extrinsics_matrices(extrinsics):
+    extrinsics = np.asarray(extrinsics, dtype=np.float32)
+    if extrinsics.ndim != 3:
+        raise ValueError(f"Expected extrinsics with shape [N,3,4] or [N,4,4], got {extrinsics.shape}")
+    if extrinsics.shape[1:] == (4, 4):
+        return extrinsics
+    if extrinsics.shape[1:] == (3, 4):
+        padded = np.tile(np.eye(4, dtype=np.float32), (extrinsics.shape[0], 1, 1))
+        padded[:, :3, :4] = extrinsics
+        return padded
+    raise ValueError(f"Unsupported extrinsics shape: {extrinsics.shape}")
+
+
+def closed_form_inverse_se3_numpy(se3):
+    se3 = normalize_extrinsics_matrices(se3)
+    rotation = se3[:, :3, :3]
+    translation = se3[:, :3, 3:]
+    rotation_t = np.transpose(rotation, (0, 2, 1))
+    top_right = -np.matmul(rotation_t, translation)
+    inverted = np.tile(np.eye(4, dtype=se3.dtype), (len(rotation), 1, 1))
+    inverted[:, :3, :3] = rotation_t
+    inverted[:, :3, 3:] = top_right
+    return inverted
+
+
+def camera_centers_from_extrinsics(extrinsics):
+    extrinsics = normalize_extrinsics_matrices(extrinsics)
+    rotation = extrinsics[:, :3, :3]
+    translation = extrinsics[:, :3, 3]
+    return (-(np.transpose(rotation, (0, 2, 1)) @ translation[..., None])).squeeze(-1).astype(np.float32)
+
+
+def unproject_depth_map_to_world_points(depth_map, extrinsics_cam, intrinsics_cam):
+    depth_map = np.asarray(depth_map, dtype=np.float32)
+    extrinsics_cam = normalize_extrinsics_matrices(extrinsics_cam)
+    intrinsics_cam = np.asarray(intrinsics_cam, dtype=np.float32)
+    cam_to_world = closed_form_inverse_se3_numpy(extrinsics_cam)
+    world_points = []
+    for frame_idx in range(depth_map.shape[0]):
+        depth = depth_map[frame_idx]
+        if depth.ndim == 3:
+            depth = depth[..., 0]
+        intrinsic = intrinsics_cam[frame_idx]
+
+        height, width = depth.shape
+        u, v = np.meshgrid(np.arange(width, dtype=np.float32), np.arange(height, dtype=np.float32))
+
+        fu, fv = intrinsic[0, 0], intrinsic[1, 1]
+        cu, cv = intrinsic[0, 2], intrinsic[1, 2]
+
+        x_cam = (u - cu) * depth / max(float(fu), 1e-6)
+        y_cam = (v - cv) * depth / max(float(fv), 1e-6)
+        z_cam = depth
+        cam_coords = np.stack((x_cam, y_cam, z_cam), axis=-1)
+
+        rotation = cam_to_world[frame_idx, :3, :3]
+        translation = cam_to_world[frame_idx, :3, 3]
+        world = np.dot(cam_coords, rotation.T) + translation
+        world_points.append(world.astype(np.float32))
+
+    return np.stack(world_points, axis=0)
+
+
+def render_point_cloud_views(output_path, points, colors, title, camera_xyz=None, max_points=180000):
+    points = np.asarray(points, dtype=np.float32)
+    colors = np.asarray(colors, dtype=np.uint8)
+    if points.shape[0] == 0:
+        fig, ax = plt.subplots(figsize=(8, 8), dpi=220, facecolor="black")
+        ax.set_facecolor("black")
+        ax.text(0.5, 0.5, "No points", color="white", ha="center", va="center", fontsize=20)
+        ax.set_axis_off()
+        fig.suptitle(title, color="white", fontsize=14)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        fig.savefig(output_path, bbox_inches="tight", pad_inches=0.05, facecolor=fig.get_facecolor())
+        plt.close(fig)
+        return
+
+    points, colors = downsample_point_cloud(points, colors, max_points=max_points)
+    camera_xyz = None if camera_xyz is None else np.asarray(camera_xyz, dtype=np.float32)
+    norm_colors = np.clip(colors.astype(np.float32) / 255.0, 0.0, 1.0)
+    point_size = float(np.clip(30000.0 / max(points.shape[0], 1), 0.06, 0.45))
+
+    def _project(cloud, mode):
+        if mode == "front":
+            return cloud[:, 0], cloud[:, 1]
+        if mode == "side":
+            return cloud[:, 2], cloud[:, 1]
+        if mode == "top":
+            return cloud[:, 0], cloud[:, 2]
+        if mode == "oblique":
+            return cloud[:, 0] + 0.45 * cloud[:, 2], cloud[:, 1] - 0.18 * cloud[:, 2]
+        raise ValueError(f"Unsupported render mode: {mode}")
+
+    def _set_limits(ax, x, y):
+        if x.size <= 1 or y.size <= 1:
+            return
+        x_lo, x_hi = np.percentile(x, [1.0, 99.0])
+        y_lo, y_hi = np.percentile(y, [1.0, 99.0])
+        span = max(float(x_hi - x_lo), float(y_hi - y_lo), 1e-3)
+        pad = span * 0.08
+        x_center = float((x_lo + x_hi) * 0.5)
+        y_center = float((y_lo + y_hi) * 0.5)
+        ax.set_xlim(x_center - span * 0.5 - pad, x_center + span * 0.5 + pad)
+        ax.set_ylim(y_center - span * 0.5 - pad, y_center + span * 0.5 + pad)
+
+    view_specs = (
+        ("Front (X/Y)", "front"),
+        ("Side (Z/Y)", "side"),
+        ("Top (X/Z)", "top"),
+        ("Oblique", "oblique"),
+    )
+    fig, axes = plt.subplots(2, 2, figsize=(16, 16), dpi=220, facecolor="black")
+    for ax, (label, mode) in zip(axes.flatten(), view_specs):
+        ax.set_facecolor("black")
+        x_vals, y_vals = _project(points, mode)
+        ax.scatter(x_vals, y_vals, s=point_size, c=norm_colors, linewidths=0, alpha=0.82)
+        if camera_xyz is not None and camera_xyz.size > 0:
+            cam_x, cam_y = _project(camera_xyz, mode)
+            ax.scatter(cam_x, cam_y, s=28, c="#ff5a36", marker="^", linewidths=0, alpha=0.95)
+        _set_limits(ax, x_vals, y_vals)
+        ax.set_aspect("equal", adjustable="box")
+        ax.set_xticks([])
+        ax.set_yticks([])
+        for spine in ax.spines.values():
+            spine.set_visible(False)
+        ax.set_title(label, color="white", fontsize=12)
+    fig.suptitle(title, color="white", fontsize=18)
+    fig.tight_layout(rect=(0, 0, 1, 0.97))
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    fig.savefig(output_path, bbox_inches="tight", pad_inches=0.06, facecolor=fig.get_facecolor())
+    plt.close(fig)
 
 
 def save_mosaic(path, images_hwc):
@@ -616,6 +760,21 @@ def export_prior_artifacts(output_dir, sample, images, prior_target_mask=None, c
     )
     write_binary_ply(output_dir / "sample_human_prior_completion_world_points.ply", completion_points, completion_colors)
     write_binary_ply(output_dir / "sample_completed_world_points.ply", completed_points, completed_colors)
+    camera_xyz = camera_centers_from_extrinsics(np.stack(sample["extrinsics"]).astype(np.float32))
+    render_point_cloud_views(
+        output_dir / "sample_human_prior_completion_world_points_views.png",
+        completion_artifacts["completion_points"],
+        completion_artifacts["completion_colors"],
+        title="Human Prior Completion Point Cloud",
+        camera_xyz=camera_xyz,
+    )
+    render_point_cloud_views(
+        output_dir / "sample_completed_world_points_views.png",
+        completion_artifacts["completed_points"],
+        completion_artifacts["completed_colors"],
+        title="Completed Point Cloud",
+        camera_xyz=camera_xyz,
+    )
 
 
 def build_case_package(output_dir, sample, prior_target_mask=None):
@@ -700,9 +859,36 @@ def summarize_point_cloud(points, written_vertex_count):
     }
 
 
-def export_sample_artifacts(output_dir, images, depths, flat_points, flat_colors):
+def export_sample_artifacts(output_dir, images, depths, world_points, world_colors, extrinsics, intrinsics):
+    flat_points, flat_colors = downsample_point_cloud(world_points, world_colors, max_points=250000)
     write_binary_ply(output_dir / "sample_world_points.ply", flat_points, flat_colors)
     save_mosaic(output_dir / "sample_images.png", images)
+    camera_xyz = camera_centers_from_extrinsics(extrinsics)
+    render_point_cloud_views(
+        output_dir / "sample_world_points_views.png",
+        world_points,
+        world_colors,
+        title="Dataset World Points",
+        camera_xyz=camera_xyz,
+    )
+
+    depth_world_points = unproject_depth_map_to_world_points(depths, extrinsics, intrinsics)
+    depth_maps = np.asarray(depths, dtype=np.float32)
+    if depth_maps.ndim == 4:
+        depth_valid = np.isfinite(depth_maps[..., 0]) & (depth_maps[..., 0] > 0.0)
+    else:
+        depth_valid = np.isfinite(depth_maps) & (depth_maps > 0.0)
+    depth_flat_points = depth_world_points.reshape(-1, 3)[depth_valid.reshape(-1)]
+    depth_flat_colors = images.reshape(-1, 3)[depth_valid.reshape(-1)]
+    depth_ply_points, depth_ply_colors = downsample_point_cloud(depth_flat_points, depth_flat_colors, max_points=250000)
+    write_binary_ply(output_dir / "sample_depth_unproject_world_points.ply", depth_ply_points, depth_ply_colors)
+    render_point_cloud_views(
+        output_dir / "sample_depth_unproject_world_points_views.png",
+        depth_flat_points,
+        depth_flat_colors,
+        title="Depth Unprojected Point Cloud",
+        camera_xyz=camera_xyz,
+    )
 
     depth_vis = []
     for depth in depths:
@@ -873,13 +1059,18 @@ def write_sample_summary(output_dir, payload):
                 "- `sample_images.png`",
                 "- `sample_depths.png`",
                 "- `sample_world_points.ply`",
+                "- `sample_world_points_views.png`",
+                "- `sample_depth_unproject_world_points.ply`",
+                "- `sample_depth_unproject_world_points_views.png`",
                 "- `sample_smpl_prior_masks.png`",
                 "- `sample_smpl_prior_feature_maps.png`",
                 "- `sample_human_prior_completion_masks.png`",
                 "- `sample_human_prior_completion_point_masks.png`",
                 "- `sample_human_prior_completion_depths.png`",
                 "- `sample_human_prior_completion_world_points.ply`",
+                "- `sample_human_prior_completion_world_points_views.png`",
                 "- `sample_completed_world_points.ply`",
+                "- `sample_completed_world_points_views.png`",
                 "- `sample_human_prior_target_mask.png`",
                 "- `sample_prior_case_package.npz`",
             ]
@@ -1094,6 +1285,10 @@ def main():
         supervised_view_quality_filter=args.supervised_view_quality_filter,
         conf_depth_view_quality_filter=args.conf_depth_view_quality_filter,
         min_depth_conf=args.min_depth_conf,
+        smpl_prior_pose_noise_prob=args.smpl_prior_pose_noise_prob,
+        smpl_prior_pose_noise_rot_deg=args.smpl_prior_pose_noise_rot_deg,
+        smpl_prior_pose_noise_trans_scale=args.smpl_prior_pose_noise_trans_scale,
+        smpl_prior_pose_noise_scale_std=args.smpl_prior_pose_noise_scale_std,
         len_train=-1,
         len_test=-1,
     )
@@ -1121,12 +1316,7 @@ def main():
 
         flat_points_full = world_points.reshape(-1, 3)[masks.reshape(-1)]
         flat_colors_full = images.reshape(-1, 3)[masks.reshape(-1)]
-        flat_points = flat_points_full
-        flat_colors = flat_colors_full
-        if flat_points.shape[0] > 250000:
-            keep = np.linspace(0, flat_points.shape[0] - 1, 250000, dtype=np.int64)
-            flat_points = flat_points[keep]
-            flat_colors = flat_colors[keep]
+        flat_points, flat_colors = downsample_point_cloud(flat_points_full, flat_colors_full, max_points=250000)
 
         pointcloud_stats = summarize_point_cloud(flat_points_full, written_vertex_count=flat_points.shape[0])
         payload = build_sample_payload(
@@ -1145,7 +1335,15 @@ def main():
         payloads.append(payload)
 
         if loop_idx == 0:
-            export_sample_artifacts(output_dir, images, depths, flat_points, flat_colors)
+            export_sample_artifacts(
+                output_dir,
+                images,
+                depths,
+                flat_points_full,
+                flat_colors_full,
+                np.stack(sample["extrinsics"]).astype(np.float32),
+                np.stack(sample["intrinsics"]).astype(np.float32),
+            )
             export_prior_artifacts(
                 output_dir,
                 sample,

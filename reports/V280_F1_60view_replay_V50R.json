@@ -1,0 +1,14 @@
+{
+  "candidate": "V50R_rebuilt_after_artifact_loss",
+  "created_utc": "2026-05-08T21:10:59Z",
+  "decision": "12-view x 3-frame support exists; true 60-view replay needs original V50/V55/V135 assets or rerun.",
+  "frames_available": [
+    "frame0000",
+    "frame0001",
+    "frame0002"
+  ],
+  "sixty_view_full_protocol": "not_available_in_rebuilt_package",
+  "status": "PASS_WITH_RISK",
+  "task": "V280_F1_60view_replay_V50R",
+  "views_available_in_candidate": 12
+}

@@ -1,0 +1,100 @@
+{
+  "archive_sha256": "91de7305ce52b80b007d359b7b0237b861f96e24a4574d4d4befd32801d3b89a",
+  "archive_zip": "D:\\vggt\\vggt-main\\archive\\V50R2_rebuilt_candidate_package.zip",
+  "bitwise_original_v50": false,
+  "blockers": [],
+  "candidate_package_path": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V50_final_promotion_transaction\\candidate_package_v50r2",
+  "created_utc": "2026-05-08T21:49:04Z",
+  "formal_cloud_unblocked": true,
+  "frozen_candidate_path": "D:\\vggt\\vggt-main\\output\\frozen_candidates\\V50R2_rebuilt_from_sessions_gdrive_modal",
+  "original_hash_comparison": {
+    "manifest.json": {
+      "matches_original_v50_session_hash": false,
+      "original_v50_sha256_from_session": "03a8603892bedfaadbfa21b1a4b96dc0b462dff8d3bcfa5b7abe2bb49f0318bc",
+      "sha256": "a6447376b17f89f58e272011ef2bae3590a50a7237391ed012f3efdb3f4e1c2f",
+      "size": 4195
+    },
+    "package_files/candidate_files__candidate_normals.npz": {
+      "matches_original_v50_session_hash": false,
+      "original_v50_sha256_from_session": "acbe786a1047a417f14f60716edad65aae3810072dcef312c0bf436067101022",
+      "sha256": "d3a168f9641f5bb16a8df3110b3342ba188b4cf8b4ae8a3912ba5df02856cbce",
+      "size": 17421343
+    },
+    "package_files/candidate_files__candidate_points.npz": {
+      "matches_original_v50_session_hash": false,
+      "original_v50_sha256_from_session": "9f032e87125b1c204cc7cc83b9dbaf73f448ab7a99f1a4852bb0b84644bff12b",
+      "sha256": "4e09398bd4bee9d0859820b2e3ae133d06b1b86324fd0872a2bf72d7e81dd215",
+      "size": 17459703
+    },
+    "package_files/candidate_files__hand_patch.npz": {
+      "matches_original_v50_session_hash": false,
+      "original_v50_sha256_from_session": "dd46ad76d2aa4b84693f5997b9efb2547171ec2f73ac4e8691eefc96274b590b",
+      "sha256": "d7302d9348ab8d8b8fb5daf3fedae98ecf6a2045f9f79fd14552042ba16cac45",
+      "size": 338578
+    },
+    "package_files/candidate_files__head_face_patch.npz": {
+      "matches_original_v50_session_hash": false,
+      "original_v50_sha256_from_session": "7f3d06368a917d651ee3b4c99c9832081e26953fed446f8c67945a44816fd001",
+      "sha256": "469f7da437ed4ddefd0cf69e033f6b9efa5b06a5355d6ccedf7ce1d548394e7c",
+      "size": 254999
+    },
+    "package_files/candidate_files__temporal_teacher.npz": {
+      "matches_original_v50_session_hash": false,
+      "original_v50_sha256_from_session": "cf5d52c699225bf25e8fc448f23fc6dd6f8dfffa52672a4dfa811a4174eb9c13",
+      "sha256": "1bc5b168c9d49e002f2405095b5e5357f78a17e156da5ebc0850dc94ad346446",
+      "size": 2169469
+    },
+    "package_files/candidate_files__visual_review.json": {
+      "matches_original_v50_session_hash": false,
+      "original_v50_sha256_from_session": "4ca0386f594afa247ed5bd8a508d43bb85758ed253197c8deb6f9b67b1277dca",
+      "sha256": "9951ddbe24f3aec1c9bc4d7f822ee4e0faeca4b124d47032bb5dd69a3f15aec7",
+      "size": 262
+    },
+    "package_files/v42_prior_enabled_payload__control_audit.json": {
+      "matches_original_v50_session_hash": true,
+      "original_v50_sha256_from_session": "ad7e2cfa0ccd4684aab781b033f8ffdb6c1e1867886ed0cef296b47d129e9033",
+      "sha256": "ad7e2cfa0ccd4684aab781b033f8ffdb6c1e1867886ed0cef296b47d129e9033",
+      "size": 19263
+    },
+    "package_files/v42_prior_enabled_payload__research_confidence.npz": {
+      "matches_original_v50_session_hash": true,
+      "original_v50_sha256_from_session": "04eba319d53fc954e6567450201119e3ae7e884f39a8a8f49492000b0586bd38",
+      "sha256": "04eba319d53fc954e6567450201119e3ae7e884f39a8a8f49492000b0586bd38",
+      "size": 85602711
+    },
+    "package_files/v42_prior_enabled_payload__research_depths.npz": {
+      "matches_original_v50_session_hash": true,
+      "original_v50_sha256_from_session": "ea27ebda9034a57efc41c2af7b979531c35d65ca2fffae05f1dfb648d35fabfa",
+      "sha256": "ea27ebda9034a57efc41c2af7b979531c35d65ca2fffae05f1dfb648d35fabfa",
+      "size": 30775206
+    },
+    "package_files/v42_prior_enabled_payload__research_normals_geometric.npz": {
+      "matches_original_v50_session_hash": true,
+      "original_v50_sha256_from_session": "a819da26578afa05ce4cf18a5a68ce9177ae3a25c5bcd5f9b3034eb9dea07c14",
+      "sha256": "a819da26578afa05ce4cf18a5a68ce9177ae3a25c5bcd5f9b3034eb9dea07c14",
+      "size": 100071633
+    },
+    "package_files/v42_prior_enabled_payload__research_points_world.npz": {
+      "matches_original_v50_session_hash": true,
+      "original_v50_sha256_from_session": "d8e70e539fe3cb93e2d881abdb0565ef42d33c5915d96d03fe2783362b107215",
+      "sha256": "d8e70e539fe3cb93e2d881abdb0565ef42d33c5915d96d03fe2783362b107215",
+      "size": 105107787
+    },
+    "package_files/v42_prior_enabled_payload__research_prior_effect.json": {
+      "matches_original_v50_session_hash": true,
+      "original_v50_sha256_from_session": "2480829b52a2f3d9146662c6aae346c57df8fcc3f3bfdc7215f768327bbe072f",
+      "sha256": "2480829b52a2f3d9146662c6aae346c57df8fcc3f3bfdc7215f768327bbe072f",
+      "size": 35089
+    },
+    "strict_registry_entry_v50r2.json": {
+      "matches_original_v50_session_hash": false,
+      "original_v50_sha256_from_session": null,
+      "sha256": "1013e63442ac3f63c6f896bfff6657e89b02771731a02aa600f89198f4d0cce9",
+      "size": 466
+    }
+  },
+  "status": "DONE_PASS",
+  "strict_candidate_passes": 1,
+  "strict_teacher_passes": 0,
+  "task": "v50r2_package_builder"
+}

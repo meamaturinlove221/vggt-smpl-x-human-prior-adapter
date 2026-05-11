@@ -1,0 +1,91 @@
+{
+  "task": "v33_head_face_region_teacher_refiner",
+  "status": "DONE_PASS",
+  "created_utc": "2026-05-08T21:45:13Z",
+  "research_only": true,
+  "smplx_native_only": true,
+  "no_flame": true,
+  "no_candidate_export": true,
+  "no_teacher_export": true,
+  "no_predictions_write": true,
+  "no_registry_write": true,
+  "inputs": {
+    "v16_roi": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V16_smplx_native_region_roi_builder\\v16_smplx_native_region_roi_maps.npz",
+    "v24_targets": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V24_residual_teacher_v2\\v24_residual_teacher_targets_v2.npz",
+    "v26_targets": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V26_temporal_canonical_teacher\\v26_temporal_canonical_teacher_targets.npz"
+  },
+  "outputs": {
+    "refined_npz": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V33_head_face_detail_route\\v33_head_face_refined_teacher.npz",
+    "refined_ply": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V33_head_face_detail_route\\v33_head_face_refined_teacher_points.ply",
+    "summary_json": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V33_head_face_detail_route\\summary.json",
+    "report_json": "D:\\vggt\\vggt-main\\reports\\20260508_v33_head_face_detail_route.json",
+    "report_md": "D:\\vggt\\vggt-main\\reports\\20260508_v33_head_face_detail_route.md"
+  },
+  "metrics": {
+    "coverage": {
+      "head": {
+        "pixels": 6782,
+        "views_with_pixels": 6,
+        "per_view_pixels": [
+          1148,
+          1091,
+          1345,
+          1135,
+          1243,
+          820
+        ],
+        "normal_length": {
+          "count": 6782,
+          "finite": 6782,
+          "min": 0.9999998807907104,
+          "median": 1.0,
+          "mean": 1.0,
+          "p95": 1.0,
+          "max": 1.0000001192092896
+        },
+        "temporal_relief_norm": {
+          "count": 6782,
+          "finite": 6782,
+          "min": 0.0,
+          "median": 0.10617396235466003,
+          "mean": 0.11316405981779099,
+          "p95": 0.2739180028438568,
+          "max": 0.4811273515224457
+        }
+      },
+      "face": {
+        "pixels": 2535,
+        "views_with_pixels": 6,
+        "per_view_pixels": [
+          253,
+          267,
+          527,
+          702,
+          410,
+          376
+        ],
+        "normal_length": {
+          "count": 2535,
+          "finite": 2535,
+          "min": 0.9999998807907104,
+          "median": 1.0,
+          "mean": 1.0,
+          "p95": 1.0,
+          "max": 1.0000001192092896
+        },
+        "temporal_relief_norm": {
+          "count": 2535,
+          "finite": 2535,
+          "min": 0.0,
+          "median": 0.12754033505916595,
+          "mean": 0.1268315315246582,
+          "p95": 0.27536827325820923,
+          "max": 0.45602622628211975
+        }
+      }
+    },
+    "total_refined_pixels": 6782,
+    "normal_support_pixels": 6782
+  },
+  "blockers": []
+}

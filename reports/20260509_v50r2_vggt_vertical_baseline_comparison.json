@@ -1,0 +1,848 @@
+{
+  "task": "v50r2_vggt_vertical_baseline_comparison",
+  "created_utc": "2026-05-09T12:34:10Z",
+  "status": "DONE_PASS",
+  "scene": "D:\\vggt\\vggt-main\\output\\4k4d_scenes\\0012_11_frame0000_12views_tmf_v223_repaired",
+  "camera_ids": [
+    "00",
+    "01",
+    "06",
+    "11",
+    "16",
+    "21"
+  ],
+  "methods": [
+    {
+      "key": "v25_base_vggt",
+      "label": "V25 base VGGT",
+      "point_path": "D:\\vggt\\vggt-main\\output\\surface_research_cloud_preflight\\V25_research_vggt_predictions\\research_points_world.npz",
+      "point_key": "frame0000",
+      "method_type": "vggt_baseline",
+      "confidence_path": "D:\\vggt\\vggt-main\\output\\surface_research_cloud_preflight\\V25_research_vggt_predictions\\research_confidence.npz",
+      "confidence_key": "frame0000_world_points_conf",
+      "normal_path": null,
+      "normal_key": null,
+      "head_patch_path": null,
+      "hand_patch_path": null,
+      "notes": "base VGGT research prediction, human_prior_channels=0"
+    },
+    {
+      "key": "v42_prior_enabled",
+      "label": "V42 prior-enabled VGGT",
+      "point_path": "D:\\vggt\\vggt-main\\output\\surface_research_cloud_preflight\\V42_prior_enabled_predictions\\research_points_world.npz",
+      "point_key": "frame0000",
+      "method_type": "vggt_prior_enabled",
+      "confidence_path": "D:\\vggt\\vggt-main\\output\\surface_research_cloud_preflight\\V42_prior_enabled_predictions\\research_confidence.npz",
+      "confidence_key": "frame0000_world_points_conf",
+      "normal_path": "D:\\vggt\\vggt-main\\output\\surface_research_cloud_preflight\\V42_prior_enabled_predictions\\research_normals_geometric.npz",
+      "normal_key": "frame0000",
+      "head_patch_path": null,
+      "hand_patch_path": null,
+      "notes": "prior-enabled prediction; this is the main point-map source used by V50R2"
+    },
+    {
+      "key": "v50r2_candidate",
+      "label": "V50R2 candidate package",
+      "point_path": "D:\\vggt\\vggt-main\\output\\frozen_candidates\\V50R2_rebuilt_from_sessions_gdrive_modal\\package_files\\candidate_files__candidate_points.npz",
+      "point_key": "candidate_points_world",
+      "method_type": "vggt_candidate_package",
+      "confidence_path": "D:\\vggt\\vggt-main\\output\\frozen_candidates\\V50R2_rebuilt_from_sessions_gdrive_modal\\package_files\\v42_prior_enabled_payload__research_confidence.npz",
+      "confidence_key": "frame0000_world_points_conf",
+      "normal_path": "D:\\vggt\\vggt-main\\output\\frozen_candidates\\V50R2_rebuilt_from_sessions_gdrive_modal\\package_files\\candidate_files__candidate_normals.npz",
+      "normal_key": "candidate_normals_geometric",
+      "head_patch_path": "D:\\vggt\\vggt-main\\output\\frozen_candidates\\V50R2_rebuilt_from_sessions_gdrive_modal\\package_files\\candidate_files__head_face_patch.npz",
+      "hand_patch_path": "D:\\vggt\\vggt-main\\output\\frozen_candidates\\V50R2_rebuilt_from_sessions_gdrive_modal\\package_files\\candidate_files__hand_patch.npz",
+      "notes": "strict candidate package; main point map is V42 frame0000 first six views plus packaged head/hand/normal evidence"
+    },
+    {
+      "key": "v16_smplx_prior_only",
+      "label": "V16 SMPL-X prior only",
+      "point_path": "D:\\vggt\\vggt-main\\output\\surface_research_cloud_preflight\\V16_smplx_native_prior_case_restored_dir\\targets.npz",
+      "point_key": "prior_points",
+      "method_type": "prior_reference_not_vggt_output",
+      "confidence_path": null,
+      "confidence_key": null,
+      "normal_path": "D:\\vggt\\vggt-main\\output\\surface_research_cloud_preflight\\V16_smplx_native_prior_case_restored_dir\\targets.npz",
+      "normal_key": "prior_normals",
+      "head_patch_path": null,
+      "hand_patch_path": null,
+      "notes": "SMPL-X prior-only reference, not a VGGT prediction and not a candidate pass"
+    }
+  ],
+  "images": {
+    "full_rgb": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\vertical_vggt_baseline_comparison\\images\\v50r2_vertical_full_rgb_comparison.png",
+    "full_depth": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\vertical_vggt_baseline_comparison\\images\\v50r2_vertical_full_depth_comparison.png",
+    "head_face_rgb": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\vertical_vggt_baseline_comparison\\images\\v50r2_vertical_head_face_rgb_comparison.png",
+    "head_face_depth": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\vertical_vggt_baseline_comparison\\images\\v50r2_vertical_head_face_depth_comparison.png",
+    "left_hand_rgb": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\vertical_vggt_baseline_comparison\\images\\v50r2_vertical_left_hand_rgb_comparison.png",
+    "left_hand_depth": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\vertical_vggt_baseline_comparison\\images\\v50r2_vertical_left_hand_depth_comparison.png",
+    "right_hand_rgb": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\vertical_vggt_baseline_comparison\\images\\v50r2_vertical_right_hand_rgb_comparison.png",
+    "right_hand_depth": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\vertical_vggt_baseline_comparison\\images\\v50r2_vertical_right_hand_depth_comparison.png",
+    "hands_rgb": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\vertical_vggt_baseline_comparison\\images\\v50r2_vertical_hands_rgb_comparison.png",
+    "hands_depth": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\vertical_vggt_baseline_comparison\\images\\v50r2_vertical_hands_depth_comparison.png"
+  },
+  "mentor_images": {
+    "full_rgb": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\images\\09_vertical_full_body_rgb.png",
+    "head_face_rgb": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\images\\10_vertical_head_face_rgb.png",
+    "hands_rgb": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\images\\11_vertical_hands_rgb.png",
+    "full_depth": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\images\\12_vertical_full_body_depth.png",
+    "head_face_depth": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\images\\13_vertical_head_face_depth.png",
+    "hands_depth": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\images\\14_vertical_hands_depth.png"
+  },
+  "ply": {
+    "v25_base_vggt_cam00_full": {
+      "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\vertical_vggt_baseline_comparison\\ply\\v25_base_vggt_cam00_full.ply",
+      "points": 11240
+    },
+    "v25_base_vggt_cam00_head_face": {
+      "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\vertical_vggt_baseline_comparison\\ply\\v25_base_vggt_cam00_head_face.ply",
+      "points": 3695
+    },
+    "v25_base_vggt_cam00_left_hand": {
+      "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\vertical_vggt_baseline_comparison\\ply\\v25_base_vggt_cam00_left_hand.ply",
+      "points": 4660
+    },
+    "v25_base_vggt_cam00_right_hand": {
+      "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\vertical_vggt_baseline_comparison\\ply\\v25_base_vggt_cam00_right_hand.ply",
+      "points": 3619
+    },
+    "v25_base_vggt_cam06_full": {
+      "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\vertical_vggt_baseline_comparison\\ply\\v25_base_vggt_cam06_full.ply",
+      "points": 9293
+    },
+    "v25_base_vggt_cam06_head_face": {
+      "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\vertical_vggt_baseline_comparison\\ply\\v25_base_vggt_cam06_head_face.ply",
+      "points": 3269
+    },
+    "v25_base_vggt_cam06_left_hand": {
+      "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\vertical_vggt_baseline_comparison\\ply\\v25_base_vggt_cam06_left_hand.ply",
+      "points": 2768
+    },
+    "v25_base_vggt_cam06_right_hand": {
+      "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\vertical_vggt_baseline_comparison\\ply\\v25_base_vggt_cam06_right_hand.ply",
+      "points": 3673
+    },
+    "v25_base_vggt_cam16_full": {
+      "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\vertical_vggt_baseline_comparison\\ply\\v25_base_vggt_cam16_full.ply",
+      "points": 11274
+    },
+    "v25_base_vggt_cam16_head_face": {
+      "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\vertical_vggt_baseline_comparison\\ply\\v25_base_vggt_cam16_head_face.ply",
+      "points": 4022
+    },
+    "v25_base_vggt_cam16_left_hand": {
+      "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\vertical_vggt_baseline_comparison\\ply\\v25_base_vggt_cam16_left_hand.ply",
+      "points": 897
+    },
+    "v25_base_vggt_cam16_right_hand": {
+      "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\vertical_vggt_baseline_comparison\\ply\\v25_base_vggt_cam16_right_hand.ply",
+      "points": 6535
+    },
+    "v42_prior_enabled_cam00_full": {
+      "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\vertical_vggt_baseline_comparison\\ply\\v42_prior_enabled_cam00_full.ply",
+      "points": 11240
+    },
+    "v42_prior_enabled_cam00_head_face": {
+      "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\vertical_vggt_baseline_comparison\\ply\\v42_prior_enabled_cam00_head_face.ply",
+      "points": 3695
+    },
+    "v42_prior_enabled_cam00_left_hand": {
+      "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\vertical_vggt_baseline_comparison\\ply\\v42_prior_enabled_cam00_left_hand.ply",
+      "points": 4660
+    },
+    "v42_prior_enabled_cam00_right_hand": {
+      "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\vertical_vggt_baseline_comparison\\ply\\v42_prior_enabled_cam00_right_hand.ply",
+      "points": 3619
+    },
+    "v42_prior_enabled_cam06_full": {
+      "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\vertical_vggt_baseline_comparison\\ply\\v42_prior_enabled_cam06_full.ply",
+      "points": 9293
+    },
+    "v42_prior_enabled_cam06_head_face": {
+      "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\vertical_vggt_baseline_comparison\\ply\\v42_prior_enabled_cam06_head_face.ply",
+      "points": 3269
+    },
+    "v42_prior_enabled_cam06_left_hand": {
+      "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\vertical_vggt_baseline_comparison\\ply\\v42_prior_enabled_cam06_left_hand.ply",
+      "points": 2768
+    },
+    "v42_prior_enabled_cam06_right_hand": {
+      "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\vertical_vggt_baseline_comparison\\ply\\v42_prior_enabled_cam06_right_hand.ply",
+      "points": 3673
+    },
+    "v42_prior_enabled_cam16_full": {
+      "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\vertical_vggt_baseline_comparison\\ply\\v42_prior_enabled_cam16_full.ply",
+      "points": 11274
+    },
+    "v42_prior_enabled_cam16_head_face": {
+      "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\vertical_vggt_baseline_comparison\\ply\\v42_prior_enabled_cam16_head_face.ply",
+      "points": 4022
+    },
+    "v42_prior_enabled_cam16_left_hand": {
+      "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\vertical_vggt_baseline_comparison\\ply\\v42_prior_enabled_cam16_left_hand.ply",
+      "points": 897
+    },
+    "v42_prior_enabled_cam16_right_hand": {
+      "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\vertical_vggt_baseline_comparison\\ply\\v42_prior_enabled_cam16_right_hand.ply",
+      "points": 6535
+    },
+    "v50r2_candidate_cam00_full": {
+      "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\vertical_vggt_baseline_comparison\\ply\\v50r2_candidate_cam00_full.ply",
+      "points": 11240
+    },
+    "v50r2_candidate_cam00_head_face": {
+      "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\vertical_vggt_baseline_comparison\\ply\\v50r2_candidate_cam00_head_face.ply",
+      "points": 1027
+    },
+    "v50r2_candidate_cam00_left_hand": {
+      "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\vertical_vggt_baseline_comparison\\ply\\v50r2_candidate_cam00_left_hand.ply",
+      "points": 513
+    },
+    "v50r2_candidate_cam00_right_hand": {
+      "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\vertical_vggt_baseline_comparison\\ply\\v50r2_candidate_cam00_right_hand.ply",
+      "points": 817
+    },
+    "v50r2_candidate_cam06_full": {
+      "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\vertical_vggt_baseline_comparison\\ply\\v50r2_candidate_cam06_full.ply",
+      "points": 9293
+    },
+    "v50r2_candidate_cam06_head_face": {
+      "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\vertical_vggt_baseline_comparison\\ply\\v50r2_candidate_cam06_head_face.ply",
+      "points": 387
+    },
+    "v50r2_candidate_cam06_left_hand": {
+      "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\vertical_vggt_baseline_comparison\\ply\\v50r2_candidate_cam06_left_hand.ply",
+      "points": 987
+    },
+    "v50r2_candidate_cam06_right_hand": {
+      "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\vertical_vggt_baseline_comparison\\ply\\v50r2_candidate_cam06_right_hand.ply",
+      "points": 462
+    },
+    "v50r2_candidate_cam16_full": {
+      "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\vertical_vggt_baseline_comparison\\ply\\v50r2_candidate_cam16_full.ply",
+      "points": 11274
+    },
+    "v50r2_candidate_cam16_head_face": {
+      "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\vertical_vggt_baseline_comparison\\ply\\v50r2_candidate_cam16_head_face.ply",
+      "points": 4022
+    },
+    "v50r2_candidate_cam16_left_hand": {
+      "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\vertical_vggt_baseline_comparison\\ply\\v50r2_candidate_cam16_left_hand.ply",
+      "points": 897
+    },
+    "v50r2_candidate_cam16_right_hand": {
+      "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\vertical_vggt_baseline_comparison\\ply\\v50r2_candidate_cam16_right_hand.ply",
+      "points": 1024
+    },
+    "v16_smplx_prior_only_cam00_full": {
+      "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\vertical_vggt_baseline_comparison\\ply\\v16_smplx_prior_only_cam00_full.ply",
+      "points": 11240
+    },
+    "v16_smplx_prior_only_cam00_head_face": {
+      "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\vertical_vggt_baseline_comparison\\ply\\v16_smplx_prior_only_cam00_head_face.ply",
+      "points": 3695
+    },
+    "v16_smplx_prior_only_cam00_left_hand": {
+      "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\vertical_vggt_baseline_comparison\\ply\\v16_smplx_prior_only_cam00_left_hand.ply",
+      "points": 4660
+    },
+    "v16_smplx_prior_only_cam00_right_hand": {
+      "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\vertical_vggt_baseline_comparison\\ply\\v16_smplx_prior_only_cam00_right_hand.ply",
+      "points": 3619
+    },
+    "v16_smplx_prior_only_cam06_full": {
+      "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\vertical_vggt_baseline_comparison\\ply\\v16_smplx_prior_only_cam06_full.ply",
+      "points": 9293
+    },
+    "v16_smplx_prior_only_cam06_head_face": {
+      "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\vertical_vggt_baseline_comparison\\ply\\v16_smplx_prior_only_cam06_head_face.ply",
+      "points": 3269
+    },
+    "v16_smplx_prior_only_cam06_left_hand": {
+      "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\vertical_vggt_baseline_comparison\\ply\\v16_smplx_prior_only_cam06_left_hand.ply",
+      "points": 2768
+    },
+    "v16_smplx_prior_only_cam06_right_hand": {
+      "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\vertical_vggt_baseline_comparison\\ply\\v16_smplx_prior_only_cam06_right_hand.ply",
+      "points": 3673
+    },
+    "v16_smplx_prior_only_cam16_full": {
+      "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\vertical_vggt_baseline_comparison\\ply\\v16_smplx_prior_only_cam16_full.ply",
+      "points": 11274
+    },
+    "v16_smplx_prior_only_cam16_head_face": {
+      "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\vertical_vggt_baseline_comparison\\ply\\v16_smplx_prior_only_cam16_head_face.ply",
+      "points": 4022
+    },
+    "v16_smplx_prior_only_cam16_left_hand": {
+      "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\vertical_vggt_baseline_comparison\\ply\\v16_smplx_prior_only_cam16_left_hand.ply",
+      "points": 897
+    },
+    "v16_smplx_prior_only_cam16_right_hand": {
+      "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\vertical_vggt_baseline_comparison\\ply\\v16_smplx_prior_only_cam16_right_hand.ply",
+      "points": 6535
+    }
+  },
+  "metrics_csv": "D:\\vggt\\vggt-main\\reports\\20260509_v50r2_vggt_vertical_baseline_metrics.csv",
+  "aggregate_metrics": [
+    {
+      "method": "v16_smplx_prior_only",
+      "label": "V16 SMPL-X prior only",
+      "method_type": "prior_reference_not_vggt_output",
+      "region": "full",
+      "views": 6,
+      "region_pixels_mean": 11575.5,
+      "valid_points_mean": 11575.5,
+      "coverage_mean": 1.0,
+      "xyz_span_norm_mean": 1.04453141439476,
+      "z_relief_p95_p5_mean": 0.6327743823329608,
+      "neighbor_delta_median_mean": 0.0008840879697042207,
+      "neighbor_delta_p95_mean": 0.003780679039967557,
+      "mean_l2_from_v25_baseline_mean": null,
+      "confidence_mean_mean": null,
+      "normal_available": true,
+      "notes": "SMPL-X prior-only reference, not a VGGT prediction and not a candidate pass"
+    },
+    {
+      "method": "v16_smplx_prior_only",
+      "label": "V16 SMPL-X prior only",
+      "method_type": "prior_reference_not_vggt_output",
+      "region": "head_face",
+      "views": 6,
+      "region_pixels_mean": 4019.1666666666665,
+      "valid_points_mean": 4019.1666666666665,
+      "coverage_mean": 1.0,
+      "xyz_span_norm_mean": 0.9378097883317031,
+      "z_relief_p95_p5_mean": 0.5518123517433803,
+      "neighbor_delta_median_mean": 0.0008428469106244544,
+      "neighbor_delta_p95_mean": 0.0032892239202434817,
+      "mean_l2_from_v25_baseline_mean": null,
+      "confidence_mean_mean": null,
+      "normal_available": true,
+      "notes": "SMPL-X prior-only reference, not a VGGT prediction and not a candidate pass"
+    },
+    {
+      "method": "v16_smplx_prior_only",
+      "label": "V16 SMPL-X prior only",
+      "method_type": "prior_reference_not_vggt_output",
+      "region": "left_hand",
+      "views": 6,
+      "region_pixels_mean": 3276.0,
+      "valid_points_mean": 3276.0,
+      "coverage_mean": 1.0,
+      "xyz_span_norm_mean": 1.0075953244954003,
+      "z_relief_p95_p5_mean": 0.4903389898439248,
+      "neighbor_delta_median_mean": 0.0015714634791947901,
+      "neighbor_delta_p95_mean": 0.004738912296791871,
+      "mean_l2_from_v25_baseline_mean": null,
+      "confidence_mean_mean": null,
+      "normal_available": true,
+      "notes": "SMPL-X prior-only reference, not a VGGT prediction and not a candidate pass"
+    },
+    {
+      "method": "v16_smplx_prior_only",
+      "label": "V16 SMPL-X prior only",
+      "method_type": "prior_reference_not_vggt_output",
+      "region": "right_hand",
+      "views": 6,
+      "region_pixels_mean": 4905.666666666667,
+      "valid_points_mean": 4905.666666666667,
+      "coverage_mean": 1.0,
+      "xyz_span_norm_mean": 0.8278529524845842,
+      "z_relief_p95_p5_mean": 0.49660807897647224,
+      "neighbor_delta_median_mean": 0.0009231986089920005,
+      "neighbor_delta_p95_mean": 0.0030969422853862247,
+      "mean_l2_from_v25_baseline_mean": null,
+      "confidence_mean_mean": null,
+      "normal_available": true,
+      "notes": "SMPL-X prior-only reference, not a VGGT prediction and not a candidate pass"
+    },
+    {
+      "method": "v16_smplx_prior_only",
+      "label": "V16 SMPL-X prior only",
+      "method_type": "prior_reference_not_vggt_output",
+      "region": "upper",
+      "views": 6,
+      "region_pixels_mean": 8240.833333333334,
+      "valid_points_mean": 8240.833333333334,
+      "coverage_mean": 1.0,
+      "xyz_span_norm_mean": 0.9828323962951594,
+      "z_relief_p95_p5_mean": 0.5946322078506152,
+      "neighbor_delta_median_mean": 0.0008758316010547181,
+      "neighbor_delta_p95_mean": 0.003647552259887258,
+      "mean_l2_from_v25_baseline_mean": null,
+      "confidence_mean_mean": null,
+      "normal_available": true,
+      "notes": "SMPL-X prior-only reference, not a VGGT prediction and not a candidate pass"
+    },
+    {
+      "method": "v25_base_vggt",
+      "label": "V25 base VGGT",
+      "method_type": "vggt_baseline",
+      "region": "full",
+      "views": 6,
+      "region_pixels_mean": 11575.5,
+      "valid_points_mean": 11575.5,
+      "coverage_mean": 1.0,
+      "xyz_span_norm_mean": 0.40893803126598316,
+      "z_relief_p95_p5_mean": 0.19834651201963424,
+      "neighbor_delta_median_mean": 0.0017251677345484495,
+      "neighbor_delta_p95_mean": 0.0042329604815070825,
+      "mean_l2_from_v25_baseline_mean": null,
+      "confidence_mean_mean": 3.2334941824277244,
+      "normal_available": false,
+      "notes": "base VGGT research prediction, human_prior_channels=0"
+    },
+    {
+      "method": "v25_base_vggt",
+      "label": "V25 base VGGT",
+      "method_type": "vggt_baseline",
+      "region": "head_face",
+      "views": 6,
+      "region_pixels_mean": 4019.1666666666665,
+      "valid_points_mean": 4019.1666666666665,
+      "coverage_mean": 1.0,
+      "xyz_span_norm_mean": 0.1847990109698073,
+      "z_relief_p95_p5_mean": 0.0829388717810313,
+      "neighbor_delta_median_mean": 0.0016078758635558188,
+      "neighbor_delta_p95_mean": 0.004042641220924755,
+      "mean_l2_from_v25_baseline_mean": null,
+      "confidence_mean_mean": 3.2300731341044107,
+      "normal_available": false,
+      "notes": "base VGGT research prediction, human_prior_channels=0"
+    },
+    {
+      "method": "v25_base_vggt",
+      "label": "V25 base VGGT",
+      "method_type": "vggt_baseline",
+      "region": "left_hand",
+      "views": 6,
+      "region_pixels_mean": 3276.0,
+      "valid_points_mean": 3276.0,
+      "coverage_mean": 1.0,
+      "xyz_span_norm_mean": 0.23792681586032594,
+      "z_relief_p95_p5_mean": 0.11129618187745412,
+      "neighbor_delta_median_mean": 0.0022421858351056776,
+      "neighbor_delta_p95_mean": 0.005285682117876907,
+      "mean_l2_from_v25_baseline_mean": null,
+      "confidence_mean_mean": 2.9767700831095376,
+      "normal_available": false,
+      "notes": "base VGGT research prediction, human_prior_channels=0"
+    },
+    {
+      "method": "v25_base_vggt",
+      "label": "V25 base VGGT",
+      "method_type": "vggt_baseline",
+      "region": "right_hand",
+      "views": 6,
+      "region_pixels_mean": 4905.666666666667,
+      "valid_points_mean": 4905.666666666667,
+      "coverage_mean": 1.0,
+      "xyz_span_norm_mean": 0.2651172435859665,
+      "z_relief_p95_p5_mean": 0.12973543405532834,
+      "neighbor_delta_median_mean": 0.001675526921947797,
+      "neighbor_delta_p95_mean": 0.003783726987118522,
+      "mean_l2_from_v25_baseline_mean": null,
+      "confidence_mean_mean": 3.465503970781962,
+      "normal_available": false,
+      "notes": "base VGGT research prediction, human_prior_channels=0"
+    },
+    {
+      "method": "v25_base_vggt",
+      "label": "V25 base VGGT",
+      "method_type": "vggt_baseline",
+      "region": "upper",
+      "views": 6,
+      "region_pixels_mean": 8240.833333333334,
+      "valid_points_mean": 8240.833333333334,
+      "coverage_mean": 1.0,
+      "xyz_span_norm_mean": 0.2607808077198201,
+      "z_relief_p95_p5_mean": 0.12035465439160664,
+      "neighbor_delta_median_mean": 0.0016508751626436908,
+      "neighbor_delta_p95_mean": 0.004259626691540082,
+      "mean_l2_from_v25_baseline_mean": null,
+      "confidence_mean_mean": 3.229581634203593,
+      "normal_available": false,
+      "notes": "base VGGT research prediction, human_prior_channels=0"
+    },
+    {
+      "method": "v42_prior_enabled",
+      "label": "V42 prior-enabled VGGT",
+      "method_type": "vggt_prior_enabled",
+      "region": "full",
+      "views": 6,
+      "region_pixels_mean": 11575.5,
+      "valid_points_mean": 11575.5,
+      "coverage_mean": 1.0,
+      "xyz_span_norm_mean": 0.40869066042916513,
+      "z_relief_p95_p5_mean": 0.19823953559001284,
+      "neighbor_delta_median_mean": 0.0017229397005091112,
+      "neighbor_delta_p95_mean": 0.00423233137310793,
+      "mean_l2_from_v25_baseline_mean": 0.0002449021194479428,
+      "confidence_mean_mean": 3.243269602457682,
+      "normal_available": true,
+      "notes": "prior-enabled prediction; this is the main point-map source used by V50R2"
+    },
+    {
+      "method": "v42_prior_enabled",
+      "label": "V42 prior-enabled VGGT",
+      "method_type": "vggt_prior_enabled",
+      "region": "head_face",
+      "views": 6,
+      "region_pixels_mean": 4019.1666666666665,
+      "valid_points_mean": 4019.1666666666665,
+      "coverage_mean": 1.0,
+      "xyz_span_norm_mean": 0.18464707342503717,
+      "z_relief_p95_p5_mean": 0.08281371692816412,
+      "neighbor_delta_median_mean": 0.0016052623007756968,
+      "neighbor_delta_p95_mean": 0.004040255754565199,
+      "mean_l2_from_v25_baseline_mean": 0.000296475778062207,
+      "confidence_mean_mean": 3.2395017941792807,
+      "normal_available": true,
+      "notes": "prior-enabled prediction; this is the main point-map source used by V50R2"
+    },
+    {
+      "method": "v42_prior_enabled",
+      "label": "V42 prior-enabled VGGT",
+      "method_type": "vggt_prior_enabled",
+      "region": "left_hand",
+      "views": 6,
+      "region_pixels_mean": 3276.0,
+      "valid_points_mean": 3276.0,
+      "coverage_mean": 1.0,
+      "xyz_span_norm_mean": 0.23786059057401324,
+      "z_relief_p95_p5_mean": 0.11131287713845567,
+      "neighbor_delta_median_mean": 0.002241244539618492,
+      "neighbor_delta_p95_mean": 0.005275004349338512,
+      "mean_l2_from_v25_baseline_mean": 0.00029693676575940725,
+      "confidence_mean_mean": 2.9845337867736816,
+      "normal_available": true,
+      "notes": "prior-enabled prediction; this is the main point-map source used by V50R2"
+    },
+    {
+      "method": "v42_prior_enabled",
+      "label": "V42 prior-enabled VGGT",
+      "method_type": "vggt_prior_enabled",
+      "region": "right_hand",
+      "views": 6,
+      "region_pixels_mean": 4905.666666666667,
+      "valid_points_mean": 4905.666666666667,
+      "coverage_mean": 1.0,
+      "xyz_span_norm_mean": 0.26500729226800485,
+      "z_relief_p95_p5_mean": 0.12965595920880635,
+      "neighbor_delta_median_mean": 0.001673237808669607,
+      "neighbor_delta_p95_mean": 0.0037786309452106557,
+      "mean_l2_from_v25_baseline_mean": 0.00020038515503983945,
+      "confidence_mean_mean": 3.47550892829895,
+      "normal_available": true,
+      "notes": "prior-enabled prediction; this is the main point-map source used by V50R2"
+    },
+    {
+      "method": "v42_prior_enabled",
+      "label": "V42 prior-enabled VGGT",
+      "method_type": "vggt_prior_enabled",
+      "region": "upper",
+      "views": 6,
+      "region_pixels_mean": 8240.833333333334,
+      "valid_points_mean": 8240.833333333334,
+      "coverage_mean": 1.0,
+      "xyz_span_norm_mean": 0.26054926971035297,
+      "z_relief_p95_p5_mean": 0.12016814748446143,
+      "neighbor_delta_median_mean": 0.0016478148560660582,
+      "neighbor_delta_p95_mean": 0.004255704892178376,
+      "mean_l2_from_v25_baseline_mean": 0.0002564808067594034,
+      "confidence_mean_mean": 3.2388722896575928,
+      "normal_available": true,
+      "notes": "prior-enabled prediction; this is the main point-map source used by V50R2"
+    },
+    {
+      "method": "v50r2_candidate",
+      "label": "V50R2 candidate package",
+      "method_type": "vggt_candidate_package",
+      "region": "full",
+      "views": 6,
+      "region_pixels_mean": 11575.5,
+      "valid_points_mean": 11575.5,
+      "coverage_mean": 1.0,
+      "xyz_span_norm_mean": 0.40869066042916513,
+      "z_relief_p95_p5_mean": 0.19823953559001284,
+      "neighbor_delta_median_mean": 0.0017229397005091112,
+      "neighbor_delta_p95_mean": 0.00423233137310793,
+      "mean_l2_from_v25_baseline_mean": 0.0002449021194479428,
+      "confidence_mean_mean": 3.243269602457682,
+      "normal_available": true,
+      "notes": "strict candidate package; main point map is V42 frame0000 first six views plus packaged head/hand/normal evidence"
+    },
+    {
+      "method": "v50r2_candidate",
+      "label": "V50R2 candidate package",
+      "method_type": "vggt_candidate_package",
+      "region": "head_face",
+      "views": 6,
+      "region_pixels_mean": 2450.8333333333335,
+      "valid_points_mean": 2450.8333333333335,
+      "coverage_mean": 1.0,
+      "xyz_span_norm_mean": 0.2365589984906417,
+      "z_relief_p95_p5_mean": 0.06590716292460756,
+      "neighbor_delta_median_mean": 0.0018075142870657146,
+      "neighbor_delta_p95_mean": 0.004845378648800154,
+      "mean_l2_from_v25_baseline_mean": 0.0004825297267719482,
+      "confidence_mean_mean": 2.2784608205159507,
+      "normal_available": true,
+      "notes": "strict candidate package; main point map is V42 frame0000 first six views plus packaged head/hand/normal evidence"
+    },
+    {
+      "method": "v50r2_candidate",
+      "label": "V50R2 candidate package",
+      "method_type": "vggt_candidate_package",
+      "region": "left_hand",
+      "views": 6,
+      "region_pixels_mean": 1248.8333333333333,
+      "valid_points_mean": 1248.8333333333333,
+      "coverage_mean": 1.0,
+      "xyz_span_norm_mean": 0.1695159618067509,
+      "z_relief_p95_p5_mean": 0.08084027220805484,
+      "neighbor_delta_median_mean": 0.002212602509340892,
+      "neighbor_delta_p95_mean": 0.005252530061018963,
+      "mean_l2_from_v25_baseline_mean": 0.0002983396649748708,
+      "confidence_mean_mean": 2.448758681615194,
+      "normal_available": true,
+      "notes": "strict candidate package; main point map is V42 frame0000 first six views plus packaged head/hand/normal evidence"
+    },
+    {
+      "method": "v50r2_candidate",
+      "label": "V50R2 candidate package",
+      "method_type": "vggt_candidate_package",
+      "region": "right_hand",
+      "views": 6,
+      "region_pixels_mean": 842.8333333333334,
+      "valid_points_mean": 842.8333333333334,
+      "coverage_mean": 1.0,
+      "xyz_span_norm_mean": 0.11096603966480528,
+      "z_relief_p95_p5_mean": 0.05356448193391161,
+      "neighbor_delta_median_mean": 0.0017979607994978626,
+      "neighbor_delta_p95_mean": 0.004588389109509687,
+      "mean_l2_from_v25_baseline_mean": 0.00022199918385013007,
+      "confidence_mean_mean": 2.860395908355713,
+      "normal_available": true,
+      "notes": "strict candidate package; main point map is V42 frame0000 first six views plus packaged head/hand/normal evidence"
+    },
+    {
+      "method": "v50r2_candidate",
+      "label": "V50R2 candidate package",
+      "method_type": "vggt_candidate_package",
+      "region": "upper",
+      "views": 6,
+      "region_pixels_mean": 8240.833333333334,
+      "valid_points_mean": 8240.833333333334,
+      "coverage_mean": 1.0,
+      "xyz_span_norm_mean": 0.26054926971035297,
+      "z_relief_p95_p5_mean": 0.12016814748446143,
+      "neighbor_delta_median_mean": 0.0016478148560660582,
+      "neighbor_delta_p95_mean": 0.004255704892178376,
+      "mean_l2_from_v25_baseline_mean": 0.0002564808067594034,
+      "confidence_mean_mean": 3.2388722896575928,
+      "normal_available": true,
+      "notes": "strict candidate package; main point map is V42 frame0000 first six views plus packaged head/hand/normal evidence"
+    }
+  ],
+  "summary_table": [
+    {
+      "method": "v25_base_vggt",
+      "label": "V25 base VGGT",
+      "region": "full",
+      "valid_points_mean": 11575.5,
+      "coverage_mean": 1.0,
+      "z_relief_p95_p5_mean": 0.19834651201963424,
+      "neighbor_delta_p95_mean": 0.0042329604815070825,
+      "mean_l2_from_v25_baseline_mean": null,
+      "normal_available": false,
+      "method_type": "vggt_baseline"
+    },
+    {
+      "method": "v25_base_vggt",
+      "label": "V25 base VGGT",
+      "region": "head_face",
+      "valid_points_mean": 4019.1666666666665,
+      "coverage_mean": 1.0,
+      "z_relief_p95_p5_mean": 0.0829388717810313,
+      "neighbor_delta_p95_mean": 0.004042641220924755,
+      "mean_l2_from_v25_baseline_mean": null,
+      "normal_available": false,
+      "method_type": "vggt_baseline"
+    },
+    {
+      "method": "v25_base_vggt",
+      "label": "V25 base VGGT",
+      "region": "left_hand",
+      "valid_points_mean": 3276.0,
+      "coverage_mean": 1.0,
+      "z_relief_p95_p5_mean": 0.11129618187745412,
+      "neighbor_delta_p95_mean": 0.005285682117876907,
+      "mean_l2_from_v25_baseline_mean": null,
+      "normal_available": false,
+      "method_type": "vggt_baseline"
+    },
+    {
+      "method": "v25_base_vggt",
+      "label": "V25 base VGGT",
+      "region": "right_hand",
+      "valid_points_mean": 4905.666666666667,
+      "coverage_mean": 1.0,
+      "z_relief_p95_p5_mean": 0.12973543405532834,
+      "neighbor_delta_p95_mean": 0.003783726987118522,
+      "mean_l2_from_v25_baseline_mean": null,
+      "normal_available": false,
+      "method_type": "vggt_baseline"
+    },
+    {
+      "method": "v42_prior_enabled",
+      "label": "V42 prior-enabled VGGT",
+      "region": "full",
+      "valid_points_mean": 11575.5,
+      "coverage_mean": 1.0,
+      "z_relief_p95_p5_mean": 0.19823953559001284,
+      "neighbor_delta_p95_mean": 0.00423233137310793,
+      "mean_l2_from_v25_baseline_mean": 0.0002449021194479428,
+      "normal_available": true,
+      "method_type": "vggt_prior_enabled"
+    },
+    {
+      "method": "v42_prior_enabled",
+      "label": "V42 prior-enabled VGGT",
+      "region": "head_face",
+      "valid_points_mean": 4019.1666666666665,
+      "coverage_mean": 1.0,
+      "z_relief_p95_p5_mean": 0.08281371692816412,
+      "neighbor_delta_p95_mean": 0.004040255754565199,
+      "mean_l2_from_v25_baseline_mean": 0.000296475778062207,
+      "normal_available": true,
+      "method_type": "vggt_prior_enabled"
+    },
+    {
+      "method": "v42_prior_enabled",
+      "label": "V42 prior-enabled VGGT",
+      "region": "left_hand",
+      "valid_points_mean": 3276.0,
+      "coverage_mean": 1.0,
+      "z_relief_p95_p5_mean": 0.11131287713845567,
+      "neighbor_delta_p95_mean": 0.005275004349338512,
+      "mean_l2_from_v25_baseline_mean": 0.00029693676575940725,
+      "normal_available": true,
+      "method_type": "vggt_prior_enabled"
+    },
+    {
+      "method": "v42_prior_enabled",
+      "label": "V42 prior-enabled VGGT",
+      "region": "right_hand",
+      "valid_points_mean": 4905.666666666667,
+      "coverage_mean": 1.0,
+      "z_relief_p95_p5_mean": 0.12965595920880635,
+      "neighbor_delta_p95_mean": 0.0037786309452106557,
+      "mean_l2_from_v25_baseline_mean": 0.00020038515503983945,
+      "normal_available": true,
+      "method_type": "vggt_prior_enabled"
+    },
+    {
+      "method": "v50r2_candidate",
+      "label": "V50R2 candidate package",
+      "region": "full",
+      "valid_points_mean": 11575.5,
+      "coverage_mean": 1.0,
+      "z_relief_p95_p5_mean": 0.19823953559001284,
+      "neighbor_delta_p95_mean": 0.00423233137310793,
+      "mean_l2_from_v25_baseline_mean": 0.0002449021194479428,
+      "normal_available": true,
+      "method_type": "vggt_candidate_package"
+    },
+    {
+      "method": "v50r2_candidate",
+      "label": "V50R2 candidate package",
+      "region": "head_face",
+      "valid_points_mean": 2450.8333333333335,
+      "coverage_mean": 1.0,
+      "z_relief_p95_p5_mean": 0.06590716292460756,
+      "neighbor_delta_p95_mean": 0.004845378648800154,
+      "mean_l2_from_v25_baseline_mean": 0.0004825297267719482,
+      "normal_available": true,
+      "method_type": "vggt_candidate_package"
+    },
+    {
+      "method": "v50r2_candidate",
+      "label": "V50R2 candidate package",
+      "region": "left_hand",
+      "valid_points_mean": 1248.8333333333333,
+      "coverage_mean": 1.0,
+      "z_relief_p95_p5_mean": 0.08084027220805484,
+      "neighbor_delta_p95_mean": 0.005252530061018963,
+      "mean_l2_from_v25_baseline_mean": 0.0002983396649748708,
+      "normal_available": true,
+      "method_type": "vggt_candidate_package"
+    },
+    {
+      "method": "v50r2_candidate",
+      "label": "V50R2 candidate package",
+      "region": "right_hand",
+      "valid_points_mean": 842.8333333333334,
+      "coverage_mean": 1.0,
+      "z_relief_p95_p5_mean": 0.05356448193391161,
+      "neighbor_delta_p95_mean": 0.004588389109509687,
+      "mean_l2_from_v25_baseline_mean": 0.00022199918385013007,
+      "normal_available": true,
+      "method_type": "vggt_candidate_package"
+    },
+    {
+      "method": "v16_smplx_prior_only",
+      "label": "V16 SMPL-X prior only",
+      "region": "full",
+      "valid_points_mean": 11575.5,
+      "coverage_mean": 1.0,
+      "z_relief_p95_p5_mean": 0.6327743823329608,
+      "neighbor_delta_p95_mean": 0.003780679039967557,
+      "mean_l2_from_v25_baseline_mean": null,
+      "normal_available": true,
+      "method_type": "prior_reference_not_vggt_output"
+    },
+    {
+      "method": "v16_smplx_prior_only",
+      "label": "V16 SMPL-X prior only",
+      "region": "head_face",
+      "valid_points_mean": 4019.1666666666665,
+      "coverage_mean": 1.0,
+      "z_relief_p95_p5_mean": 0.5518123517433803,
+      "neighbor_delta_p95_mean": 0.0032892239202434817,
+      "mean_l2_from_v25_baseline_mean": null,
+      "normal_available": true,
+      "method_type": "prior_reference_not_vggt_output"
+    },
+    {
+      "method": "v16_smplx_prior_only",
+      "label": "V16 SMPL-X prior only",
+      "region": "left_hand",
+      "valid_points_mean": 3276.0,
+      "coverage_mean": 1.0,
+      "z_relief_p95_p5_mean": 0.4903389898439248,
+      "neighbor_delta_p95_mean": 0.004738912296791871,
+      "mean_l2_from_v25_baseline_mean": null,
+      "normal_available": true,
+      "method_type": "prior_reference_not_vggt_output"
+    },
+    {
+      "method": "v16_smplx_prior_only",
+      "label": "V16 SMPL-X prior only",
+      "region": "right_hand",
+      "valid_points_mean": 4905.666666666667,
+      "coverage_mean": 1.0,
+      "z_relief_p95_p5_mean": 0.49660807897647224,
+      "neighbor_delta_p95_mean": 0.0030969422853862247,
+      "mean_l2_from_v25_baseline_mean": null,
+      "normal_available": true,
+      "method_type": "prior_reference_not_vggt_output"
+    }
+  ],
+  "key_findings": {
+    "v42_vs_v25_mean_l2_on_all_pixels": 0.0005354409804567695,
+    "v50r2_candidate_points_vs_v42_max_abs": 0.0,
+    "interpretation": "V50R2 candidate main point map is identical to V42 prior-enabled first-six-view frame0000 point map; V50R2 adds packaged head/hand/normal/visual-gate evidence rather than a new full-body point-map coordinate field."
+  }
+}

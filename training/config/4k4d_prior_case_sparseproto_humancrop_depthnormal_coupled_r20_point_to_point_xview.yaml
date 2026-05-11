@@ -1,0 +1,48 @@
+defaults:
+  - 4k4d_prior_case_sparseproto_humancrop_depthnormal_coupled_r18_pointbranch_signed_roi
+  - _self_
+
+exp_name: 4k4d_prior_case_sparseproto_humancrop_depthnormal_coupled_r20_point_to_point_xview
+
+loss:
+  human_prior:
+    weight: 0.12
+    depth_normal:
+      consistency_weight: 0.05
+      orientation: oriented
+      flip_depth_normal: true
+      normal_target_detach: true
+      valid_range: 0.96
+      head_roi_weight: 2.5
+      face_roi_weight: 4.0
+      hairline_roi_weight: 4.0
+      ear_band_roi_weight: 2.5
+      boundary_boost: 2.0
+    depth_point:
+      consistency_weight: 0.08
+      xyz_weight: 0.50
+      z_weight: 0.80
+      valid_range: 0.96
+      relative_scale: true
+      head_roi_weight: 2.5
+      face_roi_weight: 4.0
+      hairline_roi_weight: 4.0
+      ear_band_roi_weight: 2.5
+      boundary_boost: 2.0
+    cross_view:
+      consistency_weight: 0.12
+      depth_weight: 0.35
+      point_weight: 1.40
+      normal_weight: 0.0
+      point_projection_source: world_points
+      valid_range: 0.96
+      stride: 8
+      max_pairs: 12
+      min_depth: 0.0001
+      orientation: unoriented
+      detach_projection: true
+      head_roi_weight: 2.5
+      face_roi_weight: 4.0
+      hairline_roi_weight: 4.0
+      ear_band_roi_weight: 2.5
+      boundary_boost: 2.0

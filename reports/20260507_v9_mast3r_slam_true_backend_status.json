@@ -1,0 +1,90 @@
+{
+  "task": "v9_mast3r_slam_true_backend_status",
+  "created_utc": "2026-05-07T15:56:06Z",
+  "backend": "mast3r-slam",
+  "worker_blocked": false,
+  "status": "true_backend_completed_research_only_degenerate_geometry",
+  "verdict": "PASS for official MASt3R-SLAM true backend smoke. NOT a pass for usable geometry because the saved PLY has zero vertices.",
+  "research_only": true,
+  "formal_cloud_unblocked": false,
+  "no_export": true,
+  "no_predictions_write": true,
+  "no_teacher_export": true,
+  "no_candidate_export": true,
+  "no_registry_write": true,
+  "no_strict_pass_write": true,
+  "run_paths": {
+    "summary_json": "D:\\vggt\\vggt-main\\output\\surface_research_cloud_preflight\\Cloud_B_V9\\mast3r_slam_true_backend_smoke\\summary.json",
+    "report_md": "D:\\vggt\\vggt-main\\output\\surface_research_cloud_preflight\\Cloud_B_V9\\mast3r_slam_true_backend_smoke\\report.md",
+    "output_dir": "D:\\vggt\\vggt-main\\output\\surface_research_cloud_preflight\\Cloud_B_V9\\mast3r_slam_true_backend_smoke"
+  },
+  "backend_artifacts": {
+    "trajectory_txt": {
+      "path": "D:\\vggt\\vggt-main\\output\\surface_research_cloud_preflight\\Cloud_B_V9\\mast3r_slam_true_backend_smoke\\mast3r_slam_logs\\input_png_sequence.txt",
+      "bytes": 32,
+      "line_count": 1,
+      "verdict": "Official MASt3R-SLAM trajectory log exists, but contains only the initial identity keyframe pose."
+    },
+    "reconstruction_ply": {
+      "path": "D:\\vggt\\vggt-main\\output\\surface_research_cloud_preflight\\Cloud_B_V9\\mast3r_slam_true_backend_smoke\\mast3r_slam_logs\\input_png_sequence.ply",
+      "bytes": 175,
+      "vertex_count": 0,
+      "verdict": "Official MASt3R-SLAM reconstruction file exists, but is empty."
+    },
+    "keyframe_png": {
+      "path": "D:\\vggt\\vggt-main\\output\\surface_research_cloud_preflight\\Cloud_B_V9\\mast3r_slam_true_backend_smoke\\mast3r_slam_logs\\keyframes\\input_png_sequence\\0.0.png",
+      "bytes": 97971,
+      "verdict": "Official MASt3R-SLAM keyframe export exists."
+    }
+  },
+  "validated_steps": {
+    "readme_entrypoint_confirmed": "python main.py --dataset <folder-or-video> --config config/base.yaml --calib optional --no-viz",
+    "folder_input_format_confirmed": "mast3r_slam.dataloader.RGBFiles reads top-level *.png files.",
+    "remote_asset_layout_confirmed": "surface_research_cloud_preflight/V9_cloud_asset_staging/assets/scene/images/*.png",
+    "input_images_staged": 4,
+    "modal_asset_copy": {
+      "file_count": 127,
+      "bytes": 108475488
+    },
+    "clone_returncode": 0,
+    "mast3r_install_returncode": 0,
+    "in3d_install_returncode": 0,
+    "self_install_returncode": 0,
+    "import_probe": {
+      "returncode": 0,
+      "stdout": "2.5.1+cu124 12.4 True"
+    },
+    "checkpoint_status": "ready",
+    "checkpoint_downloads": {
+      "MASt3R_ViTLarge_BaseDecoder_512_catmlpdpt_metric.pth": {
+        "status": "downloaded",
+        "bytes": 2754910614
+      },
+      "MASt3R_ViTLarge_BaseDecoder_512_catmlpdpt_metric_retrieval_trainingfree.pth": {
+        "status": "downloaded",
+        "bytes": 8399111
+      },
+      "MASt3R_ViTLarge_BaseDecoder_512_catmlpdpt_metric_retrieval_codebook.pkl": {
+        "status": "downloaded",
+        "bytes": 268435691
+      }
+    },
+    "main_py_returncode": 0,
+    "main_py_runtime_evidence": [
+      "model loaded from MASt3R_ViTLarge_BaseDecoder_512_catmlpdpt_metric.pth",
+      "retrieval model loaded from MASt3R_ViTLarge_BaseDecoder_512_catmlpdpt_metric_retrieval_trainingfree.pth",
+      "backend attempted relocalization",
+      "main.py printed done"
+    ]
+  },
+  "runtime_notes": {
+    "stdout_tail_key_lines": [
+      "RELOCALIZING against kf  1  and  [0]",
+      "Failed to relocalize",
+      "Skipped frame 1",
+      "done"
+    ],
+    "geometry_blocker_for_nonempty_output": "The staged four 4K4D views are same-frame multi-camera images, while MASt3R-SLAM expects an ordered monocular sequence/video. The backend ran, but the sequence did not yield valid tracking/relocalization geometry.",
+    "unique_next_unblocker_for_nonempty_geometry": "Provide a MASt3R-SLAM-compatible ordered RGB sequence, or a calibrated run matched to the backend's sequence assumptions. Do not spend more attempts on dependency or checkpoint fixes."
+  }
+}

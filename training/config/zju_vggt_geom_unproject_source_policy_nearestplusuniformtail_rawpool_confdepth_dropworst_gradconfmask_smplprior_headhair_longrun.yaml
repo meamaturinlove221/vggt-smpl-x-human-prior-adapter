@@ -26,6 +26,10 @@ logging:
         - loss_human_prior_depth_presence
         - loss_human_prior_pseudo_depth
         - loss_human_prior_pseudo_unproject
+        - loss_conf_normal
+        - loss_reg_normal
+        - loss_grad_normal
+        - loss_normal_depth_consistency
     val:
       keys_to_log:
         - loss_objective
@@ -45,6 +49,10 @@ logging:
         - loss_human_prior_depth_presence
         - loss_human_prior_pseudo_depth
         - loss_human_prior_pseudo_unproject
+        - loss_conf_normal
+        - loss_reg_normal
+        - loss_grad_normal
+        - loss_normal_depth_consistency
 
 loss:
   depth:
@@ -56,6 +64,15 @@ loss:
     human_prior_pseudo_depth_key: human_prior_completion_depths
     human_prior_pseudo_mask_key: human_prior_completion_point_masks
     human_prior_pseudo_weight: 0.20
+  normal:
+    weight: 0.35
+    gradient_loss_fn: "grad"
+    valid_range: 0.98
+    target_point_key: cam_points
+    target_mask_key: point_masks
+    human_mask_key: human_prior_completion_masks
+    depth_consistency_weight: 0.10
+    depth_consistency_mask_key: human_prior_completion_masks
   unproject_geometry:
     warmup_end: 0.15
     warmup_init_factor: 0.35
@@ -72,3 +89,6 @@ loss:
     human_prior_pseudo_world_key: human_prior_completion_world_points
     human_prior_pseudo_mask_key: human_prior_completion_point_masks
     human_prior_pseudo_weight: 0.35
+
+model:
+  enable_normal: True

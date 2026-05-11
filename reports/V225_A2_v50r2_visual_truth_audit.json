@@ -1,0 +1,42 @@
+{
+  "face_close": "PASS_WITH_RISK",
+  "full_body": "PASS_WITH_RISK",
+  "hairline_close": "PASS_WITH_RISK",
+  "head_close": "PASS_WITH_RISK",
+  "left_hand": "PASS_WITH_RISK",
+  "right_hand": "PASS_WITH_RISK",
+  "right_hand_metrics": {
+    "finger_bands_nonempty": 5,
+    "finger_pixels": {
+      "index_right": 74,
+      "middle_right": 180,
+      "pinky_right": 150,
+      "ring_right": 168,
+      "thumb_right": 112
+    },
+    "hand_to_wrist_centroid_distance": {
+      "count": 4,
+      "finite": 4,
+      "max": 0.28969162702560425,
+      "mean": 0.1761351078748703,
+      "median": 0.17933177947998047,
+      "min": 0.05618523061275482,
+      "p95": 0.2870867848396301
+    },
+    "per_view_pixels": [
+      0,
+      0,
+      216,
+      246,
+      17,
+      56
+    ],
+    "pixels": 535,
+    "views_with_pixels": 4,
+    "wrist_bridge_pixels": 6941
+  },
+  "sixty_view_support": "PASS_WITH_RISK",
+  "status": "PASS_WITH_RISK",
+  "temporal_overlay": "PASS_WITH_RISK",
+  "visual_board_dir": "D:\\vggt\\vggt-main\\output\\V223_v50r2_mentor_final_controller\\visual_board"
+}

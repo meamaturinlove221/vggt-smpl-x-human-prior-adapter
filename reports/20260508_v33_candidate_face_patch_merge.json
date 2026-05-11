@@ -1,0 +1,22 @@
+{
+  "task": "v33_candidate_face_patch_merge",
+  "status": "DONE_PASS",
+  "created_utc": "2026-05-08T21:45:24Z",
+  "research_only": true,
+  "smplx_native_only": true,
+  "no_flame": true,
+  "candidate_optional_missing": false,
+  "candidate_path": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V32_candidate_inference_research\\candidate_points_world_research.npz",
+  "metrics": {
+    "head_patch_pixels": 4247,
+    "face_patch_pixels": 2535,
+    "merged_patch_points": 6782
+  },
+  "outputs": {
+    "merged_npz": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V33_head_face_detail_route\\v33_candidate_face_patch_merged_research.npz",
+    "merged_ply": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V33_head_face_detail_route\\v33_candidate_face_patch_merged_research.ply",
+    "report_json": "D:\\vggt\\vggt-main\\reports\\20260508_v33_candidate_face_patch_merge.json",
+    "report_md": "D:\\vggt\\vggt-main\\reports\\20260508_v33_candidate_face_patch_merge.md"
+  },
+  "blockers": []
+}

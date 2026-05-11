@@ -1,0 +1,393 @@
+{
+  "active_candidate": "V50R_rebuilt_after_artifact_loss",
+  "active_candidate_path": "output/frozen_candidates/V50R_rebuilt_after_artifact_loss",
+  "blockers": [
+    "active candidate is V50R rebuild, not original V50; requires new mentor/D-line acceptance",
+    "full_body strict visual not pass: PASS_WITH_RISK",
+    "head_close strict visual not pass: PASS_WITH_RISK",
+    "face_close strict visual not pass: PASS_WITH_RISK",
+    "hairline_close strict visual not pass: SOFT_REVIEW_ONLY",
+    "left_hand strict visual not pass: PASS_WITH_RISK",
+    "right_hand strict visual not pass: SOFT_REVIEW_ONLY",
+    "sixty_view_support strict visual not pass: PASS_WITH_RISK",
+    "temporal_overlay strict visual not pass: PASS_WITH_RISK",
+    "right hand hard merge not pass: MERGE_FAIL_SOFT_REVIEW_ONLY"
+  ],
+  "created_utc": "2026-05-08T21:12:02Z",
+  "decision": "V50R cannot be promoted under strict mentor gate. No registry/pass/package was written.",
+  "evidence": {
+    "candidate_confidence_from_v42.npz": {
+      "exists": true,
+      "keys": {
+        "frame0000_depth_conf": {
+          "dtype": "float32",
+          "finite_ratio": 1.0,
+          "max": 10.874534606933594,
+          "mean": 4.110233306884766,
+          "min": 1.0,
+          "nonzero_ratio": 1.0,
+          "shape": [
+            12,
+            518,
+            518
+          ]
+        },
+        "frame0000_normal_conf": {
+          "dtype": "float32",
+          "finite_ratio": 1.0,
+          "max": 0.5021443367004395,
+          "mean": 0.498607337474823,
+          "min": 0.49077466130256653,
+          "nonzero_ratio": 1.0,
+          "shape": [
+            12,
+            518,
+            518
+          ]
+        },
+        "frame0000_world_points_conf": {
+          "dtype": "float32",
+          "finite_ratio": 1.0,
+          "max": 8.671518325805664,
+          "mean": 2.020899534225464,
+          "min": 1.0,
+          "nonzero_ratio": 1.0,
+          "shape": [
+            12,
+            518,
+            518
+          ]
+        }
+      },
+      "path": "output/frozen_candidates/V50R_rebuilt_after_artifact_loss/package_files/candidate_confidence_from_v42.npz"
+    },
+    "candidate_depths_from_v42.npz": {
+      "exists": true,
+      "keys": {
+        "frame0000": {
+          "dtype": "float32",
+          "finite_ratio": 1.0,
+          "max": 1.476786494255066,
+          "mean": 1.0508143901824951,
+          "min": 0.41003546118736267,
+          "nonzero_ratio": 1.0,
+          "shape": [
+            12,
+            518,
+            518,
+            1
+          ]
+        },
+        "frame0001": {
+          "dtype": "float32",
+          "finite_ratio": 1.0,
+          "max": 1.4722163677215576,
+          "mean": 1.050845980644226,
+          "min": 0.4136143624782562,
+          "nonzero_ratio": 1.0,
+          "shape": [
+            12,
+            518,
+            518,
+            1
+          ]
+        },
+        "frame0002": {
+          "dtype": "float32",
+          "finite_ratio": 1.0,
+          "max": 1.5268194675445557,
+          "mean": 1.0535396337509155,
+          "min": 0.4148617684841156,
+          "nonzero_ratio": 1.0,
+          "shape": [
+            12,
+            518,
+            518,
+            1
+          ]
+        }
+      },
+      "path": "output/frozen_candidates/V50R_rebuilt_after_artifact_loss/package_files/candidate_depths_from_v42.npz"
+    },
+    "candidate_normals_from_v42.npz": {
+      "exists": true,
+      "keys": {
+        "frame0000": {
+          "dtype": "float32",
+          "finite_ratio": 1.0,
+          "max": 0.9301949739456177,
+          "mean": 0.1580507606267929,
+          "min": -0.6274083852767944,
+          "nonzero_ratio": 1.0,
+          "shape": [
+            12,
+            518,
+            518,
+            3
+          ]
+        },
+        "frame0001": {
+          "dtype": "float32",
+          "finite_ratio": 1.0,
+          "max": 0.9300981760025024,
+          "mean": 0.15796588361263275,
+          "min": -0.6268116235733032,
+          "nonzero_ratio": 1.0,
+          "shape": [
+            12,
+            518,
+            518,
+            3
+          ]
+        },
+        "frame0002": {
+          "dtype": "float32",
+          "finite_ratio": 1.0,
+          "max": 0.9305212497711182,
+          "mean": 0.15812942385673523,
+          "min": -0.6264513731002808,
+          "nonzero_ratio": 1.0,
+          "shape": [
+            12,
+            518,
+            518,
+            3
+          ]
+        }
+      },
+      "path": "output/frozen_candidates/V50R_rebuilt_after_artifact_loss/package_files/candidate_normals_from_v42.npz"
+    },
+    "candidate_points_from_v42.npz": {
+      "exists": true,
+      "keys": {
+        "frame0000": {
+          "dtype": "float32",
+          "finite_ratio": 1.0,
+          "max": 1.4767510890960693,
+          "mean": 0.29981738328933716,
+          "min": -0.7733497023582458,
+          "nonzero_ratio": 1.0,
+          "shape": [
+            12,
+            518,
+            518,
+            3
+          ]
+        },
+        "frame0001": {
+          "dtype": "float32",
+          "finite_ratio": 1.0,
+          "max": 1.4750853776931763,
+          "mean": 0.30022430419921875,
+          "min": -0.7714514136314392,
+          "nonzero_ratio": 1.0,
+          "shape": [
+            12,
+            518,
+            518,
+            3
+          ]
+        },
+        "frame0002": {
+          "dtype": "float32",
+          "finite_ratio": 1.0,
+          "max": 1.515575885772705,
+          "mean": 0.30029284954071045,
+          "min": -0.7702153325080872,
+          "nonzero_ratio": 1.0,
+          "shape": [
+            12,
+            518,
+            518,
+            3
+          ]
+        }
+      },
+      "path": "output/frozen_candidates/V50R_rebuilt_after_artifact_loss/package_files/candidate_points_from_v42.npz"
+    },
+    "hash_gate": {
+      "checked": [
+        {
+          "actual_sha256": "5b0027a531c51fd7fd9ad4619cec41791e040a7cae07236b45b6baa2899bf2e5",
+          "exists": true,
+          "expected_sha256": "5b0027a531c51fd7fd9ad4619cec41791e040a7cae07236b45b6baa2899bf2e5",
+          "match": true,
+          "path": "output/frozen_candidates/V50R_rebuilt_after_artifact_loss/manifest.json"
+        },
+        {
+          "actual_sha256": "04eba319d53fc954e6567450201119e3ae7e884f39a8a8f49492000b0586bd38",
+          "exists": true,
+          "expected_sha256": "04eba319d53fc954e6567450201119e3ae7e884f39a8a8f49492000b0586bd38",
+          "match": true,
+          "path": "output/frozen_candidates/V50R_rebuilt_after_artifact_loss/package_files/candidate_confidence_from_v42.npz"
+        },
+        {
+          "actual_sha256": "ea27ebda9034a57efc41c2af7b979531c35d65ca2fffae05f1dfb648d35fabfa",
+          "exists": true,
+          "expected_sha256": "ea27ebda9034a57efc41c2af7b979531c35d65ca2fffae05f1dfb648d35fabfa",
+          "match": true,
+          "path": "output/frozen_candidates/V50R_rebuilt_after_artifact_loss/package_files/candidate_depths_from_v42.npz"
+        },
+        {
+          "actual_sha256": "a819da26578afa05ce4cf18a5a68ce9177ae3a25c5bcd5f9b3034eb9dea07c14",
+          "exists": true,
+          "expected_sha256": "a819da26578afa05ce4cf18a5a68ce9177ae3a25c5bcd5f9b3034eb9dea07c14",
+          "match": true,
+          "path": "output/frozen_candidates/V50R_rebuilt_after_artifact_loss/package_files/candidate_normals_from_v42.npz"
+        },
+        {
+          "actual_sha256": "d8e70e539fe3cb93e2d881abdb0565ef42d33c5915d96d03fe2783362b107215",
+          "exists": true,
+          "expected_sha256": "d8e70e539fe3cb93e2d881abdb0565ef42d33c5915d96d03fe2783362b107215",
+          "match": true,
+          "path": "output/frozen_candidates/V50R_rebuilt_after_artifact_loss/package_files/candidate_points_from_v42.npz"
+        },
+        {
+          "actual_sha256": "ad7e2cfa0ccd4684aab781b033f8ffdb6c1e1867886ed0cef296b47d129e9033",
+          "exists": true,
+          "expected_sha256": "ad7e2cfa0ccd4684aab781b033f8ffdb6c1e1867886ed0cef296b47d129e9033",
+          "match": true,
+          "path": "output/frozen_candidates/V50R_rebuilt_after_artifact_loss/package_files/control_audit_from_v42.json"
+        },
+        {
+          "actual_sha256": "2480829b52a2f3d9146662c6aae346c57df8fcc3f3bfdc7215f768327bbe072f",
+          "exists": true,
+          "expected_sha256": "2480829b52a2f3d9146662c6aae346c57df8fcc3f3bfdc7215f768327bbe072f",
+          "match": true,
+          "path": "output/frozen_candidates/V50R_rebuilt_after_artifact_loss/package_files/prior_effect_from_v42.json"
+        },
+        {
+          "actual_sha256": "3e0353c483cd3f237a0abb01f6d1a15101d5ef00cc2c95a9924c0547c3de2fe3",
+          "exists": true,
+          "expected_sha256": "3e0353c483cd3f237a0abb01f6d1a15101d5ef00cc2c95a9924c0547c3de2fe3",
+          "match": true,
+          "path": "output/frozen_candidates/V50R_rebuilt_after_artifact_loss/package_files/v16_case_manifest.json"
+        },
+        {
+          "actual_sha256": "fae21927d3ce53e8f969a431c6e65dc5791f0352f2e2001c0b26e6f13897a038",
+          "exists": true,
+          "expected_sha256": "fae21927d3ce53e8f969a431c6e65dc5791f0352f2e2001c0b26e6f13897a038",
+          "match": true,
+          "path": "output/frozen_candidates/V50R_rebuilt_after_artifact_loss/package_files/v16_prior_inputs.npz"
+        },
+        {
+          "actual_sha256": "ec6e418ee594ca92d141efa12761747bdecfe7680b805408b4292a7fcfc4d8f1",
+          "exists": true,
+          "expected_sha256": "ec6e418ee594ca92d141efa12761747bdecfe7680b805408b4292a7fcfc4d8f1",
+          "match": true,
+          "path": "output/frozen_candidates/V50R_rebuilt_after_artifact_loss/package_files/v16_prior_targets.npz"
+        },
+        {
+          "actual_sha256": "1002454b88448f66728c227d49a32a83f1b8098d783cd03d6a04a5dd76d8b2b0",
+          "exists": true,
+          "expected_sha256": "1002454b88448f66728c227d49a32a83f1b8098d783cd03d6a04a5dd76d8b2b0",
+          "match": true,
+          "path": "output/frozen_candidates/V50R_rebuilt_after_artifact_loss/package_files/v25_baseline_depths.npz"
+        },
+        {
+          "actual_sha256": "ba9b1c1aacd07e6d7c6141dbce41c0d95939c354c525d33aea2915a60d4749ad",
+          "exists": true,
+          "expected_sha256": "ba9b1c1aacd07e6d7c6141dbce41c0d95939c354c525d33aea2915a60d4749ad",
+          "match": true,
+          "path": "output/frozen_candidates/V50R_rebuilt_after_artifact_loss/package_files/v25_baseline_points.npz"
+        },
+        {
+          "actual_sha256": "26d5817560060fb73ca45d17d8aa9f9f1d892f16a9928e27476e2ffc754bdbea",
+          "exists": true,
+          "expected_sha256": "26d5817560060fb73ca45d17d8aa9f9f1d892f16a9928e27476e2ffc754bdbea",
+          "match": true,
+          "path": "output/frozen_candidates/V50R_rebuilt_after_artifact_loss/package_files/v42_guard.json"
+        },
+        {
+          "actual_sha256": "f86304bc3397d128765f2d6cf5a3be100cf4d9fa8200885011af497876d18ff9",
+          "exists": true,
+          "expected_sha256": "f86304bc3397d128765f2d6cf5a3be100cf4d9fa8200885011af497876d18ff9",
+          "match": true,
+          "path": "output/frozen_candidates/V50R_rebuilt_after_artifact_loss/visual_board/full_xy.png"
+        },
+        {
+          "actual_sha256": "940997530655a38a57d2d1da830f97f04983b1c15405cfeac0515445d387302b",
+          "exists": true,
+          "expected_sha256": "940997530655a38a57d2d1da830f97f04983b1c15405cfeac0515445d387302b",
+          "match": true,
+          "path": "output/frozen_candidates/V50R_rebuilt_after_artifact_loss/visual_board/full_xz.png"
+        },
+        {
+          "actual_sha256": "86aefbc8ff492628ba2dea0591c219290c903e9d01fa26508a4a487a6640a459",
+          "exists": true,
+          "expected_sha256": "86aefbc8ff492628ba2dea0591c219290c903e9d01fa26508a4a487a6640a459",
+          "match": true,
+          "path": "output/frozen_candidates/V50R_rebuilt_after_artifact_loss/visual_board/full_yz.png"
+        }
+      ],
+      "file_count": 16
+    },
+    "manifest": {
+      "exists": true,
+      "not_original_v50": true,
+      "package_kind": "V223_rebuilt_after_artifact_loss_candidate_package",
+      "strict_candidate_passes_written": 0,
+      "strict_teacher_passes_written": 0
+    },
+    "process_gate": {
+      "modal_app_count": 0,
+      "modal_apps": [],
+      "modal_container_count": 0,
+      "modal_containers": [],
+      "pass": true
+    },
+    "right_hand_hard_merge_gate": {
+      "active_candidate_modified": false,
+      "created_utc": "2026-05-08T21:10:58Z",
+      "decision": "Right-hand patch is not hard-merged. Mentor must accept risk or provide/authorize more evidence.",
+      "result": "MERGE_FAIL_SOFT_REVIEW_ONLY",
+      "status": "FAIL_FROZEN",
+      "task": "V253_C4_right_hand_hard_merge_gate"
+    },
+    "teacher_route": {
+      "blocked_sources": [
+        "candidate-derived target",
+        "VGGT shell teacher",
+        "2D overlay teacher",
+        "point-count-only teacher"
+      ],
+      "created_utc": "2026-05-08T21:11:00Z",
+      "decision": "Teacher route remains frozen until an independent same-frame dense source passes strict depth/normal/visual ownership.",
+      "independent_dense_source_available": false,
+      "status": "FAIL_FROZEN",
+      "strict_teacher_passes": 0,
+      "task": "V310_I_teacher_resurrection"
+    },
+    "visual_truth_audit": {
+      "active_candidate": "V50R_rebuilt_after_artifact_loss",
+      "created_utc": "2026-05-08T21:10:56Z",
+      "decision": "Visual truth audit is sufficient for mentor risk disclosure, not for silently claiming original V50 strict pass.",
+      "face_close": "PASS_WITH_RISK",
+      "full_body": "PASS_WITH_RISK",
+      "hairline_close": "SOFT_REVIEW_ONLY",
+      "head_close": "PASS_WITH_RISK",
+      "left_hand": "PASS_WITH_RISK",
+      "outputs": {
+        "visual_truth_board": "output/V225_A2_visual_truth_board"
+      },
+      "right_hand": "SOFT_REVIEW_ONLY",
+      "risks": [
+        "Original V50 was not recovered; V50R is rebuilt from V42/V25/V16 evidence.",
+        "Right hand remains soft-review-only without original V50 hand patch.",
+        "Hairline remains candidate-level risk."
+      ],
+      "sixty_view_support": "PASS_WITH_RISK",
+      "status": "PASS_WITH_RISK",
+      "task": "V225_A2_visual_truth_audit",
+      "temporal_overlay": "PASS_WITH_RISK"
+    }
+  },
+  "formal_cloud_unblocked": false,
+  "status": "DONE_HARD_IMPOSSIBLE_WITH_EVIDENCE",
+  "strict_candidate_passes_written": 0,
+  "strict_teacher_passes_written": 0,
+  "task": "V400_v50r_strict_promotion_transaction",
+  "writes_candidate_package": false,
+  "writes_registry": false,
+  "writes_teacher_package": false
+}

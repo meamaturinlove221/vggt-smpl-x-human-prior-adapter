@@ -1,0 +1,84 @@
+{
+  "task": "v9_execution_rollup_final",
+  "created_local": "2026-05-08T00:20:00+08:00",
+  "research_only": true,
+  "formal_cloud_unblocked": false,
+  "strict_candidate_passes": 0,
+  "strict_teacher_passes": 0,
+  "no_export": true,
+  "no_predictions_write": true,
+  "no_teacher_export": true,
+  "no_candidate_export": true,
+  "no_registry_write": true,
+  "no_strict_pass_write": true,
+  "process_cleanup": {
+    "backend_wrapper_processes_remaining": 0,
+    "note": "No local wrapper/modal/python processes matching the V9 2DGS, MASt3R-SLAM, or Hair-GS backend smokes remained at final cleanup."
+  },
+  "completed": {
+    "v9_reality_audit": {
+      "status": "completed",
+      "verdict": "Prior V8 A5-X/B-hand10/B-hair3 positives were proxy/smoke unless backed by later true-backend runs.",
+      "report": "D:\\vggt\\vggt-main\\reports\\20260507_v9_reality_audit.md"
+    },
+    "cloud_asset_staging": {
+      "status": "completed",
+      "verdict": "Remote research assets verified: query cache, template payload, VGGT tokens, 60 images/masks, cameras, and priors; procedural fallback disabled.",
+      "report": "D:\\vggt\\vggt-main\\reports\\20260507_v9_cloud_asset_verification_status.md"
+    },
+    "cloud_a_b_fus3d3_real_asset_preflight": {
+      "status": "completed_research_only",
+      "verdict": "Real staged assets used and procedural fallback was not used; remains research preflight, not candidate.",
+      "summary": "D:\\vggt\\vggt-main\\output\\surface_research_cloud_preflight\\Cloud_A_V9\\b_fus3d3_real_asset_train_preflight\\v9_cloud_a_real_asset_wrapper_summary.json"
+    },
+    "a5x2_must3r_true_backend": {
+      "status": "completed_weak_pool_only",
+      "verdict": "Official MUSt3R produced nonempty weak-pool pointmaps, but alignment/known-camera/region gates did not pass strict teacher intake.",
+      "summary": "D:\\vggt\\vggt-main\\output\\surface_research_cloud_preflight\\Cloud_B_V9\\a5x2_must3r_true_backend\\summary.json",
+      "audit": "D:\\vggt\\vggt-main\\reports\\20260507_v9_a5x2_must3r_artifact_audit.md"
+    },
+    "a5x2_2dgs_colmap_scene": {
+      "status": "completed_research_loader_and_train_smoke",
+      "verdict": "2DGS read the staged known-camera COLMAP scene with 6 cameras and 301056 weak-pool initial points, then completed 30 train iterations.",
+      "scene_summary": "D:\\vggt\\vggt-main\\output\\surface_research_cloud_preflight\\Cloud_B_V9\\a5x2_2dgs_colmap_scene\\summary.json",
+      "smoke_summary": "D:\\vggt\\vggt-main\\output\\surface_research_cloud_preflight\\Cloud_B_V9\\a5x2_2dgs_colmap_scene_smoke\\summary.json"
+    },
+    "mast3r_slam_true_backend": {
+      "status": "completed_research_only_degenerate_geometry",
+      "verdict": "Official MASt3R-SLAM main.py returned 0 on staged 4K4D PNG input and wrote logs, trajectory, and PLY; PLY has 0 vertices, so this is a backend decision smoke, not usable geometry.",
+      "summary": "D:\\vggt\\vggt-main\\output\\surface_research_cloud_preflight\\Cloud_B_V9\\mast3r_slam_true_backend_smoke\\summary.json",
+      "report": "D:\\vggt\\vggt-main\\reports\\20260507_v9_mast3r_slam_true_backend_status.md"
+    },
+    "hair_gs_dependency_fix2": {
+      "status": "dependency_import_ready_missing_flame_and_hair_dataset",
+      "verdict": "Hair-GS imports on Modal with cu118/torch2.0/gcc11/sm86; CUDA rasterizer, simple-knn, PyTorch3D, and HairGaussianModel import passed. Next blocker is FLAME and hair dataset conversion.",
+      "summary": "D:\\vggt\\vggt-main\\output\\surface_research_cloud_preflight\\V9_backend_dependency_smokes\\hair_gs_fix2\\hair_gs_fix2_summary.json",
+      "report": "D:\\vggt\\vggt-main\\reports\\20260507_v9_hairgs_dependency_fix_status.md"
+    },
+    "d_line_guard_and_referee": {
+      "status": "completed_red_guard",
+      "verdict": "Formal cloud still blocked; research-only artifacts clean.",
+      "summary": "D:\\vggt\\vggt-main\\output\\surface_research_cloud_preflight\\V9_dline_final_guard_refresh\\summary.json",
+      "referee_status": "research_cloud_artifact_referee_research_only"
+    }
+  },
+  "blocked": {
+    "unified_surface_candidate_precheck": {
+      "status": "blocked_no_unified_surface_candidate_precheck",
+      "reasons": [
+        "A5-X2 MUSt3R is real and nonempty but weak-pool only; known-camera/reprojection/region gates have not passed.",
+        "B-hand11 real VGGT+hand-token decoder is unavailable; B-hand10 proxy cannot satisfy hand ownership.",
+        "B-hair4 real HairGS topology backend is unavailable; B-hair3 proxy cannot satisfy hairline/head-top ownership."
+      ],
+      "report": "D:\\vggt\\vggt-main\\reports\\20260507_v9_unified_surface_precheck_status.json"
+    },
+    "strict_teacher_or_candidate": {
+      "status": "blocked",
+      "reasons": [
+        "strict_teacher_passes is 0",
+        "strict_candidate_passes is 0"
+      ]
+    }
+  },
+  "final_verdict": "V9 executable work was landed and run to current true blockers. Research cloud is allowed; formal cloud train/infer/export, teacher export, candidate export, predictions export, registry writes, and strict pass writes remain blocked."
+}

@@ -1,0 +1,188 @@
+{
+  "task": "v223_open3d_clear_human_screenshots",
+  "created_utc": "2026-05-09T04:07:18Z",
+  "open3d_version": "0.19.0",
+  "output_dir": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_clear_human",
+  "image_dir": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_clear_human\\images",
+  "ply_dir": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_clear_human\\ply",
+  "cases": [
+    {
+      "name": "open3d_smplx_native_full_body_clear",
+      "title": "SMPL-X Native Full Body Prior",
+      "ply": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_clear_human\\ply\\open3d_smplx_native_full_body_clear.ply",
+      "images": [
+        "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_clear_human\\images\\open3d_smplx_native_full_body_clear_front.png",
+        "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_clear_human\\images\\open3d_smplx_native_full_body_clear_side.png",
+        "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_clear_human\\images\\open3d_smplx_native_full_body_clear_iso.png",
+        "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_clear_human\\images\\open3d_smplx_native_full_body_clear_top.png"
+      ],
+      "point_count": 110000,
+      "bbox_min": [
+        -0.8445460608548749,
+        -1.3017982196792977,
+        -0.15162355911044606
+      ],
+      "bbox_max": [
+        0.8445185190735419,
+        0.4190045612567994,
+        0.14192386763309786
+      ],
+      "source": "V15 SMPL-X native raster vertices/faces"
+    },
+    {
+      "name": "open3d_full_body_centered",
+      "title": "V50R2 Candidate Full Body Risk View",
+      "ply": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_clear_human\\ply\\open3d_full_body_centered.ply",
+      "images": [
+        "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_clear_human\\images\\open3d_full_body_centered_front.png",
+        "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_clear_human\\images\\open3d_full_body_centered_side.png",
+        "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_clear_human\\images\\open3d_full_body_centered_iso.png"
+      ],
+      "point_count": 76119,
+      "bbox_min": [
+        -0.6832332611083984,
+        -0.6461101174354553,
+        0.06611932069063187
+      ],
+      "bbox_max": [
+        0.7555086016654968,
+        0.46401453018188477,
+        1.2141820192337036
+      ]
+    },
+    {
+      "name": "open3d_head_face_centered",
+      "title": "V50R2 Candidate Head / Face Risk View",
+      "ply": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_clear_human\\ply\\open3d_head_face_centered.ply",
+      "images": [
+        "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_clear_human\\images\\open3d_head_face_centered_front.png",
+        "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_clear_human\\images\\open3d_head_face_centered_side.png",
+        "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_clear_human\\images\\open3d_head_face_centered_iso.png"
+      ],
+      "point_count": 6664,
+      "bbox_min": [
+        -0.5627915263175964,
+        -0.5981338024139404,
+        0.06611932069063187
+      ],
+      "bbox_max": [
+        0.7473644018173218,
+        0.4236469268798828,
+        1.0782238245010376
+      ]
+    },
+    {
+      "name": "open3d_hairline_centered",
+      "title": "V50R2 Candidate Hairline / Head Risk View",
+      "ply": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_clear_human\\ply\\open3d_hairline_centered.ply",
+      "images": [
+        "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_clear_human\\images\\open3d_hairline_centered_front.png",
+        "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_clear_human\\images\\open3d_hairline_centered_top.png",
+        "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_clear_human\\images\\open3d_hairline_centered_iso.png"
+      ],
+      "point_count": 6664,
+      "bbox_min": [
+        -0.5627915263175964,
+        -0.5981338024139404,
+        0.06611932069063187
+      ],
+      "bbox_max": [
+        0.7473644018173218,
+        0.4236469268798828,
+        1.0782238245010376
+      ]
+    },
+    {
+      "name": "open3d_left_hand_centered",
+      "title": "V50R2 Candidate Left Hand Risk View",
+      "ply": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_clear_human\\ply\\open3d_left_hand_centered.ply",
+      "images": [
+        "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_clear_human\\images\\open3d_left_hand_centered_front.png",
+        "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_clear_human\\images\\open3d_left_hand_centered_side.png",
+        "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_clear_human\\images\\open3d_left_hand_centered_iso.png"
+      ],
+      "point_count": 4643,
+      "bbox_min": [
+        -0.48325133323669434,
+        -0.6120186448097229,
+        0.1142834722995758
+      ],
+      "bbox_max": [
+        0.7086778283119202,
+        0.3937529921531677,
+        1.0970180034637451
+      ]
+    },
+    {
+      "name": "open3d_right_hand_centered",
+      "title": "V50R2 Candidate Right Hand Risk View",
+      "ply": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_clear_human\\ply\\open3d_right_hand_centered.ply",
+      "images": [
+        "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_clear_human\\images\\open3d_right_hand_centered_front.png",
+        "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_clear_human\\images\\open3d_right_hand_centered_side.png",
+        "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_clear_human\\images\\open3d_right_hand_centered_iso.png"
+      ],
+      "point_count": 6869,
+      "bbox_min": [
+        -0.6832332611083984,
+        -0.6461101174354553,
+        0.17775753140449524
+      ],
+      "bbox_max": [
+        0.7555086016654968,
+        0.4116019606590271,
+        1.1165207624435425
+      ]
+    },
+    {
+      "name": "open3d_temporal_centered",
+      "title": "V50R2 Temporal Support Centered",
+      "ply": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_clear_human\\ply\\open3d_temporal_centered.ply",
+      "images": [
+        "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_clear_human\\images\\open3d_temporal_centered_front.png",
+        "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_clear_human\\images\\open3d_temporal_centered_side.png",
+        "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_clear_human\\images\\open3d_temporal_centered_iso.png"
+      ],
+      "point_count": 65469,
+      "bbox_min": [
+        -0.029244400560855865,
+        -0.41034990549087524,
+        0.43812915682792664
+      ],
+      "bbox_max": [
+        0.6900944113731384,
+        0.4777804911136627,
+        1.2550883293151855
+      ]
+    },
+    {
+      "name": "open3d_60view_support_centered",
+      "title": "V50R2 60-View Support Centered",
+      "ply": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_clear_human\\ply\\open3d_60view_support_centered.ply",
+      "images": [
+        "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_clear_human\\images\\open3d_60view_support_centered_front.png",
+        "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_clear_human\\images\\open3d_60view_support_centered_iso.png"
+      ],
+      "point_count": 76119,
+      "bbox_min": [
+        -0.6832332611083984,
+        -0.6461101174354553,
+        0.06611932069063187
+      ],
+      "bbox_max": [
+        0.7555086016654968,
+        0.46401453018188477,
+        1.2141820192337036
+      ]
+    }
+  ],
+  "point_counts_before_downsample": {
+    "body": 57943,
+    "head": 4164,
+    "face": 2500,
+    "left_hand": 4643,
+    "right_hand": 6869,
+    "temporal": 65469
+  },
+  "note": "Images are captured from Open3D PLY sources with Open3D Visualizer first. Projection fallback is used only if both Visualizer and offscreen rendering are unavailable."
+}

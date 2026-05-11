@@ -1,0 +1,31 @@
+{
+  "status": "DONE_PASS",
+  "blockers": [],
+  "region_metrics": {
+    "body": {
+      "depth_finite_ratio": 1.0,
+      "normal_nonzero_ratio": 1.0,
+      "pixel_count": 59474
+    },
+    "face": {
+      "depth_finite_ratio": 1.0,
+      "normal_nonzero_ratio": 1.0,
+      "pixel_count": 2422
+    },
+    "head": {
+      "depth_finite_ratio": 1.0,
+      "normal_nonzero_ratio": 1.0,
+      "pixel_count": 4114
+    },
+    "left_hand": {
+      "depth_finite_ratio": 1.0,
+      "normal_nonzero_ratio": 1.0,
+      "pixel_count": 736
+    },
+    "right_hand": {
+      "depth_finite_ratio": 1.0,
+      "normal_nonzero_ratio": 1.0,
+      "pixel_count": 472
+    }
+  }
+}

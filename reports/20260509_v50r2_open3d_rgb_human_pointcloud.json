@@ -1,0 +1,168 @@
+{
+  "task": "v223_rgb_human_pointcloud_screenshots",
+  "created_utc": "2026-05-09T04:10:39Z",
+  "open3d_version": "0.19.0",
+  "rgb_source": "D:\\vggt\\vggt-main\\output\\training_cases\\0012_11_frame0000_6views_smplx_native_prior_v15\\inputs.npz",
+  "point_source": "D:\\vggt\\vggt-main\\output\\frozen_candidates\\V50R2_rebuilt_from_sessions_gdrive_modal\\package_files\\candidate_files__candidate_points.npz",
+  "head_face_source": "D:\\vggt\\vggt-main\\output\\frozen_candidates\\V50R2_rebuilt_from_sessions_gdrive_modal\\package_files\\candidate_files__head_face_patch.npz",
+  "hand_source": "D:\\vggt\\vggt-main\\output\\frozen_candidates\\V50R2_rebuilt_from_sessions_gdrive_modal\\package_files\\candidate_files__hand_patch.npz",
+  "output_dir": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_human_pointcloud",
+  "image_dir": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_human_pointcloud\\images",
+  "ply_dir": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_human_pointcloud\\ply",
+  "cases": [
+    {
+      "name": "rgb_v50r2_full_body",
+      "title": "V50R2 RGB human point cloud full body",
+      "ply": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_human_pointcloud\\ply\\rgb_v50r2_full_body.ply",
+      "images": [
+        "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_human_pointcloud\\images\\rgb_v50r2_full_body_front.png",
+        "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_human_pointcloud\\images\\rgb_v50r2_full_body_side.png",
+        "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_human_pointcloud\\images\\rgb_v50r2_full_body_iso.png"
+      ],
+      "point_count": 79764,
+      "bbox_min": [
+        -0.0335255041718483,
+        -0.40774378180503845,
+        0.45438146591186523
+      ],
+      "bbox_max": [
+        0.6909661293029785,
+        0.4700489342212677,
+        1.4357478618621826
+      ]
+    },
+    {
+      "name": "rgb_v50r2_target_view",
+      "title": "V50R2 RGB target-view point cloud",
+      "ply": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_human_pointcloud\\ply\\rgb_v50r2_target_view.ply",
+      "images": [
+        "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_human_pointcloud\\images\\rgb_v50r2_target_view_front.png",
+        "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_human_pointcloud\\images\\rgb_v50r2_target_view_iso.png"
+      ],
+      "point_count": 13122,
+      "bbox_min": [
+        -0.04496058449149132,
+        -0.2624266743659973,
+        0.7064927220344543
+      ],
+      "bbox_max": [
+        0.16921301186084747,
+        0.20077267289161682,
+        1.440462589263916
+      ]
+    },
+    {
+      "name": "rgb_v50r2_head_shoulders",
+      "title": "V50R2 RGB head/shoulders point cloud",
+      "ply": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_human_pointcloud\\ply\\rgb_v50r2_head_shoulders.ply",
+      "images": [
+        "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_human_pointcloud\\images\\rgb_v50r2_head_shoulders_front.png",
+        "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_human_pointcloud\\images\\rgb_v50r2_head_shoulders_side.png",
+        "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_human_pointcloud\\images\\rgb_v50r2_head_shoulders_iso.png"
+      ],
+      "point_count": 75287,
+      "bbox_min": [
+        -0.03410748392343521,
+        -0.40981096029281616,
+        0.4503161907196045
+      ],
+      "bbox_max": [
+        0.6915721893310547,
+        0.47102993726730347,
+        1.4363863468170166
+      ]
+    },
+    {
+      "name": "rgb_v50r2_head_face",
+      "title": "V50R2 RGB head/face patch point cloud",
+      "ply": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_human_pointcloud\\ply\\rgb_v50r2_head_face.ply",
+      "images": [
+        "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_human_pointcloud\\images\\rgb_v50r2_head_face_front.png",
+        "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_human_pointcloud\\images\\rgb_v50r2_head_face_side.png",
+        "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_human_pointcloud\\images\\rgb_v50r2_head_face_iso.png"
+      ],
+      "point_count": 6610,
+      "bbox_min": [
+        -0.5628491640090942,
+        -0.5978682637214661,
+        0.06611932069063187
+      ],
+      "bbox_max": [
+        0.7418785691261292,
+        0.4190383553504944,
+        1.0734409093856812
+      ]
+    },
+    {
+      "name": "rgb_v50r2_face_close",
+      "title": "V50R2 RGB face-close point cloud",
+      "ply": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_human_pointcloud\\ply\\rgb_v50r2_face_close.ply",
+      "images": [
+        "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_human_pointcloud\\images\\rgb_v50r2_face_close_front.png",
+        "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_human_pointcloud\\images\\rgb_v50r2_face_close_iso.png"
+      ],
+      "point_count": 2488,
+      "bbox_min": [
+        -0.012660371139645576,
+        -0.5495702028274536,
+        0.11240006238222122
+      ],
+      "bbox_max": [
+        0.7472235560417175,
+        0.4116019904613495,
+        1.036177396774292
+      ]
+    },
+    {
+      "name": "rgb_v50r2_left_hand",
+      "title": "V50R2 RGB left hand point cloud",
+      "ply": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_human_pointcloud\\ply\\rgb_v50r2_left_hand.ply",
+      "images": [
+        "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_human_pointcloud\\images\\rgb_v50r2_left_hand_front.png",
+        "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_human_pointcloud\\images\\rgb_v50r2_left_hand_iso.png"
+      ],
+      "point_count": 4622,
+      "bbox_min": [
+        -0.04381762444972992,
+        -0.6120186448097229,
+        0.11456146836280823
+      ],
+      "bbox_max": [
+        0.7086778283119202,
+        0.3929022550582886,
+        1.0970180034637451
+      ]
+    },
+    {
+      "name": "rgb_v50r2_right_hand",
+      "title": "V50R2 RGB right hand point cloud",
+      "ply": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_human_pointcloud\\ply\\rgb_v50r2_right_hand.ply",
+      "images": [
+        "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_human_pointcloud\\images\\rgb_v50r2_right_hand_front.png",
+        "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_human_pointcloud\\images\\rgb_v50r2_right_hand_iso.png"
+      ],
+      "point_count": 6842,
+      "bbox_min": [
+        -0.6832332611083984,
+        -0.6461101174354553,
+        0.18364684283733368
+      ],
+      "bbox_max": [
+        0.7031254172325134,
+        0.4116019606590271,
+        1.0958008766174316
+      ]
+    }
+  ],
+  "contact_sheet": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_human_pointcloud\\images\\rgb_v50r2_human_pointcloud_contact_sheet.png",
+  "point_counts": {
+    "full": 81992,
+    "target": 13520,
+    "head_shoulders": 77402,
+    "head_face": 6744,
+    "face": 2518,
+    "left_hand": 4721,
+    "right_hand": 6913
+  },
+  "note": "These are RGB-colored human point-cloud screenshots. Colors come from the aligned 6-view input images at the same 518x518 pixel coordinates as the candidate/world point maps."
+}

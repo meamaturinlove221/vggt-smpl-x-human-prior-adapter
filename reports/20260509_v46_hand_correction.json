@@ -1,0 +1,13 @@
+{
+  "blockers": [],
+  "created_utc": "2026-05-08T21:47:38Z",
+  "left_finger_bands_nonempty": 5,
+  "left_hand_pixels": 760,
+  "research_only": true,
+  "right_finger_bands_nonempty": 5,
+  "right_hand_pixels": 535,
+  "smplx_native_only": true,
+  "source_report": "D:\\vggt\\vggt-main\\reports\\20260508_v34_smplx_native_hand_route.json",
+  "status": "DONE_PASS",
+  "task": "v46_hand_correction"
+}

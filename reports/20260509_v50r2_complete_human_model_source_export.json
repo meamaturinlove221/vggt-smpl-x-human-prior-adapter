@@ -1,0 +1,81 @@
+{
+  "task": "v223_complete_human_model_source_export",
+  "created_utc": "2026-05-09T06:08:19Z",
+  "decision": "Complete 3D mentor-facing source is the SMPL-X native full mesh / mesh-sampled point cloud. Per-view VGGT point maps are visible-surface diagnostics and must not be presented as complete 3D human modeling.",
+  "complete_model_policy": {
+    "complete_human_mesh": "SMPL-X native vertices/faces from V15, part-colored for mentor display.",
+    "complete_human_pointcloud": "Uniform samples from the complete mesh surface.",
+    "visible_pointmaps": "diagnostic only; not full-body 3D model sources.",
+    "strict_teacher_pass_claimed": false
+  },
+  "inputs": {
+    "v15_smplx_raster_npz": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V15_SMPLX_native_camera_raster_export\\v15_smplx_camera_raster_export.npz",
+    "v23_residual_surface_npz": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V23_residual_surface_v2\\v23_residual_surface_v2_points.npz"
+  },
+  "outputs": {
+    "full_mesh": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\complete_3d_model_sources\\v50r2_COMPLETE_human_smplx_native_mesh_FULL_SEND.ply",
+    "full_pointcloud": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\complete_3d_model_sources\\v50r2_COMPLETE_human_smplx_native_pointcloud_FULL_SEND.ply",
+    "head_face_mesh": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\complete_3d_model_sources\\v50r2_COMPLETE_head_face_smplx_native_mesh_SEND.ply",
+    "head_face_pointcloud": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\complete_3d_model_sources\\v50r2_COMPLETE_head_face_smplx_native_pointcloud_SEND.ply",
+    "hand_outputs": [
+      {
+        "side": "left",
+        "mesh": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\complete_3d_model_sources\\v50r2_COMPLETE_left_hand_forearm_smplx_native_mesh_SEND.ply",
+        "pointcloud": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\complete_3d_model_sources\\v50r2_COMPLETE_left_hand_forearm_smplx_native_pointcloud_SEND.ply",
+        "vertices": 607,
+        "faces": 1129,
+        "points": 22000
+      },
+      {
+        "side": "right",
+        "mesh": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\complete_3d_model_sources\\v50r2_COMPLETE_right_hand_forearm_smplx_native_mesh_SEND.ply",
+        "pointcloud": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\complete_3d_model_sources\\v50r2_COMPLETE_right_hand_forearm_smplx_native_pointcloud_SEND.ply",
+        "vertices": 579,
+        "faces": 1064,
+        "points": 22000
+      }
+    ],
+    "diagnostic": {
+      "residual_visible_surface_ply": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\complete_3d_model_sources\\v50r2_DIAGNOSTIC_residual_visible_surface_points_NOT_COMPLETE_MODEL.ply",
+      "points": 67218
+    },
+    "images": [
+      "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\complete_3d_model_sources\\images\\v50r2_complete_human_smplx_native_front.png",
+      "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\complete_3d_model_sources\\images\\v50r2_complete_human_smplx_native_side.png",
+      "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\complete_3d_model_sources\\images\\v50r2_complete_human_smplx_native_iso.png",
+      "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\complete_3d_model_sources\\images\\v50r2_complete_human_smplx_native_top.png",
+      "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\complete_3d_model_sources\\images\\v50r2_complete_head_face_front.png",
+      "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\complete_3d_model_sources\\images\\v50r2_complete_head_face_side.png",
+      "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\complete_3d_model_sources\\images\\v50r2_complete_head_face_iso.png"
+    ]
+  },
+  "counts": {
+    "full_vertices": 10475,
+    "full_faces": 20908,
+    "full_sampled_points": 130000,
+    "head_face_vertices": 8391,
+    "head_face_faces": 16694,
+    "head_face_points": 32000
+  },
+  "bbox": {
+    "full_min": [
+      -0.846165120601654,
+      -1.301810622215271,
+      -0.15175265073776245
+    ],
+    "full_max": [
+      0.8454458713531494,
+      0.4190727174282074,
+      0.1419680416584015
+    ],
+    "full_extent": [
+      1.6916110515594482,
+      1.7208833694458008,
+      0.29372069239616394
+    ]
+  },
+  "invalidated_prior_outputs": [
+    "output/mentor_report_v50r2/pointcloud_sources/invalid_do_not_send/v50r2_human_only_candidate_world_merged6v.ply",
+    "output/surface_research_preflight_local/V32_candidate_inference_research/v32_candidate_open3d_review_points.ply"
+  ]
+}

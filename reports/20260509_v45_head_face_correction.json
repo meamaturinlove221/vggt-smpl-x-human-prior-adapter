@@ -1,0 +1,11 @@
+{
+  "blockers": [],
+  "created_utc": "2026-05-08T21:47:38Z",
+  "face_pixels": 2535,
+  "head_pixels": 6782,
+  "research_only": true,
+  "smplx_native_only": true,
+  "source_report": "D:\\vggt\\vggt-main\\reports\\20260508_v33_head_face_detail_route.json",
+  "status": "DONE_PASS",
+  "task": "v45_head_face_correction"
+}

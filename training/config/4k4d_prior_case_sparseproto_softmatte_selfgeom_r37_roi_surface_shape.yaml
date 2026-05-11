@@ -1,0 +1,48 @@
+defaults:
+  - 4k4d_prior_case_sparseproto_softmatte_selfgeom_r30_raw_smplx_bodyhand_anchor
+  - _self_
+
+exp_name: 4k4d_prior_case_sparseproto_softmatte_selfgeom_r37_roi_surface_shape
+
+# Local diagnostic only.
+# r21-r36 showed that normal metrics, highres/token grids, canonical fusion,
+# more views, and weak SMPL-X body/hand anchors do not create modeled
+# face/head/hairline/hand geometry. This variant adds a small teacherless
+# ROI-surface-shape term that explicitly audits and weakly penalizes
+# depth-vs-point displacement plus local surface discontinuity inside the
+# head/face/hairline ROIs. SMPL-X remains a weak body/hand anchor only.
+
+checkpoint:
+  save_dir: output/local_training_results/r37_roi_surface_shape_smoke1/ckpts
+  resume_checkpoint_path: D:/vggt/vggt-main/output/local_training_results/r30_raw_smplx_bodyhand_anchor_smoke1/inference_model.pt
+  strict: False
+
+logging:
+  log_dir: output/local_training_results/r37_roi_surface_shape_smoke1/logs
+
+optim:
+  frozen_module_names:
+    - aggregator
+    - camera_head
+    - normal_head
+  optimizer:
+    lr: 3e-7
+
+loss:
+  human_prior:
+    weight: 0.10
+    roi_surface_shape:
+      consistency_weight: 0.035
+      depth_point_weight: 1.0
+      surface_smooth_weight: 0.35
+      normal_smooth_weight: 0.10
+      valid_range: 0.96
+      min_depth: 0.0001
+      relative_scale: true
+      detach_depth_surface: true
+      normal_eps: 0.001
+      head_roi_weight: 2.5
+      face_roi_weight: 5.0
+      hairline_roi_weight: 4.0
+      ear_band_roi_weight: 2.0
+      boundary_boost: 2.0

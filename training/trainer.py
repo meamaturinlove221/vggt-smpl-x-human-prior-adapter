@@ -210,6 +210,28 @@ class Trainer:
         )
         self.rank = dist.get_rank()
 
+    def _load_model_state_with_shape_filter(self, model_state_dict: Mapping[str, torch.Tensor]):
+        current_state = self.model.state_dict()
+        filtered_state = {}
+        skipped_shape_mismatch = {}
+        unexpected_input_keys = []
+
+        for key, value in model_state_dict.items():
+            if key not in current_state:
+                unexpected_input_keys.append(key)
+                continue
+            if current_state[key].shape != value.shape:
+                skipped_shape_mismatch[key] = {
+                    "checkpoint_shape": tuple(value.shape),
+                    "model_shape": tuple(current_state[key].shape),
+                }
+                continue
+            filtered_state[key] = value
+
+        missing, unexpected_loaded = self.model.load_state_dict(filtered_state, strict=False)
+        unexpected = list(dict.fromkeys(list(unexpected_input_keys) + list(unexpected_loaded)))
+        return missing, unexpected, skipped_shape_mismatch
+
     def _load_resuming_checkpoint(self, ckpt_path: str):
         """Loads a checkpoint from the given path to resume training."""
         logging.info(f"Resuming training from {ckpt_path} (rank {self.rank})")
@@ -219,11 +241,19 @@ class Trainer:
         
         # Load model state
         model_state_dict = checkpoint["model"] if "model" in checkpoint else checkpoint
-        missing, unexpected = self.model.load_state_dict(
-            model_state_dict, strict=self.checkpoint_conf.strict
-        )
+        missing, unexpected, skipped_shape_mismatch = self._load_model_state_with_shape_filter(model_state_dict)
         if self.rank == 0:
             logging.info(f"Model state loaded. Missing keys: {missing or 'None'}. Unexpected keys: {unexpected or 'None'}.")
+            if skipped_shape_mismatch:
+                preview = {
+                    key: value
+                    for key, value in list(skipped_shape_mismatch.items())[:16]
+                }
+                logging.info(
+                    "Model state skipped %d shape-mismatched key(s). Preview: %s",
+                    len(skipped_shape_mismatch),
+                    preview,
+                )
 
         # Load optimizer state if available and in training mode
         if "optimizer" in checkpoint and getattr(self, "optims", None) is not None:
@@ -240,10 +270,24 @@ class Trainer:
             if len(optimizer_wrappers) == len(optimizer_states):
                 for optim_wrapper, optimizer_state in zip(optimizer_wrappers, optimizer_states):
                     optimizer = getattr(optim_wrapper, "optimizer", optim_wrapper)
-                    optimizer.load_state_dict(optimizer_state)
+                    try:
+                        optimizer.load_state_dict(optimizer_state)
+                    except ValueError as exc:
+                        logging.warning(
+                            "Skipping optimizer state load because the resumed optimizer param groups "
+                            "do not match the current model structure: %s",
+                            exc,
+                        )
             elif len(optimizer_wrappers) == 1 and len(optimizer_states) == 1:
                 optimizer = getattr(optimizer_wrappers[0], "optimizer", optimizer_wrappers[0])
-                optimizer.load_state_dict(optimizer_states[0])
+                try:
+                    optimizer.load_state_dict(optimizer_states[0])
+                except ValueError as exc:
+                    logging.warning(
+                        "Skipping optimizer state load because the resumed optimizer param groups "
+                        "do not match the current model structure: %s",
+                        exc,
+                    )
             else:
                 logging.warning(
                     "Skipping optimizer state load because checkpoint stores %d optimizer state(s) "
@@ -794,7 +838,14 @@ class Trainer:
         tensor_keys = [
             "images", "depths", "extrinsics", "intrinsics", 
             "cam_points", "world_points", "point_masks", "foreground_masks", "conf_depth_point_masks",
+            "depth_conf_maps",
+            "smpl_prior_masks",
+            "smpl_prior_feature_maps",
+            "smpl_vertex_feature_maps",
+            "human_prior_completion_masks",
             "human_prior_completion_depths", "human_prior_completion_world_points", "human_prior_completion_point_masks",
+            "head_hair_region_masks",
+            "head_hair_detail_masks",
             "selection_anchor_quality_score",
             "selection_sample_manifest_applied",
         ]        
@@ -809,6 +860,10 @@ class Trainer:
                     else original_tensor
                 )
                 batch[key] = torch.concatenate([original_tensor, flipped_tensor], dim=0)
+
+        if "smpl_summary_tokens" in batch:
+            original_tokens = batch["smpl_summary_tokens"]
+            batch["smpl_summary_tokens"] = torch.concatenate([original_tokens, original_tokens], dim=0)
         
         for key in string_keys:
             if key in batch and batch[key] is not None:
@@ -907,7 +962,12 @@ class Trainer:
             A dictionary containing the computed losses.
         """
         # Forward pass
-        y_hat = model(images=batch["images"])
+        model_kwargs = {"images": batch["images"]}
+        if "smpl_vertex_feature_maps" in batch and batch["smpl_vertex_feature_maps"] is not None:
+            model_kwargs["human_prior_feature_maps"] = batch["smpl_vertex_feature_maps"]
+        if "smpl_summary_tokens" in batch and batch["smpl_summary_tokens"] is not None:
+            model_kwargs["human_prior_summary_tokens"] = batch["smpl_summary_tokens"]
+        y_hat = model(**model_kwargs)
         
         # Loss computation
         loss_batch = dict(batch)

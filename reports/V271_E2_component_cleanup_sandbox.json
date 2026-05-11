@@ -1,0 +1,7 @@
+{
+  "active_candidate_modified": false,
+  "created_utc": "2026-05-08T21:10:59Z",
+  "decision": "No body enhancement promoted; V50R retained as frozen rebuild baseline.",
+  "status": "FAIL_FROZEN",
+  "task": "component_cleanup_sandbox"
+}

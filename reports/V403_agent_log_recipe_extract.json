@@ -1,0 +1,358 @@
+{
+  "task": "V403_agent_log_recipe_extract",
+  "created_local": "2026-05-09T05:33:00+08:00",
+  "mode": "read_only_log_report",
+  "workspace": "D:\\vggt\\vggt-main",
+  "session_root_scanned": "C:\\Users\\WINDOWS\\.codex\\sessions\\2026\\05",
+  "requested_focus": [
+    "V42",
+    "V44",
+    "V49",
+    "V50",
+    "V64"
+  ],
+  "write_scope": [
+    "reports\\V403_agent_log_recipe_extract.json",
+    "reports\\V403_agent_log_recipe_extract.md"
+  ],
+  "source_logs": [
+    {
+      "role": "main_orchestrator",
+      "path": "C:\\Users\\WINDOWS\\.codex\\sessions\\2026\\05\\07\\rollout-2026-05-07T16-16-22-019e0182-634f-75a3-92a1-b9d19d2c8cad.jsonl",
+      "notes": "Contains the V37-V50 orchestration, V50 pass, V62-V120/V64 archive work, later V223 deletion/recovery incident, and final responses."
+    },
+    {
+      "role": "V42_V43_subagent_initial",
+      "path": "C:\\Users\\WINDOWS\\.codex\\sessions\\2026\\05\\08\\rollout-2026-05-08T21-27-33-019e07c5-a3fa-7543-9b63-5cc3dd994c1f.jsonl",
+      "notes": "Initial V42/V43 fail-closed attempt before later main-thread rerun."
+    },
+    {
+      "role": "V44_V50_subagent_initial",
+      "path": "C:\\Users\\WINDOWS\\.codex\\sessions\\2026\\05\\08\\rollout-2026-05-08T21-27-38-019e07c5-b88a-7113-be29-e7d0d4c40dac.jsonl",
+      "notes": "Initial V44-V50 fail-closed attempt before later main-thread V42 payload and V50 pass."
+    },
+    {
+      "role": "artifact_search_followup",
+      "path": "C:\\Users\\WINDOWS\\.codex\\sessions\\2026\\05\\09\\rollout-2026-05-09T05-24-07-019e0979-f49f-7882-87ee-2685540fb196.jsonl",
+      "notes": "Later read-only provenance/artifact search; useful for current artifact absence after incident."
+    },
+    {
+      "role": "artifact_search_followup",
+      "path": "C:\\Users\\WINDOWS\\.codex\\sessions\\2026\\05\\09\\rollout-2026-05-09T05-24-08-019e0979-f4f4-7a22-9e6a-ab331e1a6d70.jsonl",
+      "notes": "Later read-only provenance/artifact search; useful for current artifact absence after incident."
+    }
+  ],
+  "timeline": [
+    {
+      "stage": "V42_initial_fail_closed",
+      "timestamp_utc": "2026-05-08T13:32:48Z",
+      "evidence_lines": [
+        "main:9918",
+        "subagent_V42:3566-3572",
+        "main:9934-9939"
+      ],
+      "commands": [
+        "python -m py_compile tools\\v42_prior_enabled_predictions_rerun.py tools\\v43_replay_with_prior_enabled_predictions.py",
+        "python tools\\v42_prior_enabled_predictions_rerun.py",
+        "python tools\\v43_replay_with_prior_enabled_predictions.py"
+      ],
+      "result": "Initial V42 refused to generate prior-enabled predictions because only scaffold/no trained prior-enabled checkpoint was available."
+    },
+    {
+      "stage": "V44_V50_initial_fail_closed",
+      "timestamp_utc": "2026-05-08T13:37:52Z",
+      "evidence_lines": [
+        "main:9919",
+        "subagent_V44_V50:3577-3593",
+        "main:9950-9955"
+      ],
+      "commands": [
+        "python -m py_compile tools\\v44_v50_common.py tools\\v44_strict_visual_pre_promotion_gate.py tools\\v45_head_face_correction.py tools\\v46_hand_correction.py tools\\v47_60view_correction.py tools\\v48_temporal_correction.py tools\\v49_package_dry_run.py tools\\v50_final_promotion_transaction.py",
+        "python tools\\v44_strict_visual_pre_promotion_gate.py; python tools\\v45_head_face_correction.py; python tools\\v46_hand_correction.py; python tools\\v47_60view_correction.py; python tools\\v48_temporal_correction.py; python tools\\v49_package_dry_run.py; python tools\\v50_final_promotion_transaction.py",
+        "python -m py_compile tools\\v44_v50_completion_audit.py; python tools\\v44_v50_completion_audit.py"
+      ],
+      "result": "Initial V44-V50 completed as fail-closed: V44 DONE_FAIL_ROUTED, V49 DONE_FAIL_ROUTED, V50 DONE_HARD_IMPOSSIBLE_WITH_EVIDENCE."
+    },
+    {
+      "stage": "V42_dependency_rewire_and_cloud_runner",
+      "timestamp_utc": "2026-05-08T14:12:41Z",
+      "evidence_lines": [
+        "main:10239",
+        "main:10301-10312",
+        "main:10368",
+        "main:10377-10383"
+      ],
+      "scripts_added_or_patched": [
+        "modal_v42_prior_enabled_predictions.py",
+        "tools\\v42_prior_enabled_predictions_rerun.py",
+        "tools\\v43_replay_with_prior_enabled_predictions.py"
+      ],
+      "commands": [
+        "python -m py_compile tools\\v42_prior_enabled_predictions_rerun.py tools\\v43_replay_with_prior_enabled_predictions.py tools\\v44_strict_visual_pre_promotion_gate.py tools\\v49_package_dry_run.py tools\\v50_final_promotion_transaction.py; python tools\\v42_prior_enabled_predictions_rerun.py",
+        "python -m py_compile modal_v42_prior_enabled_predictions.py",
+        "$env:PYTHONUTF8='1'; $env:PYTHONIOENCODING='utf-8'; modal run modal_v42_prior_enabled_predictions.py"
+      ],
+      "inputs_logged": [
+        "facebook/VGGT-1B remote-HF base route",
+        "V41b prior-enabled checkpoint context",
+        "frame0000/0001/0002 12-view TMF scenes",
+        "SMPL-X prior maps with 30 channels",
+        "controls: real, zero, shuffle, random-region, prior-dropout"
+      ],
+      "outputs_expected": [
+        "output\\surface_research_cloud_preflight\\V42_prior_enabled_predictions\\research_depths.npz",
+        "output\\surface_research_cloud_preflight\\V42_prior_enabled_predictions\\research_points_world.npz",
+        "output\\surface_research_cloud_preflight\\V42_prior_enabled_predictions\\research_confidence.npz",
+        "output\\surface_research_cloud_preflight\\V42_prior_enabled_predictions\\research_normals_geometric.npz",
+        "output\\surface_research_cloud_preflight\\V42_prior_enabled_predictions\\research_prior_effect.json",
+        "output\\surface_research_cloud_preflight\\V42_prior_enabled_predictions\\control_real_zero_shuffle_random_dropout.json"
+      ],
+      "result": "After an initial missing-payload state, V42 ultimately became DONE_PASS before V50. Final response says V42 used the remote-HF route, constructed a 30-channel SMPL-X prior-enabled VGGT, emitted research-only depth/points/normals/confidence/control payload, and did not write formal predictions.npz."
+    },
+    {
+      "stage": "V44_pass",
+      "timestamp_utc": "2026-05-08T15:10:37Z",
+      "evidence_lines": [
+        "main:10597",
+        "main:10693"
+      ],
+      "command": "python tools\\v44_strict_visual_pre_promotion_gate.py",
+      "inputs_logged": [
+        "V42 DONE_PASS prior-enabled payload",
+        "V32 candidate points/normals",
+        "V44 visual review gate"
+      ],
+      "outputs_logged": {
+        "visual_review_path": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V44_strict_visual_pre_promotion_gate\\visual_review_codex_pass.json",
+        "candidate_points_size_bytes": 798357,
+        "candidate_normals_size_bytes": 796589,
+        "v32_contact_sheet_size_bytes": 4108
+      },
+      "result": "V44 visual pre-promotion gate passed with forbidden_hit_count 0."
+    },
+    {
+      "stage": "V49_package_dry_run_pass",
+      "timestamp_utc": "2026-05-08T15:10:52Z",
+      "evidence_lines": [
+        "main:10605",
+        "main:10683",
+        "main:10696"
+      ],
+      "command": "python tools\\v49_package_dry_run.py",
+      "outputs_logged": {
+        "candidate_package_dryrun_manifest": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V49_package_dry_run\\candidate_package_dryrun\\manifest_dryrun.json",
+        "teacher_package_dryrun_manifest": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V49_package_dry_run\\teacher_package_dryrun\\manifest_dryrun.json",
+        "registry_entry_dryrun": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V49_package_dry_run\\registry_entry_dryrun.json",
+        "registry_entry_dryrun_size_bytes": 1290
+      },
+      "result": "V49 dry-run passed. It would write a formal package, but did not write strict registry/formal package in dry-run."
+    },
+    {
+      "stage": "V50_final_promotion_pass",
+      "timestamp_utc": "2026-05-08T15:14:41Z",
+      "evidence_lines": [
+        "main:10606",
+        "main:10700-10740",
+        "main:10743-10744"
+      ],
+      "commands": [
+        "python tools\\v50_final_promotion_transaction.py",
+        "python -m py_compile tools\\v50_final_promotion_transaction.py; python tools\\v50_final_promotion_transaction.py; python tools\\v44_v50_completion_audit.py; python tools\\v37_v50_completion_audit.py"
+      ],
+      "scripts": [
+        "tools\\v50_final_promotion_transaction.py",
+        "tools\\v44_v50_completion_audit.py",
+        "tools\\v37_v50_completion_audit.py"
+      ],
+      "outputs_logged": {
+        "report": "D:\\vggt\\vggt-main\\reports\\20260509_v50_final_promotion_transaction.json",
+        "candidate_package_path": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V50_final_promotion_transaction\\candidate_package_v50",
+        "candidate_package_manifest": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V50_final_promotion_transaction\\candidate_package_v50\\manifest.json",
+        "strict_registry_entry": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V50_final_promotion_transaction\\strict_registry_entry_v50.json",
+        "status": "DONE_PASS",
+        "strict_candidate_passes": 1,
+        "strict_teacher_passes": 0,
+        "formal_cloud_unblocked": true,
+        "forbidden_hit_count": 0,
+        "completion_audit": "COMPLETE_AUDIT_PASS"
+      },
+      "manifest_inputs_logged": {
+        "candidate_points": "output\\surface_research_preflight_local\\V32_candidate_inference_research\\candidate_points_world_research.npz",
+        "candidate_normals": "output\\surface_research_preflight_local\\V32_candidate_inference_research\\candidate_normals_geometric_research.npz",
+        "hand_patch": "output\\surface_research_preflight_local\\V34_smplx_native_hand_route\\v34_smplx_native_hand_continuity_patch.npz",
+        "head_face_patch": "output\\surface_research_preflight_local\\V33_head_face_detail_route\\v33_head_face_refined_teacher.npz",
+        "temporal_teacher": "output\\surface_research_preflight_local\\V26_temporal_canonical_teacher\\v26_temporal_canonical_teacher_targets.npz",
+        "visual_review": "output\\surface_research_preflight_local\\V44_strict_visual_pre_promotion_gate\\visual_review_codex_pass.json",
+        "v42_research_depths": "D:\\vggt\\vggt-main\\output\\surface_research_cloud_preflight\\V42_prior_enabled_predictions\\research_depths.npz",
+        "v42_research_points_world": "D:\\vggt\\vggt-main\\output\\surface_research_cloud_preflight\\V42_prior_enabled_predictions\\research_points_world.npz",
+        "v42_research_confidence": "D:\\vggt\\vggt-main\\output\\surface_research_cloud_preflight\\V42_prior_enabled_predictions\\research_confidence.npz",
+        "v42_research_normals_geometric": "D:\\vggt\\vggt-main\\output\\surface_research_cloud_preflight\\V42_prior_enabled_predictions\\research_normals_geometric.npz",
+        "v42_research_prior_effect": "D:\\vggt\\vggt-main\\output\\surface_research_cloud_preflight\\V42_prior_enabled_predictions\\research_prior_effect.json",
+        "v42_control_audit": "D:\\vggt\\vggt-main\\output\\surface_research_cloud_preflight\\V42_prior_enabled_predictions\\control_real_zero_shuffle_random_dropout.json"
+      },
+      "final_response_summary": "Completed to local D-line strict candidate pass: strict_candidate_passes=1, strict_teacher_passes=0, formal_cloud_unblocked=true, V37-V50 audit COMPLETE_AUDIT_PASS, forbidden scan 0, no residual Python/Modal task processes, V42 remote-HF route produced research-only payload, V50 then legally wrote strict registry and candidate package."
+    },
+    {
+      "stage": "V50_frozen_clone_and_hash_manifest",
+      "timestamp_utc": "2026-05-08T16:52:40Z",
+      "evidence_lines": [
+        "main:10960-10987",
+        "main:11012"
+      ],
+      "script_context": "A2 candidate freeze clone logic copied V50 manifest/registry and package files into output\\frozen_candidates\\V50_smplx_native_candidate_pass and wrote hash_manifest.json.",
+      "logged_file_sizes": {
+        "candidate_files__candidate_normals.npz": 796589,
+        "candidate_files__candidate_points.npz": 798357,
+        "candidate_files__hand_patch.npz": 338682,
+        "candidate_files__head_face_patch.npz": 256326,
+        "candidate_files__temporal_teacher.npz": 2169505,
+        "candidate_files__visual_review.json": 262,
+        "v42_prior_enabled_payload__control_audit.json": 19263,
+        "v42_prior_enabled_payload__research_confidence.npz": 85602711,
+        "v42_prior_enabled_payload__research_depths.npz": 30775206,
+        "v42_prior_enabled_payload__research_normals_geometric.npz": 100071633,
+        "v42_prior_enabled_payload__research_points_world.npz": 105107787,
+        "v42_prior_enabled_payload__research_prior_effect.json": 35089
+      },
+      "logged_hashes_partial": {
+        "candidate_files__candidate_points.npz": "9f032e87125b1c204cc7cc83b9dbaf73f448ab7a99f1a4852bb0b84644bff12b",
+        "candidate_files__hand_patch.npz": "dd46ad76d2aa4b84693f5997b9...",
+        "note": "The visible log contains complete SHA-256 for candidate_points and a truncated display for hand_patch in the console extraction; other hashes may exist inside logged hash_manifest text but were not fully visible in the extracted snippets."
+      },
+      "result": "Frozen clone existed before later deletion/recovery incident and was treated as immutable evidence by V62-V120/V64."
+    },
+    {
+      "stage": "V64_archive_and_multibranch_followup",
+      "timestamp_utc": "2026-05-08T17:31:46Z",
+      "evidence_lines": [
+        "main:11016-11017",
+        "main:11035",
+        "main:11047",
+        "main:11088-11091",
+        "main:11151-11154",
+        "cleanup_audit:11191-11197"
+      ],
+      "commands": [
+        "$env:PYTHONUTF8='1'; $env:PYTHONIOENCODING='utf-8'; python tools\\v62_v120_multibranch_controller.py"
+      ],
+      "scripts": [
+        "tools\\v62_v120_multibranch_controller.py",
+        "tools\\v62_formal_candidate_finetune_runner.py",
+        "modal_v62_formal_candidate_finetune.py"
+      ],
+      "outputs_logged": {
+        "archive_bundle_dir": "D:\\vggt\\vggt-main\\archive\\V64_candidate_pass_bundle",
+        "archive_bundle_zip": "D:\\vggt\\vggt-main\\archive\\V64_candidate_pass_bundle.zip",
+        "archive_bundle_zip_size_bytes": 325743314,
+        "archive_bundle_zip_last_write_local": "2026-05-09T02:32:25+08:00",
+        "ledger": "D:\\vggt\\vggt-main\\reports\\V62_V120_branch_ledger.json",
+        "status": "ALL_BRANCHES_TERMINAL_V2",
+        "strict_candidate_passes": 1,
+        "strict_teacher_passes": 0,
+        "formal_cloud_unblocked": true,
+        "candidate_package_still_immutable": true,
+        "forbidden_hit_count": 0
+      },
+      "result": "V64/V62-V120 followup treated V50 as frozen, passed candidate preservation, kept teacher pass frozen at 0, created archive/reproducibility handoff, and deferred git tag because worktree was dirty."
+    },
+    {
+      "stage": "V223_deletion_recovery_incident",
+      "timestamp_utc": "2026-05-08T20:14:47Z",
+      "evidence_lines": [
+        "main:11526-11718"
+      ],
+      "summary": "A later cache-cleanup command deleted more than intended, including V50 frozen candidate/local archive/report evidence. Subsequent recovery restored source/.git and V16/V25/V42 evidence from Modal, but original V50 frozen hash could not be honestly reasserted.",
+      "final_recovery_state_logged": {
+        "strict_candidate_passes_current": "NOT_REASSERTED_AFTER_LOCAL_ARTIFACT_LOSS",
+        "strict_teacher_passes_current": 0,
+        "v50_original_hash_locked": false,
+        "candidate_pass_written_after_incident": false,
+        "teacher_pass_written_after_incident": false
+      }
+    }
+  ],
+  "current_filesystem_observations_after_incident": {
+    "observed_local_time": "2026-05-09T05:29:50+08:00",
+    "roots_checked": [
+      {
+        "path": "D:\\vggt\\vggt-main\\output\\frozen_candidates\\V50_smplx_native_candidate_pass",
+        "exists": true,
+        "type": "dir",
+        "visible_file_count_in_snapshot": 0,
+        "note": "Directory exists but package_files snapshot was empty."
+      },
+      {
+        "path": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V50_final_promotion_transaction",
+        "exists": true,
+        "type": "dir",
+        "visible_file_count_in_snapshot": 0,
+        "note": "Directory exists but candidate_package_v50 snapshot was empty."
+      },
+      {
+        "path": "D:\\vggt\\vggt-main\\archive\\V64_candidate_pass_bundle",
+        "exists": true,
+        "type": "dir"
+      },
+      {
+        "path": "D:\\vggt\\vggt-main\\archive\\V64_candidate_pass_bundle.zip",
+        "exists": false,
+        "type": "missing"
+      },
+      {
+        "path": "D:\\vggt\\vggt-main\\archive\\package_files.zip",
+        "exists": false,
+        "type": "missing"
+      },
+      {
+        "path": "D:\\vggt\\vggt-main\\archive\\V138_candidate_pass_bundle_v3",
+        "exists": true,
+        "type": "dir"
+      }
+    ],
+    "interpretation": "Current filesystem no longer contains the original V50 package files/zip as logged before the incident. The report therefore treats the logs as provenance/recipe evidence, not as proof that original bytes remain locally present now."
+  },
+  "binary_payload_assessment": {
+    "logs_contain_complete_npz_payload_bytes": false,
+    "logs_contain_complete_zip_payload_bytes": false,
+    "logs_contain_metadata_for_npz_zip": true,
+    "metadata_examples": [
+      "file names",
+      "file sizes",
+      "some SHA-256 hashes",
+      "paths",
+      "script patches",
+      "commands",
+      "JSON manifest text",
+      "final responses"
+    ],
+    "logs_contain_other_large_payloads": true,
+    "other_large_payloads": [
+      "base64 data:image/png blobs",
+      "encrypted reasoning_content fields"
+    ],
+    "conclusion": "The visible session logs are not a binary artifact store for NPZ/ZIP payloads. They can document provenance and sometimes hashes, but they do not contain enough raw bytes to reconstruct the original NPZ/ZIP files bit-for-bit."
+  },
+  "recovery_verdicts": {
+    "bitwise_v50_recovery_from_logs_alone": {
+      "possible": false,
+      "reason": "The logs preserve commands, scripts, paths, sizes, selected hashes, and manifests, but not complete NPZ/ZIP binary payload bytes. Several hashes are partial/truncated in visible console snippets. Current filesystem also shows the original V50 frozen package files absent after the later incident."
+    },
+    "recipe_rerun_possible_from_logs_and_workspace": {
+      "possible": true,
+      "confidence": "medium",
+      "requirements": [
+        "source scripts restored or regenerated from log patches/current repo",
+        "Modal credentials and vggt-4k4d-data/vggt-4k4d-output access",
+        "facebook/VGGT-1B remote-HF availability",
+        "SMPL-X and 4K4D scene/prior inputs",
+        "V26/V32/V33/V34/V42 or equivalent regenerated artifacts",
+        "fresh V49/V50 promotion run producing new hashes"
+      ],
+      "caveats": [
+        "A rerun would create a new candidate package/hash lineage, not the original V50 bytes.",
+        "Modal/HF/library nondeterminism and regenerated timestamps/manifests can change hashes.",
+        "Do not claim recovered original V50 bit identity unless an independent original package copy is found."
+      ]
+    }
+  }
+}

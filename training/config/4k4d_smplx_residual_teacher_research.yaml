@@ -1,0 +1,40 @@
+defaults:
+  - 4k4d_smplx_native_prior
+  - _self_
+
+exp_name: 4k4d_smplx_residual_teacher_research_v27
+
+research_only: true
+formal_cloud_train_infer_export: false
+write_predictions_npz: false
+write_candidate_package: false
+write_teacher_package: false
+write_strict_registry: false
+
+smplx_native_case_roots:
+  - D:/vggt/vggt-main/output/training_cases/0012_11_frame0000_6views_smplx_native_prior_v15
+
+residual_teacher:
+  v24_targets: D:/vggt/vggt-main/output/surface_research_preflight_local/V24_residual_teacher_v2/v24_residual_teacher_targets_v2.npz
+  v26_temporal_targets: D:/vggt/vggt-main/output/surface_research_preflight_local/V26_temporal_canonical_teacher/v26_temporal_canonical_teacher_targets.npz
+  use_depth: true
+  use_points: true
+  use_normals: true
+  use_visibility: true
+  use_uncertainty: true
+  use_region_masks: true
+  controls:
+    - real_teacher_real_prior
+    - zero_prior_same_teacher
+    - shuffle_prior_same_teacher
+    - smplx_template_teacher_only
+    - no_teacher_baseline
+
+trainer:
+  mode: research_microfit
+  stages:
+    - T0_single_case_overfit
+    - T1_three_frame_temporal_case
+    - T2_multiview_12v
+  max_steps: 256
+  no_formal_outputs: true

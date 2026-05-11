@@ -1,0 +1,117 @@
+{
+  "task": "v42_v50_dependency_audit_after_v39",
+  "created_utc": "2026-05-08T14:10:00Z",
+  "status": "DONE_PATCHED_AND_AUDITED",
+  "research_only": true,
+  "formal_outputs_written": false,
+  "summary": {
+    "v42_dependency_gate": "PASS_FROM_V39_COMPACT_ADAPTER_PAYLOAD",
+    "v42_prediction_payload": "MISSING_NOT_GENERATED",
+    "v44_v50_dependency_gate": "READS_V42_REPORT_AFTER_PATCH",
+    "v44_v50_completion_audit": "COMPLETE_AUDIT_PASS",
+    "promotion_state": "BLOCKED_BY_MISSING_V42_RESEARCH_PAYLOAD"
+  },
+  "findings": [
+    {
+      "id": "F1",
+      "severity": "fixed",
+      "component": "tools/v42_prior_enabled_predictions_rerun.py",
+      "problem": "V42 searched output/surface_research_preflight_local/V39_adapter_only_microfit, but the actual V39 directory is output/surface_research_preflight_local/V39_adapter_microfit.",
+      "patch": "Updated V42 roots to V39_adapter_microfit and added explicit compact adapter payload validation for V39/V41b style checkpoints."
+    },
+    {
+      "id": "F2",
+      "severity": "fixed",
+      "component": "tools/v44_v50_common.py and V44/V49/V50 callers",
+      "problem": "V44-V50 readiness checked the stale 20260508_v30_prior_enabled_vggt_predictions report instead of the new V42 report.",
+      "patch": "Added v42_prior_prediction_ready(), kept v30_prior_prediction_ready() as a compatibility wrapper, and updated V44/V49/V50 report fields to name V42."
+    },
+    {
+      "id": "F3",
+      "severity": "remaining_blocker",
+      "component": "V42 outputs",
+      "problem": "The dependency gate now accepts the V39 payload, but V42 research prediction files are still absent.",
+      "evidence": [
+        "research_depths.npz missing",
+        "research_points_world.npz missing",
+        "research_confidence.npz missing",
+        "research_normals_geometric.npz missing",
+        "research_prior_effect.json missing",
+        "control_real_zero_shuffle_random_dropout.json missing"
+      ],
+      "next_route": "Run or download V42 prediction execution using the accepted V39 compact adapter payload."
+    }
+  ],
+  "accepted_payloads": [
+    {
+      "stage": "V39",
+      "root": "D:/vggt/vggt-main/output/surface_research_preflight_local/V39_adapter_microfit",
+      "adapter_only": "D:/vggt/vggt-main/output/surface_research_preflight_local/V39_adapter_microfit/v39_adapter_only_checkpoint.pt",
+      "delta_only": "D:/vggt/vggt-main/output/surface_research_preflight_local/V39_adapter_microfit/v39_delta_only_checkpoint.pt",
+      "v38_state_dict": "D:/vggt/vggt-main/output/surface_research_preflight_local/V38_prior_enabled_checkpoint_scaffold/state_dict.pt",
+      "consumption_mode": "v38_scaffold_plus_v39_or_v41b_compact_adapter",
+      "report": "D:/vggt/vggt-main/reports/20260509_v39_adapter_microfit.json",
+      "status": "DONE_PASS",
+      "next_route": "V42_READY_FROM_V39"
+    }
+  ],
+  "refreshed_reports": {
+    "v42": {
+      "path": "D:/vggt/vggt-main/reports/20260509_v42_prior_enabled_predictions_rerun.json",
+      "status": "DONE_FAIL_ROUTED",
+      "usable_prior_enabled_checkpoint_exists": true,
+      "usable_prior_enabled_payload_exists": true,
+      "checkpoint_blockers": [],
+      "output_blocker_count": 6,
+      "next_route": "V42 prediction execution/download"
+    },
+    "v44": {
+      "path": "D:/vggt/vggt-main/reports/20260509_v44_strict_visual_pre_promotion_gate.json",
+      "status": "DONE_FAIL_ROUTED",
+      "v42_prior_prediction_ready": false,
+      "forbidden_hit_count": 0
+    },
+    "v49": {
+      "path": "D:/vggt/vggt-main/reports/20260509_v49_package_dry_run.json",
+      "status": "DONE_FAIL_ROUTED",
+      "forbidden_hit_count": 0
+    },
+    "v50": {
+      "path": "D:/vggt/vggt-main/reports/20260509_v50_final_promotion_transaction.json",
+      "status": "DONE_HARD_IMPOSSIBLE_WITH_EVIDENCE",
+      "strict_candidate_passes": 0,
+      "strict_teacher_passes": 0,
+      "writes_package": false,
+      "writes_strict_registry": false,
+      "writes_strict_pass": false,
+      "forbidden_hit_count": 0
+    },
+    "v44_v50_completion_audit": {
+      "path": "D:/vggt/vggt-main/reports/20260509_v44_v50_completion_audit.json",
+      "status": "COMPLETE_AUDIT_PASS",
+      "forbidden_hit_count": 0
+    }
+  },
+  "patched_files": [
+    "D:/vggt/vggt-main/tools/v42_prior_enabled_predictions_rerun.py",
+    "D:/vggt/vggt-main/tools/v44_v50_common.py",
+    "D:/vggt/vggt-main/tools/v44_strict_visual_pre_promotion_gate.py",
+    "D:/vggt/vggt-main/tools/v49_package_dry_run.py",
+    "D:/vggt/vggt-main/tools/v50_final_promotion_transaction.py"
+  ],
+  "commands_run": [
+    "python -m py_compile tools\\v42_prior_enabled_predictions_rerun.py tools\\v44_v50_common.py tools\\v44_strict_visual_pre_promotion_gate.py tools\\v49_package_dry_run.py tools\\v50_final_promotion_transaction.py",
+    "python tools\\v42_prior_enabled_predictions_rerun.py",
+    "python tools\\v44_strict_visual_pre_promotion_gate.py",
+    "python tools\\v49_package_dry_run.py",
+    "python tools\\v50_final_promotion_transaction.py",
+    "python tools\\v44_v50_completion_audit.py"
+  ],
+  "forbidden_output_check": {
+    "predictions_npz_written": false,
+    "candidate_package_written": false,
+    "teacher_package_written": false,
+    "strict_registry_written": false,
+    "strict_pass_written": false
+  }
+}

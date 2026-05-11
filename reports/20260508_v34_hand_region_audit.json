@@ -1,0 +1,60 @@
+{
+  "task": "v34_hand_region_audit",
+  "status": "DONE_PASS",
+  "created_utc": "2026-05-08T21:45:23Z",
+  "research_only": true,
+  "smplx_native_only": true,
+  "no_mano": true,
+  "metrics": {
+    "left_hand": {
+      "pixels": 4742,
+      "views_with_pixels": 6,
+      "bbox_extent": [
+        1.4558955430984497,
+        1.0726737976074219,
+        1.0591211318969727
+      ],
+      "bbox_extent_norm": 2.0957095623016357,
+      "normal_length": {
+        "count": 4742,
+        "finite": 4742,
+        "min": 0.9999998807907104,
+        "median": 1.0,
+        "mean": 1.0,
+        "p95": 1.0,
+        "max": 1.0000001192092896
+      },
+      "not_detached_sparse_patch": true,
+      "normal_depth_consistency_pass": true
+    },
+    "right_hand": {
+      "pixels": 6954,
+      "views_with_pixels": 6,
+      "bbox_extent": [
+        1.4558955430984497,
+        1.0765268802642822,
+        1.0591211318969727
+      ],
+      "bbox_extent_norm": 2.097684383392334,
+      "normal_length": {
+        "count": 6954,
+        "finite": 6954,
+        "min": 0.9999998807907104,
+        "median": 1.0,
+        "mean": 1.0,
+        "p95": 1.0,
+        "max": 1.0000001192092896
+      },
+      "not_detached_sparse_patch": true,
+      "normal_depth_consistency_pass": true
+    }
+  },
+  "inputs": {
+    "hand_patch": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V34_smplx_native_hand_route\\v34_smplx_native_hand_continuity_patch.npz"
+  },
+  "outputs": {
+    "report_json": "D:\\vggt\\vggt-main\\reports\\20260508_v34_hand_region_audit.json",
+    "report_md": "D:\\vggt\\vggt-main\\reports\\20260508_v34_hand_region_audit.md"
+  },
+  "blockers": []
+}

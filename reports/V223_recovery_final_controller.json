@@ -1,0 +1,67 @@
+{
+  "task": "V223_recovery_final_controller",
+  "created_utc": "2026-05-08T20:30:16Z",
+  "status": "RECOVERED_TO_REBUILT_RESEARCH_CANDIDATE_READY_FOR_NEW_PROMOTION",
+  "old_v50_status": "LOST_LOCALLY_NOT_REASSERTED",
+  "strict_candidate_passes_current": "NOT_REASSERTED_AFTER_ARTIFACT_LOSS",
+  "strict_teacher_passes_current": 0,
+  "formal_cloud_unblocked_current": "NOT_REASSERTED_AFTER_ARTIFACT_LOSS",
+  "source_tree_restored": true,
+  "git_restored": true,
+  "cloud_evidence_restored": [
+    "V16_smplx_native_prior_case",
+    "V25_research_vggt_predictions",
+    "V42_prior_enabled_predictions"
+  ],
+  "rebuilt_candidate_package": {
+    "path": "D:\\vggt\\vggt-main\\output\\V223_rebuilt_candidate_package\\manifest.json",
+    "exists": true,
+    "size": 24320,
+    "sha256": "ef6d77e91a5e3b6457ff071288980a8fddbc00e42949b296be8679afcbdd545e"
+  },
+  "rebuilt_candidate_zip": {
+    "path": "D:\\vggt\\vggt-main\\archive\\V223_rebuilt_candidate_package.zip",
+    "exists": true,
+    "size": 504782072,
+    "sha256": "310563c3b68b50a968ca12baf54c71c5e15ea518bfed81116980a72856ce9407"
+  },
+  "rebuilt_candidate_gate": {
+    "task": "V223_rebuilt_candidate_dline_gate",
+    "created_utc": "2026-05-08T20:29:21Z",
+    "candidate_package": "D:\\vggt\\vggt-main\\output\\V223_rebuilt_candidate_package",
+    "status": "PASS_REBUILT_RESEARCH_CANDIDATE",
+    "strict_candidate_passes_written": 0,
+    "strict_teacher_passes_written": 0,
+    "points_finite_gate": true,
+    "normals_finite_gate": true,
+    "control_audit_present": true,
+    "formal_cloud_unblocked": false,
+    "reason": "Original V50 local hash was lost; this gate validates a rebuilt research candidate and does not write strict registry/pass.",
+    "next": "Run full V49/V50 strict promotion transaction if a new strict pass is required from the rebuilt package."
+  },
+  "teacher_pass_written": false,
+  "candidate_pass_written": false,
+  "registry_written": false,
+  "modal_app_list": {
+    "cmd": "modal app list --json",
+    "returncode": 0,
+    "stdout": "[]",
+    "stderr": ""
+  },
+  "modal_container_list": {
+    "cmd": "modal container list --json",
+    "returncode": 0,
+    "stdout": "[]",
+    "stderr": ""
+  },
+  "local_process_scan": {
+    "cmd": "powershell -NoProfile -Command \"Get-Process | Where-Object { $_.ProcessName -match '^(python|python3|modal)$' } | Select-Object Id,ProcessName,Path,StartTime | ConvertTo-Json -Compress\"",
+    "returncode": 0,
+    "stdout": "{\"Id\":10840,\"ProcessName\":\"python\",\"Path\":\"D:\\\\anaconda\\\\python.exe\",\"StartTime\":\"\\/Date(1778272212022)\\/\"}",
+    "stderr": ""
+  },
+  "modal_running_count": 0,
+  "no_residual_cloud_process": true,
+  "next_required_step": "Run a fresh strict promotion transaction from output/V223_rebuilt_candidate_package if a new strict_candidate_pass is required. Do not use lost V50 hash claims.",
+  "incident_report": "D:\\vggt\\vggt-main\\reports\\V223_accident_recovery_and_evidence_status.json"
+}

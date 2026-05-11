@@ -1,0 +1,158 @@
+{
+  "created_utc": "2026-05-09T05:53:17Z",
+  "source_candidate_points": "D:\\vggt\\vggt-main\\output\\frozen_candidates\\V50R2_rebuilt_from_sessions_gdrive_modal\\package_files\\candidate_files__candidate_points.npz",
+  "source_candidate_depths": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V32_candidate_inference_research\\candidate_depths_research.npz",
+  "source_inputs": "D:\\vggt\\vggt-main\\output\\training_cases\\0012_11_frame0000_6views_smplx_native_prior_v15\\inputs.npz",
+  "policy": "Human-only PLY exports. Uses point_masks / ROI masks to remove background/full-frame point-map pixels. Per-view visible-surface PLYs are safe to open in MeshLab. A direct 6-view concatenation is not a valid global fused human point cloud and is explicitly marked do-not-send.",
+  "views": [
+    {
+      "camera": "00",
+      "candidate_world_points": 11490,
+      "depth_unprojected_points": 11490,
+      "candidate_world_ply": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\pointcloud_sources\\v50r2_human_only_candidate_world_cam00.ply",
+      "depth_unprojected_ply": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\pointcloud_sources\\v50r2_human_only_depth_unprojected_cam00.ply"
+    },
+    {
+      "camera": "01",
+      "candidate_world_points": 14720,
+      "depth_unprojected_points": 14720,
+      "candidate_world_ply": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\pointcloud_sources\\v50r2_human_only_candidate_world_cam01.ply",
+      "depth_unprojected_ply": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\pointcloud_sources\\v50r2_human_only_depth_unprojected_cam01.ply"
+    },
+    {
+      "camera": "15",
+      "candidate_world_points": 9515,
+      "depth_unprojected_points": 9515,
+      "candidate_world_ply": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\pointcloud_sources\\v50r2_human_only_candidate_world_cam15.ply",
+      "depth_unprojected_ply": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\pointcloud_sources\\v50r2_human_only_depth_unprojected_cam15.ply"
+    },
+    {
+      "camera": "30",
+      "candidate_world_points": 9819,
+      "depth_unprojected_points": 9819,
+      "candidate_world_ply": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\pointcloud_sources\\v50r2_human_only_candidate_world_cam30.ply",
+      "depth_unprojected_ply": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\pointcloud_sources\\v50r2_human_only_depth_unprojected_cam30.ply"
+    },
+    {
+      "camera": "45",
+      "candidate_world_points": 11538,
+      "depth_unprojected_points": 11538,
+      "candidate_world_ply": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\pointcloud_sources\\v50r2_human_only_candidate_world_cam45.ply",
+      "depth_unprojected_ply": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\pointcloud_sources\\v50r2_human_only_depth_unprojected_cam45.ply"
+    },
+    {
+      "camera": "59",
+      "candidate_world_points": 11048,
+      "depth_unprojected_points": 11048,
+      "candidate_world_ply": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\pointcloud_sources\\v50r2_human_only_candidate_world_cam59.ply",
+      "depth_unprojected_ply": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\pointcloud_sources\\v50r2_human_only_depth_unprojected_cam59.ply"
+    }
+  ],
+  "recommended_send_to_mentor": [
+    {
+      "label": "full_body_cam30_depth",
+      "category": "full_body",
+      "coordinate_space": "camera_depth_unprojected",
+      "points": 9819,
+      "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\pointcloud_sources\\send_to_mentor\\v50r2_SEND_full_body_cam30_depth.ply",
+      "reason": "front/three-quarter full body view with one visible surface"
+    },
+    {
+      "label": "full_body_cam15_depth",
+      "category": "full_body",
+      "coordinate_space": "camera_depth_unprojected",
+      "points": 9515,
+      "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\pointcloud_sources\\send_to_mentor\\v50r2_SEND_full_body_cam15_depth.ply",
+      "reason": "side full body view with one visible surface"
+    },
+    {
+      "label": "full_body_cam59_depth",
+      "category": "full_body",
+      "coordinate_space": "camera_depth_unprojected",
+      "points": 11048,
+      "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\pointcloud_sources\\send_to_mentor\\v50r2_SEND_full_body_cam59_depth.ply",
+      "reason": "back/side full body view with one visible surface"
+    },
+    {
+      "label": "head_face_cam30_depth",
+      "category": "head_face",
+      "coordinate_space": "camera_depth_unprojected",
+      "points": 1135,
+      "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\pointcloud_sources\\send_to_mentor\\v50r2_SEND_head_face_cam30_depth.ply",
+      "reason": "head/face ROI from the readable front/three-quarter view"
+    },
+    {
+      "label": "head_face_cam30_refined_world",
+      "category": "head_face",
+      "coordinate_space": "refined_world_points",
+      "points": 1135,
+      "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\pointcloud_sources\\send_to_mentor\\v50r2_SEND_head_face_cam30_refined_world.ply",
+      "reason": "head/face refined candidate ROI, one view only"
+    },
+    {
+      "label": "left_hand_cam15_depth",
+      "category": "left_hand",
+      "coordinate_space": "camera_depth_unprojected",
+      "points": 2378,
+      "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\pointcloud_sources\\send_to_mentor\\v50r2_SEND_left_hand_cam15_depth.ply",
+      "reason": "left-hand visible view"
+    },
+    {
+      "label": "left_hand_cam15_refined_world",
+      "category": "left_hand",
+      "coordinate_space": "refined_world_points",
+      "points": 2378,
+      "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\pointcloud_sources\\send_to_mentor\\v50r2_SEND_left_hand_cam15_refined_world.ply",
+      "reason": "left-hand SMPL-X native local patch, one view only"
+    },
+    {
+      "label": "right_hand_cam30_depth",
+      "category": "right_hand",
+      "coordinate_space": "camera_depth_unprojected",
+      "points": 1907,
+      "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\pointcloud_sources\\send_to_mentor\\v50r2_SEND_right_hand_cam30_depth.ply",
+      "reason": "right-hand visible view"
+    },
+    {
+      "label": "right_hand_cam30_refined_world",
+      "category": "right_hand",
+      "coordinate_space": "refined_world_points",
+      "points": 1907,
+      "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\pointcloud_sources\\send_to_mentor\\v50r2_SEND_right_hand_cam30_refined_world.ply",
+      "reason": "right-hand SMPL-X native local patch, one view only"
+    }
+  ],
+  "invalid_do_not_send": [
+    {
+      "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\pointcloud_sources\\invalid_do_not_send\\v50r2_human_only_candidate_world_merged6v.ply",
+      "reason": "This file is a stale/legacy 6-view concatenation of per-camera visible-surface point maps. It is not a calibrated fused point cloud. In MeshLab it can look like multiple bodies, flat sheets, or severe tearing. Do not send it to the mentor; use the per-view files under send_to_mentor/ instead."
+    },
+    {
+      "path": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V32_candidate_inference_research\\v32_candidate_open3d_review_points.ply",
+      "reason": "Legacy full-frame/debug review PLY. It includes non-human/full-frame point-map pixels and is not a mentor-facing human point cloud."
+    }
+  ],
+  "outputs": {
+    "candidate_world_cam00": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\pointcloud_sources\\v50r2_human_only_candidate_world_cam00.ply",
+    "depth_unprojected_cam00": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\pointcloud_sources\\v50r2_human_only_depth_unprojected_cam00.ply",
+    "candidate_world_cam01": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\pointcloud_sources\\v50r2_human_only_candidate_world_cam01.ply",
+    "depth_unprojected_cam01": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\pointcloud_sources\\v50r2_human_only_depth_unprojected_cam01.ply",
+    "candidate_world_cam15": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\pointcloud_sources\\v50r2_human_only_candidate_world_cam15.ply",
+    "depth_unprojected_cam15": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\pointcloud_sources\\v50r2_human_only_depth_unprojected_cam15.ply",
+    "candidate_world_cam30": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\pointcloud_sources\\v50r2_human_only_candidate_world_cam30.ply",
+    "depth_unprojected_cam30": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\pointcloud_sources\\v50r2_human_only_depth_unprojected_cam30.ply",
+    "candidate_world_cam45": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\pointcloud_sources\\v50r2_human_only_candidate_world_cam45.ply",
+    "depth_unprojected_cam45": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\pointcloud_sources\\v50r2_human_only_depth_unprojected_cam45.ply",
+    "candidate_world_cam59": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\pointcloud_sources\\v50r2_human_only_candidate_world_cam59.ply",
+    "depth_unprojected_cam59": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\pointcloud_sources\\v50r2_human_only_depth_unprojected_cam59.ply",
+    "full_body_cam30_depth": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\pointcloud_sources\\send_to_mentor\\v50r2_SEND_full_body_cam30_depth.ply",
+    "full_body_cam15_depth": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\pointcloud_sources\\send_to_mentor\\v50r2_SEND_full_body_cam15_depth.ply",
+    "full_body_cam59_depth": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\pointcloud_sources\\send_to_mentor\\v50r2_SEND_full_body_cam59_depth.ply",
+    "head_face_cam30_depth": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\pointcloud_sources\\send_to_mentor\\v50r2_SEND_head_face_cam30_depth.ply",
+    "head_face_cam30_refined_world": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\pointcloud_sources\\send_to_mentor\\v50r2_SEND_head_face_cam30_refined_world.ply",
+    "left_hand_cam15_depth": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\pointcloud_sources\\send_to_mentor\\v50r2_SEND_left_hand_cam15_depth.ply",
+    "left_hand_cam15_refined_world": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\pointcloud_sources\\send_to_mentor\\v50r2_SEND_left_hand_cam15_refined_world.ply",
+    "right_hand_cam30_depth": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\pointcloud_sources\\send_to_mentor\\v50r2_SEND_right_hand_cam30_depth.ply",
+    "right_hand_cam30_refined_world": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\pointcloud_sources\\send_to_mentor\\v50r2_SEND_right_hand_cam30_refined_world.ply"
+  }
+}

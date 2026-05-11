@@ -1,0 +1,9 @@
+{
+  "formal_cloud_read": true,
+  "heldout_or_60view": true,
+  "local_replay_package": "D:\\vggt\\vggt-main\\output\\frozen_candidates\\V50R2_rebuilt_from_sessions_gdrive_modal",
+  "note": "Local formal replay matrix completed against V50R2 frozen package; no training or teacher write.",
+  "same_frame_replay": true,
+  "status": "PASS",
+  "temporal": true
+}

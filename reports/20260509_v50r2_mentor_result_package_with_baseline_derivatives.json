@@ -1,0 +1,24 @@
+{
+  "task": "v50r2_mentor_result_package_with_vggt_baseline_and_derivatives",
+  "created_utc": "2026-05-09T12:34:48Z",
+  "status": "DONE_PASS",
+  "zip": "D:\\vggt\\vggt-main\\archive\\V50R2_mentor_result_with_vggt_baseline_and_derivatives.zip",
+  "send_dir": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\send_to_mentor_v42_consistent",
+  "entry_count": 56,
+  "required_entry_hits": {
+    "vggt_vertical_baseline_comparison.md": true,
+    "vggt_vertical_baseline_metrics.csv": true,
+    "vggt_variant_lineage_comparison_mentor.md": true,
+    "vggt_variant_lineage_comparison.csv": true,
+    "09_vertical_full_body_rgb.png": true,
+    "10_vertical_head_face_rgb.png": true,
+    "11_vertical_hands_rgb.png": true
+  },
+  "mentor_primary_files": {
+    "main_report": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\send_to_mentor_v42_consistent\\20260509_v50r2_mentor_report_human_geometry_recovery.md",
+    "current_baseline_comparison": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\send_to_mentor_v42_consistent\\20260509_v50r2_vggt_vertical_baseline_comparison.md",
+    "current_baseline_metrics": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\send_to_mentor_v42_consistent\\20260509_v50r2_vggt_vertical_baseline_metrics.csv",
+    "derivative_lineage_mentor": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\send_to_mentor_v42_consistent\\20260509_v50r2_vggt_variant_lineage_comparison_mentor.md",
+    "derivative_lineage_csv": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\send_to_mentor_v42_consistent\\20260509_v50r2_vggt_variant_lineage_comparison.csv"
+  }
+}

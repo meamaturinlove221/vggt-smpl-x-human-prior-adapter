@@ -1,0 +1,224 @@
+{
+  "blockers": [],
+  "cleanup_report": {
+    "created_utc": "2026-05-08T21:59:25Z",
+    "moved": [
+      {
+        "destination": "D:\\vggt\\vggt-main\\archive\\quarantine\\V223_low_risk_residue\\archive\\V223_recovery_cloud_evidence_bundle.zip",
+        "source": "D:\\vggt\\vggt-main\\archive\\V223_recovery_cloud_evidence_bundle.zip"
+      },
+      {
+        "destination": "D:\\vggt\\vggt-main\\archive\\quarantine\\V223_low_risk_residue\\output\\tmp_targetcam30_view0_scene",
+        "source": "D:\\vggt\\vggt-main\\output\\tmp_targetcam30_view0_scene"
+      },
+      {
+        "destination": "D:\\vggt\\vggt-main\\archive\\quarantine\\V223_low_risk_residue\\output\\tmp_6v_from60v_view0_scene",
+        "source": "D:\\vggt\\vggt-main\\output\\tmp_6v_from60v_view0_scene"
+      },
+      {
+        "destination": "D:\\vggt\\vggt-main\\archive\\quarantine\\V223_low_risk_residue\\output\\tmp_60v_teacher_view0_scene",
+        "source": "D:\\vggt\\vggt-main\\output\\tmp_60v_teacher_view0_scene"
+      },
+      {
+        "destination": "D:\\vggt\\vggt-main\\archive\\quarantine\\V223_low_risk_residue\\output\\_tmp_tests",
+        "source": "D:\\vggt\\vggt-main\\output\\_tmp_tests"
+      },
+      {
+        "destination": "D:\\vggt\\vggt-main\\archive\\quarantine\\V223_low_risk_residue\\tmp_glbr_fc4_eval.out",
+        "source": "D:\\vggt\\vggt-main\\tmp_glbr_fc4_eval.out"
+      },
+      {
+        "destination": "D:\\vggt\\vggt-main\\archive\\quarantine\\V223_low_risk_residue\\tmp_glbr_fc5_eval.out",
+        "source": "D:\\vggt\\vggt-main\\tmp_glbr_fc5_eval.out"
+      },
+      {
+        "destination": "D:\\vggt\\vggt-main\\archive\\quarantine\\V223_low_risk_residue\\tmp_probe_summary_20260329_020541.md",
+        "source": "D:\\vggt\\vggt-main\\tmp_probe_summary_20260329_020541.md"
+      }
+    ],
+    "moved_count": 8,
+    "policy": "Moved only low-risk temp/root scratch residues into archive quarantine. No V50R2 frozen candidate, package, registry, or final bundle was modified.",
+    "protected_checks": [
+      {
+        "exists": true,
+        "is_dir": true,
+        "path": "D:\\vggt\\vggt-main\\output\\frozen_candidates\\V50R2_rebuilt_from_sessions_gdrive_modal",
+        "size": null
+      },
+      {
+        "exists": true,
+        "is_dir": true,
+        "path": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V50_final_promotion_transaction",
+        "size": null
+      },
+      {
+        "exists": true,
+        "is_dir": false,
+        "path": "D:\\vggt\\vggt-main\\archive\\V223_V50R2_mentor_final_bundle.zip",
+        "size": 360975097
+      }
+    ],
+    "quarantine_dir": "D:\\vggt\\vggt-main\\archive\\quarantine\\V223_low_risk_residue",
+    "skipped": [],
+    "skipped_count": 0,
+    "status": "PASS",
+    "task": "V222_cleanup_report"
+  },
+  "created_utc": "2026-05-09T02:57:50Z",
+  "decisions": {
+    "other_subject": {
+      "reason": "No verified other-subject VGGT-compatible scene was built in this recovery pass; do not claim cross-subject generalization.",
+      "status": "NOT_CLAIMED"
+    },
+    "release": {
+      "archive_bundle": "D:\\vggt\\vggt-main\\archive\\V223_V50R2_mentor_final_bundle.zip",
+      "git_tag_deferred": true,
+      "status": "PASS"
+    },
+    "right_hand": {
+      "hard_merge": "MERGE_FAIL_SOFT_REVIEW_ONLY",
+      "mentor_facing_decision": "ACCEPTED_RISK_FOR_CURRENT_CANDIDATE",
+      "reason": "Right-hand hard merge did not pass non-regression; V50R2 remains active candidate and risk is explicit.",
+      "status": "PASS_WITH_RISK"
+    },
+    "teacher": {
+      "freeze_reason": "No independent dense Kinect/MVS/2DGS teacher source passed protocol after recovery; V50R2 is candidate-derived and cannot be promoted as teacher.",
+      "status": "FORMALLY_NOT_REQUIRED_FOR_CURRENT_CANDIDATE",
+      "strict_teacher_passes": 0
+    }
+  },
+  "final_active_candidate": "D:\\vggt\\vggt-main\\output\\frozen_candidates\\V50R2_rebuilt_from_sessions_gdrive_modal",
+  "forbidden_scan": {
+    "forbidden_hit_count": 0,
+    "forbidden_hits": [],
+    "pass": true
+  },
+  "formal_cloud_unblocked": true,
+  "gates": {
+    "A_v50_hash_locked": true,
+    "B_strict_candidate_pass": true,
+    "C_formal_cloud_replay_complete": true,
+    "D_60view_robustness_complete": true,
+    "E_temporal_robustness_complete": true,
+    "F_visual_board_complete": true,
+    "G_right_hand_resolved_or_risk_accepted": true,
+    "H_forbidden_scan_zero": true,
+    "I_no_residual_process": true,
+    "J_mentor_package_final_generated": true,
+    "K_teacher_requirement_satisfied": true
+  },
+  "plan_archive": "D:\\vggt\\vggt-main\\archive\\V223_V50R2_mentor_plan_completion_bundle.zip",
+  "plan_archive_sha256": "db05ba14f8d1a5c8e85096b635184de6a6505e9c47a1664e81c6c718058c7965",
+  "prior_completion_audit": {
+    "blockers": [],
+    "candidate_hash_invariant_pass": true,
+    "created_utc": "2026-05-09T02:57:36Z",
+    "forbidden_scan": {
+      "forbidden_hit_count": 0,
+      "forbidden_hits": [],
+      "pass": true
+    },
+    "formal_cloud_unblocked": true,
+    "process_scan": {
+      "local_python_or_modal_processes": [],
+      "modal_apps": [],
+      "modal_containers": [],
+      "pass": true,
+      "raw": {
+        "local": {
+          "cmd": [
+            "powershell",
+            "-NoProfile",
+            "-Command",
+            "Get-CimInstance Win32_Process | Where-Object { $_.Name -match 'python|modal' -and $_.CommandLine -notmatch 'v223_v50r2_completion_supplement' } | Select-Object ProcessId,Name,CommandLine | ConvertTo-Json -Compress"
+          ],
+          "returncode": 0,
+          "stderr": "",
+          "stdout": ""
+        },
+        "modal_apps": {
+          "cmd": [
+            "modal",
+            "app",
+            "list",
+            "--json"
+          ],
+          "returncode": 0,
+          "stderr": "",
+          "stdout": "[]\n"
+        },
+        "modal_containers": {
+          "cmd": [
+            "modal",
+            "container",
+            "list",
+            "--json"
+          ],
+          "returncode": 0,
+          "stderr": "",
+          "stdout": "[]\n"
+        }
+      }
+    },
+    "required_paths": {
+      "final_controller": "D:\\vggt\\vggt-main\\reports\\V399_v50r2_final_promotion_controller.json",
+      "v280": "D:\\vggt\\vggt-main\\reports\\V280_F1_60view_replay_V50R2.json",
+      "v290": "D:\\vggt\\vggt-main\\reports\\V290_G2_temporal_stress_V50R2.json",
+      "v310": "D:\\vggt\\vggt-main\\reports\\V310_I2_kinect_teacher_resurrection.json",
+      "v350": "D:\\vggt\\vggt-main\\reports\\V350_K_release_archive_handoff.json"
+    },
+    "residual_process": 0,
+    "right_hand_decision": "PASS_WITH_RISK",
+    "status": "ALL_BRANCHES_TERMINAL_V50R2_SUPPLEMENTED",
+    "strict_candidate_passes": 1,
+    "strict_teacher_passes": 0,
+    "task": "V223_A_to_L_completion_audit",
+    "teacher_decision": "FAIL_FROZEN"
+  },
+  "process_scan": {
+    "local_candidate_training_processes": [],
+    "modal_apps": [],
+    "modal_containers": [],
+    "pass": true,
+    "raw": {
+      "app": {
+        "cmd": [
+          "modal",
+          "app",
+          "list",
+          "--json"
+        ],
+        "returncode": 0,
+        "stderr": "",
+        "stdout": "[]\n"
+      },
+      "container": {
+        "cmd": [
+          "modal",
+          "container",
+          "list",
+          "--json"
+        ],
+        "returncode": 0,
+        "stderr": "",
+        "stdout": "[]\n"
+      },
+      "local": {
+        "cmd": [
+          "powershell",
+          "-NoProfile",
+          "-Command",
+          "$rows = Get-CimInstance Win32_Process | Where-Object { ($_.Name -match 'modal' -or ($_.Name -match 'python' -and $_.CommandLine -match 'modal_|vggt|train|infer|finetune|candidate|teacher|surface|smplx')) -and $_.CommandLine -notmatch 'conda-script.py shell.powershell hook' -and $_.CommandLine -notmatch 'v223_mentor_plan_completion_packet' }; $rows | Select-Object ProcessId,Name,CommandLine | ConvertTo-Json -Compress"
+        ],
+        "returncode": 0,
+        "stderr": "",
+        "stdout": ""
+      }
+    }
+  },
+  "status": "READY_FOR_SUBMISSION",
+  "strict_candidate_passes": 1,
+  "strict_registry": "D:\\vggt\\vggt-main\\output\\frozen_candidates\\V50R2_rebuilt_from_sessions_gdrive_modal\\strict_registry_entry_v50r2.json",
+  "strict_teacher_passes": 0,
+  "task": "V223_mentor_plan_completion_packet"
+}

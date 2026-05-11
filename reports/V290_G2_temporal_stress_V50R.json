@@ -1,0 +1,28 @@
+{
+  "created_utc": "2026-05-08T21:11:00Z",
+  "decision": "Temporal stress completed on rebuilt 3-frame prior-enabled prediction payload.",
+  "frame_metrics": {
+    "frame0000": {
+      "finite_ratio": 1.0,
+      "max_abs_delta_from_frame0": 0.0,
+      "mean_abs_delta_from_frame0": 0.0
+    },
+    "frame0001": {
+      "finite_ratio": 1.0,
+      "max_abs_delta_from_frame0": 0.7277098894119263,
+      "mean_abs_delta_from_frame0": 0.0012841005809605122
+    },
+    "frame0002": {
+      "finite_ratio": 1.0,
+      "max_abs_delta_from_frame0": 0.73945552110672,
+      "mean_abs_delta_from_frame0": 0.0024289374705404043
+    }
+  },
+  "frames": [
+    "frame0000",
+    "frame0001",
+    "frame0002"
+  ],
+  "status": "PASS_WITH_RISK",
+  "task": "V290_G2_temporal_stress_V50R"
+}

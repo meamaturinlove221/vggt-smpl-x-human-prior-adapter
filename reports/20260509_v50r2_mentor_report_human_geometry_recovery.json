@@ -1,0 +1,110 @@
+{
+  "task": "v223_build_mentor_report_md",
+  "created_utc": "2026-05-09T11:48:45Z",
+  "status": "DONE_PASS",
+  "report_md": "D:/vggt/vggt-main/reports/20260509_v50r2_mentor_report_human_geometry_recovery.md",
+  "portable_report_md": "D:/vggt/vggt-main/output/mentor_report_v50r2/20260509_v50r2_mentor_report_human_geometry_recovery.md",
+  "image_index_md": "D:/vggt/vggt-main/reports/20260509_v50r2_mentor_report_image_index.md",
+  "portable_image_index_md": "D:/vggt/vggt-main/output/mentor_report_v50r2/20260509_v50r2_mentor_report_image_index.md",
+  "root_cause_md": "D:/vggt/vggt-main/reports/20260509_v50r2_pointcloud_render_root_cause.md",
+  "root_cause_json": "D:/vggt/vggt-main/reports/20260509_v50r2_pointcloud_render_root_cause.json",
+  "doc_dir": "D:/vggt/vggt-main/output/mentor_report_v50r2",
+  "send_dir": "D:/vggt/vggt-main/output/mentor_report_v50r2/send_to_mentor_v42_consistent",
+  "report_zip": "D:/vggt/vggt-main/archive/V50R2_mentor_report_with_v42_consistent_pointclouds.zip",
+  "images": {
+    "full_body": "D:/vggt/vggt-main/output/mentor_report_v50r2/images/01_full_body_v42_consistent_pointcloud.png",
+    "upper_body": "D:/vggt/vggt-main/output/mentor_report_v50r2/images/02_upper_body_v42_consistent_pointcloud.png",
+    "head_face": "D:/vggt/vggt-main/output/mentor_report_v50r2/images/03_head_face_v42_consistent_pointcloud.png",
+    "hands": "D:/vggt/vggt-main/output/mentor_report_v50r2/images/04_hands_v42_consistent_pointcloud.png",
+    "architecture": "D:/vggt/vggt-main/output/mentor_report_v50r2/images/05_vggt_smplx_native_architecture.png",
+    "vertical_full_body_rgb": "D:/vggt/vggt-main/output/mentor_report_v50r2/images/09_vertical_full_body_rgb.png",
+    "vertical_head_face_rgb": "D:/vggt/vggt-main/output/mentor_report_v50r2/images/10_vertical_head_face_rgb.png",
+    "vertical_hands_rgb": "D:/vggt/vggt-main/output/mentor_report_v50r2/images/11_vertical_hands_rgb.png",
+    "vertical_full_body_depth": "D:/vggt/vggt-main/output/mentor_report_v50r2/images/12_vertical_full_body_depth.png",
+    "vertical_head_face_depth": "D:/vggt/vggt-main/output/mentor_report_v50r2/images/13_vertical_head_face_depth.png",
+    "vertical_hands_depth": "D:/vggt/vggt-main/output/mentor_report_v50r2/images/14_vertical_hands_depth.png"
+  },
+  "root_cause": {
+    "task": "v50r2_pointcloud_render_root_cause",
+    "created_utc": "2026-05-09T11:48:44Z",
+    "status": "DONE_PASS",
+    "root_cause": "Old V223 report scripts mixed V50R2 candidate point maps with V15/V16 images, masks, and camera ids. V50R2 candidate points are V42 frame0000 first six views, not V15 cameras 00,01,15,30,45,59.",
+    "correct_camera_ids": [
+      "00",
+      "01",
+      "06",
+      "11",
+      "16",
+      "21"
+    ],
+    "view_mapping_max_abs": [
+      {
+        "view_index": 0,
+        "max_abs": 0.0,
+        "mean_abs": 0.0
+      },
+      {
+        "view_index": 1,
+        "max_abs": 0.0,
+        "mean_abs": 0.0
+      },
+      {
+        "view_index": 2,
+        "max_abs": 0.0,
+        "mean_abs": 0.0
+      },
+      {
+        "view_index": 3,
+        "max_abs": 0.0,
+        "mean_abs": 0.0
+      },
+      {
+        "view_index": 4,
+        "max_abs": 0.0,
+        "mean_abs": 0.0
+      },
+      {
+        "view_index": 5,
+        "max_abs": 0.0,
+        "mean_abs": 0.0
+      }
+    ],
+    "fixed_script": "D:/vggt/vggt-main/tools/v223_v50r2_view_consistent_sources.py",
+    "mentor_images": {
+      "full_body": "D:/vggt/vggt-main/output/mentor_report_v50r2/images/01_full_body_v42_consistent_pointcloud.png",
+      "upper_body": "D:/vggt/vggt-main/output/mentor_report_v50r2/images/02_upper_body_v42_consistent_pointcloud.png",
+      "head_face": "D:/vggt/vggt-main/output/mentor_report_v50r2/images/03_head_face_v42_consistent_pointcloud.png",
+      "hands": "D:/vggt/vggt-main/output/mentor_report_v50r2/images/04_hands_v42_consistent_pointcloud.png",
+      "architecture": "D:/vggt/vggt-main/output/mentor_report_v50r2/images/05_vggt_smplx_native_architecture.png",
+      "vertical_full_body_rgb": "D:/vggt/vggt-main/output/mentor_report_v50r2/images/09_vertical_full_body_rgb.png",
+      "vertical_head_face_rgb": "D:/vggt/vggt-main/output/mentor_report_v50r2/images/10_vertical_head_face_rgb.png",
+      "vertical_hands_rgb": "D:/vggt/vggt-main/output/mentor_report_v50r2/images/11_vertical_hands_rgb.png",
+      "vertical_full_body_depth": "D:/vggt/vggt-main/output/mentor_report_v50r2/images/12_vertical_full_body_depth.png",
+      "vertical_head_face_depth": "D:/vggt/vggt-main/output/mentor_report_v50r2/images/13_vertical_head_face_depth.png",
+      "vertical_hands_depth": "D:/vggt/vggt-main/output/mentor_report_v50r2/images/14_vertical_hands_depth.png"
+    },
+    "invalidated_old_dirs": [
+      {
+        "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\pointcloud_sources",
+        "reason": "V15/V16 source protocol mismatch"
+      },
+      {
+        "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\open3d_rgb_camera_view_pointcloud",
+        "reason": "V15/V16 source protocol mismatch"
+      },
+      {
+        "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\kinect_style_3d_pointcloud",
+        "reason": "V15/V16 source protocol mismatch"
+      },
+      {
+        "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\reference_angle_pointcloud",
+        "reason": "V15/V16 source protocol mismatch"
+      },
+      {
+        "path": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\rgb_dot_pointcloud",
+        "reason": "V15/V16 source protocol mismatch"
+      }
+    ],
+    "policy": "Use V42-consistent point cloud images and PLYs for mentor-facing V50R2 evidence. Do not use old kinect_style/rgb_camera_view/rgb_dot outputs."
+  }
+}

@@ -1,0 +1,51 @@
+{
+  "created_utc": "2026-05-08T21:10:58Z",
+  "decision": "Formal inference artifact board generated from active candidate evidence; right hand remains risk-routed.",
+  "outputs": {
+    "V231_B2_60view_support.png": {
+      "exists": true,
+      "path": "output/V231_B2_formal_inference_artifact_board/V231_B2_60view_support.png",
+      "point_count": 120000,
+      "size": 953885
+    },
+    "V231_B2_full_body.png": {
+      "exists": true,
+      "path": "output/V231_B2_formal_inference_artifact_board/V231_B2_full_body.png",
+      "point_count": 120000,
+      "size": 950463
+    },
+    "V231_B2_hairline.png": {
+      "exists": true,
+      "path": "output/V231_B2_formal_inference_artifact_board/V231_B2_hairline.png",
+      "point_count": 120000,
+      "size": 540331
+    },
+    "V231_B2_head_face.png": {
+      "exists": true,
+      "path": "output/V231_B2_formal_inference_artifact_board/V231_B2_head_face.png",
+      "point_count": 120000,
+      "size": 583766
+    },
+    "V231_B2_left_hand.png": {
+      "exists": true,
+      "path": "output/V231_B2_formal_inference_artifact_board/V231_B2_left_hand.png",
+      "point_count": 120000,
+      "size": 549867
+    },
+    "V231_B2_right_hand.png": {
+      "exists": true,
+      "path": "output/V231_B2_formal_inference_artifact_board/V231_B2_right_hand.png",
+      "point_count": 120000,
+      "size": 527424
+    },
+    "V231_B2_temporal.png": {
+      "exists": true,
+      "path": "output/V231_B2_formal_inference_artifact_board/V231_B2_temporal.png",
+      "point_count": 120000,
+      "size": 951080
+    }
+  },
+  "right_hand_review": "SOFT_REVIEW_ONLY",
+  "status": "PASS_WITH_RISK",
+  "task": "V231_B2_formal_inference_artifact_board"
+}
