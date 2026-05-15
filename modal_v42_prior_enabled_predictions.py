@@ -372,7 +372,11 @@ def run_v42_remote(cfg_json: str) -> dict[str, Any]:
             c_maps, c_summary = _make_control_prior(prior_maps, prior_summary, control)
             with torch.no_grad():
                 with torch.cuda.amp.autocast(dtype=dtype):
-                    pred = model(images, prior_maps=c_maps, prior_summary_tokens=c_summary)
+                    pred = model(
+                        images,
+                        human_prior_feature_maps=c_maps,
+                        human_prior_summary_tokens=c_summary,
+                    )
             depth = _to_numpy(pred["depth"].squeeze(0))
             depth_conf = _to_numpy(pred["depth_conf"].squeeze(0))
             world_points = _to_numpy(pred["world_points"].squeeze(0))

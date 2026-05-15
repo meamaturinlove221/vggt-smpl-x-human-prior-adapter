@@ -70,7 +70,7 @@ class MultitaskLoss(torch.nn.Module):
     - Point loss
     - Tracking loss (not cleaned yet, dirty code is at the bottom of this file)
     """
-    def __init__(self, camera=None, depth=None, point=None, normal=None, track=None, unproject_geometry=None, **kwargs):
+    def __init__(self, camera=None, depth=None, point=None, normal=None, track=None, unproject_geometry=None, human_prior=None, **kwargs):
         super().__init__()
         # Loss configuration dictionaries for each task
         self.camera = camera
@@ -79,6 +79,7 @@ class MultitaskLoss(torch.nn.Module):
         self.normal = normal
         self.track = track
         self.unproject_geometry = unproject_geometry
+        self.human_prior = human_prior
 
     def forward(self, predictions, batch) -> torch.Tensor:
         """
@@ -95,7 +96,7 @@ class MultitaskLoss(torch.nn.Module):
         loss_dict = {}
         
         # Camera pose loss - if pose encodings are predicted
-        if "pose_enc_list" in predictions:
+        if "pose_enc_list" in predictions and self.camera is not None:
             camera_loss_dict = compute_camera_loss(
                 predictions, batch, **_loss_call_kwargs(self.camera)
             )
@@ -111,7 +112,7 @@ class MultitaskLoss(torch.nn.Module):
             loss_dict.update(camera_loss_dict)
         
         # Depth estimation loss - if depth maps are predicted
-        if "depth" in predictions:
+        if "depth" in predictions and self.depth is not None:
             depth_loss_dict = compute_depth_loss(
                 predictions, batch, **_loss_call_kwargs(self.depth)
             )
@@ -128,7 +129,7 @@ class MultitaskLoss(torch.nn.Module):
             loss_dict.update(depth_loss_dict)
 
         # 3D point reconstruction loss - if world points are predicted
-        if "world_points" in predictions:
+        if "world_points" in predictions and self.point is not None:
             point_loss_dict = compute_point_loss(
                 predictions, batch, **_loss_call_kwargs(self.point)
             )
@@ -188,6 +189,31 @@ class MultitaskLoss(torch.nn.Module):
             )
             total_loss = total_loss + unproject_geometry_loss
             loss_dict.update(unproject_geometry_loss_dict)
+
+        # SMPL-X / human-prior auxiliary losses.  These are deliberately
+        # separate from the base depth/point losses so prior supervision cannot
+        # be mistaken for the original VGGT target.
+        if self.human_prior is not None:
+            human_prior_loss_dict = compute_human_prior_loss(
+                predictions,
+                batch,
+                **_loss_call_kwargs(self.human_prior),
+            )
+            human_prior_weight = resolve_scheduled_loss_weight(
+                self.human_prior.get("weight", 1.0),
+                self.human_prior,
+                batch,
+            )
+            human_prior_weight = resolve_two_stage_scalar(
+                human_prior_weight,
+                batch,
+                start=self.human_prior.get("weight_stage2_start"),
+                end=self.human_prior.get("weight_stage2_end"),
+                stage2_value=self.human_prior.get("weight_stage2_value"),
+            )
+            human_prior_loss = human_prior_loss_dict["loss_human_prior"] * human_prior_weight
+            total_loss = total_loss + human_prior_loss
+            loss_dict.update(human_prior_loss_dict)
 
         # Tracking loss - not cleaned yet, dirty code is at the bottom of this file
         if "track" in predictions:
@@ -1427,6 +1453,356 @@ def compute_normal_loss(
         "loss_grad_normal": loss_grad_normal,
         "loss_normal_depth_consistency": depth_consistency_loss,
     }
+
+
+def _zero_like_prediction(predictions, key="world_points"):
+    value = predictions.get(key)
+    if value is None:
+        for item in predictions.values():
+            if torch.is_tensor(item):
+                return item.sum() * 0.0
+        return torch.zeros(())
+    return value.sum() * 0.0
+
+
+def _as_bool_mask(batch, key, reference, *, allow_missing=False):
+    value = batch.get(key, None)
+    if value is None:
+        if allow_missing:
+            return None
+        raise KeyError(f"human-prior loss requires batch['{key}'].")
+    mask = value.to(device=reference.device, dtype=torch.bool)
+    if tuple(mask.shape) != tuple(reference.shape):
+        raise ValueError(
+            f"batch['{key}'] shape {tuple(mask.shape)} does not match reference shape {tuple(reference.shape)}."
+        )
+    return mask
+
+
+def _as_float_tensor(batch, key, reference, *, last_dim=None, allow_missing=False):
+    value = batch.get(key, None)
+    if value is None:
+        if allow_missing:
+            return None
+        raise KeyError(f"human-prior loss requires batch['{key}'].")
+    tensor = value.to(device=reference.device, dtype=reference.dtype)
+    expected = tuple(reference.shape) if last_dim is None else tuple(reference.shape) + (int(last_dim),)
+    if tuple(tensor.shape) != expected:
+        raise ValueError(
+            f"batch['{key}'] shape {tuple(tensor.shape)} does not match expected shape {expected}."
+        )
+    return check_and_fix_inf_nan(tensor, f"{key}_human_prior_target", hard_max=None)
+
+
+def _valid_prior_mask(base_mask, target, *, require_positive_depth=False):
+    mask = base_mask & torch.isfinite(target).all(dim=-1 if target.ndim == base_mask.ndim + 1 else 0)
+    if require_positive_depth:
+        mask = mask & (target > 0.0) & torch.isfinite(target)
+    return mask
+
+
+def _resolve_prior_mask(batch, reference_mask, mask_key=None):
+    for key in (mask_key, "prior_mask", "smplx_native_visible_mask", "teacher_mask"):
+        if not key:
+            continue
+        value = batch.get(key, None)
+        if value is not None:
+            return _as_bool_mask(batch, key, reference_mask, allow_missing=False)
+    return reference_mask.clone()
+
+
+def _masked_mean_values(values, mask, zero, valid_range=-1, min_valid=1, name="human_prior_loss"):
+    if values is None:
+        return zero
+    values = values[mask]
+    if values.numel() < int(min_valid):
+        return zero
+    values = check_and_fix_inf_nan(values, name, hard_max=None)
+    if valid_range and float(valid_range) > 0:
+        values = filter_by_quantile(values, float(valid_range))
+    if values.numel() <= 0:
+        return zero
+    return values.mean()
+
+
+def _confidence_loss_from_reg(reg_map, conf, mask, zero, gamma=1.0, alpha=0.0, valid_range=-1, name="human_prior_conf"):
+    if conf is None:
+        return zero
+    conf = check_and_fix_inf_nan(conf, name).clamp_min(1e-8)
+    values = float(gamma) * reg_map[mask] * conf[mask] - float(alpha) * torch.log(conf[mask])
+    if values.numel() <= 0:
+        return zero
+    values = check_and_fix_inf_nan(values, name, hard_max=None)
+    if valid_range and float(valid_range) > 0:
+        values = filter_by_quantile(values, float(valid_range))
+    if values.numel() <= 0:
+        return zero
+    return values.mean()
+
+
+def _region_mask_without_exclusions(batch, base_mask, *, exclude_head_roi=True, exclude_face_roi=True, exclude_hairline_roi=True, exclude_ear_band_roi=True):
+    mask = base_mask.clone()
+    exclusions = []
+    if exclude_head_roi:
+        exclusions.extend(("head_roi_mask", "head_face_mask"))
+    if exclude_face_roi:
+        exclusions.append("face_mask")
+    if exclude_hairline_roi:
+        exclusions.extend(("hairline_mask", "head_hair_detail_masks"))
+    if exclude_ear_band_roi:
+        exclusions.append("ear_band_mask")
+    for key in exclusions:
+        value = batch.get(key, None)
+        if value is not None and tuple(value.shape) == tuple(mask.shape):
+            mask = mask & ~value.to(device=mask.device, dtype=torch.bool)
+    return mask
+
+
+def compute_human_prior_loss(
+    predictions,
+    batch,
+    weight=1.0,
+    depth=None,
+    point=None,
+    normal=None,
+    depth_point=None,
+    smplx_weak_anchor=None,
+    mask_key="prior_mask",
+    depth_key="prior_depths",
+    point_key="prior_points",
+    normal_key="prior_normals",
+    eps=1e-8,
+    **kwargs,
+):
+    """Active SMPL-X/native-prior auxiliary objective.
+
+    This loss is intentionally explicit: prior depth supervises the depth head,
+    prior points supervise predictions["world_points"], prior normals supervise
+    the normal head, and depth-point coupling keeps predicted depth unprojection
+    aligned with the predicted point map.  The returned keys match the V15
+    logging config so missing branches are visible instead of silently inert.
+    """
+    del kwargs, weight
+
+    reference = predictions.get("world_points")
+    if reference is None:
+        reference = predictions.get("depth")
+    if reference is None:
+        zero = _zero_like_prediction(predictions)
+        return {"loss_human_prior": zero}
+
+    if reference.ndim == 5 and reference.shape[-1] == 3:
+        reference_mask = torch.isfinite(reference).all(dim=-1)
+    elif reference.ndim == 5 and reference.shape[-1] == 1:
+        reference_mask = torch.isfinite(reference[..., 0])
+    else:
+        raise ValueError(f"Unsupported human-prior reference prediction shape: {tuple(reference.shape)}")
+
+    prior_mask = _resolve_prior_mask(batch, reference_mask, mask_key=mask_key)
+    zero = _zero_like_prediction(predictions, "world_points" if "world_points" in predictions else "depth")
+
+    total = zero
+    out = {
+        "loss_prior_depth": zero,
+        "loss_prior_depth_conf": zero,
+        "loss_prior_depth_reg": zero,
+        "loss_prior_depth_grad": zero,
+        "loss_prior_point": zero,
+        "loss_prior_point_conf": zero,
+        "loss_prior_point_reg": zero,
+        "loss_prior_point_grad": zero,
+        "loss_prior_normal": zero,
+        "loss_prior_normal_conf": zero,
+        "loss_prior_normal_reg": zero,
+        "loss_prior_depth_point": zero,
+        "loss_prior_depth_point_consistency": zero,
+        "loss_prior_smplx_body_depth": zero,
+        "loss_prior_smplx_body_point": zero,
+        "loss_prior_smplx_body_weak": zero,
+        "loss_prior_smplx_hand_depth": zero,
+        "loss_prior_smplx_hand_point": zero,
+        "loss_prior_smplx_hand_weak": zero,
+        "loss_prior_smplx_weak_anchor": zero,
+    }
+
+    if depth is not None and "depth" in predictions and depth_key in batch:
+        cfg = depth
+        pred_depth = predictions["depth"][..., 0]
+        target_depth = _as_float_tensor(batch, depth_key, pred_depth, allow_missing=False)
+        depth_mask = prior_mask & torch.isfinite(target_depth) & (target_depth > 0.0)
+        if int(depth_mask.sum().item()) > 0:
+            reg_map = (pred_depth - target_depth).abs()
+            out["loss_prior_depth_reg"] = _masked_mean_values(
+                reg_map,
+                depth_mask,
+                zero,
+                valid_range=cfg.get("valid_range", -1),
+                name="loss_prior_depth_reg",
+            )
+            out["loss_prior_depth_conf"] = _confidence_loss_from_reg(
+                reg_map,
+                predictions.get("depth_conf"),
+                depth_mask,
+                zero,
+                gamma=cfg.get("gamma", 1.0),
+                alpha=cfg.get("alpha", 0.0),
+                valid_range=cfg.get("valid_range", -1),
+                name="loss_prior_depth_conf",
+            ) if bool(cfg.get("supervise_conf", False)) else zero
+            if cfg.get("gradient_loss_fn", None):
+                out["loss_prior_depth_grad"] = gradient_loss_multi_scale_wrapper(
+                    pred_depth.unsqueeze(-1).reshape(-1, pred_depth.shape[-2], pred_depth.shape[-1], 1),
+                    target_depth.unsqueeze(-1).reshape(-1, target_depth.shape[-2], target_depth.shape[-1], 1),
+                    depth_mask.reshape(-1, depth_mask.shape[-2], depth_mask.shape[-1]),
+                    gradient_loss_fn=gradient_loss,
+                    scales=3,
+                )
+            out["loss_prior_depth"] = (
+                out["loss_prior_depth_conf"] + out["loss_prior_depth_reg"] + out["loss_prior_depth_grad"]
+            )
+            total = total + out["loss_prior_depth"]
+
+    if point is not None and "world_points" in predictions and point_key in batch:
+        cfg = point
+        pred_points = predictions["world_points"]
+        target_points = _as_float_tensor(batch, point_key, pred_points[..., 0], last_dim=3, allow_missing=False)
+        point_mask = prior_mask & torch.isfinite(target_points).all(dim=-1)
+        if int(point_mask.sum().item()) > 0:
+            reg_map = torch.norm(pred_points - target_points, dim=-1)
+            out["loss_prior_point_reg"] = _masked_mean_values(
+                reg_map,
+                point_mask,
+                zero,
+                valid_range=cfg.get("valid_range", -1),
+                name="loss_prior_point_reg",
+            )
+            out["loss_prior_point_conf"] = _confidence_loss_from_reg(
+                reg_map,
+                predictions.get("world_points_conf"),
+                point_mask,
+                zero,
+                gamma=cfg.get("gamma", 1.0),
+                alpha=cfg.get("alpha", 0.0),
+                valid_range=cfg.get("valid_range", -1),
+                name="loss_prior_point_conf",
+            ) if bool(cfg.get("supervise_conf", False)) else zero
+            if cfg.get("gradient_loss_fn", None):
+                out["loss_prior_point_grad"] = gradient_loss_multi_scale_wrapper(
+                    pred_points.reshape(-1, pred_points.shape[-3], pred_points.shape[-2], 3),
+                    target_points.reshape(-1, target_points.shape[-3], target_points.shape[-2], 3),
+                    point_mask.reshape(-1, point_mask.shape[-2], point_mask.shape[-1]),
+                    gradient_loss_fn=normal_loss if "normal" in str(cfg.get("gradient_loss_fn")).lower() else gradient_loss,
+                    scales=3,
+                )
+            out["loss_prior_point"] = (
+                out["loss_prior_point_conf"] + out["loss_prior_point_reg"] + out["loss_prior_point_grad"]
+            )
+            total = total + out["loss_prior_point"]
+
+    if normal is not None and "normal" in predictions and normal_key in batch:
+        cfg = normal
+        pred_normal = predictions["normal"]
+        target_normal = _as_float_tensor(batch, normal_key, pred_normal[..., 0], last_dim=3, allow_missing=False)
+        normal_mask = prior_mask & torch.isfinite(target_normal).all(dim=-1)
+        if int(normal_mask.sum().item()) > 0:
+            out["loss_prior_normal_reg"] = cosine_normal_loss(
+                pred_normal,
+                target_normal,
+                normal_mask,
+                conf=predictions.get("normal_conf") if bool(cfg.get("supervise_conf", False)) else None,
+                gamma=cfg.get("gamma", 1.0),
+                alpha=cfg.get("alpha", 0.0),
+                valid_range=cfg.get("valid_range", -1),
+            )
+            out["loss_prior_normal"] = out["loss_prior_normal_conf"] + out["loss_prior_normal_reg"]
+            total = total + out["loss_prior_normal"]
+
+    if depth_point is not None and "depth" in predictions and "world_points" in predictions:
+        cfg = depth_point
+        intrinsics = batch.get("intrinsics", None)
+        extrinsics = batch.get("extrinsics", None)
+        if intrinsics is not None and extrinsics is not None:
+            pred_depth = predictions["depth"]
+            cam_points = unproject_depth_to_camera_points(
+                pred_depth,
+                intrinsics.to(device=pred_depth.device, dtype=pred_depth.dtype),
+            )
+            world_to_cam_R = extrinsics[..., :3, :3].to(device=pred_depth.device, dtype=pred_depth.dtype)
+            world_to_cam_t = extrinsics[..., :3, 3].to(device=pred_depth.device, dtype=pred_depth.dtype)
+            cam_to_world_R = world_to_cam_R.transpose(-1, -2)
+            cam_to_world_t = -torch.matmul(cam_to_world_R, world_to_cam_t.unsqueeze(-1)).squeeze(-1)
+            depth_world_points = torch.einsum("bsij,bshwj->bshwi", cam_to_world_R, cam_points)
+            depth_world_points = depth_world_points + cam_to_world_t.unsqueeze(-2).unsqueeze(-2)
+            consistency_mask = prior_mask & (pred_depth[..., 0] > 0.0) & torch.isfinite(depth_world_points).all(dim=-1)
+            if int(consistency_mask.sum().item()) > 0:
+                consistency_map = torch.norm(predictions["world_points"] - depth_world_points, dim=-1)
+                out["loss_prior_depth_point_consistency"] = _masked_mean_values(
+                    consistency_map,
+                    consistency_mask,
+                    zero,
+                    valid_range=cfg.get("valid_range", -1),
+                    name="loss_prior_depth_point_consistency",
+                )
+                out["loss_prior_depth_point"] = (
+                    float(cfg.get("consistency_weight", 1.0)) * out["loss_prior_depth_point_consistency"]
+                )
+                total = total + out["loss_prior_depth_point"]
+
+    if smplx_weak_anchor is not None:
+        cfg = smplx_weak_anchor
+        body_mask = batch.get("smplx_body_anchor_mask", None)
+        hand_mask = batch.get("smplx_hand_anchor_mask", None)
+        masks = []
+        if body_mask is not None:
+            masks.append(("body", body_mask.to(device=prior_mask.device, dtype=torch.bool), float(cfg.get("body_weight", 0.0))))
+        if hand_mask is not None:
+            masks.append(("hand", hand_mask.to(device=prior_mask.device, dtype=torch.bool), float(cfg.get("hand_weight", 0.0))))
+        for region, region_mask, region_weight in masks:
+            region_mask = region_mask & prior_mask
+            if region == "body":
+                region_mask = _region_mask_without_exclusions(
+                    batch,
+                    region_mask,
+                    exclude_head_roi=cfg.get("exclude_head_roi", True),
+                    exclude_face_roi=cfg.get("exclude_face_roi", True),
+                    exclude_hairline_roi=cfg.get("exclude_hairline_roi", True),
+                    exclude_ear_band_roi=cfg.get("exclude_ear_band_roi", True),
+                )
+            if int(region_mask.sum().item()) < int(cfg.get("min_pixels", 64)):
+                continue
+            region_total = zero
+            if "depth" in predictions and depth_key in batch:
+                target_depth = _as_float_tensor(batch, depth_key, predictions["depth"][..., 0], allow_missing=False)
+                depth_mask = region_mask & torch.isfinite(target_depth) & (target_depth > 0.0)
+                if int(depth_mask.sum().item()) > 0:
+                    depth_loss = _masked_mean_values(
+                        (predictions["depth"][..., 0] - target_depth).abs(),
+                        depth_mask,
+                        zero,
+                        valid_range=cfg.get("valid_range", -1),
+                        name=f"loss_prior_smplx_{region}_depth",
+                    )
+                    out[f"loss_prior_smplx_{region}_depth"] = depth_loss
+                    region_total = region_total + float(cfg.get("depth_loss_weight", 0.0)) * depth_loss
+            if "world_points" in predictions and point_key in batch:
+                target_points = _as_float_tensor(batch, point_key, predictions["world_points"][..., 0], last_dim=3, allow_missing=False)
+                point_mask = region_mask & torch.isfinite(target_points).all(dim=-1)
+                if int(point_mask.sum().item()) > 0:
+                    point_loss = _masked_mean_values(
+                        torch.norm(predictions["world_points"] - target_points, dim=-1),
+                        point_mask,
+                        zero,
+                        valid_range=cfg.get("valid_range", -1),
+                        name=f"loss_prior_smplx_{region}_point",
+                    )
+                    out[f"loss_prior_smplx_{region}_point"] = point_loss
+                    region_total = region_total + float(cfg.get("point_loss_weight", 0.0)) * point_loss
+            out[f"loss_prior_smplx_{region}_weak"] = region_weight * region_total
+            total = total + out[f"loss_prior_smplx_{region}_weak"]
+        out["loss_prior_smplx_weak_anchor"] = out["loss_prior_smplx_body_weak"] + out["loss_prior_smplx_hand_weak"]
+
+    out["loss_human_prior"] = total
+    return out
 
 
 def compute_depth_loss(
@@ -2902,7 +3278,7 @@ def regression_loss(
         to_feed_conf = None
 
     # Compute gradient loss if specified for spatial smoothness
-    if "normal" in gradient_loss_fn:
+    if gradient_loss_fn is not None and "normal" in gradient_loss_fn:
         # Surface normal-based gradient loss
         loss_grad = gradient_loss_multi_scale_wrapper(
             pred.reshape(bb*ss, hh, ww, nc),
@@ -2912,7 +3288,7 @@ def regression_loss(
             scales=3,
             conf=to_feed_conf,
         )
-    elif "grad" in gradient_loss_fn:
+    elif gradient_loss_fn is not None and "grad" in gradient_loss_fn:
         # Standard gradient-based loss
         loss_grad = gradient_loss_multi_scale_wrapper(
             pred.reshape(bb*ss, hh, ww, nc),

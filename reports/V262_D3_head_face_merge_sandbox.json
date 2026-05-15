@@ -1,6 +1,0 @@
-{
-  "created_utc": "2026-05-08T21:10:59Z",
-  "decision": "No hard merge; original V50 non-regression cannot be proven from rebuilt package alone.",
-  "status": "FAIL_FROZEN",
-  "task": "V262_D3_head_face_merge_sandbox"
-}

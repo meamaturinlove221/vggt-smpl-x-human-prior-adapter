@@ -250,6 +250,33 @@ class ComposedDataset(Dataset, ABC):
                 batch.get("selection_sample_manifest_label") or ""
             )
 
+        # Preserve optional SMPL-X-native prior supervision fields.  Earlier
+        # configs referenced these keys in SMPLXNativePriorLoss, but the
+        # composed dataset only forwarded a smaller ZJU-style subset, so the
+        # losses could silently route through missing-key/zero branches.
+        for optional_key in (
+            "prior_maps",
+            "prior_mask",
+            "prior_depths",
+            "prior_points",
+            "prior_normals",
+            "teacher_mask",
+            "smplx_bodyhand_anchor_mask",
+            "smplx_body_anchor_mask",
+            "smplx_hand_anchor_mask",
+            "smplx_left_hand_anchor_mask",
+            "smplx_right_hand_anchor_mask",
+            "smplx_native_visible_mask",
+        ):
+            if optional_key in batch and batch[optional_key] is not None:
+                arr = np.stack(batch[optional_key])
+                if arr.dtype == np.bool_:
+                    sample[optional_key] = torch.from_numpy(arr.astype(bool))
+                elif np.issubdtype(arr.dtype, np.number):
+                    sample[optional_key] = torch.from_numpy(arr.astype(np.float32))
+                else:
+                    sample[optional_key] = arr
+
         # --- Track Processing (if enabled) ---
         if self.load_track:
             if batch["tracks"] is not None:

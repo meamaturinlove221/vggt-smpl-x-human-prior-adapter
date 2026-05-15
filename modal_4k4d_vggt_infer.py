@@ -435,9 +435,45 @@ def _load_checkpoint_state_dict(source: str):
 def _infer_vggt_model_kwargs_from_state_dict(state_dict) -> dict:
     if not isinstance(state_dict, dict):
         return {}
-    model_kwargs = {}
+    model_kwargs = {
+        "enable_camera": any(str(key).startswith("camera_head.") for key in state_dict.keys()),
+        "enable_point": any(str(key).startswith("point_head.") for key in state_dict.keys()),
+        "enable_depth": any(str(key).startswith("depth_head.") for key in state_dict.keys()),
+        "enable_track": any(str(key).startswith("track_head.") for key in state_dict.keys()),
+    }
     if any(str(key).startswith("normal_head.") for key in state_dict.keys()):
         model_kwargs["enable_normal"] = True
+    prior_conv = state_dict.get("aggregator.human_prior_patch_embeds.0.0.weight")
+    legacy_proj = state_dict.get("aggregator.human_prior_adapter.proj.0.weight")
+    summary_ln = state_dict.get("aggregator.human_prior_summary_proj.0.weight")
+    legacy_summary = state_dict.get("aggregator.human_prior_adapter.summary_proj.0.weight")
+    if prior_conv is not None:
+        model_kwargs["human_prior_in_chans"] = int(prior_conv.shape[1])
+        model_kwargs["human_prior_hidden_dim"] = int(prior_conv.shape[0])
+    elif legacy_proj is not None:
+        model_kwargs["human_prior_in_chans"] = int(legacy_proj.shape[1])
+        model_kwargs["human_prior_hidden_dim"] = int(legacy_proj.shape[0])
+    if summary_ln is not None:
+        model_kwargs["human_prior_summary_in_dim"] = int(summary_ln.shape[0])
+    elif legacy_summary is not None:
+        model_kwargs["human_prior_summary_in_dim"] = int(legacy_summary.shape[1])
+    scale_count = len({
+        str(key).split(".")[2]
+        for key in state_dict.keys()
+        if str(key).startswith("aggregator.human_prior_patch_embeds.") and str(key).endswith(".0.weight")
+    })
+    if scale_count == 3:
+        model_kwargs["human_prior_scales"] = [1, 2, 4]
+    elif scale_count > 0:
+        model_kwargs["human_prior_scales"] = list(range(1, scale_count + 1))
+    if not model_kwargs["enable_camera"]:
+        model_kwargs.pop("enable_camera", None)
+    if not model_kwargs["enable_point"]:
+        model_kwargs.pop("enable_point", None)
+    if not model_kwargs["enable_depth"]:
+        model_kwargs.pop("enable_depth", None)
+    if not model_kwargs["enable_track"]:
+        model_kwargs.pop("enable_track", None)
     return model_kwargs
 
 

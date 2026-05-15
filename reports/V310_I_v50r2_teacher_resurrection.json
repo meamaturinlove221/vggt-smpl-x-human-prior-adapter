@@ -1,6 +1,0 @@
-{
-  "reason": "V50R2 is candidate-derived and not an independent dense teacher source.",
-  "resurrection_policy": "Only independent dense sensor/MVS surface with protocol pass may reopen teacher route.",
-  "status": "FAIL_FROZEN",
-  "strict_teacher_passes": 0
-}

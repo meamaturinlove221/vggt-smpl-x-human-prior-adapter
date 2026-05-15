@@ -32,8 +32,40 @@ class VGGT(nn.Module, PyTorchModelHubMixin):
         enable_human_prior_summary=True,
         human_prior_summary_in_dim=12,
         human_prior_summary_num_heads=4,
+        # Backward-compatible aliases used by earlier SMPL-X/VGGT configs and
+        # checkpoint payloads.  The canonical names are the *_in_chans /
+        # *_in_dim arguments above, but silently ignoring these older keys was
+        # enough to make prior-enabled runs fall back to a truncated/default
+        # prior path.
+        human_prior_channels=None,
+        human_prior_summary_channels=None,
+        human_prior_multi_scale_factors=None,
+        human_prior_gate_init=None,
+        human_prior_enable_input_fusion=None,
+        human_prior_enable_frame_fusion=None,
+        human_prior_enable_global_fusion=None,
+        human_prior_enable_summary_fusion=None,
     ):
         super().__init__()
+
+        if human_prior_channels is not None:
+            human_prior_in_chans = human_prior_channels
+        if human_prior_summary_channels is not None:
+            human_prior_summary_in_dim = human_prior_summary_channels
+        if human_prior_multi_scale_factors is not None:
+            human_prior_scales = human_prior_multi_scale_factors
+        if human_prior_enable_summary_fusion is not None:
+            enable_human_prior_summary = bool(human_prior_enable_summary_fusion)
+        if any(flag is not None for flag in (
+            human_prior_enable_input_fusion,
+            human_prior_enable_frame_fusion,
+            human_prior_enable_global_fusion,
+        )):
+            enable_human_prior_fusion = bool(
+                (human_prior_enable_input_fusion if human_prior_enable_input_fusion is not None else True)
+                or (human_prior_enable_frame_fusion if human_prior_enable_frame_fusion is not None else True)
+                or (human_prior_enable_global_fusion if human_prior_enable_global_fusion is not None else True)
+            )
 
         self.aggregator = Aggregator(
             img_size=img_size,
@@ -47,6 +79,8 @@ class VGGT(nn.Module, PyTorchModelHubMixin):
             human_prior_summary_in_dim=human_prior_summary_in_dim,
             human_prior_summary_num_heads=human_prior_summary_num_heads,
         )
+        if human_prior_gate_init is not None:
+            self._init_human_prior_gates(float(human_prior_gate_init))
 
         self.camera_head = CameraHead(dim_in=2 * embed_dim) if enable_camera else None
         self.point_head = DPTHead(dim_in=2 * embed_dim, output_dim=4, activation="inv_log", conf_activation="expp1") if enable_point else None
@@ -54,12 +88,24 @@ class VGGT(nn.Module, PyTorchModelHubMixin):
         self.normal_head = DPTHead(dim_in=2 * embed_dim, output_dim=4, activation="norm", conf_activation="expp1") if enable_normal else None
         self.track_head = TrackHead(dim_in=2 * embed_dim, patch_size=patch_size) if enable_track else None
 
+    def _init_human_prior_gates(self, value: float) -> None:
+        if self.aggregator.input_prior_adapter is not None:
+            nn.init.constant_(self.aggregator.input_prior_adapter.gamma, value)
+        for adapter in self.aggregator.frame_prior_adapters:
+            nn.init.constant_(adapter.gamma, value)
+        for adapter in self.aggregator.global_prior_adapters:
+            nn.init.constant_(adapter.gamma, value)
+        for adapter in self.aggregator.global_summary_adapters:
+            nn.init.constant_(adapter.gamma, value)
+
     def forward(
         self,
         images: torch.Tensor,
         query_points: torch.Tensor = None,
         human_prior_feature_maps: torch.Tensor = None,
         human_prior_summary_tokens: torch.Tensor = None,
+        prior_maps: torch.Tensor = None,
+        prior_summary_tokens: torch.Tensor = None,
     ):
         """
         Forward pass of the VGGT model.
@@ -87,6 +133,11 @@ class VGGT(nn.Module, PyTorchModelHubMixin):
                 - vis (torch.Tensor): Visibility scores for tracked points with shape [B, S, N]
                 - conf (torch.Tensor): Confidence scores for tracked points with shape [B, S, N]
         """        
+        if human_prior_feature_maps is None and prior_maps is not None:
+            human_prior_feature_maps = prior_maps
+        if human_prior_summary_tokens is None and prior_summary_tokens is not None:
+            human_prior_summary_tokens = prior_summary_tokens
+
         # If without batch dimension, add it
         if len(images.shape) == 4:
             images = images.unsqueeze(0)

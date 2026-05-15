@@ -1,6 +1,0 @@
-{
-  "created_utc": "2026-05-08T21:10:59Z",
-  "decision": "View-family robustness is limited to rebuilt 12-view evidence.",
-  "status": "PASS_WITH_RISK",
-  "task": "V281_F2_view_family_robustness"
-}

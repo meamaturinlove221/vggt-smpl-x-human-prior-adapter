@@ -1,0 +1,66 @@
+defaults:
+  - default
+  - _self_
+
+img_size: 518
+patch_size: 14
+num_workers: 0
+max_img_per_gpu: 6
+
+data:
+  train:
+    common_config:
+      img_size: ${img_size}
+      patch_size: ${patch_size}
+      fix_img_num: 6
+      img_nums: [6, 6]
+      load_track: False
+      track_num: 1024
+      training: True
+      inside_random: False
+      rescale: False
+      rescale_aug: False
+      landscape_check: False
+      repeat_batch: False
+      allow_duplicate_img: False
+      augs:
+        cojitter: False
+        cojitter_ratio: 0.0
+        scales: null
+        aspects: [1.0, 1.0]
+        color_jitter: null
+        gray_scale: False
+        gau_blur: False
+  val:
+    common_config:
+      img_size: ${img_size}
+      patch_size: ${patch_size}
+      fix_img_num: 6
+      img_nums: [6, 6]
+      load_track: False
+      track_num: 1024
+      training: False
+      inside_random: False
+      rescale: False
+      rescale_aug: False
+      landscape_check: False
+      repeat_batch: False
+      allow_duplicate_img: False
+      augs:
+        cojitter: False
+        cojitter_ratio: 0.0
+        scales: null
+        aspects: [1.0, 1.0]
+        color_jitter: null
+        gray_scale: False
+        gau_blur: False
+
+model:
+  _target_: vggt.models.vggt.VGGT
+  img_size: ${img_size}
+  patch_size: ${patch_size}
+  enable_camera: True
+  enable_depth: True
+  enable_point: True
+  enable_normal: True
+  enable_track: False

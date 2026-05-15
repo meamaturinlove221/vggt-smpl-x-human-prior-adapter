@@ -44,14 +44,17 @@ def _extract_model_state_dict(payload):
 def _infer_model_kwargs_from_state_dict(state_dict: dict) -> dict:
     camera_token = state_dict.get("aggregator.camera_token")
     embed_dim = int(camera_token.shape[-1]) if camera_token is not None else 1024
-    proj0 = state_dict.get("aggregator.human_prior_adapter.proj.0.weight")
-    summary_proj0 = state_dict.get("aggregator.human_prior_adapter.summary_proj.0.weight")
-    gate = state_dict.get("aggregator.human_prior_adapter.input_fusion.gate")
-    scale_factors = state_dict.get("aggregator.human_prior_adapter.scale_factors_tensor")
-    if scale_factors is not None:
-        scale_factors = [int(value) for value in scale_factors.tolist()]
-    else:
-        scale_factors = [1]
+    prior_conv = state_dict.get("aggregator.human_prior_patch_embeds.0.0.weight")
+    legacy_proj = state_dict.get("aggregator.human_prior_adapter.proj.0.weight")
+    summary_ln = state_dict.get("aggregator.human_prior_summary_proj.0.weight")
+    legacy_summary = state_dict.get("aggregator.human_prior_adapter.summary_proj.0.weight")
+    scale_count = len({
+        key.split(".")[2]
+        for key in state_dict
+        if key.startswith("aggregator.human_prior_patch_embeds.") and key.endswith(".0.weight")
+    })
+    if scale_count <= 0:
+        scale_count = 1
     return {
         "img_size": 518,
         "patch_size": 14,
@@ -61,11 +64,10 @@ def _infer_model_kwargs_from_state_dict(state_dict: dict) -> dict:
         "enable_depth": any(key.startswith("depth_head.") for key in state_dict),
         "enable_normal": any(key.startswith("normal_head.") for key in state_dict),
         "enable_track": any(key.startswith("track_head.") for key in state_dict),
-        "human_prior_channels": int(proj0.shape[1]) if proj0 is not None else 0,
-        "human_prior_summary_channels": int(summary_proj0.shape[1]) if summary_proj0 is not None else 0,
-        "human_prior_hidden_dim": int(proj0.shape[0]) if proj0 is not None else 64,
-        "human_prior_gate_init": float(gate.item()) if gate is not None else 0.0,
-        "human_prior_multi_scale_factors": scale_factors,
+        "human_prior_in_chans": int(prior_conv.shape[1]) if prior_conv is not None else (int(legacy_proj.shape[1]) if legacy_proj is not None else 17),
+        "human_prior_summary_in_dim": int(summary_ln.shape[0]) if summary_ln is not None else (int(legacy_summary.shape[1]) if legacy_summary is not None else 12),
+        "human_prior_hidden_dim": int(prior_conv.shape[0]) if prior_conv is not None else (int(legacy_proj.shape[0]) if legacy_proj is not None else 128),
+        "human_prior_scales": list(range(1, scale_count + 1)) if scale_count != 3 else [1, 2, 4],
     }
 
 
@@ -157,7 +159,11 @@ def main() -> int:
     dtype = torch.bfloat16 if device == "cuda" and torch.cuda.get_device_capability()[0] >= 8 else torch.float16
     with torch.no_grad():
         with torch.cuda.amp.autocast(enabled=device == "cuda", dtype=dtype):
-            predictions = model(images, prior_maps=prior_maps, prior_summary_tokens=prior_summary_tokens)
+            predictions = model(
+                images,
+                human_prior_feature_maps=prior_maps,
+                human_prior_summary_tokens=prior_summary_tokens,
+            )
 
     pose_enc = predictions["pose_enc"]
     extrinsic, intrinsic = pose_encoding_to_extri_intri(pose_enc, images.shape[-2:])

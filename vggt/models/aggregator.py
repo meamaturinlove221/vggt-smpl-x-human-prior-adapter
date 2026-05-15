@@ -181,6 +181,11 @@ class Aggregator(nn.Module):
         self.enable_human_prior_summary = bool(enable_human_prior_summary)
         self.human_prior_summary_in_dim = int(max(1, human_prior_summary_in_dim))
         self.human_prior_summary_num_heads = int(max(1, human_prior_summary_num_heads))
+        # Compatibility aliases used by older tooling/reports.  Keep them in
+        # sync with the canonical names so audits do not read a missing
+        # attribute as "no prior".
+        self.human_prior_channels = self.human_prior_in_chans
+        self.human_prior_summary_channels = self.human_prior_summary_in_dim
 
         # Validate that depth is divisible by aa_block_size
         if self.depth % self.aa_block_size != 0:

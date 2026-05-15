@@ -243,8 +243,8 @@ def _run_component(
     with torch.cuda.amp.autocast(enabled=trainer.optim_conf.amp.enabled, dtype=amp_dtype):
         predictions = model(
             images=batch["images"],
-            prior_maps=batch.get("prior_maps"),
-            prior_summary_tokens=batch.get("prior_summary_tokens"),
+            human_prior_feature_maps=batch.get("smpl_vertex_feature_maps", batch.get("prior_maps")),
+            human_prior_summary_tokens=batch.get("smpl_summary_tokens", batch.get("prior_summary_tokens")),
         )
         retained_predictions = {}
         for key in PREDICTION_KEYS:

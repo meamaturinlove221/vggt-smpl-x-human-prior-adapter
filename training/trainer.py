@@ -842,6 +842,18 @@ class Trainer:
             "smpl_prior_masks",
             "smpl_prior_feature_maps",
             "smpl_vertex_feature_maps",
+            "prior_maps",
+            "prior_mask",
+            "prior_depths",
+            "prior_points",
+            "prior_normals",
+            "teacher_mask",
+            "smplx_bodyhand_anchor_mask",
+            "smplx_body_anchor_mask",
+            "smplx_hand_anchor_mask",
+            "smplx_left_hand_anchor_mask",
+            "smplx_right_hand_anchor_mask",
+            "smplx_native_visible_mask",
             "human_prior_completion_masks",
             "human_prior_completion_depths", "human_prior_completion_world_points", "human_prior_completion_point_masks",
             "head_hair_region_masks",
@@ -904,28 +916,52 @@ class Trainer:
         return first_cam_rotation, first_cam_translation, avg_scale
 
     def _normalize_human_prior_completion_batch_tensors(self, batch: Mapping) -> None:
+        first_cam_rotation, first_cam_translation, avg_scale = self._compute_batch_scene_normalization_stats(batch)
+
         prior_point_masks = batch.get("human_prior_completion_point_masks", None)
         prior_world_points = batch.get("human_prior_completion_world_points", None)
         prior_depths = batch.get("human_prior_completion_depths", None)
-        if prior_point_masks is None or (prior_world_points is None and prior_depths is None):
+        if prior_point_masks is not None and (prior_world_points is not None or prior_depths is not None):
+            if prior_world_points is not None:
+                normalized_prior_world_points = (
+                    prior_world_points @ first_cam_rotation.transpose(-1, -2).unsqueeze(1).unsqueeze(2)
+                ) + first_cam_translation.unsqueeze(1).unsqueeze(2).unsqueeze(3)
+                normalized_prior_world_points = normalized_prior_world_points / avg_scale.view(-1, 1, 1, 1, 1)
+                batch["human_prior_completion_world_points"] = torch.where(
+                    prior_point_masks.unsqueeze(-1),
+                    normalized_prior_world_points,
+                    torch.zeros_like(normalized_prior_world_points),
+                )
+
+            if prior_depths is not None:
+                normalized_prior_depths = prior_depths / avg_scale.view(-1, 1, 1, 1)
+                batch["human_prior_completion_depths"] = torch.where(
+                    prior_point_masks,
+                    normalized_prior_depths,
+                    torch.zeros_like(normalized_prior_depths),
+                )
+
+        native_prior_mask = batch.get("prior_mask", None)
+        native_prior_points = batch.get("prior_points", None)
+        native_prior_depths = batch.get("prior_depths", None)
+        if native_prior_mask is None or (native_prior_points is None and native_prior_depths is None):
             return
 
-        first_cam_rotation, first_cam_translation, avg_scale = self._compute_batch_scene_normalization_stats(batch)
-        if prior_world_points is not None:
+        if native_prior_points is not None:
             normalized_prior_world_points = (
-                prior_world_points @ first_cam_rotation.transpose(-1, -2).unsqueeze(1).unsqueeze(2)
+                native_prior_points @ first_cam_rotation.transpose(-1, -2).unsqueeze(1).unsqueeze(2)
             ) + first_cam_translation.unsqueeze(1).unsqueeze(2).unsqueeze(3)
             normalized_prior_world_points = normalized_prior_world_points / avg_scale.view(-1, 1, 1, 1, 1)
-            batch["human_prior_completion_world_points"] = torch.where(
-                prior_point_masks.unsqueeze(-1),
+            batch["prior_points"] = torch.where(
+                native_prior_mask.unsqueeze(-1),
                 normalized_prior_world_points,
                 torch.zeros_like(normalized_prior_world_points),
             )
 
-        if prior_depths is not None:
-            normalized_prior_depths = prior_depths / avg_scale.view(-1, 1, 1, 1)
-            batch["human_prior_completion_depths"] = torch.where(
-                prior_point_masks,
+        if native_prior_depths is not None:
+            normalized_prior_depths = native_prior_depths / avg_scale.view(-1, 1, 1, 1)
+            batch["prior_depths"] = torch.where(
+                native_prior_mask,
                 normalized_prior_depths,
                 torch.zeros_like(normalized_prior_depths),
             )

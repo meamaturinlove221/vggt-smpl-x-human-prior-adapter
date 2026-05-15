@@ -1,8 +1,0 @@
-{
-  "active_candidate_modified": false,
-  "created_utc": "2026-05-08T21:10:58Z",
-  "decision": "Right-hand patch is not hard-merged. Mentor must accept risk or provide/authorize more evidence.",
-  "result": "MERGE_FAIL_SOFT_REVIEW_ONLY",
-  "status": "FAIL_FROZEN",
-  "task": "V253_C4_right_hand_hard_merge_gate"
-}
