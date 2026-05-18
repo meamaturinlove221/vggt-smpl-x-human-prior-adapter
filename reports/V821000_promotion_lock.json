@@ -1,0 +1,9 @@
+{
+  "V770_predictions": "D:\\vggt\\vggt-main\\local_report_auxiliary\\V600_quality_rebuild\\output\\V701000_V900000_production_live_highres\\V770000_production_composition_NOT_CANDIDATE\\predictions.npz",
+  "active_candidate": "V11700_gap_reduction_branch_520",
+  "allow_as_candidate": false,
+  "allow_mentor_package": false,
+  "allow_strict_registry": false,
+  "reason": "User/mentor must explicitly approve after reviewing V820 readiness evidence; current output remains NOT_CANDIDATE diagnostic.",
+  "status": "V821000_PROMOTION_LOCK"
+}

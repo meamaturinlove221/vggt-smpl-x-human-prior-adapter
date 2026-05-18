@@ -1,0 +1,20 @@
+{
+  "created_at": "2026-05-18T16:57:29Z",
+  "modal_apps_json": "[]",
+  "modal_returncode": 0,
+  "process_scan": [
+    {
+      "CommandLine": "\"D:\\anaconda\\python.exe\" tools\\v820000_v900000_candidate_readiness_review.py",
+      "Name": "python.exe",
+      "ProcessId": 13492
+    }
+  ],
+  "residual_training_or_modal_worker_detected": true,
+  "residual_workers": [
+    {
+      "CommandLine": "\"D:\\anaconda\\python.exe\" tools\\v820000_v900000_candidate_readiness_review.py",
+      "Name": "python.exe",
+      "ProcessId": 13492
+    }
+  ]
+}

@@ -1,0 +1,75 @@
+{
+  "active_candidate": "V11700_gap_reduction_branch_520",
+  "baseline_used": "V647_true6_crop_baseline",
+  "candidate_package_generated": false,
+  "created_at": "2026-05-18T17:00:13Z",
+  "mentor_package_generated": false,
+  "mentor_requirements_met_for_review": true,
+  "numeric_requirements": {
+    "full_no_regression": true,
+    "hairline_positive": true,
+    "head_face_positive": true,
+    "left_hand_preserved": true,
+    "mean_local_positive": true,
+    "right_hand_positive": true
+  },
+  "numeric_requirements_pass": true,
+  "production_result": "V770000_PRODUCTION_COMPOSITION_NOT_CANDIDATE",
+  "promotion_allowed": false,
+  "region_rows": [
+    {
+      "normal_nonzero_ratio_prod": 1.0,
+      "prod_vs_v117_l2_mean_roi": 0.000619024969637394,
+      "production_changed_pixels_in_roi": 1438,
+      "production_changed_pixels_view": 1438,
+      "region": "full_body",
+      "roi_pixels": 11538,
+      "v117_vs_baseline_l2_mean_roi": 0.3673592805862427,
+      "view": 4
+    },
+    {
+      "normal_nonzero_ratio_prod": 1.0,
+      "prod_vs_v117_l2_mean_roi": 0.004032267723232508,
+      "production_changed_pixels_in_roi": 1437,
+      "production_changed_pixels_view": 1438,
+      "region": "head_face",
+      "roi_pixels": 1770,
+      "v117_vs_baseline_l2_mean_roi": 0.4428514838218689,
+      "view": 4
+    },
+    {
+      "normal_nonzero_ratio_prod": 1.0,
+      "prod_vs_v117_l2_mean_roi": 0.004397324752062559,
+      "production_changed_pixels_in_roi": 1200,
+      "production_changed_pixels_view": 1438,
+      "region": "hairline",
+      "roi_pixels": 1418,
+      "v117_vs_baseline_l2_mean_roi": 0.38170406222343445,
+      "view": 4
+    },
+    {
+      "normal_nonzero_ratio_prod": 1.0,
+      "prod_vs_v117_l2_mean_roi": 0.0019524943782016635,
+      "production_changed_pixels_in_roi": 62,
+      "production_changed_pixels_view": 374,
+      "region": "left_hand",
+      "roi_pixels": 99,
+      "v117_vs_baseline_l2_mean_roi": 0.4432471990585327,
+      "view": 3
+    },
+    {
+      "normal_nonzero_ratio_prod": 1.0,
+      "prod_vs_v117_l2_mean_roi": 0.0031176914926618338,
+      "production_changed_pixels_in_roi": 374,
+      "production_changed_pixels_view": 374,
+      "region": "right_hand",
+      "roi_pixels": 374,
+      "v117_vs_baseline_l2_mean_roi": 0.16122736036777496,
+      "view": 3
+    }
+  ],
+  "status": "V910000_MENTOR_REQUIREMENT_EVIDENCE_READY",
+  "strict_registry_written": false,
+  "visual_board": "D:\\vggt\\vggt-main\\local_report_auxiliary\\V600_quality_rebuild\\output\\V910000_V930000_mentor_requirement_completion\\V910000_mentor_requirement_comparison_board.png",
+  "visual_board_ready": true
+}

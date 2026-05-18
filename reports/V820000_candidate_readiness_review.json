@@ -1,0 +1,80 @@
+{
+  "active_candidate": "V11700_gap_reduction_branch_520",
+  "candidate_readiness_package_generated": true,
+  "created_at": "2026-05-18T16:57:26Z",
+  "mentor_gate": {
+    "candidate_readiness_allowed": false,
+    "pass": true,
+    "reason": "Gate pass here only means production route produced non-empty evidence; final promotion still needs user/mentor approval and stricter visual acceptance.",
+    "requirements": {
+      "full_body_no_regression": true,
+      "hand_improved_or_preserved_with_blocker": true,
+      "head_face_or_hairline_visible_improvement": true,
+      "no_evaluator_only_claim": true,
+      "normal_depth_point_not_worse": true,
+      "selected_record_count_gt_0": true
+    },
+    "status": "V790000_MENTOR_GATE"
+  },
+  "mentor_package_generated": false,
+  "previous_return_condition": {
+    "active_candidate": "V11700_gap_reduction_branch_520",
+    "branch": "codex/live-highres-crop",
+    "candidate_generated": false,
+    "global_terminal": false,
+    "mentor_gate_pass": true,
+    "mentor_package_generated": false,
+    "next_route": "V820000 candidate-readiness package may be prepared only after user approval; strict registry remains blocked.",
+    "production_code_changed": true,
+    "route_classification": "MENTOR_VISIBLE_GAIN_READY_DIAGNOSTIC_NOT_PROMOTED",
+    "status": "V900000_PRODUCTION_LIVE_HIGHRES_ROUTE_BUDGET_SNAPSHOT",
+    "strict_registry_written": false,
+    "v50_v50r2_modified": false,
+    "worktree": "D:\\vggt\\vggt-live-highres-crop"
+  },
+  "readiness_scope": "review bundle only; not active-candidate promotion",
+  "requires_human_approval_before_registry_or_candidate_promotion": true,
+  "route_decision": {
+    "active_candidate": "V11700_gap_reduction_branch_520",
+    "classification": "MENTOR_VISIBLE_GAIN_READY_DIAGNOSTIC_NOT_PROMOTED",
+    "next_route": "V820000 candidate-readiness package may be prepared only after user approval; strict registry remains blocked.",
+    "single_branch_terminal_is_global_terminal": false,
+    "status": "V800000_GLOBAL_ROUTE_DECISION"
+  },
+  "source_diagnostic": {
+    "candidate_generated": false,
+    "npz": "D:\\vggt\\vggt-main\\local_report_auxiliary\\V600_quality_rebuild\\output\\V701000_V900000_production_live_highres\\V770000_production_composition_NOT_CANDIDATE\\predictions.npz",
+    "patch_count": 3,
+    "status": "V770000_PRODUCTION_COMPOSITION_NOT_CANDIDATE",
+    "used_records": [
+      {
+        "classification": "HAND_TRUE_GAIN",
+        "region": "right_hand",
+        "view": 3
+      },
+      {
+        "classification": "HEAD_HAIR_TRUE_GAIN",
+        "region": "head_face",
+        "view": 4
+      },
+      {
+        "classification": "HEAD_HAIR_TRUE_GAIN",
+        "region": "hairline",
+        "view": 4
+      }
+    ],
+    "v629_delta": {
+      "full_body_quality": 0.00023165146509795953,
+      "hairline_quality": 0.0006129578749339837,
+      "head_face_quality": 0.0013244062662124412,
+      "left_hand_quality": 0.0,
+      "local_detail_quality": 0.0007627446651456982,
+      "mean_quality": 0.0006742291318043714,
+      "right_hand_quality": 0.000551952918370624
+    }
+  },
+  "status": "V820000_CANDIDATE_READINESS_REVIEW_READY_NOT_PROMOTION",
+  "strict_registry_written": false,
+  "v50_v50r2_modified": false,
+  "visual_review_board": "D:\\vggt\\vggt-main\\local_report_auxiliary\\V600_quality_rebuild\\output\\V820000_V900000_readiness_review\\V820000_candidate_readiness_visual_review_board.png"
+}

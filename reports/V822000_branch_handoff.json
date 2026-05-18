@@ -1,0 +1,13 @@
+{
+  "branch": "codex/live-highres-crop",
+  "last_commit": "d22aa9e Run production high-res crop controller",
+  "next_allowed_actions": [
+    "human/mentor review of V820 readiness board",
+    "user-approved candidate-readiness packaging continuation",
+    "new supervision/architecture route if review rejects visual gain"
+  ],
+  "production_controller": "D:\\vggt\\vggt-live-highres-crop\\tools\\v701000_v900000_production_highres_controller.py",
+  "readiness_controller": "D:\\vggt\\vggt-live-highres-crop\\tools\\v820000_v900000_candidate_readiness_review.py",
+  "status": "V822000_BRANCH_HANDOFF",
+  "worktree": "D:\\vggt\\vggt-live-highres-crop"
+}
