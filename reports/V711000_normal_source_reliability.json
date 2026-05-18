@@ -1,0 +1,33 @@
+{
+  "sources": {
+    "SMPLX_rendered_normal": {
+      "role": "weak_prior_only",
+      "teacher_claim": false
+    },
+    "Sapiens_2d_normal": {
+      "role": "weak_risk_cue_only",
+      "teacher_claim": false
+    },
+    "crop_predicted_normal": {
+      "must_be_nonzero": true,
+      "role": "trainable residual output"
+    },
+    "depth_derived_normal": {
+      "reliable_for": [
+        "smooth local surfaces"
+      ],
+      "role": "consistency_signal",
+      "teacher_claim": false
+    },
+    "geometric_normal_from_point_map": {
+      "reliable_for": [
+        "head_face",
+        "hairline",
+        "hands"
+      ],
+      "role": "primary_selfsupervised_signal",
+      "teacher_claim": false
+    }
+  },
+  "status": "V711000_NORMAL_SOURCE_RELIABILITY"
+}

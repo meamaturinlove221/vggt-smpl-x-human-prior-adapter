@@ -1,0 +1,332 @@
+{
+  "action": "expanded crop diagnostics through existing high-res ROI inventory; if no true hand gain remains, external hand supervision is required",
+  "hand_inventory": [
+    {
+      "camera_id": 30,
+      "crop_id": 15,
+      "crop_pixels_lowres": 17292,
+      "defect_score": 0.5822392702102661,
+      "enough_pixels_for_detail": true,
+      "lowres_bbox": [
+        202,
+        182,
+        333,
+        314
+      ],
+      "lowres_preview_path": "D:\\vggt\\vggt-main\\local_report_auxiliary\\V600_quality_rebuild\\output\\V400000_V520000_highres_human_feature_branch\\V402000_high_res_roi_inventory\\crops\\V402000_crop015_left_hand_view3_lowres_overlay.png",
+      "original_pixel_coverage": 0.01008249312557287,
+      "raw_available": true,
+      "raw_bbox": [
+        799,
+        860,
+        1317,
+        1484
+      ],
+      "raw_crop_path": "D:\\vggt\\vggt-main\\local_report_auxiliary\\V600_quality_rebuild\\output\\V400000_V520000_highres_human_feature_branch\\V402000_high_res_roi_inventory\\crops\\V402000_crop015_left_hand_view3_raw.png",
+      "region": "left_hand",
+      "region_pixels": 99,
+      "semantic_ownership_confidence": 0.30181819200515747,
+      "view": 3
+    },
+    {
+      "camera_id": 45,
+      "crop_id": 16,
+      "crop_pixels_lowres": 36290,
+      "defect_score": 0.561373233795166,
+      "enough_pixels_for_detail": true,
+      "lowres_bbox": [
+        132,
+        166,
+        322,
+        357
+      ],
+      "lowres_preview_path": "D:\\vggt\\vggt-main\\local_report_auxiliary\\V600_quality_rebuild\\output\\V400000_V520000_highres_human_feature_branch\\V402000_high_res_roi_inventory\\crops\\V402000_crop016_left_hand_view4_lowres_overlay.png",
+      "original_pixel_coverage": 0.02998786618131392,
+      "raw_available": true,
+      "raw_bbox": [
+        522,
+        784,
+        1273,
+        1687
+      ],
+      "raw_crop_path": "D:\\vggt\\vggt-main\\local_report_auxiliary\\V600_quality_rebuild\\output\\V400000_V520000_highres_human_feature_branch\\V402000_high_res_roi_inventory\\crops\\V402000_crop016_left_hand_view4_raw.png",
+      "region": "left_hand",
+      "region_pixels": 346,
+      "semantic_ownership_confidence": 0.3528323769569397,
+      "view": 4
+    },
+    {
+      "camera_id": 59,
+      "crop_id": 17,
+      "crop_pixels_lowres": 40200,
+      "defect_score": 0.4910707473754883,
+      "enough_pixels_for_detail": true,
+      "lowres_bbox": [
+        126,
+        164,
+        326,
+        365
+      ],
+      "lowres_preview_path": "D:\\vggt\\vggt-main\\local_report_auxiliary\\V600_quality_rebuild\\output\\V400000_V520000_highres_human_feature_branch\\V402000_high_res_roi_inventory\\crops\\V402000_crop017_left_hand_view5_lowres_overlay.png",
+      "original_pixel_coverage": 0.05394641564083997,
+      "raw_available": true,
+      "raw_bbox": [
+        730,
+        1297,
+        1888,
+        2886
+      ],
+      "raw_crop_path": "D:\\vggt\\vggt-main\\local_report_auxiliary\\V600_quality_rebuild\\output\\V400000_V520000_highres_human_feature_branch\\V402000_high_res_roi_inventory\\crops\\V402000_crop017_left_hand_view5_raw.png",
+      "region": "left_hand",
+      "region_pixels": 596,
+      "semantic_ownership_confidence": 0.42255035042762756,
+      "view": 5
+    },
+    {
+      "camera_id": 15,
+      "crop_id": 14,
+      "crop_pixels_lowres": 33856,
+      "defect_score": 0.41920050978660583,
+      "enough_pixels_for_detail": true,
+      "lowres_bbox": [
+        195,
+        174,
+        379,
+        358
+      ],
+      "lowres_preview_path": "D:\\vggt\\vggt-main\\local_report_auxiliary\\V600_quality_rebuild\\output\\V400000_V520000_highres_human_feature_branch\\V402000_high_res_roi_inventory\\crops\\V402000_crop014_left_hand_view2_lowres_overlay.png",
+      "original_pixel_coverage": 0.0905937992643195,
+      "raw_available": true,
+      "raw_bbox": [
+        771,
+        822,
+        1498,
+        1692
+      ],
+      "raw_crop_path": "D:\\vggt\\vggt-main\\local_report_auxiliary\\V600_quality_rebuild\\output\\V400000_V520000_highres_human_feature_branch\\V402000_high_res_roi_inventory\\crops\\V402000_crop014_left_hand_view2_raw.png",
+      "region": "left_hand",
+      "region_pixels": 862,
+      "semantic_ownership_confidence": 0.5364269614219666,
+      "view": 2
+    },
+    {
+      "camera_id": 1,
+      "crop_id": 13,
+      "crop_pixels_lowres": 32400,
+      "defect_score": 0.35318678617477417,
+      "enough_pixels_for_detail": true,
+      "lowres_bbox": [
+        172,
+        176,
+        352,
+        356
+      ],
+      "lowres_preview_path": "D:\\vggt\\vggt-main\\local_report_auxiliary\\V600_quality_rebuild\\output\\V400000_V520000_highres_human_feature_branch\\V402000_high_res_roi_inventory\\crops\\V402000_crop013_left_hand_view1_lowres_overlay.png",
+      "original_pixel_coverage": 0.06345108695652174,
+      "raw_available": true,
+      "raw_bbox": [
+        680,
+        832,
+        1392,
+        1682
+      ],
+      "raw_crop_path": "D:\\vggt\\vggt-main\\local_report_auxiliary\\V600_quality_rebuild\\output\\V400000_V520000_highres_human_feature_branch\\V402000_high_res_roi_inventory\\crops\\V402000_crop013_left_hand_view1_raw.png",
+      "region": "left_hand",
+      "region_pixels": 934,
+      "semantic_ownership_confidence": 0.28847965598106384,
+      "view": 1
+    },
+    {
+      "camera_id": 0,
+      "crop_id": 12,
+      "crop_pixels_lowres": 30450,
+      "defect_score": 0.28176331520080566,
+      "enough_pixels_for_detail": true,
+      "lowres_bbox": [
+        182,
+        179,
+        357,
+        353
+      ],
+      "lowres_preview_path": "D:\\vggt\\vggt-main\\local_report_auxiliary\\V600_quality_rebuild\\output\\V400000_V520000_highres_human_feature_branch\\V402000_high_res_roi_inventory\\crops\\V402000_crop012_left_hand_view0_lowres_overlay.png",
+      "original_pixel_coverage": 0.06231505657093125,
+      "raw_available": true,
+      "raw_bbox": [
+        720,
+        846,
+        1411,
+        1668
+      ],
+      "raw_crop_path": "D:\\vggt\\vggt-main\\local_report_auxiliary\\V600_quality_rebuild\\output\\V400000_V520000_highres_human_feature_branch\\V402000_high_res_roi_inventory\\crops\\V402000_crop012_left_hand_view0_raw.png",
+      "region": "left_hand",
+      "region_pixels": 716,
+      "semantic_ownership_confidence": 0.2860335111618042,
+      "view": 0
+    },
+    {
+      "camera_id": 30,
+      "crop_id": 21,
+      "crop_pixels_lowres": 3600,
+      "defect_score": 0.5890738368034363,
+      "enough_pixels_for_detail": true,
+      "lowres_bbox": [
+        253,
+        204,
+        313,
+        264
+      ],
+      "lowres_preview_path": "D:\\vggt\\vggt-main\\local_report_auxiliary\\V600_quality_rebuild\\output\\V400000_V520000_highres_human_feature_branch\\V402000_high_res_roi_inventory\\crops\\V402000_crop021_right_hand_view3_lowres_overlay.png",
+      "original_pixel_coverage": 0.03808941847438639,
+      "raw_available": true,
+      "raw_bbox": [
+        1000,
+        964,
+        1237,
+        1248
+      ],
+      "raw_crop_path": "D:\\vggt\\vggt-main\\local_report_auxiliary\\V600_quality_rebuild\\output\\V400000_V520000_highres_human_feature_branch\\V402000_high_res_roi_inventory\\crops\\V402000_crop021_right_hand_view3_raw.png",
+      "region": "right_hand",
+      "region_pixels": 374,
+      "semantic_ownership_confidence": 0.51871657371521,
+      "view": 3
+    },
+    {
+      "camera_id": 45,
+      "crop_id": 22,
+      "crop_pixels_lowres": 1024,
+      "defect_score": 0.4478342533111572,
+      "enough_pixels_for_detail": false,
+      "lowres_bbox": [
+        258,
+        219,
+        290,
+        251
+      ],
+      "lowres_preview_path": "D:\\vggt\\vggt-main\\local_report_auxiliary\\V600_quality_rebuild\\output\\V400000_V520000_highres_human_feature_branch\\V402000_high_res_roi_inventory\\crops\\V402000_crop022_right_hand_view4_lowres_overlay.png",
+      "original_pixel_coverage": 0.005113537874848327,
+      "raw_available": true,
+      "raw_bbox": [
+        1020,
+        1035,
+        1147,
+        1186
+      ],
+      "raw_crop_path": "D:\\vggt\\vggt-main\\local_report_auxiliary\\V600_quality_rebuild\\output\\V400000_V520000_highres_human_feature_branch\\V402000_high_res_roi_inventory\\crops\\V402000_crop022_right_hand_view4_raw.png",
+      "region": "right_hand",
+      "region_pixels": 59,
+      "semantic_ownership_confidence": 0.2800000011920929,
+      "view": 4
+    },
+    {
+      "camera_id": 59,
+      "crop_id": 23,
+      "crop_pixels_lowres": 841,
+      "defect_score": 0.36856913566589355,
+      "enough_pixels_for_detail": false,
+      "lowres_bbox": [
+        266,
+        223,
+        295,
+        252
+      ],
+      "lowres_preview_path": "D:\\vggt\\vggt-main\\local_report_auxiliary\\V600_quality_rebuild\\output\\V400000_V520000_highres_human_feature_branch\\V402000_high_res_roi_inventory\\crops\\V402000_crop023_right_hand_view5_lowres_overlay.png",
+      "original_pixel_coverage": 0.0052498189717595945,
+      "raw_available": true,
+      "raw_bbox": [
+        1541,
+        1763,
+        1708,
+        1993
+      ],
+      "raw_crop_path": "D:\\vggt\\vggt-main\\local_report_auxiliary\\V600_quality_rebuild\\output\\V400000_V520000_highres_human_feature_branch\\V402000_high_res_roi_inventory\\crops\\V402000_crop023_right_hand_view5_raw.png",
+      "region": "right_hand",
+      "region_pixels": 58,
+      "semantic_ownership_confidence": 0.2800000011920929,
+      "view": 5
+    },
+    {
+      "camera_id": 1,
+      "crop_id": 19,
+      "crop_pixels_lowres": 3136,
+      "defect_score": 0.357010155916214,
+      "enough_pixels_for_detail": true,
+      "lowres_bbox": [
+        256,
+        206,
+        312,
+        262
+      ],
+      "lowres_preview_path": "D:\\vggt\\vggt-main\\local_report_auxiliary\\V600_quality_rebuild\\output\\V400000_V520000_highres_human_feature_branch\\V402000_high_res_roi_inventory\\crops\\V402000_crop019_right_hand_view1_lowres_overlay.png",
+      "original_pixel_coverage": 0.019633152173913045,
+      "raw_available": true,
+      "raw_bbox": [
+        1012,
+        974,
+        1234,
+        1238
+      ],
+      "raw_crop_path": "D:\\vggt\\vggt-main\\local_report_auxiliary\\V600_quality_rebuild\\output\\V400000_V520000_highres_human_feature_branch\\V402000_high_res_roi_inventory\\crops\\V402000_crop019_right_hand_view1_raw.png",
+      "region": "right_hand",
+      "region_pixels": 289,
+      "semantic_ownership_confidence": 0.2800000011920929,
+      "view": 1
+    },
+    {
+      "camera_id": 15,
+      "crop_id": 20,
+      "crop_pixels_lowres": 3600,
+      "defect_score": 0.34703636169433594,
+      "enough_pixels_for_detail": true,
+      "lowres_bbox": [
+        254,
+        204,
+        314,
+        264
+      ],
+      "lowres_preview_path": "D:\\vggt\\vggt-main\\local_report_auxiliary\\V600_quality_rebuild\\output\\V400000_V520000_highres_human_feature_branch\\V402000_high_res_roi_inventory\\crops\\V402000_crop020_right_hand_view2_lowres_overlay.png",
+      "original_pixel_coverage": 0.03688912243825539,
+      "raw_available": true,
+      "raw_bbox": [
+        1004,
+        964,
+        1241,
+        1248
+      ],
+      "raw_crop_path": "D:\\vggt\\vggt-main\\local_report_auxiliary\\V600_quality_rebuild\\output\\V400000_V520000_highres_human_feature_branch\\V402000_high_res_roi_inventory\\crops\\V402000_crop020_right_hand_view2_raw.png",
+      "region": "right_hand",
+      "region_pixels": 351,
+      "semantic_ownership_confidence": 0.2800000309944153,
+      "view": 2
+    },
+    {
+      "camera_id": 0,
+      "crop_id": 18,
+      "crop_pixels_lowres": 2500,
+      "defect_score": 0.21138551831245422,
+      "enough_pixels_for_detail": true,
+      "lowres_bbox": [
+        259,
+        209,
+        309,
+        259
+      ],
+      "lowres_preview_path": "D:\\vggt\\vggt-main\\local_report_auxiliary\\V600_quality_rebuild\\output\\V400000_V520000_highres_human_feature_branch\\V402000_high_res_roi_inventory\\crops\\V402000_crop018_right_hand_view0_lowres_overlay.png",
+      "original_pixel_coverage": 0.02010443864229765,
+      "raw_available": true,
+      "raw_bbox": [
+        1024,
+        988,
+        1222,
+        1224
+      ],
+      "raw_crop_path": "D:\\vggt\\vggt-main\\local_report_auxiliary\\V600_quality_rebuild\\output\\V400000_V520000_highres_human_feature_branch\\V402000_high_res_roi_inventory\\crops\\V402000_crop018_right_hand_view0_raw.png",
+      "region": "right_hand",
+      "region_pixels": 231,
+      "semantic_ownership_confidence": 0.2799999713897705,
+      "view": 0
+    }
+  ],
+  "left_hand_mean_pixels": 592.1666666666666,
+  "right_hand_mean_pixels": 227.0,
+  "status": "V721000_HAND_CROP_EXPANSION"
+}

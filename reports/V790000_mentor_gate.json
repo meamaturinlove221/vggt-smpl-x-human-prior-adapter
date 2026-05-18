@@ -1,0 +1,14 @@
+{
+  "candidate_readiness_allowed": false,
+  "pass": true,
+  "reason": "Gate pass here only means production route produced non-empty evidence; final promotion still needs user/mentor approval and stricter visual acceptance.",
+  "requirements": {
+    "full_body_no_regression": true,
+    "hand_improved_or_preserved_with_blocker": true,
+    "head_face_or_hairline_visible_improvement": true,
+    "no_evaluator_only_claim": true,
+    "normal_depth_point_not_worse": true,
+    "selected_record_count_gt_0": true
+  },
+  "status": "V790000_MENTOR_GATE"
+}

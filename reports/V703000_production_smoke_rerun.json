@@ -1,0 +1,84 @@
+{
+  "smoke_report": {
+    "changed_pixels": 12,
+    "grad_nonzero": true,
+    "identity_l2": 0.0,
+    "loss_end": 3.881581278619706e-08,
+    "loss_start": 1.5999997060589521e-07,
+    "outside_changed_pixels": 0,
+    "pass": true,
+    "target_indices": 12,
+    "trace": [
+      {
+        "grad_norm": 7.670298529660613e-08,
+        "loss": 1.5999997060589521e-07,
+        "step": 0
+      },
+      {
+        "grad_norm": 8.973415444035737e-08,
+        "loss": 1.5473003145416442e-07,
+        "step": 1
+      },
+      {
+        "grad_norm": 1.0473536904420655e-07,
+        "loss": 1.4933500835923041e-07,
+        "step": 2
+      },
+      {
+        "grad_norm": 1.2221105283316547e-07,
+        "loss": 1.4349200228025438e-07,
+        "step": 3
+      },
+      {
+        "grad_norm": 1.428099272171579e-07,
+        "loss": 1.3690731748283724e-07,
+        "step": 4
+      },
+      {
+        "grad_norm": 1.6729711793672664e-07,
+        "loss": 1.2925916337280796e-07,
+        "step": 5
+      },
+      {
+        "grad_norm": 1.9647546167789187e-07,
+        "loss": 1.2016018047233956e-07,
+        "step": 6
+      },
+      {
+        "grad_norm": 2.3090083089982727e-07,
+        "loss": 1.0913313985838613e-07,
+        "step": 7
+      },
+      {
+        "grad_norm": 2.700106547237624e-07,
+        "loss": 9.562049285705143e-08,
+        "step": 8
+      },
+      {
+        "grad_norm": 3.095946263798055e-07,
+        "loss": 7.910446697678708e-08,
+        "step": 9
+      },
+      {
+        "grad_norm": 3.348798989222246e-07,
+        "loss": 5.9561759968573824e-08,
+        "step": 10
+      },
+      {
+        "grad_norm": 3.065707216975966e-07,
+        "loss": 3.881581278619706e-08,
+        "step": 11
+      }
+    ]
+  },
+  "status": "V703000_PRODUCTION_SMOKE_RERUN",
+  "subprocess": {
+    "cmd": [
+      "D:\\anaconda\\python.exe",
+      "tools/smoke_highres_crop_geometry_branch.py"
+    ],
+    "returncode": 0,
+    "stderr": "",
+    "stdout": "{\n  \"identity_l2\": 0.0,\n  \"loss_start\": 1.5999997060589521e-07,\n  \"loss_end\": 3.881581278619706e-08,\n  \"grad_nonzero\": true,\n  \"changed_pixels\": 12,\n  \"outside_changed_pixels\": 0,\n  \"target_indices\": 12,\n  \"trace\": [\n    {\n      \"step\": 0,\n      \"loss\": 1.5999997060589521e-07,\n      \"grad_norm\": 7.670298529660613e-08\n    },\n    {\n      \"step\": 1,\n      \"loss\": 1.5473003145416442e-07,\n      \"grad_norm\": 8.973415444035737e-08\n    },\n    {\n      \"step\": 2,\n      \"loss\": 1.4933500835923041e-07,\n      \"grad_norm\": 1.0473536904420655e-07\n    },\n    {\n      \"step\": 3,\n      \"loss\": 1.4349200228025438e-07,\n      \"grad_norm\": 1.2221105283316547e-07\n    },\n    {\n      \"step\": 4,\n      \"loss\": 1.3690731748283724e-07,\n      \"grad_norm\": 1.428099272171579e-07\n    },\n    {\n      \"step\": 5,\n      \"loss\": 1.2925916337280796e-07,\n      \"grad_norm\": 1.6729711793672664e-07\n    },\n    {\n      \"step\": 6,\n      \"loss\": 1.2016018047233956e-07,\n      \"grad_norm\": 1.9647546167789187e-07\n    },\n    {\n      \"step\": 7,\n      \"loss\": 1.0913313985838613e-07,\n      \"grad_norm\": 2.3090083089982727e-07\n    },\n    {\n      \"step\": 8,\n      \"loss\": 9.562049285705143e-08,\n      \"grad_norm\": 2.700106547237624e-07\n    },\n    {\n      \"step\": 9,\n      \"loss\": 7.910446697678708e-08,\n      \"grad_norm\": 3.095946263798055e-07\n    },\n    {\n      \"step\": 10,\n      \"loss\": 5.9561759968573824e-08,\n      \"grad_norm\": 3.348798989222246e-07\n    },\n    {\n      \"step\": 11,\n      \"loss\": 3.881581278619706e-08,\n      \"grad_norm\": 3.065707216975966e-07\n    }\n  ],\n  \"pass\": true\n}\n"
+  }
+}

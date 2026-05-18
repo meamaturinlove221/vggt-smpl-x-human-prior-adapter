@@ -1,0 +1,161 @@
+{
+  "rows": [
+    {
+      "feature_to_region_center_l2": 0.38125213980674744,
+      "region": "head_face",
+      "status": "MULTIVIEW_CROP_CONSISTENCY_DIAGNOSTIC",
+      "view": 4,
+      "view_count": 6
+    },
+    {
+      "feature_to_region_center_l2": 0.32514891028404236,
+      "region": "head_face",
+      "status": "MULTIVIEW_CROP_CONSISTENCY_DIAGNOSTIC",
+      "view": 5,
+      "view_count": 6
+    },
+    {
+      "feature_to_region_center_l2": 0.13328176736831665,
+      "region": "head_face",
+      "status": "MULTIVIEW_CROP_CONSISTENCY_DIAGNOSTIC",
+      "view": 3,
+      "view_count": 6
+    },
+    {
+      "feature_to_region_center_l2": 0.20525117218494415,
+      "region": "head_face",
+      "status": "MULTIVIEW_CROP_CONSISTENCY_DIAGNOSTIC",
+      "view": 2,
+      "view_count": 6
+    },
+    {
+      "feature_to_region_center_l2": 0.2983953654766083,
+      "region": "head_face",
+      "status": "MULTIVIEW_CROP_CONSISTENCY_DIAGNOSTIC",
+      "view": 0,
+      "view_count": 6
+    },
+    {
+      "feature_to_region_center_l2": 0.3065856397151947,
+      "region": "head_face",
+      "status": "MULTIVIEW_CROP_CONSISTENCY_DIAGNOSTIC",
+      "view": 1,
+      "view_count": 6
+    },
+    {
+      "feature_to_region_center_l2": 0.31135690212249756,
+      "region": "hairline",
+      "status": "MULTIVIEW_CROP_CONSISTENCY_DIAGNOSTIC",
+      "view": 4,
+      "view_count": 6
+    },
+    {
+      "feature_to_region_center_l2": 0.434948593378067,
+      "region": "hairline",
+      "status": "MULTIVIEW_CROP_CONSISTENCY_DIAGNOSTIC",
+      "view": 5,
+      "view_count": 6
+    },
+    {
+      "feature_to_region_center_l2": 0.0861891582608223,
+      "region": "hairline",
+      "status": "MULTIVIEW_CROP_CONSISTENCY_DIAGNOSTIC",
+      "view": 3,
+      "view_count": 6
+    },
+    {
+      "feature_to_region_center_l2": 0.2751465439796448,
+      "region": "hairline",
+      "status": "MULTIVIEW_CROP_CONSISTENCY_DIAGNOSTIC",
+      "view": 0,
+      "view_count": 6
+    },
+    {
+      "feature_to_region_center_l2": 0.2778233289718628,
+      "region": "hairline",
+      "status": "MULTIVIEW_CROP_CONSISTENCY_DIAGNOSTIC",
+      "view": 1,
+      "view_count": 6
+    },
+    {
+      "feature_to_region_center_l2": 0.22445885837078094,
+      "region": "hairline",
+      "status": "MULTIVIEW_CROP_CONSISTENCY_DIAGNOSTIC",
+      "view": 2,
+      "view_count": 6
+    },
+    {
+      "feature_to_region_center_l2": 0.46418851613998413,
+      "region": "left_hand",
+      "status": "MULTIVIEW_CROP_CONSISTENCY_DIAGNOSTIC",
+      "view": 3,
+      "view_count": 6
+    },
+    {
+      "feature_to_region_center_l2": 0.3845123052597046,
+      "region": "left_hand",
+      "status": "MULTIVIEW_CROP_CONSISTENCY_DIAGNOSTIC",
+      "view": 4,
+      "view_count": 6
+    },
+    {
+      "feature_to_region_center_l2": 0.3917589783668518,
+      "region": "left_hand",
+      "status": "MULTIVIEW_CROP_CONSISTENCY_DIAGNOSTIC",
+      "view": 5,
+      "view_count": 6
+    },
+    {
+      "feature_to_region_center_l2": 0.42965102195739746,
+      "region": "left_hand",
+      "status": "MULTIVIEW_CROP_CONSISTENCY_DIAGNOSTIC",
+      "view": 2,
+      "view_count": 6
+    },
+    {
+      "feature_to_region_center_l2": 0.2655355632305145,
+      "region": "left_hand",
+      "status": "MULTIVIEW_CROP_CONSISTENCY_DIAGNOSTIC",
+      "view": 1,
+      "view_count": 6
+    },
+    {
+      "feature_to_region_center_l2": 0.38533487915992737,
+      "region": "left_hand",
+      "status": "MULTIVIEW_CROP_CONSISTENCY_DIAGNOSTIC",
+      "view": 0,
+      "view_count": 6
+    },
+    {
+      "feature_to_region_center_l2": 0.5273246169090271,
+      "region": "right_hand",
+      "status": "MULTIVIEW_CROP_CONSISTENCY_DIAGNOSTIC",
+      "view": 3,
+      "view_count": 4
+    },
+    {
+      "feature_to_region_center_l2": 0.15160252153873444,
+      "region": "right_hand",
+      "status": "MULTIVIEW_CROP_CONSISTENCY_DIAGNOSTIC",
+      "view": 1,
+      "view_count": 4
+    },
+    {
+      "feature_to_region_center_l2": 0.16067057847976685,
+      "region": "right_hand",
+      "status": "MULTIVIEW_CROP_CONSISTENCY_DIAGNOSTIC",
+      "view": 2,
+      "view_count": 4
+    },
+    {
+      "feature_to_region_center_l2": 0.3319838345050812,
+      "region": "right_hand",
+      "status": "MULTIVIEW_CROP_CONSISTENCY_DIAGNOSTIC",
+      "view": 0,
+      "view_count": 4
+    }
+  ],
+  "rows_empty": false,
+  "status": "V760000_REAL_MULTIVIEW_CROP_TRAINING",
+  "training_claim": "diagnostic consistency rows only; not 24/60 and not promotion"
+}

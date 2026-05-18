@@ -1,0 +1,31 @@
+{
+  "hard_external_blocker": false,
+  "sources": {
+    "Kinect_TSDF": {
+      "role": "only if same-view local alignment can be proven",
+      "usable_now": false
+    },
+    "SMPLX_rendered_depth_normal": {
+      "role": "weak prior only",
+      "usable_now": true
+    },
+    "Sapiens_normal_or_parsing": {
+      "role": "weak cue/risk feature, not 3D teacher",
+      "usable_now": "if local assets exist"
+    },
+    "hand_keypoint_or_pose_prior": {
+      "role": "needed for hand rescue",
+      "usable_now": false
+    },
+    "multi_frame_true6": {
+      "role": "future data expansion",
+      "usable_now": false
+    },
+    "segmentation_boundary": {
+      "role": "weak boundary label",
+      "usable_now": true
+    }
+  },
+  "status": "V810000_EXTERNAL_SUPERVISION_INVENTORY",
+  "triggered_by": "MENTOR_VISIBLE_GAIN_READY_DIAGNOSTIC_NOT_PROMOTED"
+}

@@ -1,0 +1,13 @@
+﻿{
+    "created_at":  "2026-05-18T15:17:43Z",
+    "modal_apps_json":  "[]",
+    "process_scan":  {
+                         "ProcessId":  32760,
+                         "Name":  "python.exe",
+                         "CommandLine":  "\"C:\\Users\\WINDOWS\\AppData\\Roaming\\WPS 灵犀\\python-env\\python.exe\" -c \"import sys,json;d=json.loads(sys.stdin.readline());exec(compile(d[\\\"boot\\\"],\\\"\u003cbootstrap\u003e\\\",\\\"exec\\\"))\""
+                     },
+    "residual_training_or_modal_worker_detected":  false,
+    "residual_workers":  [
+
+                         ]
+}

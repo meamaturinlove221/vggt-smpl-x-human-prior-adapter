@@ -1,0 +1,22 @@
+{
+  "attempts": [
+    {
+      "added": [
+        "view_id_embedding",
+        "crop_scale"
+      ],
+      "attempt": 0,
+      "result": "diagnostic_needed_before_promotion"
+    },
+    {
+      "added": [
+        "normal_camera_angle",
+        "region_pose_proxy"
+      ],
+      "attempt": 1,
+      "result": "queued_for_next_training_if_multiview_overfit_persists"
+    }
+  ],
+  "not_returned_on_empty_rows": true,
+  "status": "V762000_VIEW_CONDITIONED_ADAPTER_REPAIR"
+}

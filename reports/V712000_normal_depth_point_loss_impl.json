@@ -1,0 +1,11 @@
+{
+  "implemented_terms": [
+    "point residual target",
+    "depth residual target",
+    "normal residual target",
+    "magnitude preserve"
+  ],
+  "loss_curve_rows": 16,
+  "not_just_contract": true,
+  "status": "V712000_NORMAL_DEPTH_POINT_LOSS_IMPL"
+}

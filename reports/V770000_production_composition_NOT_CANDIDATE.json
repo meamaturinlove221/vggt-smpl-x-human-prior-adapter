@@ -1,0 +1,32 @@
+{
+  "candidate_generated": false,
+  "npz": "D:\\vggt\\vggt-main\\local_report_auxiliary\\V600_quality_rebuild\\output\\V701000_V900000_production_live_highres\\V770000_production_composition_NOT_CANDIDATE\\predictions.npz",
+  "patch_count": 3,
+  "status": "V770000_PRODUCTION_COMPOSITION_NOT_CANDIDATE",
+  "used_records": [
+    {
+      "classification": "HAND_TRUE_GAIN",
+      "region": "right_hand",
+      "view": 3
+    },
+    {
+      "classification": "HEAD_HAIR_TRUE_GAIN",
+      "region": "head_face",
+      "view": 4
+    },
+    {
+      "classification": "HEAD_HAIR_TRUE_GAIN",
+      "region": "hairline",
+      "view": 4
+    }
+  ],
+  "v629_delta": {
+    "full_body_quality": 0.00023165146509795953,
+    "hairline_quality": 0.0006129578749339837,
+    "head_face_quality": 0.0013244062662124412,
+    "left_hand_quality": 0.0,
+    "local_detail_quality": 0.0007627446651456982,
+    "mean_quality": 0.0006742291318043714,
+    "right_hand_quality": 0.000551952918370624
+  }
+}

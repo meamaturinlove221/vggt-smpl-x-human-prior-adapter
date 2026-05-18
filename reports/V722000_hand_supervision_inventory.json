@@ -1,0 +1,12 @@
+{
+  "if_no_hand_true_gain": "HAND_EXTERNAL_SUPERVISION_NEEDED",
+  "sources": {
+    "2D_hand_keypoints": "not_confirmed_local",
+    "SMPLX_hand_vertices": "weak_prior_available",
+    "Sapiens_or_parsing": "weak_risk_cue_only_if_local_assets_exist",
+    "external_dense_hand_teacher": "not_available",
+    "mask_boundary": "weak_edge_available",
+    "wrist_arm_continuity": "weak_geometry_available"
+  },
+  "status": "V722000_HAND_SUPERVISION_INVENTORY"
+}

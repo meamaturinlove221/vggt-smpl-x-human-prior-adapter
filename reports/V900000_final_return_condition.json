@@ -1,0 +1,15 @@
+{
+  "active_candidate": "V11700_gap_reduction_branch_520",
+  "branch": "codex/live-highres-crop",
+  "candidate_generated": false,
+  "global_terminal": false,
+  "mentor_gate_pass": true,
+  "mentor_package_generated": false,
+  "next_route": "V820000 candidate-readiness package may be prepared only after user approval; strict registry remains blocked.",
+  "production_code_changed": true,
+  "route_classification": "MENTOR_VISIBLE_GAIN_READY_DIAGNOSTIC_NOT_PROMOTED",
+  "status": "V900000_PRODUCTION_LIVE_HIGHRES_ROUTE_BUDGET_SNAPSHOT",
+  "strict_registry_written": false,
+  "v50_v50r2_modified": false,
+  "worktree": "D:\\vggt\\vggt-live-highres-crop"
+}
