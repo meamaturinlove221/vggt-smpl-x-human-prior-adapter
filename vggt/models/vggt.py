@@ -12,6 +12,7 @@ from vggt.models.aggregator import Aggregator
 from vggt.heads.camera_head import CameraHead
 from vggt.heads.dpt_head import DPTHead
 from vggt.heads.track_head import TrackHead
+from vggt.models.highres_crop_geometry import HighResCropGeometryBranch
 
 
 class VGGT(nn.Module, PyTorchModelHubMixin):
@@ -45,6 +46,9 @@ class VGGT(nn.Module, PyTorchModelHubMixin):
         human_prior_enable_frame_fusion=None,
         human_prior_enable_global_fusion=None,
         human_prior_enable_summary_fusion=None,
+        enable_highres_crop_geometry=False,
+        highres_crop_feature_dim=32,
+        highres_crop_hidden_dim=128,
     ):
         super().__init__()
 
@@ -87,6 +91,11 @@ class VGGT(nn.Module, PyTorchModelHubMixin):
         self.depth_head = DPTHead(dim_in=2 * embed_dim, output_dim=2, activation="exp", conf_activation="expp1") if enable_depth else None
         self.normal_head = DPTHead(dim_in=2 * embed_dim, output_dim=4, activation="norm", conf_activation="expp1") if enable_normal else None
         self.track_head = TrackHead(dim_in=2 * embed_dim, patch_size=patch_size) if enable_track else None
+        self.highres_crop_geometry = (
+            HighResCropGeometryBranch(feature_dim=highres_crop_feature_dim, hidden_dim=highres_crop_hidden_dim)
+            if enable_highres_crop_geometry
+            else None
+        )
 
     def _init_human_prior_gates(self, value: float) -> None:
         if self.aggregator.input_prior_adapter is not None:
@@ -106,6 +115,9 @@ class VGGT(nn.Module, PyTorchModelHubMixin):
         human_prior_summary_tokens: torch.Tensor = None,
         prior_maps: torch.Tensor = None,
         prior_summary_tokens: torch.Tensor = None,
+        highres_crop_features: torch.Tensor = None,
+        highres_crop_indices: torch.Tensor = None,
+        highres_crop_weights: torch.Tensor = None,
     ):
         """
         Forward pass of the VGGT model.
@@ -183,6 +195,31 @@ class VGGT(nn.Module, PyTorchModelHubMixin):
                 )
                 predictions["world_points"] = pts3d
                 predictions["world_points_conf"] = pts3d_conf
+
+            if (
+                self.highres_crop_geometry is not None
+                and highres_crop_features is not None
+                and highres_crop_indices is not None
+                and "world_points" in predictions
+            ):
+                crop_updates = self.highres_crop_geometry(
+                    world_points=predictions["world_points"],
+                    depth=predictions.get("depth"),
+                    normal=predictions.get("normal"),
+                    crop_features=highres_crop_features,
+                    crop_indices=highres_crop_indices,
+                    crop_weights=highres_crop_weights,
+                )
+                predictions["world_points"] = crop_updates["world_points"]
+                predictions["crop_delta_point"] = crop_updates["crop_delta_point"]
+                predictions["crop_apply_gate"] = crop_updates["crop_apply_gate"]
+                predictions["crop_uncertainty"] = crop_updates["crop_uncertainty"]
+                if "depth" in crop_updates:
+                    predictions["depth"] = crop_updates["depth"]
+                    predictions["crop_delta_depth"] = crop_updates["crop_delta_depth"]
+                if "normal" in crop_updates:
+                    predictions["normal"] = crop_updates["normal"]
+                    predictions["crop_delta_normal"] = crop_updates["crop_delta_normal"]
 
         if self.track_head is not None and query_points is not None:
             track_list, vis, conf = self.track_head(
