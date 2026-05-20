@@ -209,6 +209,7 @@ def run_sparseconv_route(
     seed: int = 10000000,
     teacher_mode: str = "guarded_v129",
     feature_mode: str = "full",
+    model_mode: str = "spconv",
     max_scale: float = 1.25,
     archive_mode: str = "full",
 ) -> dict[str, Any]:
@@ -364,6 +365,7 @@ def run_sparseconv_route(
     local_gain = np.clip(0.20 * head + 0.35 * hand - 0.25 * hair - 0.30 * phone, 0.0, 0.45).astype(np.float32)
     teacher_mode = str(teacher_mode or "guarded_v129").strip().lower()
     feature_mode = str(feature_mode or "full").strip().lower()
+    model_mode = str(model_mode or "spconv").strip().lower()
     archive_mode = str(archive_mode or "full").strip().lower()
     if teacher_mode in {"guarded_v129", "v129_guarded_mix", "default"}:
         sparse_teacher_delta = delta_v999 + local_gain[:, None] * (delta_v129 - delta_v999)
@@ -394,6 +396,9 @@ def run_sparseconv_route(
     elif feature_mode == "smpl_only":
         input_features[:, obs_start:synthetic_start] = 0.0
         feature_ablation["zeroed_columns"].append("vggt_point_normal_conf")
+    elif feature_mode == "no_smpl":
+        input_features[:, 0:feat_width] = 0.0
+        feature_ablation["zeroed_columns"].append("smplx_feature_maps")
     elif feature_mode == "no_semantic":
         semantic_names = [
             "semantic_foreground",
@@ -411,6 +416,36 @@ def run_sparseconv_route(
     elif feature_mode == "no_canonical":
         input_features[:, 0:3] = 0.0
         feature_ablation["zeroed_columns"].append("canonical_xyz")
+    elif feature_mode == "random_canonical_xyz":
+        rng_feat = np.random.default_rng(seed + 15700004)
+        input_features[:, 0:3] = rng_feat.normal(0.0, 1.0, size=input_features[:, 0:3].shape).astype(np.float32)
+        feature_ablation["randomized_columns"] = ["canonical_xyz"]
+    elif feature_mode == "shuffled_canonical_xyz":
+        rng_feat = np.random.default_rng(seed + 15700005)
+        perm = rng_feat.permutation(input_features.shape[0])
+        input_features[:, 0:3] = input_features[perm, 0:3]
+        feature_ablation["shuffled_columns"] = ["canonical_xyz"]
+    elif feature_mode == "random_bodypart_labels":
+        rng_feat = np.random.default_rng(seed + 15700006)
+        body_part_col = min(13, feat_width - 1)
+        input_features[:, body_part_col] = rng_feat.uniform(0.0, 1.0, size=input_features.shape[0]).astype(np.float32)
+        feature_ablation["randomized_columns"] = ["macro_part_scaled"]
+    elif feature_mode == "shuffled_bodypart_labels":
+        rng_feat = np.random.default_rng(seed + 15700007)
+        perm = rng_feat.permutation(input_features.shape[0])
+        body_part_col = min(13, feat_width - 1)
+        input_features[:, body_part_col] = input_features[perm, body_part_col]
+        feature_ablation["shuffled_columns"] = ["macro_part_scaled"]
+    elif feature_mode == "random_visibility":
+        rng_feat = np.random.default_rng(seed + 15700008)
+        visibility_col = min(10, feat_width - 1)
+        input_features[:, visibility_col] = rng_feat.uniform(0.0, 1.0, size=input_features.shape[0]).astype(np.float32)
+        feature_ablation["randomized_columns"] = ["smplx_visibility"]
+    elif feature_mode == "random_voxel_permutation":
+        rng_feat = np.random.default_rng(seed + 15700009)
+        perm = rng_feat.permutation(input_features.shape[0])
+        input_features[:, 0:feat_width] = input_features[perm, 0:feat_width]
+        feature_ablation["shuffled_columns"] = ["smplx_feature_maps_random_voxel_permutation"]
     elif feature_mode == "observation_only":
         input_features[:, 0:feat_width] = 0.0
         input_features[:, synthetic_start : synthetic_start + 6] = 0.0
@@ -496,8 +531,32 @@ def run_sparseconv_route(
             y = self.net(x)
             return self.head(y.features)
 
+    class MLPDeltaNet(nn.Module):
+        def __init__(self, in_dim: int, hidden: int = 96) -> None:
+            super().__init__()
+            self.net = nn.Sequential(
+                nn.Linear(in_dim, hidden),
+                nn.LayerNorm(hidden),
+                nn.GELU(),
+                nn.Linear(hidden, hidden),
+                nn.GELU(),
+                nn.Linear(hidden, 3),
+            )
+
+        def forward(self, features: torch.Tensor, indices: torch.Tensor | None = None) -> torch.Tensor:
+            return self.net(features)
+
     torch.manual_seed(seed)
-    model = SparseDeltaNet(feat_t.shape[1]).to(device)
+    if model_mode in {"spconv", "sparseconv", "sparse"}:
+        model = SparseDeltaNet(feat_t.shape[1]).to(device)
+        effective_backend = "spconv"
+        real_sparse_backend = True
+    elif model_mode in {"mlp", "no_sparseconv", "no_sparseconv_mlp"}:
+        model = MLPDeltaNet(feat_t.shape[1]).to(device)
+        effective_backend = "mlp_no_sparseconv"
+        real_sparse_backend = False
+    else:
+        raise ValueError(f"Unknown model_mode={model_mode!r}")
     opt = torch.optim.AdamW(model.parameters(), lr=2.0e-3, weight_decay=1.0e-4)
     curves: list[dict[str, Any]] = []
     start_train = time.time()
@@ -518,7 +577,9 @@ def run_sparseconv_route(
         voxel_pred = model(feat_t, coords_t).detach().cpu().numpy().astype(np.float32)
     train_summary = {
         "created_utc": _now(),
-        "backend": "spconv",
+        "backend": effective_backend,
+        "model_mode": model_mode,
+        "real_sparse_backend": real_sparse_backend,
         "device": str(device),
         "steps": int(steps),
         "runtime_seconds": time.time() - start_train,
@@ -665,14 +726,17 @@ def run_sparseconv_route(
             cand_dir = cand_root / name
             wp = points + float(scale) * delta_field.astype(np.float32)
             save_pred(cand_dir / "predictions.npz", v770, wp)
-            row = eval_candidate(name, wp, "spconv", float(scale), blend_name)
+            row = eval_candidate(name, wp, effective_backend, float(scale), blend_name)
+            row["real_sparse_backend"] = bool(real_sparse_backend)
             write_json(cand_dir / "eval.json", row)
             write_json(
                 cand_dir / "config.json",
                 {
                     "scale": float(scale),
                     "blend": blend_name,
-                    "backend": "spconv",
+                    "backend": effective_backend,
+                    "model_mode": model_mode,
+                    "real_sparse_backend": bool(real_sparse_backend),
                     "teacher_mode": teacher_mode,
                     "feature_mode": feature_mode,
                     "feature_ablation": feature_ablation,
@@ -729,7 +793,7 @@ def run_sparseconv_route(
         writer.writeheader()
         writer.writerows(ranked)
 
-    sparse_success = bool(env["module_probes"]["spconv.pytorch"]["import_ok"] and train_summary["fit_drop"] is not None and train_summary["fit_drop"] > 0.1)
+    sparse_success = bool(real_sparse_backend and env["module_probes"]["spconv.pytorch"]["import_ok"] and train_summary["fit_drop"] is not None and train_summary["fit_drop"] > 0.1)
     visibly_stronger_than_v999 = bool(best and best["mean_delta_vs_v999"] > 1e-5 and best["changed_vs_v999"] > 1000)
     review_ready = bool(sparse_success and best and visibly_stronger_than_v999 and not best["array_equal_v770"] and not best["array_equal_v999"])
     final_status = "V12000000_REVIEW_READY_NOT_PROMOTED" if review_ready else "V12000000_ROUTE_EXHAUSTED_WITH_FAILURE_ANALYSIS"
@@ -740,8 +804,9 @@ def run_sparseconv_route(
         "promotion": False,
         "strict_registry_written": False,
         "v50_v50r2_modified": False,
-        "real_sparse_backend": True,
-        "backend": "spconv",
+        "real_sparse_backend": bool(real_sparse_backend),
+        "backend": effective_backend,
+        "model_mode": model_mode,
         "teacher_mode": teacher_mode,
         "feature_mode": feature_mode,
         "feature_ablation": feature_ablation,
@@ -828,8 +893,10 @@ def main(
     candidates: int = 100,
     max_points: int = 120000,
     grid_size: int = 72,
+    seed: int = 10000000,
     teacher_mode: str = "guarded_v129",
     feature_mode: str = "full",
+    model_mode: str = "spconv",
     max_scale: float = 1.25,
     archive_mode: str = "full",
     run_id: str = "",
@@ -851,8 +918,10 @@ def main(
         candidates=int(candidates),
         max_points=int(max_points),
         grid_size=int(grid_size),
+        seed=int(seed),
         teacher_mode=str(teacher_mode),
         feature_mode=str(feature_mode),
+        model_mode=str(model_mode),
         max_scale=float(max_scale),
         archive_mode=str(archive_mode),
     )
@@ -879,6 +948,8 @@ def main(
         "result_status": result.get("status"),
         "teacher_mode": str(teacher_mode),
         "feature_mode": str(feature_mode),
+        "model_mode": str(model_mode),
+        "seed": int(seed),
         "max_scale": float(max_scale),
         "archive_mode": str(archive_mode),
     }
