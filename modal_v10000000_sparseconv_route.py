@@ -207,6 +207,10 @@ def run_sparseconv_route(
     max_points: int = 120_000,
     grid_size: int = 72,
     seed: int = 10000000,
+    teacher_mode: str = "guarded_v129",
+    feature_mode: str = "full",
+    max_scale: float = 1.25,
+    archive_mode: str = "full",
 ) -> dict[str, Any]:
     import csv
     import importlib
@@ -358,7 +362,19 @@ def run_sparseconv_route(
     phone = feature_maps[:, ch.get("phone_object_exclusion", 20)].reshape(-1)[flat_indices]
     hand = np.maximum(lh, rh)
     local_gain = np.clip(0.20 * head + 0.35 * hand - 0.25 * hair - 0.30 * phone, 0.0, 0.45).astype(np.float32)
-    sparse_teacher_delta = delta_v999 + local_gain[:, None] * (delta_v129 - delta_v999)
+    teacher_mode = str(teacher_mode or "guarded_v129").strip().lower()
+    feature_mode = str(feature_mode or "full").strip().lower()
+    archive_mode = str(archive_mode or "full").strip().lower()
+    if teacher_mode in {"guarded_v129", "v129_guarded_mix", "default"}:
+        sparse_teacher_delta = delta_v999 + local_gain[:, None] * (delta_v129 - delta_v999)
+    elif teacher_mode in {"v999_only", "no_v129", "sparse_no_v129"}:
+        sparse_teacher_delta = delta_v999
+    elif teacher_mode in {"v129_only", "v129_guard_only"}:
+        sparse_teacher_delta = local_gain[:, None] * delta_v129
+    elif teacher_mode in {"zero_control", "residual_zero_control"}:
+        sparse_teacher_delta = np.zeros_like(delta_v999, dtype=np.float32)
+    else:
+        raise ValueError(f"Unknown teacher_mode={teacher_mode!r}")
     input_features = np.concatenate(
         [
             feat_pixel,
@@ -369,6 +385,38 @@ def run_sparseconv_route(
         ],
         axis=-1,
     ).astype(np.float32)
+    feature_ablation: dict[str, Any] = {"mode": feature_mode, "zeroed_columns": []}
+    feat_width = int(feat_pixel.shape[1])
+    obs_start = feat_width
+    synthetic_start = feat_width + 3 + 3 + 1
+    if feature_mode == "full":
+        pass
+    elif feature_mode == "smpl_only":
+        input_features[:, obs_start:synthetic_start] = 0.0
+        feature_ablation["zeroed_columns"].append("vggt_point_normal_conf")
+    elif feature_mode == "no_semantic":
+        semantic_names = [
+            "semantic_foreground",
+            "semantic_head_face",
+            "semantic_hairline",
+            "semantic_left_hand",
+            "semantic_right_hand",
+            "phone_object_exclusion",
+        ]
+        semantic_indices = [ch[name] for name in semantic_names if name in ch and ch[name] < feat_width]
+        if semantic_indices:
+            input_features[:, semantic_indices] = 0.0
+        input_features[:, synthetic_start : synthetic_start + 6] = 0.0
+        feature_ablation["zeroed_columns"].extend(semantic_names + ["synthetic_region_stack"])
+    elif feature_mode == "no_canonical":
+        input_features[:, 0:3] = 0.0
+        feature_ablation["zeroed_columns"].append("canonical_xyz")
+    elif feature_mode == "observation_only":
+        input_features[:, 0:feat_width] = 0.0
+        input_features[:, synthetic_start : synthetic_start + 6] = 0.0
+        feature_ablation["zeroed_columns"].append("smplx_feature_maps_and_region_stack")
+    else:
+        raise ValueError(f"Unknown feature_mode={feature_mode!r}")
 
     mins = np.nanquantile(canonical, 0.001, axis=0).astype(np.float32)
     maxs = np.nanquantile(canonical, 0.999, axis=0).astype(np.float32)
@@ -457,6 +505,11 @@ def run_sparseconv_route(
         "point_count": int(flat_indices.size),
         "feature_dim": int(feat_t.shape[1]),
         "grid_size": int(grid_size),
+        "teacher_mode": teacher_mode,
+        "feature_mode": feature_mode,
+        "feature_ablation": feature_ablation,
+        "max_scale": float(max_scale),
+        "archive_mode": archive_mode,
         "curves": curves,
     }
     write_json(reports / "V10300000_decoder_training_summary.json", train_summary)
@@ -483,6 +536,8 @@ def run_sparseconv_route(
         voxel_prediction=voxel_pred.astype(np.float32),
         voxel_target=voxel_target.astype(np.float32),
         voxel_count=voxel_count.astype(np.float32),
+        teacher_mode=np.asarray([teacher_mode]),
+        feature_mode=np.asarray([feature_mode]),
         bounds_min=mins,
         bounds_max=maxs,
         grid_size=np.asarray([grid_size, grid_size, grid_size], dtype=np.int32),
@@ -511,6 +566,8 @@ def run_sparseconv_route(
             "real_sparse_backend": True,
             "scale": float(scale),
             "blend": blend,
+            "teacher_mode": teacher_mode,
+            "feature_mode": feature_mode,
             "changed_pixels": int((delta > 1e-7).sum()),
             "changed_vs_v999": int((extra > 1e-7).sum()),
             "mean_delta_vs_v770": float(delta.mean()),
@@ -566,13 +623,15 @@ def run_sparseconv_route(
         plt.close(fig)
 
     candidate_rows: list[dict[str, Any]] = []
-    scales = np.linspace(0.25, 1.25, max(10, int(candidates) // 4), dtype=np.float32)
+    scale_hi = max(0.25, float(max_scale))
+    scales = np.linspace(0.25, scale_hi, max(10, int(candidates) // 4), dtype=np.float32)
     blends: list[tuple[str, np.ndarray]] = [
         ("spconv", dense_delta),
         ("spconv_target_mix", 0.75 * dense_delta + 0.25 * dense_target_delta),
         ("spconv_humanram_mix", 0.70 * dense_delta + 0.30 * v999_delta),
-        ("spconv_v129_guarded_mix", 0.65 * dense_delta + 0.20 * v999_delta + 0.15 * (1.0 - hair_dense) * v129_delta),
     ]
+    if teacher_mode in {"guarded_v129", "v129_guarded_mix", "default", "v129_only", "v129_guard_only"}:
+        blends.append(("spconv_v129_guarded_mix", 0.65 * dense_delta + 0.20 * v999_delta + 0.15 * (1.0 - hair_dense) * v129_delta))
     idx = 0
     for blend_name, delta_field in blends:
         for scale in scales:
@@ -584,7 +643,17 @@ def run_sparseconv_route(
             save_pred(cand_dir / "predictions.npz", v770, wp)
             row = eval_candidate(name, wp, "spconv", float(scale), blend_name)
             write_json(cand_dir / "eval.json", row)
-            write_json(cand_dir / "config.json", {"scale": float(scale), "blend": blend_name, "backend": "spconv"})
+            write_json(
+                cand_dir / "config.json",
+                {
+                    "scale": float(scale),
+                    "blend": blend_name,
+                    "backend": "spconv",
+                    "teacher_mode": teacher_mode,
+                    "feature_mode": feature_mode,
+                    "feature_ablation": feature_ablation,
+                },
+            )
             board(cand_dir / "changed_map.png", name, [("delta_v0", np.linalg.norm((wp - points)[0], axis=-1)), ("extra_v999_v0", np.linalg.norm((wp - v999["world_points"])[0], axis=-1))])
             if idx < 12:
                 board(cand_dir / "board.png", name, [("new_z_v0", wp[0, :, :, 2]), ("v770_z_v0", points[0, :, :, 2]), ("v999_z_v0", v999["world_points"][0, :, :, 2]), ("new_minus_v999", np.linalg.norm((wp - v999["world_points"])[0], axis=-1))])
@@ -649,6 +718,11 @@ def run_sparseconv_route(
         "v50_v50r2_modified": False,
         "real_sparse_backend": True,
         "backend": "spconv",
+        "teacher_mode": teacher_mode,
+        "feature_mode": feature_mode,
+        "feature_ablation": feature_ablation,
+        "max_scale": float(max_scale),
+        "archive_mode": archive_mode,
         "candidate_count": len(candidate_rows),
         "best": best,
         "sparse_success": sparse_success,
@@ -678,6 +752,8 @@ def run_sparseconv_route(
         f"- best_candidate: `{best['name'] if best else 'none'}`",
         f"- candidate_count: `{len(candidate_rows)}`",
         f"- sparse_backend: `spconv`",
+        f"- teacher_mode: `{teacher_mode}`",
+        f"- feature_mode: `{feature_mode}`",
         "",
         "No promotion, no strict registry, and no V50/V50R2 modification were performed.",
     ]
@@ -687,7 +763,8 @@ def run_sparseconv_route(
     files_for_zip = [p for p in out_dir.rglob("*") if p.is_file()]
     full_zip = out_dir / "V11000000_full_sparseconv_archive.zip"
     thin_zip = out_dir / "V11000000_thin_review_bundle.zip"
-    for zip_path, thin in [(full_zip, False), (thin_zip, True)]:
+    zip_jobs = [(thin_zip, True)] if archive_mode in {"thin", "thin_only", "no_full"} else [(full_zip, False), (thin_zip, True)]
+    for zip_path, thin in zip_jobs:
         if zip_path.exists():
             zip_path.unlink()
         with zipfile.ZipFile(zip_path, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=4) as zf:
@@ -699,6 +776,14 @@ def run_sparseconv_route(
                 zf.write(p, p.relative_to(out_dir).as_posix())
     manifests = {}
     for name, path in [("full", full_zip), ("thin", thin_zip)]:
+        if not path.exists():
+            manifests[name] = {
+                "path": str(path),
+                "size": 0,
+                "sha256": None,
+                "zip_test": "skipped_by_archive_mode",
+            }
+            continue
         manifests[name] = {
             "path": str(path),
             "size": path.stat().st_size,
@@ -719,6 +804,10 @@ def main(
     candidates: int = 100,
     max_points: int = 120000,
     grid_size: int = 72,
+    teacher_mode: str = "guarded_v129",
+    feature_mode: str = "full",
+    max_scale: float = 1.25,
+    archive_mode: str = "full",
     run_id: str = "",
     download_local_dir: str = "",
 ) -> None:
@@ -738,6 +827,10 @@ def main(
         candidates=int(candidates),
         max_points=int(max_points),
         grid_size=int(grid_size),
+        teacher_mode=str(teacher_mode),
+        feature_mode=str(feature_mode),
+        max_scale=float(max_scale),
+        archive_mode=str(archive_mode),
     )
     result["local_runtime_seconds"] = time.time() - started
     result["payload_manifest"] = payload_manifest
@@ -745,8 +838,10 @@ def main(
     result["download"] = download
     _write_json(REPORTS / "V12000000_modal_sparseconv_local_result.json", result)
     final_remote = local_out / "reports" / "V12000000_final_status.json"
-    if final_remote.is_file():
+    if final_remote.is_file() and (run_id.startswith("V100_formal") or run_id.startswith("V120")):
         shutil.copy2(final_remote, REPORTS / "V12000000_final_status.json")
+    elif final_remote.is_file():
+        shutil.copy2(final_remote, REPORTS / f"{run_id}_final_status.json")
     thin = local_out / "V11000000_thin_review_bundle.zip"
     full = local_out / "V11000000_full_sparseconv_archive.zip"
     sidecar = {
@@ -758,6 +853,10 @@ def main(
         "full_bundle": str(full) if full.exists() else None,
         "full_sha256": _sha256(full) if full.exists() else None,
         "result_status": result.get("status"),
+        "teacher_mode": str(teacher_mode),
+        "feature_mode": str(feature_mode),
+        "max_scale": float(max_scale),
+        "archive_mode": str(archive_mode),
     }
     _write_json(REPORTS / "V12000000_final_bundle_sidecar.json", sidecar)
     print(json.dumps(_json_ready(result), indent=2, ensure_ascii=True))
