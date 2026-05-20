@@ -415,6 +415,30 @@ def run_sparseconv_route(
         input_features[:, 0:feat_width] = 0.0
         input_features[:, synthetic_start : synthetic_start + 6] = 0.0
         feature_ablation["zeroed_columns"].append("smplx_feature_maps_and_region_stack")
+    elif feature_mode == "random_smpl_only":
+        rng_feat = np.random.default_rng(seed + 15700000)
+        input_features[:, 0:feat_width] = rng_feat.normal(0.0, 1.0, size=input_features[:, 0:feat_width].shape).astype(np.float32)
+        input_features[:, obs_start:synthetic_start] = 0.0
+        input_features[:, synthetic_start : synthetic_start + 6] = 0.0
+        feature_ablation["zeroed_columns"].extend(["vggt_point_normal_conf", "synthetic_region_stack"])
+        feature_ablation["randomized_columns"] = ["smplx_feature_maps"]
+    elif feature_mode == "random_smpl_full":
+        rng_feat = np.random.default_rng(seed + 15700002)
+        input_features[:, 0:feat_width] = rng_feat.normal(0.0, 1.0, size=input_features[:, 0:feat_width].shape).astype(np.float32)
+        feature_ablation["randomized_columns"] = ["smplx_feature_maps"]
+    elif feature_mode == "shuffled_smpl_only":
+        rng_feat = np.random.default_rng(seed + 15700001)
+        perm = rng_feat.permutation(input_features.shape[0])
+        input_features[:, 0:feat_width] = input_features[perm, 0:feat_width]
+        input_features[:, obs_start:synthetic_start] = 0.0
+        input_features[:, synthetic_start : synthetic_start + 6] = 0.0
+        feature_ablation["zeroed_columns"].extend(["vggt_point_normal_conf", "synthetic_region_stack"])
+        feature_ablation["shuffled_columns"] = ["smplx_feature_maps"]
+    elif feature_mode == "shuffled_smpl_full":
+        rng_feat = np.random.default_rng(seed + 15700003)
+        perm = rng_feat.permutation(input_features.shape[0])
+        input_features[:, 0:feat_width] = input_features[perm, 0:feat_width]
+        feature_ablation["shuffled_columns"] = ["smplx_feature_maps"]
     else:
         raise ValueError(f"Unknown feature_mode={feature_mode!r}")
 
