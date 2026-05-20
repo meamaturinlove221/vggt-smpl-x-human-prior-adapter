@@ -774,6 +774,17 @@ def v350_package(extras: dict[str, Path], advisor: dict[str, Path]) -> dict[str,
     return payload
 
 
+def update_v330_after_packaging(v330: dict[str, Any], manifest: dict[str, Any]) -> dict[str, Any]:
+    v330 = dict(v330)
+    checks = dict(v330.get("checks", {}))
+    checks["upload_safe_bundles_complete"] = bool(manifest.get("under_total_500mb"))
+    v330["checks"] = checks
+    v330["upload_manifest"] = str(REPORTS / "V35000000_upload_manifest.json")
+    v330["status"] = "V33000000_STRICT_FINAL_EVAL_V4_READY_BUT_LIMITATIONS_DISCLOSED"
+    write_json(REPORTS / "V33000000_strict_final_eval_v4.json", v330)
+    return v330
+
+
 def v355_cleanup() -> dict[str, Any]:
     payload = {
         "created_utc": now(),
@@ -843,6 +854,7 @@ def main() -> None:
     v330 = v330_eval(v280, qrows, comps, extras["token_proxy"])
     advisor = v340_report(v280, v330)
     manifest = v350_package(extras, advisor)
+    v330 = update_v330_after_packaging(v330, manifest)
     cleanup_payload = v355_cleanup()
     final = v360_final(v280, v330, manifest, cleanup_payload)
     print(json.dumps(final, indent=2, ensure_ascii=True))
