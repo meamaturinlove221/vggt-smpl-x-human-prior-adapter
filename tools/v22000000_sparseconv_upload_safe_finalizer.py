@@ -86,7 +86,9 @@ def make_zip(path: Path, files: list[Path], base: Path = ROOT) -> dict[str, Any]
     row = file_row(path)
     row["zip_test"] = zip_clean(path)
     row["entry_count"] = len(seen)
-    row["under_500mb"] = bool(row["size"] <= UPLOAD_LIMIT)
+    row["upload_limit_bytes"] = UPLOAD_LIMIT
+    row["under_upload_limit"] = bool(row["size"] <= UPLOAD_LIMIT)
+    row["under_500mb"] = bool(row["size"] <= 500 * MB)
     return row
 
 
@@ -311,9 +313,12 @@ def make_advisor_v2(records: list[dict[str, Any]], causal_rows: list[dict[str, A
 
 def upload_safe_bundles(records: list[dict[str, Any]], advisor: dict[str, Path]) -> dict[str, Any]:
     previous_audit = read_json(REPORTS / "V15200000_previous_bundle_size_audit.json", {})
-    previous_v190_thin = file_row(ARCHIVE / "V19000000_thin_review_bundle.zip")
-    previous_v190_thin["bundle_key"] = "V19000000_thin_review_bundle_before_micro_split"
-    previous_v190_thin["over_current_upload_limit"] = bool(previous_v190_thin["size"] > UPLOAD_LIMIT)
+    prior_manifest = read_json(REPORTS / "V19000000_upload_manifest.json", {})
+    previous_v190_thin = prior_manifest.get("previous_v190_thin_review_before_micro_split")
+    if not previous_v190_thin:
+        previous_v190_thin = file_row(ARCHIVE / "V19000000_thin_review_bundle.zip")
+        previous_v190_thin["bundle_key"] = "V19000000_thin_review_bundle_before_micro_split"
+        previous_v190_thin["over_current_upload_limit"] = bool(previous_v190_thin["size"] > UPLOAD_LIMIT)
     report_files = [
         REPORTS / "V15000000_final_status.json",
         REPORTS / "V12500000_causal_ablation_results.csv",
@@ -385,8 +390,12 @@ def upload_safe_bundles(records: list[dict[str, Any]], advisor: dict[str, Path])
             "thin_review": thin_bundle,
             "candidate_shards": shards,
         },
-        "all_upload_bundles_under_500mb": all(
+        "all_upload_bundles_under_current_limit": all(
             b["size"] <= UPLOAD_LIMIT
+            for b in [visual_bundle, report_bundle, thin_bundle] + shards
+        ),
+        "all_upload_bundles_under_500mb": all(
+            b["size"] <= 500 * MB
             for b in [visual_bundle, report_bundle, thin_bundle] + shards
         ),
         "omitted_large_files": omitted,
@@ -412,7 +421,7 @@ def cleanup_report(name: str) -> dict[str, Any]:
 
 def final_status(manifest: dict[str, Any], causal_rows: list[dict[str, Any]], cleanup: dict[str, Any], *, post_push: bool) -> dict[str, Any]:
     causal = read_json(REPORTS / "V15700000_causal_conclusion.json", {})
-    upload_ok = bool(manifest.get("all_upload_bundles_under_500mb"))
+    upload_ok = bool(manifest.get("all_upload_bundles_under_current_limit", manifest.get("all_upload_bundles_under_500mb")))
     causal_ok = bool(causal.get("full_no_v129_positive") and causal.get("smpl_signal_positive"))
     random_ok = causal.get("random_smpl_full_weaker_than_full") or causal.get("random_smpl_only_weaker_than_full")
     obs_ok = causal.get("observation_only_weaker_than_full")
