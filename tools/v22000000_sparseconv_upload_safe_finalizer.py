@@ -22,9 +22,9 @@ RUN_ROOT = OUTPUT / "V10000000_V12000000_modal_sparseconv"
 MB = 1024 * 1024
 VISUAL_LIMIT = 150 * MB
 REPORT_LIMIT = 50 * MB
-THIN_LIMIT = 450 * MB
-SHARD_LIMIT = 450 * MB
-UPLOAD_LIMIT = 500 * MB
+THIN_LIMIT = 150 * MB
+SHARD_LIMIT = 100 * MB
+UPLOAD_LIMIT = 150 * MB
 
 
 def now() -> str:
@@ -171,7 +171,7 @@ def audit_previous_bundles() -> dict[str, Any]:
             "candidate_shard": SHARD_LIMIT,
             "absolute_upload_limit": UPLOAD_LIMIT,
         },
-        "rule": "No upload-facing bundle may exceed 500MB; V141 thin bundle is superseded if over limit.",
+        "rule": "No upload-facing bundle may exceed 150MB in the current micro-shard policy; reports/visuals stay in thin review and predictions are separate candidate shards.",
     }
     write_json(REPORTS / "V15200000_packaging_policy.json", policy)
     return audit
@@ -311,6 +311,9 @@ def make_advisor_v2(records: list[dict[str, Any]], causal_rows: list[dict[str, A
 
 def upload_safe_bundles(records: list[dict[str, Any]], advisor: dict[str, Path]) -> dict[str, Any]:
     previous_audit = read_json(REPORTS / "V15200000_previous_bundle_size_audit.json", {})
+    previous_v190_thin = file_row(ARCHIVE / "V19000000_thin_review_bundle.zip")
+    previous_v190_thin["bundle_key"] = "V19000000_thin_review_bundle_before_micro_split"
+    previous_v190_thin["over_current_upload_limit"] = bool(previous_v190_thin["size"] > UPLOAD_LIMIT)
     report_files = [
         REPORTS / "V15000000_final_status.json",
         REPORTS / "V12500000_causal_ablation_results.csv",
@@ -332,13 +335,17 @@ def upload_safe_bundles(records: list[dict[str, Any]], advisor: dict[str, Path])
     report_bundle = make_zip(ARCHIVE / "V19000000_reports_bundle.zip", report_files)
     visual_bundle = make_zip(ARCHIVE / "V19000000_visual_bundle.zip", visual_files + [advisor["one_page"]])
 
-    thin_files = report_files + visual_files + top_predictions[:5]
+    # Keep the thin review bundle upload-friendly. Candidate predictions are
+    # large, already-compressed npz files, so shard them separately below.
+    thin_files = report_files + visual_files
     thin_bundle = make_zip(ARCHIVE / "V19000000_thin_review_bundle.zip", thin_files)
 
     shards = []
     current: list[Path] = []
     current_size = 0
     shard_idx = 0
+    for stale in ARCHIVE.glob("V19000000_candidate_shard_*.zip"):
+        stale.unlink()
     for pred in top_predictions:
         size = pred.stat().st_size
         if current and current_size + size > SHARD_LIMIT:
@@ -369,6 +376,8 @@ def upload_safe_bundles(records: list[dict[str, Any]], advisor: dict[str, Path])
     manifest = {
         "created_utc": now(),
         "limits": {"visual": VISUAL_LIMIT, "reports": REPORT_LIMIT, "thin": THIN_LIMIT, "shard": SHARD_LIMIT, "absolute": UPLOAD_LIMIT},
+        "split_policy": "Thin review contains reports and visual proof only; candidate predictions are sharded separately with one compressed npz per shard when needed.",
+        "previous_v190_thin_review_before_micro_split": previous_v190_thin,
         "previous_bundle_size_audit": previous_audit,
         "bundles": {
             "visual": visual_bundle,
