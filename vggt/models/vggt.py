@@ -20,6 +20,7 @@ class VGGT(nn.Module, PyTorchModelHubMixin):
         self,
         img_size=518,
         patch_size=14,
+        patch_embed="dinov2_vitl14_reg",
         embed_dim=1024,
         enable_camera=True,
         enable_point=True,
@@ -74,6 +75,7 @@ class VGGT(nn.Module, PyTorchModelHubMixin):
         self.aggregator = Aggregator(
             img_size=img_size,
             patch_size=patch_size,
+            patch_embed=patch_embed,
             embed_dim=embed_dim,
             enable_human_prior_fusion=enable_human_prior_fusion,
             human_prior_in_chans=human_prior_in_chans,
