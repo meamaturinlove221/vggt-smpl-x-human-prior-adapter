@@ -391,6 +391,75 @@ def run_sparseconv_route(
     feat_width = int(feat_pixel.shape[1])
     obs_start = feat_width
     synthetic_start = feat_width + 3 + 3 + 1
+    semantic_indices = [
+        i
+        for name in [
+            "canonical_x",
+            "canonical_y",
+            "canonical_z",
+            "posed_x",
+            "posed_y",
+            "posed_z",
+            "normal_x",
+            "normal_y",
+            "normal_z",
+            "vertex_id_sin",
+            "vertex_id_cos",
+            "macro_part_scaled",
+        ]
+        for i in [ch.get(name, -1)]
+        if 0 <= i < feat_width
+    ]
+    support_indices = [
+        i
+        for name in [
+            "smplx_depth",
+            "smplx_visibility",
+            "signed_boundary",
+            "semantic_foreground",
+            "semantic_head_face",
+            "semantic_hairline",
+            "semantic_left_hand",
+            "semantic_right_hand",
+            "phone_object_exclusion",
+        ]
+        for i in [ch.get(name, -1)]
+        if 0 <= i < feat_width
+    ]
+    observation_slice = slice(obs_start, synthetic_start)
+    support_synthetic_slice = slice(synthetic_start, synthetic_start + 6)
+
+    def zero_except_feature_columns(indices: list[int]) -> None:
+        keep = np.zeros((feat_width,), dtype=bool)
+        keep[indices] = True
+        input_features[:, np.where(~keep)[0]] = 0.0
+
+    def randomize_columns(indices: list[int], tag: str, offset: int) -> None:
+        if not indices:
+            return
+        rng_feat = np.random.default_rng(seed + offset)
+        input_features[:, indices] = rng_feat.normal(0.0, 1.0, size=input_features[:, indices].shape).astype(np.float32)
+        feature_ablation.setdefault("randomized_columns", []).append(tag)
+
+    def shuffle_columns(indices: list[int], tag: str, offset: int) -> None:
+        if not indices:
+            return
+        rng_feat = np.random.default_rng(seed + offset)
+        perm = rng_feat.permutation(input_features.shape[0])
+        input_features[:, indices] = input_features[perm][:, indices]
+        feature_ablation.setdefault("shuffled_columns", []).append(tag)
+
+    def randomize_slice(slc: slice, tag: str, offset: int) -> None:
+        rng_feat = np.random.default_rng(seed + offset)
+        input_features[:, slc] = rng_feat.normal(0.0, 1.0, size=input_features[:, slc].shape).astype(np.float32)
+        feature_ablation.setdefault("randomized_columns", []).append(tag)
+
+    def shuffle_slice(slc: slice, tag: str, offset: int) -> None:
+        rng_feat = np.random.default_rng(seed + offset)
+        perm = rng_feat.permutation(input_features.shape[0])
+        input_features[:, slc] = input_features[perm, slc]
+        feature_ablation.setdefault("shuffled_columns", []).append(tag)
+
     if feature_mode == "full":
         pass
     elif feature_mode == "smpl_only":
@@ -474,6 +543,51 @@ def run_sparseconv_route(
         perm = rng_feat.permutation(input_features.shape[0])
         input_features[:, 0:feat_width] = input_features[perm, 0:feat_width]
         feature_ablation["shuffled_columns"] = ["smplx_feature_maps"]
+    elif feature_mode == "random_semantic_same_support":
+        randomize_columns(semantic_indices, "semantic_features_same_support", 91500001)
+    elif feature_mode == "shuffled_semantic_same_support":
+        shuffle_columns(semantic_indices, "semantic_features_same_support", 91500002)
+    elif feature_mode == "random_support_true_semantic":
+        randomize_columns(support_indices, "support_features_true_semantic", 91500003)
+        randomize_slice(support_synthetic_slice, "synthetic_support_stack", 91500004)
+    elif feature_mode == "mask_only_support_observation":
+        zero_except_feature_columns(support_indices)
+        input_features[:, support_synthetic_slice] = input_features[:, support_synthetic_slice]
+        feature_ablation["zeroed_columns"].append("semantic_features_keep_support_observation")
+    elif feature_mode == "support_only":
+        zero_except_feature_columns(support_indices)
+        input_features[:, observation_slice] = 0.0
+        feature_ablation["zeroed_columns"].extend(["semantic_features", "vggt_point_normal_conf"])
+    elif feature_mode == "support_observation_only":
+        zero_except_feature_columns(support_indices)
+        feature_ablation["zeroed_columns"].append("semantic_features_keep_support_observation")
+    elif feature_mode == "true_semantic_only":
+        zero_except_feature_columns(semantic_indices)
+        input_features[:, observation_slice] = 0.0
+        input_features[:, support_synthetic_slice] = 0.0
+        feature_ablation["zeroed_columns"].extend(["support_features", "vggt_point_normal_conf", "synthetic_support_stack"])
+    elif feature_mode == "random_semantic_only":
+        zero_except_feature_columns(semantic_indices)
+        randomize_columns(semantic_indices, "semantic_features_only", 91500005)
+        input_features[:, observation_slice] = 0.0
+        input_features[:, support_synthetic_slice] = 0.0
+        feature_ablation["zeroed_columns"].extend(["support_features", "vggt_point_normal_conf", "synthetic_support_stack"])
+    elif feature_mode == "shuffled_semantic_only":
+        zero_except_feature_columns(semantic_indices)
+        shuffle_columns(semantic_indices, "semantic_features_only", 91500006)
+        input_features[:, observation_slice] = 0.0
+        input_features[:, support_synthetic_slice] = 0.0
+        feature_ablation["zeroed_columns"].extend(["support_features", "vggt_point_normal_conf", "synthetic_support_stack"])
+    elif feature_mode == "shuffled_skinning":
+        body_part_col = min(13, feat_width - 1)
+        shuffle_columns([body_part_col], "macro_part_scaled_skinning_proxy", 91500007)
+    elif feature_mode == "no_observation":
+        input_features[:, observation_slice] = 0.0
+        feature_ablation["zeroed_columns"].append("vggt_point_normal_conf")
+    elif feature_mode == "shuffled_observation":
+        shuffle_slice(observation_slice, "vggt_point_normal_conf", 91500008)
+    elif feature_mode == "random_observation":
+        randomize_slice(observation_slice, "vggt_point_normal_conf", 91500009)
     else:
         raise ValueError(f"Unknown feature_mode={feature_mode!r}")
 
@@ -546,6 +660,15 @@ def run_sparseconv_route(
         def forward(self, features: torch.Tensor, indices: torch.Tensor | None = None) -> torch.Tensor:
             return self.net(features)
 
+    class DirectResidualNet(nn.Module):
+        def __init__(self, target: torch.Tensor) -> None:
+            super().__init__()
+            self.register_buffer("target", target.detach().clone())
+            self.dummy = nn.Parameter(torch.zeros(1, 3))
+
+        def forward(self, features: torch.Tensor, indices: torch.Tensor | None = None) -> torch.Tensor:
+            return self.target + self.dummy.sum() * 0.0
+
     torch.manual_seed(seed)
     if model_mode in {"spconv", "sparseconv", "sparse"}:
         model = SparseDeltaNet(feat_t.shape[1]).to(device)
@@ -554,6 +677,10 @@ def run_sparseconv_route(
     elif model_mode in {"mlp", "no_sparseconv", "no_sparseconv_mlp"}:
         model = MLPDeltaNet(feat_t.shape[1]).to(device)
         effective_backend = "mlp_no_sparseconv"
+        real_sparse_backend = False
+    elif model_mode in {"direct_residual", "no_voxel_diffusion_direct", "direct"}:
+        model = DirectResidualNet(target_t).to(device)
+        effective_backend = "direct_residual_no_voxel_diffusion"
         real_sparse_backend = False
     else:
         raise ValueError(f"Unknown model_mode={model_mode!r}")
