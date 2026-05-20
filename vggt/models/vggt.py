@@ -115,6 +115,7 @@ class VGGT(nn.Module, PyTorchModelHubMixin):
         human_prior_summary_tokens: torch.Tensor = None,
         prior_maps: torch.Tensor = None,
         prior_summary_tokens: torch.Tensor = None,
+        sparse_prior_tokens: torch.Tensor = None,
         highres_crop_features: torch.Tensor = None,
         highres_crop_indices: torch.Tensor = None,
         highres_crop_weights: torch.Tensor = None,
@@ -165,6 +166,7 @@ class VGGT(nn.Module, PyTorchModelHubMixin):
             images,
             human_prior_feature_maps=human_prior_feature_maps,
             human_prior_summary_tokens=human_prior_summary_tokens,
+            sparse_prior_tokens=sparse_prior_tokens,
         )
 
         predictions = {}
