@@ -886,6 +886,47 @@ def run_sparseconv_route(
                     "feature_ablation": feature_ablation,
                 },
             )
+            write_json(
+                cand_dir / "source_manifest.json",
+                {
+                    "teacher_source": teacher_target_mode,
+                    "blend_source": blend_name,
+                    "composition_source": "none_no_blend" if composition_no_blend else blend_name,
+                    "base_candidate": "V770_world_points_plus_sparse_delta",
+                    "whether_v999_used": bool(
+                        teacher_target_mode
+                        in {
+                            "guarded_v129",
+                            "v129_guarded_mix",
+                            "default",
+                            "v999_only",
+                            "no_v129",
+                            "sparse_no_v129",
+                            "teacher_detached",
+                            "teacher_noise",
+                            "v999_noise",
+                            "teacher_randomized",
+                            "v999_randomized",
+                        }
+                    ),
+                    "whether_humanram_used": bool((not composition_no_blend) and blend_name == "spconv_humanram_mix"),
+                    "whether_v129_used": bool(
+                        (not composition_no_blend)
+                        and (
+                            blend_name == "spconv_v129_guarded_mix"
+                            or teacher_target_mode in {"guarded_v129", "v129_guarded_mix", "default", "v129_only", "v129_guard_only"}
+                        )
+                    ),
+                    "whether_v770_used": True,
+                    "whether_v770_preserve_blend_used": False,
+                    "whether_postcompose_used": bool(not composition_no_blend and blend_name != "spconv"),
+                    "composition_no_blend": bool(composition_no_blend),
+                    "teacher_mode": teacher_mode,
+                    "feature_mode": feature_mode,
+                    "model_mode": model_mode,
+                    "feature_ablation": feature_ablation,
+                },
+            )
             board(cand_dir / "changed_map.png", name, [("delta_v0", np.linalg.norm((wp - points)[0], axis=-1)), ("extra_v999_v0", np.linalg.norm((wp - v999["world_points"])[0], axis=-1))])
             if idx < 12:
                 board(cand_dir / "board.png", name, [("new_z_v0", wp[0, :, :, 2]), ("v770_z_v0", points[0, :, :, 2]), ("v999_z_v0", v999["world_points"][0, :, :, 2]), ("new_minus_v999", np.linalg.norm((wp - v999["world_points"])[0], axis=-1))])
