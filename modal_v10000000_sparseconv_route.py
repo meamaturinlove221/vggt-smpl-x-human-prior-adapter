@@ -367,20 +367,27 @@ def run_sparseconv_route(
     feature_mode = str(feature_mode or "full").strip().lower()
     model_mode = str(model_mode or "spconv").strip().lower()
     archive_mode = str(archive_mode or "full").strip().lower()
-    if teacher_mode in {"guarded_v129", "v129_guarded_mix", "default"}:
+    composition_no_blend = teacher_mode.endswith("_no_blend") or teacher_mode in {
+        "zero_control",
+        "residual_zero_control",
+        "no_teacher",
+        "no_teacher_no_blend",
+    }
+    teacher_target_mode = teacher_mode[: -len("_no_blend")] if teacher_mode.endswith("_no_blend") else teacher_mode
+    if teacher_target_mode in {"guarded_v129", "v129_guarded_mix", "default"}:
         sparse_teacher_delta = delta_v999 + local_gain[:, None] * (delta_v129 - delta_v999)
-    elif teacher_mode in {"v999_only", "no_v129", "sparse_no_v129", "teacher_detached"}:
+    elif teacher_target_mode in {"v999_only", "no_v129", "sparse_no_v129", "teacher_detached"}:
         sparse_teacher_delta = delta_v999
-    elif teacher_mode in {"v129_only", "v129_guard_only"}:
+    elif teacher_target_mode in {"v129_only", "v129_guard_only"}:
         sparse_teacher_delta = local_gain[:, None] * delta_v129
-    elif teacher_mode in {"teacher_noise", "v999_noise"}:
+    elif teacher_target_mode in {"teacher_noise", "v999_noise"}:
         rng_teacher = np.random.default_rng(seed + 91700000)
         noise_scale = np.maximum(np.std(delta_v999, axis=0, keepdims=True), 1.0e-5)
         sparse_teacher_delta = delta_v999 + 0.50 * rng_teacher.normal(0.0, noise_scale, size=delta_v999.shape).astype(np.float32)
-    elif teacher_mode in {"teacher_randomized", "v999_randomized"}:
+    elif teacher_target_mode in {"teacher_randomized", "v999_randomized"}:
         rng_teacher = np.random.default_rng(seed + 91700001)
         sparse_teacher_delta = delta_v999[rng_teacher.permutation(delta_v999.shape[0])]
-    elif teacher_mode in {"zero_control", "residual_zero_control"}:
+    elif teacher_target_mode in {"zero_control", "residual_zero_control", "no_teacher"}:
         sparse_teacher_delta = np.zeros_like(delta_v999, dtype=np.float32)
     else:
         raise ValueError(f"Unknown teacher_mode={teacher_mode!r}")
@@ -844,12 +851,15 @@ def run_sparseconv_route(
     candidate_rows: list[dict[str, Any]] = []
     scale_hi = max(0.25, float(max_scale))
     scales = np.linspace(0.25, scale_hi, max(10, int(candidates) // 4), dtype=np.float32)
-    blends: list[tuple[str, np.ndarray]] = [
-        ("spconv", dense_delta),
-        ("spconv_target_mix", 0.75 * dense_delta + 0.25 * dense_target_delta),
-        ("spconv_humanram_mix", 0.70 * dense_delta + 0.30 * v999_delta),
-    ]
-    if teacher_mode in {"guarded_v129", "v129_guarded_mix", "default", "v129_only", "v129_guard_only"}:
+    blends: list[tuple[str, np.ndarray]] = [("spconv", dense_delta)]
+    if not composition_no_blend:
+        blends.extend(
+            [
+                ("spconv_target_mix", 0.75 * dense_delta + 0.25 * dense_target_delta),
+                ("spconv_humanram_mix", 0.70 * dense_delta + 0.30 * v999_delta),
+            ]
+        )
+    if (not composition_no_blend) and teacher_target_mode in {"guarded_v129", "v129_guarded_mix", "default", "v129_only", "v129_guard_only"}:
         blends.append(("spconv_v129_guarded_mix", 0.65 * dense_delta + 0.20 * v999_delta + 0.15 * (1.0 - hair_dense) * v129_delta))
     idx = 0
     for blend_name, delta_field in blends:
