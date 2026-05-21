@@ -15,6 +15,7 @@ ROOT = Path(r"D:\vggt\vggt-main\local_report_auxiliary\V600_quality_rebuild")
 REPORTS = ROOT / "reports"
 LOGS = ROOT / "logs"
 BOARDS = ROOT / "boards"
+FAILURES = ROOT / "failures"
 RUN_ROOT = ROOT / "output" / "V10000000_V12000000_modal_sparseconv"
 
 
@@ -47,6 +48,33 @@ def env_utf8() -> dict[str, str]:
 def candidate_source_manifest(job: dict[str, Any], best_name: str) -> dict[str, Any]:
     teacher_mode = str(job["teacher_mode"])
     teacher_target = teacher_mode[: -len("_no_blend")] if teacher_mode.endswith("_no_blend") else teacher_mode
+    feature_mode = str(job["feature_mode"])
+    teacher_used = teacher_target not in {"zero_control", "residual_zero_control", "no_teacher"}
+    observation_used = feature_mode not in {
+        "smpl_only",
+        "random_smpl_only",
+        "shuffled_smpl_only",
+        "true_semantic_only",
+        "random_semantic_only",
+        "shuffled_semantic_only",
+        "support_only",
+        "no_observation",
+    }
+    support_used = feature_mode not in {
+        "observation_only",
+        "true_semantic_only",
+        "random_semantic_only",
+        "shuffled_semantic_only",
+        "no_smpl",
+    }
+    semantic_used = feature_mode not in {
+        "observation_only",
+        "support_only",
+        "support_observation_only",
+        "mask_only_support_observation",
+        "no_smpl",
+        "no_semantic",
+    }
     return {
         "teacher_source": teacher_target,
         "blend_source": "spconv",
@@ -66,9 +94,14 @@ def candidate_source_manifest(job: dict[str, Any], best_name: str) -> dict[str, 
         "whether_v770_used": True,
         "whether_v770_preserve_blend_used": False,
         "whether_postcompose_used": False,
+        "whether_teacher_used": bool(teacher_used),
+        "whether_blend_used": False,
+        "whether_observation_used": bool(observation_used),
+        "whether_support_used": bool(support_used),
+        "whether_semantic_used": bool(semantic_used),
         "composition_no_blend": True,
         "teacher_mode": teacher_mode,
-        "feature_mode": str(job["feature_mode"]),
+        "feature_mode": feature_mode,
         "model_mode": str(job["model_mode"]),
         "group": str(job["group"]),
         "run_id": str(job["run_id"]),
@@ -89,8 +122,23 @@ def best_from_run(job: dict[str, Any], source: str = "V9175") -> dict[str, Any] 
     pred_path = cand_dir / "predictions.npz"
     eval_path = cand_dir / "eval.json"
     source_manifest_path = cand_dir / "source_manifest.json"
-    if best_name and best_name != "None" and not source_manifest_path.is_file():
-        write_json(source_manifest_path, candidate_source_manifest(job, best_name))
+    required_manifest_fields = {
+        "whether_v999_used",
+        "whether_humanram_used",
+        "whether_v129_used",
+        "whether_v770_used",
+        "whether_postcompose_used",
+        "whether_teacher_used",
+        "whether_blend_used",
+        "whether_observation_used",
+        "whether_support_used",
+        "whether_semantic_used",
+    }
+    if best_name and best_name != "None":
+        manifest = read_json(source_manifest_path, {}) if source_manifest_path.is_file() else {}
+        if not required_manifest_fields.issubset(manifest):
+            manifest.update(candidate_source_manifest(job, best_name))
+            write_json(source_manifest_path, manifest)
     train = read_json(run_dir / "reports" / "V10300000_decoder_training_summary.json", {})
     return {
         "source": source,
@@ -357,6 +405,37 @@ def summarize(rows: list[dict[str, Any]]) -> dict[str, Any]:
     }
 
 
+def source_manifest_audit(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    audit = []
+    for row in rows:
+        path = Path(str(row.get("source_manifest", "")))
+        js = read_json(path, {}) if path.is_file() else {}
+        audit.append(
+            {
+                "run_id": row.get("run_id"),
+                "group": row.get("group"),
+                "seed_index": row.get("seed_index"),
+                "source_manifest_exists": path.is_file(),
+                "teacher_source": js.get("teacher_source"),
+                "blend_source": js.get("blend_source"),
+                "composition_source": js.get("composition_source"),
+                "base_candidate": js.get("base_candidate"),
+                "whether_v999_used": js.get("whether_v999_used"),
+                "whether_humanram_used": js.get("whether_humanram_used"),
+                "whether_v129_used": js.get("whether_v129_used"),
+                "whether_v770_used": js.get("whether_v770_used"),
+                "whether_postcompose_used": js.get("whether_postcompose_used"),
+                "whether_teacher_used": js.get("whether_teacher_used"),
+                "whether_blend_used": js.get("whether_blend_used"),
+                "whether_observation_used": js.get("whether_observation_used"),
+                "whether_support_used": js.get("whether_support_used"),
+                "whether_semantic_used": js.get("whether_semantic_used"),
+                "composition_no_blend": js.get("composition_no_blend"),
+            }
+        )
+    return audit
+
+
 def write_md(summary: dict[str, Any]) -> None:
     m = summary["metrics"]
     lines = [
@@ -403,6 +482,7 @@ def plot(rows: list[dict[str, Any]]) -> None:
 def main() -> None:
     REPORTS.mkdir(parents=True, exist_ok=True)
     LOGS.mkdir(parents=True, exist_ok=True)
+    FAILURES.mkdir(parents=True, exist_ok=True)
     rows: list[dict[str, Any]] = []
     jobs = build_jobs()
     for idx, job in enumerate(jobs, 1):
@@ -415,6 +495,10 @@ def main() -> None:
         )
     write_csv(REPORTS / "V91750000_no_blend_repair_results.csv", rows)
     write_csv(REPORTS / "V91750000_teacher_leakage_repair.csv", rows)
+    write_csv(REPORTS / "V91750000_seed_level_metrics.csv", rows)
+    failures = [r for r in rows if str(r.get("status", "")).startswith("FAILED") or not r.get("prediction_exists") or not r.get("eval_exists")]
+    write_json(FAILURES / "V91750000_failed_jobs.json", failures)
+    write_json(REPORTS / "V91750000_source_manifest_audit.json", source_manifest_audit(rows))
     summary = summarize(rows)
     write_json(REPORTS / "V91750000_teacher_leakage_repair_summary.json", summary)
     write_json(REPORTS / "V91750000_teacher_leakage_repair.json", summary)

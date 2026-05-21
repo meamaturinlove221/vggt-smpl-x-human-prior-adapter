@@ -605,6 +605,33 @@ def run_sparseconv_route(
     else:
         raise ValueError(f"Unknown feature_mode={feature_mode!r}")
 
+    teacher_used = teacher_target_mode not in {"zero_control", "residual_zero_control", "no_teacher"}
+    observation_used = feature_mode not in {
+        "smpl_only",
+        "random_smpl_only",
+        "shuffled_smpl_only",
+        "true_semantic_only",
+        "random_semantic_only",
+        "shuffled_semantic_only",
+        "support_only",
+        "no_observation",
+    }
+    support_used = feature_mode not in {
+        "observation_only",
+        "true_semantic_only",
+        "random_semantic_only",
+        "shuffled_semantic_only",
+        "no_smpl",
+    }
+    semantic_used = feature_mode not in {
+        "observation_only",
+        "support_only",
+        "support_observation_only",
+        "mask_only_support_observation",
+        "no_smpl",
+        "no_semantic",
+    }
+
     mins = np.nanquantile(canonical, 0.001, axis=0).astype(np.float32)
     maxs = np.nanquantile(canonical, 0.999, axis=0).astype(np.float32)
     span = np.maximum(maxs - mins, 1e-4)
@@ -920,6 +947,11 @@ def run_sparseconv_route(
                     "whether_v770_used": True,
                     "whether_v770_preserve_blend_used": False,
                     "whether_postcompose_used": bool(not composition_no_blend and blend_name != "spconv"),
+                    "whether_teacher_used": bool(teacher_used),
+                    "whether_blend_used": bool((not composition_no_blend) and blend_name != "spconv"),
+                    "whether_observation_used": bool(observation_used),
+                    "whether_support_used": bool(support_used),
+                    "whether_semantic_used": bool(semantic_used),
                     "composition_no_blend": bool(composition_no_blend),
                     "teacher_mode": teacher_mode,
                     "feature_mode": feature_mode,

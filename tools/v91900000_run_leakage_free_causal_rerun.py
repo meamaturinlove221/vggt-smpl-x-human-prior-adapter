@@ -46,12 +46,37 @@ def env_utf8() -> dict[str, str]:
 
 def ensure_source_manifest(job: dict[str, Any], cand_dir: Path, best_name: str) -> Path:
     path = cand_dir / "source_manifest.json"
-    if path.is_file():
-        return path
     teacher_mode = str(job["teacher_mode"])
     teacher_target = teacher_mode[: -len("_no_blend")] if teacher_mode.endswith("_no_blend") else teacher_mode
-    write_json(
-        path,
+    feature_mode = str(job["feature_mode"])
+    teacher_used = teacher_target not in {"zero_control", "residual_zero_control", "no_teacher"}
+    observation_used = feature_mode not in {
+        "smpl_only",
+        "random_smpl_only",
+        "shuffled_smpl_only",
+        "true_semantic_only",
+        "random_semantic_only",
+        "shuffled_semantic_only",
+        "support_only",
+        "no_observation",
+    }
+    support_used = feature_mode not in {
+        "observation_only",
+        "true_semantic_only",
+        "random_semantic_only",
+        "shuffled_semantic_only",
+        "no_smpl",
+    }
+    semantic_used = feature_mode not in {
+        "observation_only",
+        "support_only",
+        "support_observation_only",
+        "mask_only_support_observation",
+        "no_smpl",
+        "no_semantic",
+    }
+    manifest = read_json(path, {}) if path.is_file() else {}
+    manifest.update(
         {
             "teacher_source": teacher_target,
             "blend_source": "spconv",
@@ -71,15 +96,21 @@ def ensure_source_manifest(job: dict[str, Any], cand_dir: Path, best_name: str) 
             "whether_v770_used": True,
             "whether_v770_preserve_blend_used": False,
             "whether_postcompose_used": False,
+            "whether_teacher_used": bool(teacher_used),
+            "whether_blend_used": False,
+            "whether_observation_used": bool(observation_used),
+            "whether_support_used": bool(support_used),
+            "whether_semantic_used": bool(semantic_used),
             "composition_no_blend": True,
             "teacher_mode": teacher_mode,
-            "feature_mode": str(job["feature_mode"]),
+            "feature_mode": feature_mode,
             "model_mode": str(job["model_mode"]),
             "group": str(job["group"]),
             "run_id": str(job["run_id"]),
             "best_name": best_name,
-        },
+        }
     )
+    write_json(path, manifest)
     return path
 
 
@@ -296,10 +327,21 @@ def summarize(rows: list[dict[str, Any]]) -> dict[str, Any]:
                 "run_id": row.get("run_id"),
                 "group": row.get("group"),
                 "source_manifest_exists": path.is_file(),
+                "teacher_source": js.get("teacher_source"),
+                "blend_source": js.get("blend_source"),
+                "composition_source": js.get("composition_source"),
+                "base_candidate": js.get("base_candidate"),
                 "composition_no_blend": js.get("composition_no_blend"),
                 "whether_postcompose_used": js.get("whether_postcompose_used"),
                 "whether_humanram_used": js.get("whether_humanram_used"),
                 "whether_v129_used": js.get("whether_v129_used"),
+                "whether_v999_used": js.get("whether_v999_used"),
+                "whether_v770_used": js.get("whether_v770_used"),
+                "whether_teacher_used": js.get("whether_teacher_used"),
+                "whether_blend_used": js.get("whether_blend_used"),
+                "whether_observation_used": js.get("whether_observation_used"),
+                "whether_support_used": js.get("whether_support_used"),
+                "whether_semantic_used": js.get("whether_semantic_used"),
             }
         )
     return {
