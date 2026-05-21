@@ -369,10 +369,17 @@ def run_sparseconv_route(
     archive_mode = str(archive_mode or "full").strip().lower()
     if teacher_mode in {"guarded_v129", "v129_guarded_mix", "default"}:
         sparse_teacher_delta = delta_v999 + local_gain[:, None] * (delta_v129 - delta_v999)
-    elif teacher_mode in {"v999_only", "no_v129", "sparse_no_v129"}:
+    elif teacher_mode in {"v999_only", "no_v129", "sparse_no_v129", "teacher_detached"}:
         sparse_teacher_delta = delta_v999
     elif teacher_mode in {"v129_only", "v129_guard_only"}:
         sparse_teacher_delta = local_gain[:, None] * delta_v129
+    elif teacher_mode in {"teacher_noise", "v999_noise"}:
+        rng_teacher = np.random.default_rng(seed + 91700000)
+        noise_scale = np.maximum(np.std(delta_v999, axis=0, keepdims=True), 1.0e-5)
+        sparse_teacher_delta = delta_v999 + 0.50 * rng_teacher.normal(0.0, noise_scale, size=delta_v999.shape).astype(np.float32)
+    elif teacher_mode in {"teacher_randomized", "v999_randomized"}:
+        rng_teacher = np.random.default_rng(seed + 91700001)
+        sparse_teacher_delta = delta_v999[rng_teacher.permutation(delta_v999.shape[0])]
     elif teacher_mode in {"zero_control", "residual_zero_control"}:
         sparse_teacher_delta = np.zeros_like(delta_v999, dtype=np.float32)
     else:
