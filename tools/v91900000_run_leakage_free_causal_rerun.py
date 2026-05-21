@@ -193,46 +193,66 @@ def run_one(job: dict[str, Any]) -> dict[str, Any]:
         "--run-id",
         str(job["run_id"]),
     ]
-    started = time.time()
-    try:
-        proc = subprocess.run(
-            cmd,
-            cwd=str(WORKTREE),
-            text=True,
-            capture_output=True,
-            encoding="utf-8",
-            errors="replace",
-            timeout=75 * 60,
-            env=env_utf8(),
-        )
-        log = {
-            "created_utc": now(),
-            "run_id": job["run_id"],
-            "cmd": cmd,
-            "returncode": proc.returncode,
-            "runtime_seconds": time.time() - started,
-            "stdout_tail": proc.stdout[-12000:],
-            "stderr_tail": proc.stderr[-12000:],
-            "timeout": False,
-        }
-    except subprocess.TimeoutExpired as exc:
-        log = {
-            "created_utc": now(),
-            "run_id": job["run_id"],
-            "cmd": cmd,
-            "returncode": "TIMEOUT_EXPIRED",
-            "runtime_seconds": time.time() - started,
-            "stdout_tail": (exc.stdout or "")[-12000:] if isinstance(exc.stdout, str) else "",
-            "stderr_tail": (exc.stderr or "")[-12000:] if isinstance(exc.stderr, str) else "",
-            "timeout": True,
-        }
-    write_json(LOGS / f"{job['run_id']}_modal_cli.json", log)
-    row = best_from_run(job)
+    attempts: list[dict[str, Any]] = []
+    row: dict[str, Any] | None = None
+    for attempt in range(1, 4):
+        started = time.time()
+        try:
+            proc = subprocess.run(
+                cmd,
+                cwd=str(WORKTREE),
+                text=True,
+                capture_output=True,
+                encoding="utf-8",
+                errors="replace",
+                timeout=75 * 60,
+                env=env_utf8(),
+            )
+            log = {
+                "created_utc": now(),
+                "run_id": job["run_id"],
+                "cmd": cmd,
+                "attempt": attempt,
+                "returncode": proc.returncode,
+                "runtime_seconds": time.time() - started,
+                "stdout_tail": proc.stdout[-12000:],
+                "stderr_tail": proc.stderr[-12000:],
+                "timeout": False,
+            }
+        except subprocess.TimeoutExpired as exc:
+            log = {
+                "created_utc": now(),
+                "run_id": job["run_id"],
+                "cmd": cmd,
+                "attempt": attempt,
+                "returncode": "TIMEOUT_EXPIRED",
+                "runtime_seconds": time.time() - started,
+                "stdout_tail": (exc.stdout or "")[-12000:] if isinstance(exc.stdout, str) else "",
+                "stderr_tail": (exc.stderr or "")[-12000:] if isinstance(exc.stderr, str) else "",
+                "timeout": True,
+            }
+        attempts.append(log)
+        write_json(LOGS / f"{job['run_id']}_modal_cli_attempt{attempt}.json", log)
+        write_json(LOGS / f"{job['run_id']}_modal_cli.json", log)
+        row = best_from_run(job)
+        if row is not None:
+            break
+        if attempt < 3:
+            time.sleep(30 * attempt)
     if row is None:
-        return {**job, "status": "FAILED_NO_FINAL_STATUS", "returncode": log["returncode"], "runtime_seconds": log["runtime_seconds"], "failure_reason": str(log.get("stderr_tail", ""))[-1500:]}
-    row["returncode"] = log["returncode"]
-    row["runtime_seconds"] = log["runtime_seconds"]
-    row["timeout_recovered_from_existing_artifact"] = bool(log.get("timeout"))
+        last = attempts[-1]
+        return {
+            **job,
+            "status": "FAILED_NO_FINAL_STATUS",
+            "returncode": last["returncode"],
+            "runtime_seconds": sum(float(a.get("runtime_seconds", 0.0)) for a in attempts),
+            "failure_reason": str(last.get("stderr_tail", ""))[-1500:],
+            "attempts": len(attempts),
+        }
+    row["returncode"] = attempts[-1]["returncode"]
+    row["runtime_seconds"] = sum(float(a.get("runtime_seconds", 0.0)) for a in attempts)
+    row["timeout_recovered_from_existing_artifact"] = bool(attempts[-1].get("timeout"))
+    row["attempts"] = len(attempts)
     row["skipped_existing"] = False
     return row
 
