@@ -1,0 +1,7 @@
+﻿{
+    "goal_file_path":  "D:\\vggt\\vggt-feature-adapter\\docs\\goals\\V200100000000_V300000000000_point_cloud_morphology_completion_goal.md",
+    "sha256":  "826ca6b083f11225e090612cbdb5a456aff7a5c666ee5806c273680f8f3b9a71",
+    "line_count":  758,
+    "created_at":  "2026-05-23T17:06:22.8090882Z",
+    "summary":  "V200100000000-V300000000000 point-cloud morphology completion: fused point clouds, equal-axis 3D visuals, SMPL/projection overlays, morphology metrics, repair routes, packages."
+}
