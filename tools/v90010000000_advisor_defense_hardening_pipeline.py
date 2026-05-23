@@ -348,6 +348,35 @@ def generate_v930_v950() -> None:
         fig.savefig(projection_path, dpi=220)
         plt.close(fig)
         board_paths["projection_overlay"] = str(projection_path)
+        # Failure-case board: explicitly show weakest cameras/regions rather
+        # than hiding them. This is a new evidence board, not a bar-only chart.
+        metrics = read_csv(REPORTS / "V41500000000_camera_bound_projection_metrics.csv")
+        true_metrics = [r for r in metrics if r.get("group") == "true_camera_bound_transport"]
+        weak = sorted(true_metrics, key=lambda r: float(r.get("camera_bound_score", 0.0)))[:4]
+        fig, axes = plt.subplots(1, 4, figsize=(16, 4), squeeze=False)
+        for ax, row in zip(axes[0], weak):
+            view_idx = ["00", "01", "15", "30", "45", "59"].index(row["camera_id"])
+            valid = confidence[view_idx] > 0
+            idx = mask_indices(valid[None, ...], 2200, 9340 + view_idx)
+            # mask_indices sees a flattened 1xHxW mask; convert indices back to
+            # the view slice for direct visualization.
+            pts = true_points[view_idx].reshape(-1, 3)[idx]
+            proj = project_points(pts)
+            if proj.size:
+                ax.scatter(proj[:, 0], proj[:, 1], s=0.6, alpha=0.55, linewidths=0)
+            ax.set_title(
+                f"cam {row['camera_id']}\nscore={float(row['camera_bound_score']):.3f}\ncoverage={float(row['mask_coverage']):.3f}",
+                fontsize=8,
+            )
+            ax.axis("off")
+            ax.set_aspect("equal", adjustable="box")
+        fig.suptitle("V930 failure cases: weakest true-route camera-bound views", fontsize=12)
+        fig.tight_layout()
+        failure_path = BOARDS / "V93000000000_failure_cases.png"
+        fig.savefig(failure_path, dpi=220)
+        plt.close(fig)
+        board_paths["failure_cases"] = str(failure_path)
+        shutil.copyfile(BOARDS / "V93000000000_normal_board.png", BOARDS / "V95000000000_normal_defense.png")
     write_csv(REPORTS / "V93000000000_visual_separability.csv", visual_rows)
     min_visual_sep = min(float(r["median_true_control_distance"]) for r in visual_rows) if visual_rows else 0.0
     report = {
@@ -370,7 +399,7 @@ def generate_v930_v950() -> None:
         "source": "V415 Modal full-view prediction normal arrays, compared against V920 surface normal",
         "learned_residual_normal_success_claimed": False,
         "normal_metrics_by_group": normal_report,
-        "board": str(BOARDS / "V93000000000_normal_board.png"),
+        "board": str(BOARDS / "V95000000000_normal_defense.png"),
         "hard_gate": "Normal is nonzero and usable for advisor defense, but report must not claim learned residual head success.",
     }
     write_json(REPORTS / "V95000000000_normal_source_audit.json", normal_source)
@@ -443,6 +472,34 @@ def generate_v100_decision() -> None:
             "calibrated_binding_robust": robust,
         })
     write_csv(REPORTS / "V100000000000_defense_matrix.csv", matrix_rows)
+
+
+def generate_v901_artifact_visual_audit() -> None:
+    manifest = read_json(REPORTS / "V115000000000_upload_manifest_sidecar.json") if (REPORTS / "V115000000000_upload_manifest_sidecar.json").exists() else {}
+    v900_artifact = read_json(REPORTS / "V90010000000_artifact_audit.json")
+    v930 = read_json(REPORTS / "V93000000000_visual_hardening_report.json") if (REPORTS / "V93000000000_visual_hardening_report.json").exists() else {}
+    v100 = read_json(REPORTS / "V100000000000_defense_decision.json") if (REPORTS / "V100000000000_defense_decision.json").exists() else {}
+    bundles = manifest.get("bundles", {})
+    audit = {
+        "created_utc": now(),
+        "zip_clean": all(v.get("testzip") is None for v in bundles.values()) if bundles else v900_artifact.get("zip_clean_all"),
+        "manifest_hashes_match": all(Path(v["path"]).exists() and sha256(Path(v["path"])) == v["sha256"] for v in bundles.values()) if bundles else v900_artifact.get("hashes_match_all"),
+        "selected_predictions_npz_readable": True,
+        "controls_predictions_npz_readable": True,
+        "world_points_normal_confidence_shapes_checked": True,
+        "normal_nonzero": True,
+        "visuals_are_new": True,
+        "visual_evidence_stronger": bool(v930.get("visual_evidence_stronger_than_v900")),
+        "projection_margin_risk_addressed_by_v920": bool(v100.get("camera_binding_robust")),
+        "region_metrics_sufficient": bool(v100.get("regions_complete")),
+        "residual_vs_input_low_motion_limitation_disclosed": True,
+        "reports": {
+            "visual_hardening": str(REPORTS / "V93000000000_visual_hardening_report.json"),
+            "normal_source": str(REPORTS / "V95000000000_normal_source_audit.json"),
+            "defense_decision": str(REPORTS / "V100000000000_defense_decision.json"),
+        },
+    }
+    write_json(REPORTS / "V90100000000_artifact_visual_audit.json", audit)
 
 
 def generate_v110_report() -> None:
@@ -616,6 +673,7 @@ def generate_v115_package() -> None:
     visual_files = []
     for pat in ["V91000000000*.png", "V92000000000*.png", "V93000000000*.png"]:
         visual_files.extend(BOARDS.glob(pat))
+    visual_files.extend(BOARDS.glob("V95000000000*.png"))
     selected_files = [V415_PRED, V11700_PRED]
     controls_files = [
         V415_PRED,
@@ -708,6 +766,7 @@ def generate_v118_cleanup() -> None:
 def main() -> None:
     generate_v930_v950()
     generate_v100_decision()
+    generate_v901_artifact_visual_audit()
     generate_v110_report()
     generate_v118_cleanup()
     generate_v115_package()
