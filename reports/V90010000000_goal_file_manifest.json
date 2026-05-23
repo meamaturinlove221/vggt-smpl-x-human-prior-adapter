@@ -1,0 +1,7 @@
+{
+  "created_at": "2026-05-23T12:22:12.282424+00:00",
+  "goal_file_path": "D:\\vggt\\vggt-feature-adapter\\docs\\goals\\V90010000000_V120000000000_advisor_defense_hardening_goal.md",
+  "line_count": 638,
+  "sha256": "853267ae98ae90ba2570ed56a0157bc382aba7472c88bc7793f34163a9b11d06",
+  "summary": "V900100-V120000 advisor-defense hardening: push recovery, artifact audit, binding robustness, visual hardening, normal defense, defense matrix, Yuque-style report, upload-safe package."
+}
