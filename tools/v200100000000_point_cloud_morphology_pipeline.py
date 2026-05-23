@@ -399,19 +399,50 @@ def equal_limits(samples: list[np.ndarray]) -> tuple[np.ndarray, float]:
 def scatter3(ax: Any, pts: np.ndarray, colors: np.ndarray | str, title: str, center: np.ndarray, radius: float, s: float = 0.8) -> None:
     if pts.shape[0] > 14000:
         rng = np.random.default_rng(202)
-        pts = pts[rng.choice(np.arange(pts.shape[0]), 14000, replace=False)]
+        idx = rng.choice(np.arange(pts.shape[0]), 14000, replace=False)
+        pts = pts[idx]
         if isinstance(colors, np.ndarray):
-            colors = colors[: pts.shape[0]]
+            colors = colors[idx]
     ax.scatter(pts[:, 0], pts[:, 1], pts[:, 2], c=colors, s=s, alpha=0.65, linewidths=0)
-    # Skeleton-like overlay: a vertical spine and shoulder/hand hints, derived
-    # from the shared bounds so it is an overlay guide, not a replacement mesh.
-    zmin, zmax = center[2] - radius * 0.75, center[2] + radius * 0.75
-    ax.plot([center[0], center[0]], [center[1], center[1]], [zmin, zmax], color="black", linewidth=1.2, alpha=0.55)
     ax.set_xlim(center[0] - radius, center[0] + radius)
     ax.set_ylim(center[1] - radius, center[1] + radius)
     ax.set_zlim(center[2] - radius, center[2] + radius)
     ax.set_title(title, fontsize=8)
     ax.set_axis_off()
+
+
+def load_surface_support(max_points: int = 28000) -> dict[str, np.ndarray]:
+    with np.load(SURFACE, allow_pickle=False) as surface:
+        valid = surface["valid_mask"].reshape(-1)
+        pts = transform_to_camera_bound(surface["posed_surface_xyz"]).reshape(-1, 3).astype(np.float32)
+        part = surface["region_label"].reshape(-1).astype(np.int16)
+        normal = surface["normal"].reshape(-1, 3).astype(np.float32)
+    keep = valid & np.isfinite(pts).all(axis=1)
+    idx = np.flatnonzero(keep)
+    if idx.size > max_points:
+        rng = np.random.default_rng(2023)
+        idx = rng.choice(idx, size=max_points, replace=False)
+    return {"points": pts[idx], "part": part[idx], "normal": normal[idx]}
+
+
+def overlay_surface(ax: Any, surface: dict[str, np.ndarray], center: np.ndarray, radius: float, region: str | None = None) -> None:
+    pts = surface["points"]
+    part = surface["part"]
+    if region is not None:
+        rid = {"head_face": 1, "hairline": 2, "left_hand": 3, "right_hand": 4}.get(region)
+        if rid is not None:
+            mask = part == rid
+            pts = pts[mask]
+    if pts.size == 0:
+        return
+    if pts.shape[0] > 8000:
+        rng = np.random.default_rng(2024)
+        pts = pts[rng.choice(pts.shape[0], size=8000, replace=False)]
+    ax.scatter(pts[:, 0], pts[:, 1], pts[:, 2], c="#111111", s=0.25, alpha=0.13, linewidths=0)
+    # Data-derived skeleton proxy from the surface support bounds.
+    zmin, zmax = np.percentile(pts[:, 2], [2, 98])
+    c = np.median(pts, axis=0)
+    ax.plot([c[0], c[0]], [c[1], c[1]], [zmin, zmax], color="black", linewidth=1.0, alpha=0.65)
 
 
 def v202_visualize() -> None:
@@ -420,7 +451,8 @@ def v202_visualize() -> None:
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
 
-    pcs = {g: load_pc(g) for g in GROUPS[:7]}
+    pcs = {g: load_pc(g) for g in GROUPS[:8]}
+    surface_support = load_surface_support()
     samples = [pcs[g]["points"] for g in pcs]
     center, radius = equal_limits(samples)
     views = [(8, -80, "front"), (8, 5, "side"), (82, -80, "top"), (25, -45, "oblique")]
@@ -449,10 +481,13 @@ def v202_visualize() -> None:
             elif mode == "confidence":
                 colors = pc["confidence"]
             elif mode == "distance":
-                colors = np.linalg.norm(pc["points"] - np.median(pc["points"], axis=0), axis=1)
+                surface_med = np.median(surface_support["points"], axis=0)
+                colors = np.linalg.norm(pc["points"] - surface_med, axis=1)
             else:
-                colors = "#599ad3" if g == "true_camera_bound_surface_backend" else "#bbbbbb"
+                colors = "#2ca25f" if g == FINAL_TRUE_GROUP else ("#599ad3" if g == "true_camera_bound_surface_backend" else "#bbbbbb")
             scatter3(ax, pc["points"], colors, g, center, radius)
+            if mode == "smpl":
+                overlay_surface(ax, surface_support, center, radius)
             ax.view_init(elev=18, azim=-60)
         fig.tight_layout()
         fig.savefig(BOARDS / fname, dpi=220)
@@ -462,8 +497,9 @@ def v202_visualize() -> None:
         "equal_axis": True,
         "same_bounds_across_groups": True,
         "views": [v[2] for v in views],
-        "color_modes": ["group", "body-part", "confidence", "nearest-SMPL-distance proxy", "source-view proxy"],
-        "overlays": ["skeleton guide", "SMPL surface proxy bounds"],
+        "color_modes": ["group", "body-part", "confidence", "distance-to-V920-surface-support", "source-view proxy"],
+        "overlays": ["V920 posed_surface_xyz surface support", "data-derived skeleton proxy"],
+        "surface_support_points": int(surface_support["points"].shape[0]),
     })
 
 
@@ -482,7 +518,8 @@ def v203_closeups() -> None:
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
 
-    pcs = {g: load_pc(g) for g in GROUPS[:7]}
+    pcs = {g: load_pc(g) for g in GROUPS[:8]}
+    surface_support = load_surface_support()
     for region in ["head_face", "hairline", "left_hand", "right_hand"]:
         samples = {g: region_subset(pc, region) for g, pc in pcs.items()}
         center, radius = equal_limits(list(samples.values()))
@@ -491,13 +528,14 @@ def v203_closeups() -> None:
         for i, (g, pts) in enumerate(samples.items(), start=1):
             ax = fig.add_subplot(1, len(samples), i, projection="3d")
             scatter3(ax, pts, "#2b8cbe" if g == "true_camera_bound_surface_backend" else "#999999", g, center, radius, s=1.3)
+            overlay_surface(ax, surface_support, center, radius, region)
             ax.view_init(elev=20, azim=-55)
         fig.suptitle(f"V203 {region} local morphology, equal-axis crop")
         fig.tight_layout()
         fig.savefig(BOARDS / f"V203000000000_{region}_morphology.png", dpi=220)
         plt.close(fig)
     shutil.copyfile(BOARDS / "V203000000000_head_face_morphology.png", BOARDS / "V203000000000_part_local_smpl_overlay.png")
-    write_json(REPORTS / "V203000000000_part_closeup_policy.json", {"created_utc": now(), "regions": ["head_face", "hairline", "left_hand", "right_hand"], "equal_axis": True, "same_crop_bounds_per_region": True, "normal_arrows": "sampled proxy via normal metadata"})
+    write_json(REPORTS / "V203000000000_part_closeup_policy.json", {"created_utc": now(), "regions": ["head_face", "hairline", "left_hand", "right_hand"], "equal_axis": True, "same_crop_bounds_per_region": True, "surface_overlay": "V920 posed_surface_xyz region support", "normal_arrows": "sampled proxy via normal metadata"})
 
 
 def v204_projection_overlay() -> None:
