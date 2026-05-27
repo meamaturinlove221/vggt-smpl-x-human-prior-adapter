@@ -1,0 +1,13 @@
+case,region,true_projection_score,baseline_projection_score,best_control,best_control_projection_score,non_regression,actual_visible_improvement,facial_detail_claim_allowed
+current_v895_0021_03,head_hair,0.8067111076595247,0.6273614330065251,same_topology_no_semantic,0.6363878926956654,True,True,False
+current_v895_0021_03,hand_arm,0.8461285756349564,0.6042225275814533,real_vggt_baseline_only,0.6042225275814533,True,True,
+current_v895_0021_03,clothing,0.7688935494388303,0.6534747614575009,same_topology_no_semantic,0.6633618302340469,True,True,
+0021_03_frame001,head_hair,0.8103050034809113,0.6313829447340966,same_topology_no_semantic,0.637197146769762,True,True,False
+0021_03_frame001,hand_arm,0.8445571412563324,0.6062179153263569,real_vggt_baseline_only,0.6062179153263569,True,True,
+0021_03_frame001,clothing,0.7657645158021681,0.6568742151522828,same_topology_no_semantic,0.6642949822561395,True,True,
+0012_11_frame001,head_hair,0.8282100022649765,0.6159304031682015,same_topology_no_semantic,0.6201348384380341,True,True,False
+0012_11_frame001,hand_arm,0.8542622391938184,0.6002226139366627,same_topology_no_semantic,0.6616871222138405,True,True,
+0012_11_frame001,clothing,0.7669870953244547,0.6631712626701401,same_topology_no_semantic,0.6837421650094371,True,True,
+0013_01_frame001,head_hair,0.8299191765952693,0.622405087916851,same_topology_no_semantic,0.63398502333045,True,True,False
+0013_01_frame001,hand_arm,0.8510178530216217,0.6026677117824555,same_topology_no_semantic,0.6647726077318191,True,True,
+0013_01_frame001,clothing,0.7516580642527149,0.6664270163993682,same_topology_no_semantic,0.6816137905821564,True,True,

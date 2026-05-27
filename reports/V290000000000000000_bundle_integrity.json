@@ -1,0 +1,129 @@
+{
+  "created_at": "2026-05-27T17:53:59+00:00",
+  "bundle_count": 12,
+  "all_zip_clean": true,
+  "all_under_500mb": true,
+  "all_non_empty": true,
+  "bundles": [
+    {
+      "bundle": "V290000000000000000_core_bundle.zip",
+      "path": "D:\\vggt\\vggt-canonical-surfel-adapter\\archive\\V290000000000000000_core_bundle.zip",
+      "size_bytes": 28740,
+      "under_500mb": true,
+      "zip_clean": true,
+      "entry_count": 2,
+      "non_empty": true,
+      "sha256": "3874722ded629612f017208d079c65592d45b65833a3d9e06cad1ddf5ecd9a96"
+    },
+    {
+      "bundle": "V290000000000000000_reports_bundle.zip",
+      "path": "D:\\vggt\\vggt-canonical-surfel-adapter\\archive\\V290000000000000000_reports_bundle.zip",
+      "size_bytes": 1833127,
+      "under_500mb": true,
+      "zip_clean": true,
+      "entry_count": 883,
+      "non_empty": true,
+      "sha256": "2e70746664027ec5f44496d71dffea6efe8bdb0e40434433b5ed278297e99dd4"
+    },
+    {
+      "bundle": "V290000000000000000_visuals_bundle.zip",
+      "path": "D:\\vggt\\vggt-canonical-surfel-adapter\\archive\\V290000000000000000_visuals_bundle.zip",
+      "size_bytes": 744128,
+      "under_500mb": true,
+      "zip_clean": true,
+      "entry_count": 2,
+      "non_empty": true,
+      "sha256": "1129ae847b9bfbcc2dda9f2d58b48bf2e667c5fd268249cb6f1def254ea41325"
+    },
+    {
+      "bundle": "V290000000000000000_viewer_bundle.zip",
+      "path": "D:\\vggt\\vggt-canonical-surfel-adapter\\archive\\V290000000000000000_viewer_bundle.zip",
+      "size_bytes": 6623687,
+      "under_500mb": true,
+      "zip_clean": true,
+      "entry_count": 8,
+      "non_empty": true,
+      "sha256": "2bc43b136e7c994f587fd0075a18aa0e8f9d9fc3bcf1c1db1a8486d4b3096b77"
+    },
+    {
+      "bundle": "V290000000000000000_predictions_bundle.zip",
+      "path": "D:\\vggt\\vggt-canonical-surfel-adapter\\archive\\V290000000000000000_predictions_bundle.zip",
+      "size_bytes": 202474861,
+      "under_500mb": true,
+      "zip_clean": true,
+      "entry_count": 120,
+      "non_empty": true,
+      "sha256": "2161d4821ed72799123c89d80f4fa8c252176194c7d16172f834956ba05668b0"
+    },
+    {
+      "bundle": "V290000000000000000_controls_bundle.zip",
+      "path": "D:\\vggt\\vggt-canonical-surfel-adapter\\archive\\V290000000000000000_controls_bundle.zip",
+      "size_bytes": 749217,
+      "under_500mb": true,
+      "zip_clean": true,
+      "entry_count": 3,
+      "non_empty": true,
+      "sha256": "18f142c39c32499aa57e88958ee5e0d1698c6f085c698870b68db5323573f86d"
+    },
+    {
+      "bundle": "V290000000000000000_projection_assets_bundle.zip",
+      "path": "D:\\vggt\\vggt-canonical-surfel-adapter\\archive\\V290000000000000000_projection_assets_bundle.zip",
+      "size_bytes": 802169,
+      "under_500mb": true,
+      "zip_clean": true,
+      "entry_count": 12,
+      "non_empty": true,
+      "sha256": "23ec3c2d086cd68c2499451889337b9dcb0d2684394f6af9ec6e0f39ec70fed1"
+    },
+    {
+      "bundle": "V290000000000000000_local_closeups_bundle.zip",
+      "path": "D:\\vggt\\vggt-canonical-surfel-adapter\\archive\\V290000000000000000_local_closeups_bundle.zip",
+      "size_bytes": 838645,
+      "under_500mb": true,
+      "zip_clean": true,
+      "entry_count": 3,
+      "non_empty": true,
+      "sha256": "d214649928199dd8f4b56760ac5df9023e6218d2eabe5a1486f564135e6d8403"
+    },
+    {
+      "bundle": "V290000000000000000_photometric_matrix_bundle.zip",
+      "path": "D:\\vggt\\vggt-canonical-surfel-adapter\\archive\\V290000000000000000_photometric_matrix_bundle.zip",
+      "size_bytes": 8167,
+      "under_500mb": true,
+      "zip_clean": true,
+      "entry_count": 2,
+      "non_empty": true,
+      "sha256": "c18ff9a667ab671f97a096b7d52b87580d5c15a0f6fbf3f211fc835553a2a843"
+    },
+    {
+      "bundle": "V290000000000000000_environment_bundle.zip",
+      "path": "D:\\vggt\\vggt-canonical-surfel-adapter\\archive\\V290000000000000000_environment_bundle.zip",
+      "size_bytes": 131779,
+      "under_500mb": true,
+      "zip_clean": true,
+      "entry_count": 2,
+      "non_empty": true,
+      "sha256": "259766ae64209679cf5c0e7098cd453c84ff6d013c2595d0c3fcb2e4932464ee"
+    },
+    {
+      "bundle": "V290000000000000000_metrics_bundle.zip",
+      "path": "D:\\vggt\\vggt-canonical-surfel-adapter\\archive\\V290000000000000000_metrics_bundle.zip",
+      "size_bytes": 7336,
+      "under_500mb": true,
+      "zip_clean": true,
+      "entry_count": 2,
+      "non_empty": true,
+      "sha256": "d8a6590ebee38ee8aad19344c4b4811df37c73d719010a3c0f7da6c9c237cad3"
+    },
+    {
+      "bundle": "V290000000000000000_multisequence_bundle.zip",
+      "path": "D:\\vggt\\vggt-canonical-surfel-adapter\\archive\\V290000000000000000_multisequence_bundle.zip",
+      "size_bytes": 92261,
+      "under_500mb": true,
+      "zip_clean": true,
+      "entry_count": 2,
+      "non_empty": true,
+      "sha256": "4ad356643a7df47f4ee958787a98eb9d45208c8171400f1a93ac78bdd905dc87"
+    }
+  ]
+}

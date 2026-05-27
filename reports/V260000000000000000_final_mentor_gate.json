@@ -1,0 +1,31 @@
+{
+  "created_at": "2026-05-27T17:53:45+00:00",
+  "hard_gates": {
+    "V120 downgraded": true,
+    "upload audit pass": true,
+    "config-neutral scoring pass": true,
+    "no detail_bonus/control_penalty pass": true,
+    "refined detail_source pass": true,
+    "per-case full-forward effect pass": true,
+    "SMPL feature binding pass": true,
+    "model-owned student pass": true,
+    "no teacher/raw Kinect at inference": true,
+    "full-scene RGB point cloud pass": true,
+    "human-main natural view pass": true,
+    "real environment visible pass": true,
+    "projection verification pass": true,
+    "true better than VGGT baseline pass": true,
+    "true better than posthoc/same-topology/tiny controls pass": true,
+    "true local close-up real pass": true,
+    "local detail non-regression pass": true,
+    "visible local improvement pass": true,
+    "no facial detail overclaim pass": true,
+    "viewer usable pass": true,
+    "Yuque report complete pass": true
+  },
+  "all_pass": true,
+  "failed": [],
+  "main_3d_board": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V140000000000000000_3d_human_scene_board.png",
+  "projection_board": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V140000000000000000_projection_overlay_board.png",
+  "viewer": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V230000000000000000_viewer\\index.html"
+}

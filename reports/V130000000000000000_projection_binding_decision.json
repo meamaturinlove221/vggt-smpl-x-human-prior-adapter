@@ -1,0 +1,8 @@
+{
+  "created_at": "2026-05-27T17:53:18+00:00",
+  "projection_assets_pass": true,
+  "real_rgb_mask_bound": true,
+  "camera_binding_available": true,
+  "uses_original_smc_rgb_mask": true,
+  "projection_metric_boundary": "Point UVs use SMPL feature-bank camera projection fields remapped to 518 camera views; this is a deterministic camera-binding approximation, not a new teacher source."
+}

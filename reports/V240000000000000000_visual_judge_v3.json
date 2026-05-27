@@ -1,0 +1,12 @@
+{
+  "created_at": "2026-05-27T17:53:45+00:00",
+  "natural_main_view": true,
+  "true_better_than_baseline": true,
+  "hard_controls_separated": true,
+  "projection_mask_rgb_edge_pass": true,
+  "local_closeup_real": true,
+  "facial_detail_overclaim": false,
+  "environment_visible": true,
+  "viewer_usable": true,
+  "pass": true
+}

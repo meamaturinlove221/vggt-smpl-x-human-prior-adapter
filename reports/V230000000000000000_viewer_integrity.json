@@ -1,0 +1,47 @@
+{
+  "created_at": "2026-05-27T17:53:45+00:00",
+  "viewer": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V230000000000000000_viewer\\index.html",
+  "html_size": 3884,
+  "ply_alias_count": 6,
+  "ply_aliases": [
+    {
+      "alias": "true",
+      "path": "ply/true.ply",
+      "case": "current_v895_0021_03",
+      "config": "photometric_geometry_true"
+    },
+    {
+      "alias": "baseline",
+      "path": "ply/baseline.ply",
+      "case": "current_v895_0021_03",
+      "config": "real_vggt_baseline_only"
+    },
+    {
+      "alias": "posthoc",
+      "path": "ply/posthoc.ply",
+      "case": "current_v895_0021_03",
+      "config": "posthoc_surfel_only"
+    },
+    {
+      "alias": "same_topology",
+      "path": "ply/same_topology.ply",
+      "case": "current_v895_0021_03",
+      "config": "same_topology_no_semantic"
+    },
+    {
+      "alias": "tiny",
+      "path": "ply/tiny.ply",
+      "case": "current_v895_0021_03",
+      "config": "tiny_synthetic_token_control"
+    },
+    {
+      "alias": "shuffled",
+      "path": "ply/shuffled.ply",
+      "case": "current_v895_0021_03",
+      "config": "shuffled_smpl_feature"
+    }
+  ],
+  "non_placeholder": true,
+  "html_references_ply": true,
+  "pass": true
+}

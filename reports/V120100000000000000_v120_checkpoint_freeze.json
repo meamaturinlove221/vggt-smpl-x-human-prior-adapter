@@ -1,0 +1,17 @@
+{
+  "created_at": "2026-05-27T17:53:17+00:00",
+  "previous_status": "V120000000000000000_DETAIL_VERIFIED_VISUAL_TRUTH_MENTOR_READY_NOT_PROMOTED",
+  "downgraded_to_checkpoint": true,
+  "reason": [
+    "V120 all-pass is not accepted as mentor final evidence.",
+    "V740 score_prediction contains detail_bonus/control_penalty.",
+    "V740 generation contains config-specific sampling/RGB changes.",
+    "Old closeups do not prove facial detail or hand shape.",
+    "Photometric projection verification is required before any final mentor-ready claim."
+  ],
+  "preserved_evidence": {
+    "final_status": "reports/V120000000000000000_final_status.json",
+    "mentor_gate": "reports/V100000000000000000_final_mentor_visual_gate.json",
+    "v740_code": "tools/v74000000000000000_detail_verified_densifier.py"
+  }
+}

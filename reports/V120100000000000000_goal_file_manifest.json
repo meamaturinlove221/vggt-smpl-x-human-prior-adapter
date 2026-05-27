@@ -1,0 +1,17 @@
+{
+  "goal_file_path": "D:\\vggt\\vggt-canonical-surfel-adapter\\docs\\goals\\V120100000000000000_V300000000000000000_photometric_geometry_visual_truth_goal.md",
+  "sha256": "4b23506c0f2367a21079fdcf918032d2d3f3190764362b17fd9edb6d309994c5",
+  "line_count": 766,
+  "created_at": "2026-05-28T00:59:58.6251839+08:00",
+  "repo": "D:\\vggt\\vggt-canonical-surfel-adapter",
+  "source_feature_adapter_repo": "D:\\vggt\\vggt-feature-adapter",
+  "source_scene_context_repo": "D:\\vggt\\vggt-scene-context-evidence",
+  "evidence_root": "D:\\vggt\\vggt-main\\local_report_auxiliary\\V600_quality_rebuild",
+  "previous_status": "V120000000000000000_DETAIL_VERIFIED_VISUAL_TRUTH_MENTOR_READY_NOT_PROMOTED downgraded to checkpoint",
+  "final_allowed_states": [
+    "V300000000000000000_PHOTOMETRIC_GEOMETRY_VISUAL_TRUTH_MENTOR_READY_NOT_PROMOTED",
+    "V300000000000000000_TRUE_EXTERNAL_HARD_BLOCK_REQUIRES_USER_ACTION"
+  ],
+  "no_agent_rule": "本轮严禁发起 agent/subagent; execute only in current main thread.",
+  "summary": "Photometric geometry visual truth route: downgrade V120, audit current artifacts/code, remove config-biased scoring, refine detail sources, project point clouds to real RGB/mask/camera, rebuild local projection closeups, enforce hard controls, create usable viewer, Yuque-style advisor report, bundles, and cleanup."
+}

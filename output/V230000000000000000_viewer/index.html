@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>V300 Photometric Geometry Viewer</title>
+<style>
+body{margin:0;font-family:Arial,sans-serif;background:#f3f4f1;color:#161616}
+header{padding:12px 16px;border-bottom:1px solid #aaa;background:#fff}
+main{display:grid;grid-template-columns:280px 1fr;min-height:calc(100vh - 50px)}
+aside{padding:12px;border-right:1px solid #aaa;background:#fafafa}
+canvas{width:100%;height:calc(100vh - 50px);display:block;background:#e8e8e3}
+button{width:100%;display:block;margin:6px 0;padding:8px;background:#fff;border:1px solid #555;cursor:pointer}
+a{color:#064f9e}
+</style>
+</head>
+<body>
+<header><b>V300 Photometric Geometry Human-Scene Viewer</b></header>
+<main>
+<aside>
+<p>PLY aliases are same-scene, same-budget outputs. Projection boards and local crops are linked for visual checks.</p>
+<div id="buttons"></div>
+<label>Point size <input id="size" type="range" min="1" max="5" value="2"></label>
+<p><a href="../../boards/V140000000000000000_projection_overlay_board.png">Projection overlay board</a></p>
+<p><a href="../../boards/V160000000000000000_head_hair_projection_closeup.png">Head/hair close-up</a></p>
+<p><a href="../../boards/V160000000000000000_hand_arm_projection_closeup.png">Hand/arm close-up</a></p>
+<p><a href="../../boards/V160000000000000000_clothing_projection_closeup.png">Clothing close-up</a></p>
+<pre id="meta"></pre>
+</aside>
+<canvas id="c"></canvas>
+</main>
+<script>
+const PLY_REFS = [{"alias": "true", "path": "ply/true.ply", "case": "current_v895_0021_03", "config": "photometric_geometry_true"}, {"alias": "baseline", "path": "ply/baseline.ply", "case": "current_v895_0021_03", "config": "real_vggt_baseline_only"}, {"alias": "posthoc", "path": "ply/posthoc.ply", "case": "current_v895_0021_03", "config": "posthoc_surfel_only"}, {"alias": "same_topology", "path": "ply/same_topology.ply", "case": "current_v895_0021_03", "config": "same_topology_no_semantic"}, {"alias": "tiny", "path": "ply/tiny.ply", "case": "current_v895_0021_03", "config": "tiny_synthetic_token_control"}, {"alias": "shuffled", "path": "ply/shuffled.ply", "case": "current_v895_0021_03", "config": "shuffled_smpl_feature"}];
+const canvas=document.getElementById('c'), ctx=canvas.getContext('2d');
+let clouds={}, active='true';
+function resize(){canvas.width=canvas.clientWidth;canvas.height=canvas.clientHeight;draw();}
+window.addEventListener('resize',resize);
+function parsePLY(text){const lines=text.trim().split(/\r?\n/);const end=lines.indexOf('end_header');const pts=[];for(let i=end+1;i<lines.length;i++){const v=lines[i].trim().split(/\s+/).map(Number);if(v.length>=6)pts.push(v);}return pts;}
+async function load(){const box=document.getElementById('buttons');for(const ref of PLY_REFS){const text=await fetch(ref.path).then(r=>r.text());clouds[ref.alias]=parsePLY(text);const b=document.createElement('button');b.textContent=ref.alias;b.onclick=()=>{active=ref.alias;draw();};box.appendChild(b);}resize();}
+function draw(){if(!canvas.width)return;ctx.clearRect(0,0,canvas.width,canvas.height);const pts=clouds[active]||[];document.getElementById('meta').textContent=active+'\npoints: '+pts.length; if(!pts.length)return;let min=[Infinity,Infinity,Infinity],max=[-Infinity,-Infinity,-Infinity];for(const p of pts){for(let i=0;i<3;i++){min[i]=Math.min(min[i],p[i]);max[i]=Math.max(max[i],p[i]);}}const sx=canvas.width*0.82, sy=canvas.height*0.82, ox=canvas.width*0.09, oy=canvas.height*0.91;const size=+document.getElementById('size').value;const step=Math.max(1,Math.floor(pts.length/28000));for(let i=0;i<pts.length;i+=step){const p=pts[i];const x=(p[0]-min[0])/Math.max(1e-6,max[0]-min[0])*sx+ox;const y=oy-(p[1]-min[1])/Math.max(1e-6,max[1]-min[1])*sy;ctx.fillStyle=`rgb(${p[3]|0},${p[4]|0},${p[5]|0})`;ctx.fillRect(x,y,size,size);}}
+load();
+</script>
+</body>
+</html>

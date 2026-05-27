@@ -1,0 +1,11 @@
+{
+  "created_at": "2026-05-27T17:53:18+00:00",
+  "model": "models/v180_photometric_geometry_vggt_smpl_adapter.py",
+  "full_forward_effect_path": true,
+  "smpl_feature_encoder_v7": true,
+  "photometric_detail_encoder": true,
+  "projection_loss_head": true,
+  "environment_branch_v3": true,
+  "config_specific_true_bonus": false,
+  "source_label_auxiliary_only": true
+}

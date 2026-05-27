@@ -1,0 +1,51 @@
+{
+  "created_at": "2026-05-27T17:53:45+00:00",
+  "dual_gate_pass": true,
+  "cases": {
+    "current_v895_0021_03": {
+      "true_score": 0.8108778814809662,
+      "baseline_score": 0.6677494656273409,
+      "best_control": "real_vggt_baseline_only",
+      "best_control_score": 0.6677494656273409,
+      "true_gt_baseline": true,
+      "true_gt_best_control": true,
+      "projection_pass": true,
+      "full_scene_3d_board": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V140000000000000000_3d_human_scene_board.png",
+      "projection_board": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V140000000000000000_projection_overlay_board.png"
+    },
+    "0021_03_frame001": {
+      "true_score": 0.8105602568322443,
+      "baseline_score": 0.6692345219999104,
+      "best_control": "real_vggt_baseline_only",
+      "best_control_score": 0.6692345219999104,
+      "true_gt_baseline": true,
+      "true_gt_best_control": true,
+      "projection_pass": true,
+      "full_scene_3d_board": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V140000000000000000_3d_human_scene_board.png",
+      "projection_board": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V140000000000000000_projection_overlay_board.png"
+    },
+    "0012_11_frame001": {
+      "true_score": 0.8136324252958264,
+      "baseline_score": 0.6725975321670347,
+      "best_control": "same_topology_no_semantic",
+      "best_control_score": 0.6902634607285703,
+      "true_gt_baseline": true,
+      "true_gt_best_control": true,
+      "projection_pass": true,
+      "full_scene_3d_board": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V140000000000000000_3d_human_scene_board.png",
+      "projection_board": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V140000000000000000_projection_overlay_board.png"
+    },
+    "0013_01_frame001": {
+      "true_score": 0.800527594493516,
+      "baseline_score": 0.6763652374603556,
+      "best_control": "same_topology_no_semantic",
+      "best_control_score": 0.6925596632053131,
+      "true_gt_baseline": true,
+      "true_gt_best_control": true,
+      "projection_pass": true,
+      "full_scene_3d_board": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V140000000000000000_3d_human_scene_board.png",
+      "projection_board": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V140000000000000000_projection_overlay_board.png"
+    }
+  },
+  "projection_not_replacement_for_3d": true
+}
