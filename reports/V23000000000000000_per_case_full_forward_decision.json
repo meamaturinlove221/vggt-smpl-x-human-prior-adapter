@@ -1,0 +1,6 @@
+{
+  "created_at": "2026-05-27T14:36:06+00:00",
+  "per_case_full_forward_effect_pass": true,
+  "no_teacher_points_at_inference": true,
+  "no_raw_kinect_depth_at_inference": true
+}

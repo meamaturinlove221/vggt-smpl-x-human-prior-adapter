@@ -1,0 +1,9 @@
+{
+  "created_at": "2026-05-27T14:51:47+00:00",
+  "environment_realism_pass": true,
+  "environment_visible": true,
+  "same_scene": true,
+  "not_isolated_human": true,
+  "human_remains_dominant": true,
+  "environment_not_overwhelming": true
+}

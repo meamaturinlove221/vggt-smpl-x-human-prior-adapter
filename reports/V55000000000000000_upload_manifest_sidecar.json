@@ -1,0 +1,126 @@
+{
+  "created_at": "2026-05-27T14:51:56+00:00",
+  "bundles": [
+    {
+      "name": "core",
+      "path": "archive\\V55000000000000000_core_bundle.zip",
+      "bytes": 13037,
+      "sha256": "2e5554b76ab87da4e221bf2c0c8a1d2b6b50fd1f9ccd5f5a03ae3df76f2b80b7",
+      "entry_count": 4,
+      "zip_clean": true,
+      "under_500mb": true,
+      "non_empty": true
+    },
+    {
+      "name": "reports",
+      "path": "archive\\V55000000000000000_reports_bundle.zip",
+      "bytes": 2593,
+      "sha256": "c736421d81cf390b291f2489e52031f18b3fe09bb151f8672cd22b4f8c80617f",
+      "entry_count": 3,
+      "zip_clean": true,
+      "under_500mb": true,
+      "non_empty": true
+    },
+    {
+      "name": "visuals",
+      "path": "archive\\V55000000000000000_visuals_bundle.zip",
+      "bytes": 928731,
+      "sha256": "4793f6f69bae914b6c7946b50eebb66ecdb9b7a42ef6236876811a352a63be90",
+      "entry_count": 3,
+      "zip_clean": true,
+      "under_500mb": true,
+      "non_empty": true
+    },
+    {
+      "name": "viewer",
+      "path": "archive\\V55000000000000000_viewer_bundle.zip",
+      "bytes": 312,
+      "sha256": "dffb4f19b7a9fd6cdd934ad7e5fb7ca7632d51581b72c6e987d2872b7ed84078",
+      "entry_count": 1,
+      "zip_clean": true,
+      "under_500mb": true,
+      "non_empty": true
+    },
+    {
+      "name": "predictions",
+      "path": "archive\\V55000000000000000_predictions_bundle.zip",
+      "bytes": 68534490,
+      "sha256": "0b0417cac3d12714143c211d429e15501e8f4ccb41c4a0cd5b06e23e9b26ead7",
+      "entry_count": 80,
+      "zip_clean": true,
+      "under_500mb": true,
+      "non_empty": true
+    },
+    {
+      "name": "controls",
+      "path": "archive\\V55000000000000000_controls_bundle.zip",
+      "bytes": 303152,
+      "sha256": "250de7dc7aae482744ab7cc308cc3ed4127b987ac6e68f51ad5126bf55e49e97",
+      "entry_count": 2,
+      "zip_clean": true,
+      "under_500mb": true,
+      "non_empty": true
+    },
+    {
+      "name": "full_forward_effect",
+      "path": "archive\\V55000000000000000_full_forward_effect_bundle.zip",
+      "bytes": 6758640,
+      "sha256": "79e07630818e4571c021ead906fc27171bac6847268874cf3f88fa8bc8028489",
+      "entry_count": 9,
+      "zip_clean": true,
+      "under_500mb": true,
+      "non_empty": true
+    },
+    {
+      "name": "high_density_predictions",
+      "path": "archive\\V55000000000000000_high_density_predictions_bundle.zip",
+      "bytes": 68535290,
+      "sha256": "a2d298ff663d85b9b819199814ad582dfde8d14bc330cdffb896dc408b035133",
+      "entry_count": 80,
+      "zip_clean": true,
+      "under_500mb": true,
+      "non_empty": true
+    },
+    {
+      "name": "local_detail",
+      "path": "archive\\V55000000000000000_local_detail_bundle.zip",
+      "bytes": 937995,
+      "sha256": "29882f035e2a51a5fc77f4b7f6d9581c30d6dcd1d3985b626fcc0a38d34613af",
+      "entry_count": 3,
+      "zip_clean": true,
+      "under_500mb": true,
+      "non_empty": true
+    },
+    {
+      "name": "environment",
+      "path": "archive\\V55000000000000000_environment_bundle.zip",
+      "bytes": 312256,
+      "sha256": "7292e9dada6003515bcd334f74e296745a13bc795d7445d63e8051ed37fa2795",
+      "entry_count": 1,
+      "zip_clean": true,
+      "under_500mb": true,
+      "non_empty": true
+    },
+    {
+      "name": "metrics",
+      "path": "archive\\V55000000000000000_metrics_bundle.zip",
+      "bytes": 2658,
+      "sha256": "a17c2017d1c0e8bee5353fb0ac45a15e5c7d02be0c419ca1d68dc3cea2b945fa",
+      "entry_count": 2,
+      "zip_clean": true,
+      "under_500mb": true,
+      "non_empty": true
+    },
+    {
+      "name": "multisequence",
+      "path": "archive\\V55000000000000000_multisequence_bundle.zip",
+      "bytes": 313448,
+      "sha256": "b2c68978e5b3f861bd5683fdb545b6299243c4470f1106e67058e692a51c8a6e",
+      "entry_count": 2,
+      "zip_clean": true,
+      "under_500mb": true,
+      "non_empty": true
+    }
+  ],
+  "bundle_count": 12
+}

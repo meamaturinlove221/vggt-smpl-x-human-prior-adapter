@@ -1,0 +1,23 @@
+{
+  "created_at": "2026-05-27T14:51:56+00:00",
+  "status": "V60000000000000000_HIGH_DENSITY_DETAIL_FIDELITY_MENTOR_READY_NOT_PROMOTED",
+  "all_pass": true,
+  "checks": {
+    "final_mentor_gate_pass": true,
+    "bundle_integrity_pass": true,
+    "cleanup_honest": true,
+    "no_agent_subagent": true,
+    "no_promotion": true,
+    "no_registry": true,
+    "no_v50_v50r2_change": true,
+    "active_candidate_unchanged": true
+  },
+  "allowed_final_states": [
+    "V60000000000000000_HIGH_DENSITY_DETAIL_FIDELITY_MENTOR_READY_NOT_PROMOTED",
+    "V60000000000000000_TRUE_EXTERNAL_HARD_BLOCK_REQUIRES_USER_ACTION"
+  ],
+  "main_board": "boards\\V30000000000000000_advisor_high_density_main.png",
+  "advisor_report": "reports\\V50000000000000000_high_density_detail_advisor_report.md",
+  "bundle_integrity": "reports\\V55000000000000000_bundle_integrity.json",
+  "cleanup": "reports\\V58000000000000000_post_push_cleanup.json"
+}

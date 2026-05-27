@@ -1,0 +1,14 @@
+bytes,entry_count,kind,path,zip_clean
+1572068,2,zip,archive\V19500000000000000_controls_bundle.zip,True
+12661,4,zip,archive\V19500000000000000_core_bundle.zip,True
+93777,2,zip,archive\V19500000000000000_environment_bundle.zip,True
+1726606,4,zip,archive\V19500000000000000_full_forward_or_dualpath_bundle.zip,True
+1323428,4,zip,archive\V19500000000000000_local_detail_bundle.zip,True
+2973,2,zip,archive\V19500000000000000_metrics_bundle.zip,True
+1570557,2,zip,archive\V19500000000000000_multisequence_bundle.zip,True
+5917401,72,zip,archive\V19500000000000000_predictions_bundle.zip,True
+8682600,11,zip,archive\V19500000000000000_real_vggt_tokens_bundle.zip,True
+4220,5,zip,archive\V19500000000000000_reports_bundle.zip,True
+511,1,zip,archive\V19500000000000000_viewer_bundle.zip,True
+5910267,73,zip,archive\V19500000000000000_visual_truth_matrix_bundle.zip,True
+3319623,3,zip,archive\V19500000000000000_visuals_bundle.zip,True

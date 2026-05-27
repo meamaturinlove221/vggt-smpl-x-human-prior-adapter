@@ -1,0 +1,9 @@
+{
+  "created_at": "2026-05-27T14:51:47+00:00",
+  "visual_judge_proxy_pass": true,
+  "true_controls_gap_visible": true,
+  "not_sparse_shell": true,
+  "environment_visible": true,
+  "local_detail_not_worse": true,
+  "not_active_count_only": true
+}
