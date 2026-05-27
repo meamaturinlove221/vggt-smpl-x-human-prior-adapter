@@ -1,301 +1,106 @@
 # VGGT-SMPL-X Human Prior Adapter
 
-An evidence-gated research adapter for injecting **SMPL-X human topology priors** into **VGGT** while keeping VGGT's original goal: general multi-view scene geometry. This repository is not a finished human reconstruction product and should not be presented as an advisor-pass result until the full visual gate is satisfied.
+<p align="center">
+  <img src="docs/figures/vggt_smplx_human_prior_adapter_architecture.svg" alt="VGGT-SMPL-X Human Prior Adapter architecture" width="100%" />
+</p>
 
-The core idea is simple: VGGT already predicts cameras, depth, point maps, and tracks from RGB images, but it does not explicitly know that a human body should preserve head, torso, limbs, hands, feet, and body-part connectivity. SMPL-X provides that missing topology prior. This project explores how to encode that prior into VGGT-compatible inputs, token features, supervision targets, and evidence reports without replacing VGGT with a pure SMPL regressor.
+## Route Position
 
----
+This repository contains the **model-side route** of the VGGT + SMPL-X project.
 
-## Project Position
+The starting point is straightforward: vanilla VGGT can already estimate cameras, depth, point maps, and tracks from multi-view RGB, but it does not explicitly model human body topology. In practice, this means that full-body structure may appear, while head, face, hands, and other local regions remain weak or unstable. The purpose of this repository is to add a **human prior branch** without turning VGGT into a pure SMPL-X regressor.
 
-This repository is the **model-side human-prior adapter** in the VGGT + SMPL-X project family.
+In the current project split:
 
-| Repository | Role |
-|---|---|
-| `VGGT-SMPL-X-Human-Prior-Adapter` | Model adapter, SMPL-X prior injection, token/feature supervision, evidence-gated training route. |
-| `VGGT-ZJU-Mocap-Adapter` | ZJU-MoCap data bridge, camera/mask/SMPL alignment, reproducible dataset conversion and diagnostics. |
-| `vggt_for_4k_4d` | 4K4D/DNA-Rendering-oriented VGGT case preparation, full-scene evidence generation, baseline/control packaging. |
+- **`VGGT-SMPL-X-Human-Prior-Adapter`** focuses on prior injection and model-side supervision.
+- **`VGGT-ZJU-MoCap-Adapter`** prepares trusted dataset cases and alignment audits.
+- **`vggt_for_4k_4d`** packages 4K4D-style cases, baseline/control comparisons, and advisor-facing evidence.
 
-This repository should be read as the place where the **student model route** is developed. Dense Kinect fusion, raw depth fusion, or SMPL-X-only reconstruction may be used as teachers, references, or diagnostics, but they are not the final student output.
+## What the Earlier Route Already Did
 
----
+The earlier SMPL-X + VGGT route already had an important role in the project.
 
-## What This Repository Is and Is Not
-
-### This repository is
-
-- A research route for making VGGT aware of SMPL-X human structure.
-- A place to test `prior_maps`, SMPL-X-rendered depth/point targets, feature adapters, and token-level priors.
-- A framework for comparing VGGT baseline outputs against human-prior-enhanced outputs.
-- An evidence-gated workflow that separates metric improvement from visual success.
-- A stepping stone toward a canonical SMPL-X surfel or graph representation inside a VGGT-compatible pipeline.
-
-### This repository is not
+First, it provided a pose-aligned human structure prior. This gave the model a clearer notion of where the body, head, and hands should be.
 
-- A completed product for watertight human mesh reconstruction.
-- A pure SMPL-X parameter regressor.
-- A viewer-only or post-processing-only solution.
-- A place to package teacher-only dense fusion as a model result.
-- A success claim unless the advisor visual gate is passed by a full-scene RGB point cloud.
-
----
+Second, it made it possible to render **view-aligned prior evidence** under real cameras, such as silhouette-like signals, prior depth, prior points, and region cues. These are useful because they are not abstract body-model outputs; they are aligned to the same input views that VGGT sees.
 
-## Mentor Visual Gate
+Third, it improved region ownership. Instead of evaluating the human as a single undifferentiated point set, the route made it easier to reason about body, head, face, and hand regions separately.
 
-The highest evaluation gate for this project is the advisor-facing visual requirement:
+At the same time, the earlier route also showed a clear boundary: if the SMPL-X prior is used too strongly, the output becomes template-driven. This can suppress details that should come from the images themselves, such as hair, clothing variation, and personal facial geometry.
 
-> The main evidence image must be a **full-scene RGB point cloud** or **human-main scene point cloud** where the human body is the subject, part of the surrounding environment is preserved, and the human morphology is readable by eye: head, torso, limbs, hands/feet, and overall pose should be identifiable.
+## What This Repository Adds
 
-The following are useful diagnostics but cannot be used as the main success evidence:
+The current repository keeps the main VGGT backbone intact and adds a **native human-prior path** on top of it.
 
-- isolated human scatter plots,
-- body-part close-ups,
-- projection overlays,
-- masks or heatmaps,
-- SMPL-only renderings,
-- Kinect/raw-depth teacher fusion,
-- RBF prototypes,
-- viewer screenshots that hide the full-scene geometry problem.
-
-A model result can be promoted only when it passes all three levels:
-
-```mermaid
-flowchart LR
-    A[Metric Pass] --> B[Visual Pass]
-    B --> C[Advisor Pass]
-
-    A1[Lower loss / Chamfer / depth error] -. insufficient alone .-> A
-    B1[Human shape visible in 3D point cloud] -. required .-> B
-    C1[Human-main full-scene RGB evidence<br/>same bounds, same view, same point size<br/>VGGT baseline vs adapter vs controls] -. required .-> C
-```
+The practical design is:
 
----
+1. Build a posed SMPL-X mesh from the available body parameters.
+2. Render view-aligned prior evidence under the real cameras.
+3. Package this evidence into `prior_maps`, `prior_depths`, `prior_points`, and `prior_mask` style signals.
+4. Inject the prior through a lightweight **HumanPriorAdapter**, instead of rewriting the whole VGGT architecture.
+5. Keep the final geometry prediction owned by VGGT heads rather than by the body model alone.
 
-## High-Level Architecture
+This design choice is deliberate. The prior should help the model understand **where human structure is likely to be**, but the final details should still be decided by RGB evidence and geometric consistency.
 
-The adapter keeps RGB as the main VGGT input and adds human priors through side channels, token features, or supervision targets. This avoids changing VGGT's pretrained RGB patch embedding in an unsafe way.
+## Geometric Logic of the Route
 
-```mermaid
-flowchart TB
-    subgraph Inputs[Inputs]
-        RGB[Multi-view RGB images]
-        CAM[Camera intrinsics / extrinsics]
-        MASK[Human masks / silhouettes]
-        SMPLX[SMPL-X parameters<br/>betas, pose, expression, translation, scale]
-    end
+The route is not only about adding a body template. Its more important role is to connect multiple geometric outputs so that they do not contradict each other.
 
-    subgraph PriorBuild[SMPL-X Prior Construction]
-        MESH[Build posed SMPL-X mesh]
-        RENDER[Render depth, silhouette, visibility]
-        PRIOR2D[Build prior_maps<br/>silhouette + keypoint/body channels]
-        PRIOR3D[Build prior_depths / prior_points / prior_mask]
-    end
+The underlying logic is:
 
-    subgraph VGGTModel[VGGT Student Model]
-        PATCH[VGGT RGB patch tokens]
-        HPA[HumanPriorAdapter<br/>light conv / projection / learnable gate]
-        TOK[Prior-aware VGGT tokens]
-        HEADS[VGGT heads<br/>camera / depth / point / tracks]
-    end
+- **Depth** describes visible surface distance in the target view.
+- **Point maps** are the 3D expression of depth under camera geometry.
+- **Normals** describe local surface orientation.
+- A geometric normal can be derived from the predicted depth or point map.
+- The predicted normal should therefore be consistent with the geometry implied by depth and points.
 
-    subgraph Losses[Training and Supervision]
-        RGBLOSS[Original VGGT geometry losses]
-        PRIORLOSS[SMPL-X prior depth / point / mask losses]
-        CTRL[Counterfactual controls<br/>no-prior / shuffled-prior / random-prior]
-    end
-
-    subgraph Evidence[Evidence Gate]
-        BASE[Vanilla VGGT baseline]
-        ADAPT[Prior adapter output]
-        FULL[Human-main full-scene RGB point cloud]
-        REPORT[Manifest + visual report + failure log]
-    end
-
-    RGB --> PATCH
-    CAM --> RENDER
-    MASK --> PRIOR2D
-    SMPLX --> MESH --> RENDER
-    RENDER --> PRIOR2D
-    RENDER --> PRIOR3D
-    PRIOR2D --> HPA --> TOK
-    PATCH --> TOK --> HEADS
-    HEADS --> RGBLOSS
-    PRIOR3D --> PRIORLOSS
-    CTRL --> REPORT
-    HEADS --> ADAPT --> FULL
-    RGB --> BASE --> FULL
-    FULL --> REPORT
-```
-
----
-
-## Why SMPL-X Is Used
-
-SMPL-X is used because it gives a stable human topology prior:
-
-- head / torso / limb connectivity,
-- body-part structure,
-- hands and expressive body support,
-- differentiable body surface representation,
-- compatibility with camera projection and multi-view supervision.
-
-However, SMPL-X is not treated as the final answer. It cannot fully represent hair, loose clothing, carried objects, and scene context. The project goal is to use SMPL-X as a **prior** so that VGGT's scene geometry becomes more human-structured while still preserving RGB scene evidence.
-
----
-
-## Research Workflow
+Even when this repository is used without the later normal-heavy branch, it still sits inside that same project logic: the human prior is useful only when it supports a more self-consistent 3D reconstruction.
 
-```mermaid
-flowchart TD
-    S0[Start from vanilla VGGT baseline] --> S1[Prepare aligned RGB / camera / mask / SMPL-X case]
-    S1 --> S2[Generate prior_maps and rendered prior targets]
-    S2 --> S3[Run adapter training or inference]
-    S3 --> S4[Run controls]
-    S4 --> S5{Does the adapter beat controls?}
-    S5 -- no --> F1[Fail closed<br/>do not claim semantic/topology success]
-    S5 -- yes --> S6{Does 3D human morphology improve?}
-    S6 -- no --> F2[Fail closed<br/>return to model representation, not viewer tuning]
-    S6 -- yes --> S7{Does full-scene human-main RGB point cloud pass?}
-    S7 -- no --> F3[Keep as research checkpoint<br/>report limitation honestly]
-    S7 -- yes --> P[Promotion candidate<br/>advisor report + reproducible bundle]
-
-    F1 --> R1[Inspect prior causality / masks / camera binding]
-    F2 --> R2[Move toward canonical SMPL-X surfel or graph representation]
-    F3 --> R3[Improve full-scene insertion, bounds, environment preservation]
-```
+## Experimental Closure
 
----
+In this project, a model-side change is not treated as complete just because the loss improves.
 
-## Evidence Standards
+The experimental loop for this repository is:
 
-Every experiment should distinguish the following roles and pass levels.
-
-### Teacher vs Student
-
-| Term | Meaning | Can be final result? |
-|---|---|---|
-| Dense teacher | Raw depth, Kinect fusion, or observation-verified dense reference used for supervision or diagnosis. | No. |
-| Prototype baseline | Fast experimental baseline such as compact RBF or SMPL-only visualization. | No. |
-| VGGT baseline | Original VGGT output without human prior. | Baseline only. |
-| Student adapter | VGGT output after the human-prior adapter path. | Candidate only if visual gates pass. |
-
-### Pass Levels
-
-| Level | Requirement | Failure mode |
-|---|---|---|
-| Metric pass | Numeric losses or geometry metrics improve over baseline. | May still be a blob, shell, or sheet. |
-| Visual pass | 3D point cloud visibly has human structure. | Projection overlay alone is not enough. |
-| Advisor pass | Human-main full-scene RGB point cloud passes same-view comparison against VGGT baseline and controls. | Isolated human evidence is not enough. |
-
----
-
-## Canonical Surfel Direction
-
-Earlier free-point or residual decoder routes can produce numeric improvement while still generating blob-like or sheet-like 3D morphology. The next stronger route is a canonical SMPL-X surfel or graph representation:
-
-```mermaid
-flowchart LR
-    SMPL[Canonical SMPL-X surface] --> SURF[Sample body surfels]
-    SURF --> ATTR[Attach face id, barycentric coordinate,<br/>part label, normal, tangent frame,<br/>skinning weights, joint-relative coordinate]
-    ATTR --> FEAT[Sample VGGT / RGB / visibility features]
-    FEAT --> DEC[Per-surfel decoder<br/>normal residual, tangent residual,<br/>occupancy, visibility, confidence]
-    DEC --> POSE[Pose back to camera/world space]
-    POSE --> MERGE[Merge into VGGT full-scene environment cloud]
-    MERGE --> GATE[Advisor visual gate]
-```
-
-This direction is preferred when the current adapter improves metrics but still fails to produce readable 3D human morphology.
-
----
-
-## Recommended Repository Outputs
-
-A strong experimental run should produce:
-
-- `source_manifest.json` or equivalent input manifest,
-- baseline VGGT point cloud evidence,
-- adapter point cloud evidence,
-- control runs: no-prior, random-prior, shuffled-prior, SMPL-only, smoothing-only where applicable,
-- same-view full-scene RGB point cloud comparison,
-- metric report,
-- visual report,
-- failure report when gates are not passed,
-- upload-safe bundle that excludes large datasets, private assets, caches, and licensed body model files.
-
----
-
-## Expected External Assets
-
-This repository should not include private or licensed assets. Users must obtain them separately where required:
-
-- VGGT weights according to the original VGGT license and release terms,
-- SMPL-X model files according to the official SMPL-X license,
-- dataset files such as 4K4D/DNA-Rendering or ZJU-MoCap data according to their own terms,
-- local camera calibration and masks where applicable.
-
-A common local SMPL-X layout used in development is:
-
-```text
-D:/body_models/smplx/SMPLX_NEUTRAL.npz
-D:/body_models/smplx/SMPLX_NEUTRAL.pkl
-```
-
-Do not commit these body model files to the repository.
-
----
-
-## Minimal Usage Pattern
-
-The exact scripts may evolve, but the recommended workflow is:
-
-```text
-1. Prepare a small multi-view case with RGB, masks, cameras, and SMPL-X parameters.
-2. Build prior_maps and rendered SMPL-X targets.
-3. Run vanilla VGGT to create a baseline.
-4. Run the human-prior adapter route.
-5. Run counterfactual controls.
-6. Generate full-scene RGB point cloud evidence with the same bounds and view.
-7. Write manifests, reports, and failure notes before claiming any improvement.
-```
-
----
-
-## Reporting Template
-
-Advisor-facing reports should use the following structure:
-
-1. Conclusion first.
-2. Architecture diagram.
-3. Route position.
-4. Why the previous route was insufficient.
-5. Changes in this round.
-6. Experimental closure and reproducibility.
-7. VGGT baseline / adapter / controls comparison.
-8. Full-scene point cloud visual evidence.
-9. Environment preservation and projection diagnostics.
-10. Boundary, failure cases, and next route.
-11. Files for advisor review.
-
----
+- prepare a trusted multi-view case with cameras, masks, and SMPL-X parameters;
+- build prior inputs and prior supervision targets;
+- run the vanilla VGGT baseline;
+- run the prior-aware adapter;
+- run controls such as no-prior / random-prior / shuffled-prior when applicable;
+- export same-view visual comparisons for later evidence review.
+
+This makes the repository useful not only for training, but also for controlled ablation.
+
+## How We Judge the Result
+
+Three levels are kept separate throughout the project:
+
+1. **Metric pass**: losses or geometry metrics improve.
+2. **Visual pass**: the 3D point cloud is visibly more human-structured.
+3. **Advisor pass**: the improvement is visible in a **human-main full-scene RGB point cloud** under the same scene bounds and view.
+
+This distinction matters. An isolated human scatter plot, a projection overlay, or an SMPL-X-only visualization may be useful during debugging, but none of them is the main success evidence.
+
+## Repository Boundary
+
+This repository should be understood as a **student-model route**.
+
+- Dense teacher signals, raw depth fusion, or observation-verified references can be used for supervision or diagnosis.
+- SMPL-X itself provides the structural prior.
+- The final student candidate must still come from the VGGT-based route.
+
+In other words, the repository is about **guiding VGGT with human priors**, not replacing VGGT with a body-model output.
 
 ## Current Status
 
-This project should currently be treated as a **research prototype / evidence-gated adapter route**. It is suitable for documenting the SMPL-X prior integration idea, building controlled experiments, and preparing advisor-facing evidence. It should not be described as a completed advisor-pass human point cloud reconstruction system unless the full-scene visual evidence gate is satisfied.
+At the present stage, this repository should be read as an **active research route** rather than a finished final system.
 
----
+Its value is that it establishes a clean model-side place for SMPL-X prior injection, controlled supervision, and later comparison against baseline and controls. Whether a particular checkpoint qualifies as an advisor-pass result still depends on the evidence exported by the wider project pipeline.
 
-## Project Change Log
+## Figure
 
-### 2026-05-27
+The architecture figure above is stored in:
 
-- Added a full English README.
-- Added Mermaid architecture and workflow diagrams.
-- Clarified the repository boundary: model-side SMPL-X human-prior adapter for VGGT.
-- Added teacher/student, metric/visual/advisor pass, and full-scene point cloud evidence gates.
-- Documented the canonical SMPL-X surfel direction as the preferred next route when free-point or residual decoder outputs fail visually.
-
----
-
-## Acknowledgements
-
-This project builds on the research ideas and released resources around VGGT, SMPL-X, multi-view human capture, and scene-level 3D reconstruction. Please follow the licenses of the upstream projects, datasets, and body model assets before using or redistributing any code, weights, or data.
+```text
+docs/figures/vggt_smplx_human_prior_adapter_architecture.svg
+```
