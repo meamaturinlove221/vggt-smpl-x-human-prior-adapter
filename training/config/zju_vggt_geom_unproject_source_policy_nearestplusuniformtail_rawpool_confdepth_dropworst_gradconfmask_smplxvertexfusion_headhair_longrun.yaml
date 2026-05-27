@@ -1,0 +1,14 @@
+defaults:
+  - zju_vggt_geom_unproject_source_policy_nearestplusuniformtail_rawpool_confdepth_dropworst_gradconfmask_smplprior_headhair_longrun
+  - _self_
+
+exp_name: zju_vggt_geom_unproject_source_policy_nearestplusuniformtail_rawpool_confdepth_dropworst_gradconfmask_smplxvertexfusion_headhair_longrun
+
+model:
+  enable_human_prior_fusion: True
+  human_prior_in_chans: 8
+  human_prior_hidden_dim: 128
+  enable_normal: True
+
+optim:
+  frozen_module_names: []

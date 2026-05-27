@@ -20,6 +20,17 @@ from PIL import Image
 
 from data.base_dataset import BaseDataset
 from data.dataset_util import depth_to_world_coords_points, read_image_cv2
+from vggt.utils.human_prior import (
+    DEFAULT_SUMMARY_BIN_NAMES,
+    DEFAULT_SUMMARY_FEATURE_NAMES,
+    DEFAULT_SURFACE_FEATURE_NAMES,
+    apply_pose_aligned_prior_noise,
+    build_body_local_vertices_from_pose_params,
+    build_human_summary_tokens,
+    build_pose_aligned_surface_feature_maps,
+    load_zju_smpl_params,
+    project_vertices_to_feature_maps,
+)
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
 
@@ -671,9 +682,14 @@ class ZjuVggtGeomDataset(BaseDataset):
         sample_manifest_supervised_camera_field: str = "selected_supervised_camera_names",
         use_smpl_vertices_prior: bool = True,
         smpl_vertices_subdir: str = "new_vertices,vertices",
+        smpl_params_subdir: str = "new_params,params",
         smpl_prior_point_radius_px: int = 2,
         smpl_prior_close_px: int = 4,
         smpl_prior_gaussian_sigma: float = 2.5,
+        smpl_prior_pose_noise_prob: float = 0.0,
+        smpl_prior_pose_noise_rot_deg: float = 0.0,
+        smpl_prior_pose_noise_trans_scale: float = 0.0,
+        smpl_prior_pose_noise_scale_std: float = 0.0,
         smpl_completion_dilate_px: int = 5,
         smpl_completion_max_fill_px: float = 24.0,
         head_hair_top_ratio: float = 0.30,
@@ -752,9 +768,14 @@ class ZjuVggtGeomDataset(BaseDataset):
         ).strip()
         self.use_smpl_vertices_prior = bool(use_smpl_vertices_prior)
         self.smpl_vertices_subdirs = _ensure_list(smpl_vertices_subdir) or ["new_vertices", "vertices"]
+        self.smpl_params_subdirs = _ensure_list(smpl_params_subdir) or ["new_params", "params"]
         self.smpl_prior_point_radius_px = int(max(0, smpl_prior_point_radius_px))
         self.smpl_prior_close_px = int(max(0, smpl_prior_close_px))
         self.smpl_prior_gaussian_sigma = float(max(0.0, smpl_prior_gaussian_sigma))
+        self.smpl_prior_pose_noise_prob = float(max(0.0, min(1.0, smpl_prior_pose_noise_prob)))
+        self.smpl_prior_pose_noise_rot_deg = float(max(0.0, smpl_prior_pose_noise_rot_deg))
+        self.smpl_prior_pose_noise_trans_scale = float(max(0.0, smpl_prior_pose_noise_trans_scale))
+        self.smpl_prior_pose_noise_scale_std = float(max(0.0, smpl_prior_pose_noise_scale_std))
         self.smpl_completion_dilate_px = int(max(0, smpl_completion_dilate_px))
         self.smpl_completion_max_fill_px = float(max(0.0, smpl_completion_max_fill_px))
         self.head_hair_top_ratio = float(max(0.05, min(0.75, head_hair_top_ratio)))
@@ -771,6 +792,8 @@ class ZjuVggtGeomDataset(BaseDataset):
         self.raw_source_camera_pools = {}
         self.smpl_vertices_dirs = {}
         self.smpl_vertices_cache = {}
+        self.smpl_params_dirs = {}
+        self.smpl_params_cache = {}
         self.sequence_list = []
 
         for seq_name in self.seq_names:
@@ -798,8 +821,21 @@ class ZjuVggtGeomDataset(BaseDataset):
                         seq_dir,
                         self.smpl_vertices_subdirs,
                     )
+                self.smpl_params_dirs[seq_name] = [
+                    subdir_name
+                    for subdir_name in self.smpl_params_subdirs
+                    if (seq_dir / subdir_name).is_dir()
+                ]
+                if not self.smpl_params_dirs[seq_name]:
+                    logging.warning(
+                        "ZJU VGGT-Geom could not find requested SMPL params dirs for seq=%s under %s: %s",
+                        seq_name,
+                        seq_dir,
+                        self.smpl_params_subdirs,
+                    )
             else:
                 self.smpl_vertices_dirs[seq_name] = []
+                self.smpl_params_dirs[seq_name] = []
             frame_sources = {}
             valid_geom_subdirs = []
             for geom_subdir_name in self.geom_subdirs:
@@ -938,6 +974,31 @@ class ZjuVggtGeomDataset(BaseDataset):
                 return vertices
 
         self.smpl_vertices_cache[cache_key] = None
+        return None
+
+    def _load_smpl_pose_params(self, entry):
+        if not self.use_smpl_vertices_prior:
+            return None
+
+        cache_key = (str(entry["seq_name"]), int(entry["frame_id"]))
+        if cache_key in self.smpl_params_cache:
+            return self.smpl_params_cache[cache_key]
+
+        seq_name = str(entry["seq_name"])
+        seq_dir = Path(entry["seq_dir"])
+        frame_id = int(entry["frame_id"])
+        candidate_names = [f"{frame_id}.npy", f"{frame_id:06d}.npy"]
+        for subdir_name in self.smpl_params_dirs.get(seq_name, []):
+            subdir = seq_dir / subdir_name
+            for file_name in candidate_names:
+                path = subdir / file_name
+                if not path.is_file():
+                    continue
+                params = load_zju_smpl_params(path)
+                self.smpl_params_cache[cache_key] = params
+                return params
+
+        self.smpl_params_cache[cache_key] = None
         return None
 
     def _resolve_source_view_pool_meta(self):
@@ -1359,6 +1420,7 @@ class ZjuVggtGeomDataset(BaseDataset):
         depth_conf_maps = []
         smpl_prior_masks = []
         smpl_prior_feature_maps = []
+        smpl_vertex_feature_maps = []
         human_prior_completion_masks = []
         human_prior_completion_depths = []
         human_prior_completion_world_points = []
@@ -1371,6 +1433,34 @@ class ZjuVggtGeomDataset(BaseDataset):
         original_sizes = []
         conf_depth_active_supervised_camera_names = set(quality_meta["conf_depth_active_supervised_camera_names"])
         smpl_vertices_world = self._load_smpl_vertices(entry)
+        smpl_pose_params = self._load_smpl_pose_params(entry)
+        smpl_body_local_vertices = None
+        smpl_fusion_vertices_world = None
+        smpl_fusion_body_local_vertices = None
+        smpl_summary_tokens = np.zeros(
+            (len(DEFAULT_SUMMARY_BIN_NAMES), len(DEFAULT_SUMMARY_FEATURE_NAMES)),
+            dtype=np.float32,
+        )
+        if smpl_vertices_world is not None:
+            smpl_body_local_vertices = build_body_local_vertices_from_pose_params(
+                smpl_vertices_world,
+                smpl_pose_params,
+            )
+            smpl_fusion_vertices_world = np.asarray(smpl_vertices_world, dtype=np.float32, copy=True)
+            smpl_fusion_body_local_vertices = np.asarray(smpl_body_local_vertices, dtype=np.float32, copy=True)
+            if (
+                self.training
+                and self.smpl_prior_pose_noise_prob > 0.0
+                and random.random() < self.smpl_prior_pose_noise_prob
+            ):
+                smpl_fusion_vertices_world, smpl_fusion_body_local_vertices = apply_pose_aligned_prior_noise(
+                    smpl_fusion_vertices_world,
+                    smpl_fusion_body_local_vertices,
+                    rotation_deg_std=self.smpl_prior_pose_noise_rot_deg,
+                    translation_scale_std=self.smpl_prior_pose_noise_trans_scale,
+                    scale_std=self.smpl_prior_pose_noise_scale_std,
+                )
+            smpl_summary_tokens = build_human_summary_tokens(smpl_fusion_body_local_vertices)
 
         for item_idx, cam_name in enumerate(selected_camera_names):
             local_idx = int(ids[item_idx]) if item_idx < len(ids) else -1
@@ -1417,10 +1507,11 @@ class ZjuVggtGeomDataset(BaseDataset):
                 (
                     smpl_prior_mask,
                     smpl_prior_feature_map,
+                    smpl_vertex_feature_map,
                     smpl_prior_sparse_mask,
                     smpl_prior_sparse_depth_map,
                     smpl_prior_sparse_world_points,
-                ) = _project_smpl_vertices_to_feature_map(
+                ) = project_vertices_to_feature_maps(
                     smpl_vertices_world,
                     extri_opencv,
                     intri_opencv,
@@ -1432,9 +1523,24 @@ class ZjuVggtGeomDataset(BaseDataset):
             else:
                 smpl_prior_mask = np.zeros(target_hw, dtype=bool)
                 smpl_prior_feature_map = np.zeros(target_hw, dtype=np.float32)
+                smpl_vertex_feature_map = np.zeros((len(DEFAULT_SURFACE_FEATURE_NAMES), *target_hw), dtype=np.float32)
                 smpl_prior_sparse_mask = np.zeros(target_hw, dtype=bool)
                 smpl_prior_sparse_depth_map = np.zeros(target_hw, dtype=np.float32)
                 smpl_prior_sparse_world_points = np.zeros((*target_hw, 3), dtype=np.float32)
+
+            if smpl_fusion_vertices_world is not None and smpl_fusion_body_local_vertices is not None:
+                _, _, smpl_vertex_feature_map, _ = build_pose_aligned_surface_feature_maps(
+                    smpl_fusion_vertices_world,
+                    smpl_fusion_body_local_vertices,
+                    extri_opencv,
+                    intri_opencv,
+                    target_hw,
+                    point_radius_px=self.smpl_prior_point_radius_px,
+                    close_px=self.smpl_prior_close_px,
+                    gaussian_sigma=self.smpl_prior_gaussian_sigma,
+                )
+            else:
+                smpl_vertex_feature_map = np.zeros((len(DEFAULT_SURFACE_FEATURE_NAMES), *target_hw), dtype=np.float32)
             human_prior_completion_mask, head_hair_region_mask, head_hair_detail_mask = _build_human_prior_masks(
                 raw_fg_mask,
                 smpl_prior_mask,
@@ -1483,6 +1589,7 @@ class ZjuVggtGeomDataset(BaseDataset):
             depth_conf_maps.append(depth_conf_map)
             smpl_prior_masks.append(smpl_prior_mask.astype(bool))
             smpl_prior_feature_maps.append(smpl_prior_feature_map.astype(np.float32))
+            smpl_vertex_feature_maps.append(smpl_vertex_feature_map.astype(np.float32))
             human_prior_completion_masks.append(human_prior_completion_mask.astype(bool))
             human_prior_completion_depths.append(human_prior_completion_depth_map.astype(np.float32))
             human_prior_completion_world_points.append(human_prior_completion_world_point_map.astype(np.float32))
@@ -1539,6 +1646,8 @@ class ZjuVggtGeomDataset(BaseDataset):
             "foreground_masks": foreground_masks,
             "smpl_prior_masks": smpl_prior_masks,
             "smpl_prior_feature_maps": smpl_prior_feature_maps,
+            "smpl_vertex_feature_maps": smpl_vertex_feature_maps,
+            "smpl_summary_tokens": smpl_summary_tokens.astype(np.float32),
             "human_prior_completion_masks": human_prior_completion_masks,
             "human_prior_completion_depths": human_prior_completion_depths,
             "human_prior_completion_world_points": human_prior_completion_world_points,

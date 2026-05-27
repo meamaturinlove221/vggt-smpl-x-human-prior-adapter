@@ -7,6 +7,8 @@ param(
     [string]$OutputBase = "",
     [string]$PythonExe = "",
     [string]$ModalExe = "",
+    [string]$LocalCheckpoint = "",
+    [string]$CheckpointSubpath = "",
     [switch]$FullViews,
     [switch]$PullResults,
     [string]$LocalResultsDir = "",
@@ -138,6 +140,12 @@ $modalArgs = @(
     "-OutputSubdir", $modalOutputSubdir,
     "-ModalExe", $modal
 )
+if (-not [string]::IsNullOrWhiteSpace($LocalCheckpoint)) {
+    $modalArgs += @("-LocalCheckpoint", $LocalCheckpoint)
+}
+if (-not [string]::IsNullOrWhiteSpace($CheckpointSubpath)) {
+    $modalArgs += @("-CheckpointSubpath", $CheckpointSubpath)
+}
 if ($DryRun) {
     $modalArgs += "-DryRun"
 }

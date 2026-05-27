@@ -146,8 +146,8 @@ Action taken:
 
 - App ID: `ap-HrGYz8OsqwhkQfVpowrW07`
 - App name: `vggt-zju-geometry-smplprior-headhair`
-- State at latest local check (`2026-04-15 16:51 +08:00`): `ephemeral (detached)`
-- Tasks at latest local check: `1`
+- State at last check: `ephemeral (detached)`
+- Tasks at last check: `1`
 - Created at: `2026-04-15 16:39:35 +08:00`
 - Output root: `/20260415_smplprior_headhair_longrun_eager_shmsafe_resume2`
 - Resume checkpoint: `/mnt/out/20260415_smplprior_headhair_longrun_eager_shmsafe/ckpts/checkpoint.pt`
@@ -160,10 +160,9 @@ Current evidence from live volume pulls:
   - `Single-process mode enabled; leaving model unwrapped by DDP.`
 - The resumed run is writing new training steps again under `Train Epoch: [1]`.
 - At the latest pulled point, it had reached approximately:
-  - remote log time `2026-04-15 08:49:06`
-  - `Train Epoch: [1][142/1000000]`
-  - GPU memory `83.0 GB`
-- The fresh local mirrors were written at `2026-04-15 16:51:17 +08:00` and showed no `Traceback`, `ERROR`, `Exception`, or `RuntimeError` matches in either the pulled training log or the driver log.
+  - remote log time `2026-04-15 08:42:37`
+  - `Train Epoch: [1][6/1000000]`
+  - GPU memory `82.0 GB`
 - TensorBoard output exists under:
   - `/20260415_smplprior_headhair_longrun_eager_shmsafe_resume2/logs/tensorboard`
 
@@ -181,9 +180,6 @@ Current evidence from live volume pulls:
   - `output/modal_logs/20260415_smplprior_headhair/remote_pull/driver_live_eager_shmsafe.log`
   - `output/modal_logs/20260415_smplprior_headhair/remote_pull/log_eager_shmsafe_latest.txt`
   - `output/modal_logs/20260415_smplprior_headhair/remote_pull/driver_live_eager_shmsafe_latest.log`
-- Current resumed-run pulls:
-  - `output/modal_logs/20260415_smplprior_headhair/remote_pull/log_resume2_latest.txt`
-  - `output/modal_logs/20260415_smplprior_headhair/remote_pull/driver_live_resume2_latest.log`
 
 ### Active remote output root
 

@@ -14,6 +14,10 @@ zju_source_anchor_policy: random
 zju_min_supervised_views: 1
 zju_min_depth_conf: 0.0
 zju_holdout_stride: 10
+zju_smpl_prior_pose_noise_prob: 0.0
+zju_smpl_prior_pose_noise_rot_deg: 0.0
+zju_smpl_prior_pose_noise_trans_scale: 0.0
+zju_smpl_prior_pose_noise_scale_std: 0.0
 img_size: 518
 num_workers: 0
 seed_value: 42
@@ -55,6 +59,10 @@ data:
           min_supervised_views: ${zju_min_supervised_views}
           min_depth_conf: ${zju_min_depth_conf}
           holdout_stride: ${zju_holdout_stride}
+          smpl_prior_pose_noise_prob: ${zju_smpl_prior_pose_noise_prob}
+          smpl_prior_pose_noise_rot_deg: ${zju_smpl_prior_pose_noise_rot_deg}
+          smpl_prior_pose_noise_trans_scale: ${zju_smpl_prior_pose_noise_trans_scale}
+          smpl_prior_pose_noise_scale_std: ${zju_smpl_prior_pose_noise_scale_std}
   val:
     _target_: data.dynamic_dataloader.DynamicTorchDataset
     num_workers: ${num_workers}
@@ -83,6 +91,10 @@ data:
           min_supervised_views: ${zju_min_supervised_views}
           min_depth_conf: ${zju_min_depth_conf}
           holdout_stride: ${zju_holdout_stride}
+          smpl_prior_pose_noise_prob: 0.0
+          smpl_prior_pose_noise_rot_deg: 0.0
+          smpl_prior_pose_noise_trans_scale: 0.0
+          smpl_prior_pose_noise_scale_std: 0.0
 
 logging:
   log_dir: logs
@@ -105,6 +117,10 @@ logging:
         - loss_conf_depth
         - loss_reg_depth
         - loss_grad_depth
+        - loss_conf_normal
+        - loss_reg_normal
+        - loss_grad_normal
+        - loss_normal_depth_consistency
     val:
       keys_to_log:
         - loss_objective
@@ -115,6 +131,10 @@ logging:
         - loss_conf_depth
         - loss_reg_depth
         - loss_grad_depth
+        - loss_conf_normal
+        - loss_reg_normal
+        - loss_grad_normal
+        - loss_normal_depth_consistency
 
 checkpoint:
   save_dir: logs/${exp_name}/ckpts
@@ -131,6 +151,7 @@ loss:
     weight: 1.0
     gradient_loss_fn: "grad"
     valid_range: 0.98
+  normal: null
   point: null
   track: null
 
@@ -152,6 +173,9 @@ optim:
         max_norm: 1.0
         norm_type: 2
       - module_name: ["depth"]
+        max_norm: 1.0
+        norm_type: 2
+      - module_name: ["normal"]
         max_norm: 1.0
         norm_type: 2
       - module_name: ["camera"]
@@ -182,6 +206,7 @@ model:
   enable_camera: True
   enable_depth: True
   enable_point: False
+  enable_normal: False
   enable_track: False
 
 distributed:

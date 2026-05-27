@@ -70,6 +70,10 @@ logging:
         - loss_conf_depth
         - loss_reg_depth
         - loss_grad_depth
+        - loss_conf_normal
+        - loss_reg_normal
+        - loss_grad_normal
+        - loss_normal_depth_consistency
     val:
       keys_to_log:
         - loss_objective
@@ -80,6 +84,10 @@ logging:
         - loss_conf_depth
         - loss_reg_depth
         - loss_grad_depth
+        - loss_conf_normal
+        - loss_reg_normal
+        - loss_grad_normal
+        - loss_normal_depth_consistency
 
 
 
@@ -100,6 +108,7 @@ loss:
     gradient_loss_fn: "grad" 
     valid_range: 0.98
   point: null
+  normal: null
   # If you want to enable point, use the following config
   # point: 
   #   weight: 1.0
@@ -133,6 +142,9 @@ optim:
       - module_name: ["depth"]
         max_norm: 1.0   # feel free to reduce this if you see instabilities
         norm_type: 2
+      - module_name: ["normal"]
+        max_norm: 1.0
+        norm_type: 2
       - module_name: ["camera"]
         max_norm: 1.0   # feel free to reduce this if you see instabilities
         norm_type: 2
@@ -164,6 +176,7 @@ model:
   enable_camera: True
   enable_depth: True
   enable_point: False
+  enable_normal: False
   enable_track: False
 
 

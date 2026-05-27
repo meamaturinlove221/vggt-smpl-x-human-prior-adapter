@@ -91,6 +91,7 @@ class InferenceConfig:
     output_subdir: str = ""
     image_mode: str = "pad"
     hf_repo: str = "facebook/VGGT-1B"
+    checkpoint_subpath: str = ""
 
     def to_json(self) -> str:
         return json.dumps(asdict(self), ensure_ascii=False)
@@ -109,6 +110,24 @@ def _normalize_subpath(value: str) -> str:
 
 def _remote_data_path(subpath: str) -> Path:
     return Path(str(REMOTE_DATA_DIR / _normalize_subpath(subpath)))
+
+
+def _remote_output_path(subpath: str) -> Path:
+    return Path(str(REMOTE_OUTPUT_DIR / _normalize_subpath(subpath)))
+
+
+def _resolve_checkpoint_path(subpath: str) -> Path:
+    candidates = (
+        _remote_data_path(subpath),
+        _remote_output_path(subpath),
+    )
+    for candidate in candidates:
+        if candidate.is_file():
+            return candidate
+    raise FileNotFoundError(
+        "Checkpoint not found on either Modal data/output volume.\n"
+        + "\n".join(f"- tried: {candidate}" for candidate in candidates)
+    )
 
 
 def _resolve_output_root(scene_subdir: str, output_subdir: str) -> Path:
@@ -134,6 +153,17 @@ def _upload_dir(local_dir: Path, remote_subdir: str) -> str:
     return remote_subdir
 
 
+def _upload_file(local_path: Path, remote_subpath: str) -> str:
+    local_path = local_path.expanduser().resolve()
+    if not local_path.is_file():
+        raise FileNotFoundError(f"Local file not found: {local_path}")
+    remote_subpath = _normalize_subpath(remote_subpath)
+    print(f"[modal-4k4d] upload file: {local_path} -> {DATA_VOLUME_NAME}:{remote_subpath}")
+    with data_volume.batch_upload(force=True) as batch:
+        batch.put_file(str(local_path), remote_subpath)
+    return remote_subpath
+
+
 def _to_numpy(tensor):
     return tensor.detach().float().cpu().numpy()
 
@@ -153,6 +183,20 @@ def _write_preview_png(array, output_path: Path) -> None:
             hi = lo + 1e-6
         scaled = np.clip((arr - lo) / (hi - lo), 0.0, 1.0)
         preview = (scaled * 255.0).astype(np.uint8)
+    Image.fromarray(preview).save(output_path)
+
+
+def _write_normal_preview_png(array, output_path: Path) -> None:
+    import numpy as np
+    from PIL import Image
+
+    arr = np.asarray(array, dtype=np.float32)
+    if arr.ndim != 3 or arr.shape[-1] != 3:
+        raise ValueError(f"Expected normal preview array with shape (H, W, 3), got {arr.shape}")
+    finite = np.isfinite(arr).all(axis=-1, keepdims=True)
+    arr = np.where(finite, arr, 0.0)
+    arr = np.clip((arr + 1.0) * 0.5, 0.0, 1.0)
+    preview = (arr * 255.0).round().astype(np.uint8)
     Image.fromarray(preview).save(output_path)
 
 
@@ -376,7 +420,7 @@ def _render_pointcloud_artifacts(output_dir: Path, scene_dir: Path, colors, arra
     return {"dir": str(artifact_dir), "summary": summary}
 
 
-def _load_model_weights(model, source: str) -> None:
+def _load_checkpoint_state_dict(source: str):
     import torch
 
     if source.startswith("http://") or source.startswith("https://"):
@@ -385,17 +429,73 @@ def _load_model_weights(model, source: str) -> None:
         state_dict = torch.load(source, map_location="cpu")
     if isinstance(state_dict, dict) and "model" in state_dict:
         state_dict = state_dict["model"]
-    model.load_state_dict(state_dict, strict=False)
+    return state_dict
 
 
-def _load_vggt_model(preferred_source: str, device: str):
+def _infer_vggt_model_kwargs_from_state_dict(state_dict) -> dict:
+    if not isinstance(state_dict, dict):
+        return {}
+    model_kwargs = {}
+    if any(str(key).startswith("normal_head.") for key in state_dict.keys()):
+        model_kwargs["enable_normal"] = True
+    return model_kwargs
+
+
+def _load_model_weights(model, source: str, state_dict=None) -> None:
+    if state_dict is None:
+        state_dict = _load_checkpoint_state_dict(source)
+    current_state = model.state_dict()
+    filtered_state = {}
+    skipped = {}
+    for key, value in state_dict.items():
+        if key not in current_state:
+            continue
+        if current_state[key].shape != value.shape:
+            skipped[key] = {
+                "checkpoint_shape": tuple(value.shape),
+                "model_shape": tuple(current_state[key].shape),
+            }
+            continue
+        filtered_state[key] = value
+    missing, unexpected = model.load_state_dict(filtered_state, strict=False)
+    if skipped:
+        preview = {
+            key: value
+            for key, value in list(skipped.items())[:12]
+        }
+        print(
+            f"[modal-4k4d] skipped {len(skipped)} shape-mismatched checkpoint key(s): {preview}",
+            flush=True,
+        )
+    if missing:
+        print(f"[modal-4k4d] missing keys after filtered load: {missing[:16]}", flush=True)
+    if unexpected:
+        print(f"[modal-4k4d] unexpected keys after filtered load: {unexpected[:16]}", flush=True)
+
+
+def _load_vggt_model(preferred_source: str, device: str, checkpoint_path: Path | None = None):
     import torch
     from vggt.models.vggt import VGGT
 
-    model = VGGT()
+    if checkpoint_path is not None:
+        checkpoint_path = checkpoint_path.resolve()
+        state_dict = _load_checkpoint_state_dict(str(checkpoint_path))
+        model_kwargs = _infer_vggt_model_kwargs_from_state_dict(state_dict)
+        if model_kwargs:
+            print(f"[modal-4k4d] inferred model kwargs from uploaded checkpoint: {model_kwargs}", flush=True)
+        model = VGGT(**model_kwargs)
+        print(f"[modal-4k4d] loading uploaded checkpoint: {checkpoint_path}", flush=True)
+        _load_model_weights(model, str(checkpoint_path), state_dict=state_dict)
+        return model.to(device).eval(), str(checkpoint_path), "uploaded_checkpoint"
+
     if preferred_source and (preferred_source.startswith("http://") or preferred_source.startswith("https://") or Path(preferred_source).exists()):
+        state_dict = _load_checkpoint_state_dict(preferred_source)
+        model_kwargs = _infer_vggt_model_kwargs_from_state_dict(state_dict)
+        if model_kwargs:
+            print(f"[modal-4k4d] inferred model kwargs from checkpoint source: {model_kwargs}", flush=True)
+        model = VGGT(**model_kwargs)
         print(f"[modal-4k4d] loading checkpoint source: {preferred_source}", flush=True)
-        _load_model_weights(model, preferred_source)
+        _load_model_weights(model, preferred_source, state_dict=state_dict)
         return model.to(device).eval(), preferred_source, "checkpoint"
 
     if preferred_source:
@@ -410,8 +510,44 @@ def _load_vggt_model(preferred_source: str, device: str):
                 flush=True,
             )
 
+    model = VGGT()
     _load_model_weights(model, DEFAULT_MODEL_URL)
     return model.to(device).eval(), DEFAULT_MODEL_URL, "checkpoint_fallback"
+
+
+def _load_human_prior_feature_maps(scene_dir: Path):
+    import numpy as np
+    import torch
+
+    bundle_path = scene_dir / "human_prior" / "smplx_vertex_feature_maps.npz"
+    if not bundle_path.is_file():
+        return None, None, {}
+
+    with np.load(bundle_path, allow_pickle=False) as bundle:
+        feature_key = "smpl_surface_feature_maps" if "smpl_surface_feature_maps" in bundle else "smpl_vertex_feature_maps"
+        feature_maps = np.asarray(bundle[feature_key], dtype=np.float32)
+        channel_key = "surface_channel_names" if "surface_channel_names" in bundle else "channel_names"
+        channel_names = [str(name) for name in bundle[channel_key].tolist()]
+        camera_ids = [str(camera_id) for camera_id in bundle["camera_ids"].tolist()]
+        summary_tokens = None
+        summary_feature_names = []
+        summary_bin_names = []
+        if "smpl_summary_tokens" in bundle:
+            summary_tokens = np.asarray(bundle["smpl_summary_tokens"], dtype=np.float32)
+            summary_feature_names = [str(name) for name in bundle["summary_feature_names"].tolist()]
+            summary_bin_names = [str(name) for name in bundle["summary_bin_names"].tolist()]
+
+    return torch.from_numpy(feature_maps).unsqueeze(0), (
+        torch.from_numpy(summary_tokens).unsqueeze(0) if summary_tokens is not None else None
+    ), {
+        "bundle_path": str(bundle_path),
+        "shape": list(feature_maps.shape),
+        "channel_names": channel_names,
+        "camera_ids": camera_ids,
+        "summary_shape": list(summary_tokens.shape) if summary_tokens is not None else [],
+        "summary_feature_names": summary_feature_names,
+        "summary_bin_names": summary_bin_names,
+    }
 
 
 @app.function(
@@ -451,12 +587,29 @@ def run_remote_vggt_inference(cfg_json: str) -> None:
     dtype = torch.bfloat16 if torch.cuda.get_device_capability()[0] >= 8 else torch.float16
     start_time = time.time()
 
-    model, resolved_model_source, model_load_mode = _load_vggt_model(cfg.hf_repo, device)
+    checkpoint_path = None
+    if cfg.checkpoint_subpath.strip():
+        checkpoint_path = _resolve_checkpoint_path(cfg.checkpoint_subpath)
+
+    model, resolved_model_source, model_load_mode = _load_vggt_model(
+        cfg.hf_repo,
+        device,
+        checkpoint_path=checkpoint_path,
+    )
     images = load_and_preprocess_images([str(path) for path in image_paths], mode=cfg.image_mode).to(device)
+    human_prior_feature_maps, human_prior_summary_tokens, human_prior_summary = _load_human_prior_feature_maps(scene_dir)
+    if human_prior_feature_maps is not None:
+        human_prior_feature_maps = human_prior_feature_maps.to(device=device)
+    if human_prior_summary_tokens is not None:
+        human_prior_summary_tokens = human_prior_summary_tokens.to(device=device)
 
     with torch.no_grad():
         with torch.cuda.amp.autocast(dtype=dtype):
-            predictions = model(images)
+            predictions = model(
+                images,
+                human_prior_feature_maps=human_prior_feature_maps,
+                human_prior_summary_tokens=human_prior_summary_tokens,
+            )
 
     pose_enc = predictions["pose_enc"]
     extrinsic, intrinsic = pose_encoding_to_extri_intri(pose_enc, images.shape[-2:])
@@ -470,6 +623,10 @@ def run_remote_vggt_inference(cfg_json: str) -> None:
         "world_points": _to_numpy(predictions["world_points"].squeeze(0)),
         "world_points_conf": _to_numpy(predictions["world_points_conf"].squeeze(0)),
     }
+    if "normal" in predictions:
+        arrays["normal"] = _to_numpy(predictions["normal"].squeeze(0))
+    if "normal_conf" in predictions:
+        arrays["normal_conf"] = _to_numpy(predictions["normal_conf"].squeeze(0))
     np.savez_compressed(output_root / "predictions.npz", **arrays)
     colors = (
         images.detach().float().cpu().numpy().transpose(0, 2, 3, 1).clip(0.0, 1.0) * 255.0
@@ -482,6 +639,10 @@ def run_remote_vggt_inference(cfg_json: str) -> None:
         _write_preview_png(arrays["depth"][idx, ..., 0], preview_dir / f"{stem}_depth.png")
         _write_preview_png(arrays["depth_conf"][idx], preview_dir / f"{stem}_depth_conf.png")
         _write_preview_png(arrays["world_points_conf"][idx], preview_dir / f"{stem}_point_conf.png")
+        if "normal" in arrays:
+            _write_normal_preview_png(arrays["normal"][idx], preview_dir / f"{stem}_normal.png")
+        if "normal_conf" in arrays:
+            _write_preview_png(arrays["normal_conf"][idx], preview_dir / f"{stem}_normal_conf.png")
 
     pointcloud_outputs = {
         "world_points": _render_pointcloud_artifacts(output_root, scene_dir, colors, arrays, "world_points"),
@@ -497,6 +658,7 @@ def run_remote_vggt_inference(cfg_json: str) -> None:
         "scene_subdir": cfg.scene_subdir,
         "image_mode": cfg.image_mode,
         "hf_repo": cfg.hf_repo,
+        "checkpoint_subpath": cfg.checkpoint_subpath,
         "resolved_model_source": resolved_model_source,
         "model_load_mode": model_load_mode,
         "image_names": [path.name for path in image_paths],
@@ -514,6 +676,7 @@ def run_remote_vggt_inference(cfg_json: str) -> None:
             }
             for key, value in pointcloud_outputs.items()
         },
+        "human_prior": human_prior_summary,
         "scene_manifest": scene_manifest,
     }
     (output_root / "summary.json").write_text(json.dumps(summary, indent=2, ensure_ascii=False), encoding="utf-8")
@@ -540,12 +703,14 @@ def run_scene(
     output_subdir: str = "",
     image_mode: str = "pad",
     hf_repo: str = "facebook/VGGT-1B",
+    checkpoint_subpath: str = "",
 ) -> None:
     cfg = InferenceConfig(
         scene_subdir=scene_subdir,
         output_subdir=output_subdir,
         image_mode=image_mode,
         hf_repo=hf_repo,
+        checkpoint_subpath=checkpoint_subpath,
     )
     print("[modal-4k4d] launch config:")
     print(json.dumps(asdict(cfg), indent=2, ensure_ascii=False))
@@ -559,16 +724,25 @@ def run_scene_from_local(
     output_subdir: str = "",
     image_mode: str = "pad",
     hf_repo: str = "facebook/VGGT-1B",
+    local_checkpoint: str = "",
+    checkpoint_subpath: str = "",
 ) -> None:
     local_dir = Path(local_scene_dir).expanduser().resolve()
     if not remote_scene_subdir.strip():
         remote_scene_subdir = f"scenes/{local_dir.name}"
     remote_subdir = _upload_dir(local_dir, remote_scene_subdir)
+    resolved_checkpoint_subpath = checkpoint_subpath
+    if local_checkpoint.strip():
+        local_checkpoint_path = Path(local_checkpoint).expanduser().resolve()
+        if not resolved_checkpoint_subpath.strip():
+            resolved_checkpoint_subpath = f"checkpoints/{local_checkpoint_path.name}"
+        resolved_checkpoint_subpath = _upload_file(local_checkpoint_path, resolved_checkpoint_subpath)
     cfg = InferenceConfig(
         scene_subdir=remote_subdir,
         output_subdir=output_subdir,
         image_mode=image_mode,
         hf_repo=hf_repo,
+        checkpoint_subpath=resolved_checkpoint_subpath,
     )
     print("[modal-4k4d] upload+run config:")
     print(json.dumps(asdict(cfg), indent=2, ensure_ascii=False))

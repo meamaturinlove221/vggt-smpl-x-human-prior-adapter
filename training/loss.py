@@ -70,12 +70,13 @@ class MultitaskLoss(torch.nn.Module):
     - Point loss
     - Tracking loss (not cleaned yet, dirty code is at the bottom of this file)
     """
-    def __init__(self, camera=None, depth=None, point=None, track=None, unproject_geometry=None, **kwargs):
+    def __init__(self, camera=None, depth=None, point=None, normal=None, track=None, unproject_geometry=None, **kwargs):
         super().__init__()
         # Loss configuration dictionaries for each task
         self.camera = camera
         self.depth = depth
         self.point = point
+        self.normal = normal
         self.track = track
         self.unproject_geometry = unproject_geometry
 
@@ -142,6 +143,28 @@ class MultitaskLoss(torch.nn.Module):
             point_loss = point_loss * point_weight
             total_loss = total_loss + point_loss
             loss_dict.update(point_loss_dict)
+
+        # Explicit normal-map loss - if a normal head is enabled
+        if "normal" in predictions and self.normal is not None:
+            normal_loss_dict = compute_normal_loss(
+                predictions, batch, **_loss_call_kwargs(self.normal)
+            )
+            normal_loss = (
+                normal_loss_dict["loss_conf_normal"]
+                + normal_loss_dict["loss_reg_normal"]
+                + normal_loss_dict["loss_grad_normal"]
+                + normal_loss_dict["loss_normal_depth_consistency"]
+            )
+            normal_weight = resolve_two_stage_scalar(
+                self.normal["weight"],
+                batch,
+                start=self.normal.get("weight_stage2_start"),
+                end=self.normal.get("weight_stage2_end"),
+                stage2_value=self.normal.get("weight_stage2_value"),
+            )
+            normal_loss = normal_loss * normal_weight
+            total_loss = total_loss + normal_loss
+            loss_dict.update(normal_loss_dict)
 
         # Geometry-chain auxiliary loss built from predicted depth + predicted camera.
         if self.unproject_geometry is not None and "depth" in predictions and "pose_enc" in predictions:
@@ -576,6 +599,33 @@ def unproject_depth_and_pose_to_world_points(
     world_points = torch.einsum("bsij,bshwj->bshwi", cam_to_world_R, cam_points)
     world_points = world_points + cam_to_world_t.unsqueeze(-2).unsqueeze(-2)
     return world_points
+
+
+def unproject_depth_to_camera_points(pred_depth, intrinsics):
+    """Differentiably reconstruct camera-space points from depth and known intrinsics."""
+    if pred_depth.shape[-1] != 1:
+        raise ValueError(f"Expected pred_depth to have a singleton channel dim, got {pred_depth.shape}")
+
+    depth = pred_depth[..., 0]
+    bb, ss, hh, ww = depth.shape
+    device = depth.device
+    dtype = depth.dtype
+
+    ys = torch.arange(hh, device=device, dtype=dtype)
+    xs = torch.arange(ww, device=device, dtype=dtype)
+    grid_y, grid_x = torch.meshgrid(ys, xs, indexing="ij")
+    grid_x = grid_x.view(1, 1, hh, ww)
+    grid_y = grid_y.view(1, 1, hh, ww)
+
+    fx = intrinsics[..., 0, 0].unsqueeze(-1).unsqueeze(-1).to(dtype=dtype)
+    fy = intrinsics[..., 1, 1].unsqueeze(-1).unsqueeze(-1).to(dtype=dtype)
+    cx = intrinsics[..., 0, 2].unsqueeze(-1).unsqueeze(-1).to(dtype=dtype)
+    cy = intrinsics[..., 1, 2].unsqueeze(-1).unsqueeze(-1).to(dtype=dtype)
+
+    cam_x = (grid_x - cx) * depth / fx
+    cam_y = (grid_y - cy) * depth / fy
+    cam_z = depth
+    return torch.stack((cam_x, cam_y, cam_z), dim=-1)
 
 
 def _images_to_rgb01(images):
@@ -1273,6 +1323,110 @@ def compute_point_loss(predictions, batch, gamma=1.0, alpha=0.2, gradient_loss_f
     }
     
     return loss_dict
+
+
+def compute_normal_loss(
+    predictions,
+    batch,
+    gamma=1.0,
+    alpha=0.2,
+    gradient_loss_fn=None,
+    valid_range=-1,
+    target_point_key="cam_points",
+    target_mask_key="point_masks",
+    human_mask_key="human_prior_completion_masks",
+    depth_consistency_weight=0.0,
+    depth_consistency_mask_key=None,
+):
+    """
+    Supervise an explicit normal-map prediction branch.
+
+    Ground-truth normals are derived online from dense 3D point maps, which
+    keeps the normal supervision tied to the same geometry source as the depth
+    and point objectives. By default, supervision is focused on the human area.
+    """
+    pred_normal = predictions["normal"]
+    pred_normal_conf = predictions["normal_conf"]
+
+    target_points = check_and_fix_inf_nan(
+        batch[target_point_key].to(device=pred_normal.device, dtype=pred_normal.dtype),
+        f"{target_point_key}_for_normal",
+    )
+    target_point_mask = batch[target_mask_key].to(device=pred_normal.device).bool()
+    gt_normal, gt_normal_valid = point_map_to_normal_map(target_points, target_point_mask)
+
+    target_mask = gt_normal_valid
+    if human_mask_key is not None:
+        human_mask = batch.get(human_mask_key, None)
+        if human_mask is None:
+            raise KeyError(f"human_mask_key='{human_mask_key}' not found in batch.")
+        target_mask = target_mask & human_mask.to(device=pred_normal.device).bool()
+
+    zero = (0.0 * pred_normal).mean()
+    if int(target_mask.sum().item()) <= 0:
+        return {
+            "loss_conf_normal": zero,
+            "loss_reg_normal": zero,
+            "loss_grad_normal": zero,
+            "loss_normal_depth_consistency": zero,
+        }
+
+    loss_conf_normal, loss_grad_normal, loss_reg_normal = compute_normal_regression_loss(
+        pred_normal,
+        gt_normal,
+        target_mask,
+        conf=pred_normal_conf,
+        gamma=gamma,
+        alpha=alpha,
+        gradient_loss_fn=gradient_loss_fn,
+        valid_range=valid_range,
+    )
+
+    depth_consistency_loss = zero
+    depth_consistency_weight = float(depth_consistency_weight or 0.0)
+    if depth_consistency_weight > 0.0 and "depth" in predictions:
+        intrinsics = batch.get("intrinsics", None)
+        if intrinsics is None:
+            raise KeyError("depth_consistency_weight > 0 requires batch['intrinsics'].")
+
+        pred_cam_points = unproject_depth_to_camera_points(
+            predictions["depth"],
+            intrinsics.to(device=pred_normal.device, dtype=predictions["depth"].dtype),
+        )
+        pred_depth_normal, pred_depth_valid = point_map_to_normal_map(
+            pred_cam_points,
+            predictions["depth"][..., 0] > 0.0,
+        )
+        consistency_mask = pred_depth_valid & target_mask
+        if depth_consistency_mask_key is not None:
+            consistency_extra_mask = batch.get(depth_consistency_mask_key, None)
+            if consistency_extra_mask is None:
+                raise KeyError(
+                    f"depth_consistency_mask_key='{depth_consistency_mask_key}' not found in batch."
+                )
+            consistency_mask = consistency_mask & consistency_extra_mask.to(device=pred_normal.device).bool()
+
+        if int(consistency_mask.sum().item()) > 0:
+            depth_consistency_loss = cosine_normal_loss(
+                pred_normal,
+                pred_depth_normal,
+                consistency_mask,
+                conf=pred_normal_conf,
+                gamma=gamma,
+                alpha=alpha,
+                valid_range=valid_range,
+            )
+            depth_consistency_loss = (
+                check_and_fix_inf_nan(depth_consistency_loss, "loss_normal_depth_consistency")
+                * depth_consistency_weight
+            )
+
+    return {
+        "loss_conf_normal": loss_conf_normal,
+        "loss_reg_normal": loss_reg_normal,
+        "loss_grad_normal": loss_grad_normal,
+        "loss_normal_depth_consistency": depth_consistency_loss,
+    }
 
 
 def compute_depth_loss(
@@ -2389,10 +2543,108 @@ def _build_anchor_conditioned_conf_mask_drop_map(
     return drop_map & target_region_mask & reference_mask
 
 
-def regression_loss(
+def compute_normal_regression_loss(
     pred,
     gt,
     mask,
+    conf=None,
+    gamma=1.0,
+    alpha=0.2,
+    gradient_loss_fn=None,
+    valid_range=-1,
+    conf_loss_aggregation="pixel_mean",
+):
+    """
+    Regression loss for explicit normal-map prediction.
+
+    The regression term is angular: 1 - cos(theta). Optional gradient
+    regularization is applied directly on the normal map.
+    """
+    bb, ss, hh, ww, nc = pred.shape
+    if nc != 3 or gt.shape[-1] != 3:
+        raise ValueError(
+            f"Normal regression expects 3 channels, got pred={tuple(pred.shape)} gt={tuple(gt.shape)}"
+        )
+    if conf is None:
+        raise ValueError("Explicit normal prediction requires predictions['normal_conf'].")
+
+    pred = F.normalize(pred, p=2, dim=-1, eps=1e-6)
+    gt = F.normalize(gt, p=2, dim=-1, eps=1e-6)
+    conf = check_and_fix_inf_nan(conf, "pred_normal_conf").clamp_min(1e-8)
+
+    reg_map = 1.0 - torch.sum(pred * gt, dim=-1).clamp(min=-1.0 + 1e-6, max=1.0 - 1e-6)
+    reg_map = check_and_fix_inf_nan(reg_map, "loss_reg_normal_map")
+    loss_reg = reg_map[mask]
+
+    if conf_loss_aggregation == "pixel_mean":
+        conf_reg = reg_map[mask]
+        conf_reg = check_and_fix_inf_nan(conf_reg, "conf_reg_normal")
+        loss_conf_values = gamma * conf_reg * conf[mask] - alpha * torch.log(conf[mask])
+        loss_conf_values = check_and_fix_inf_nan(loss_conf_values, "loss_conf_normal")
+        loss_conf = None
+    elif conf_loss_aggregation == "active_view_mean":
+        per_view_conf_losses = []
+        for batch_idx in range(bb):
+            for view_idx in range(ss):
+                view_mask = mask[batch_idx, view_idx]
+                if int(view_mask.sum().item()) <= 0:
+                    continue
+                view_reg = reg_map[batch_idx, view_idx][view_mask]
+                view_reg = check_and_fix_inf_nan(view_reg, "conf_reg_normal_view")
+                view_conf = conf[batch_idx, view_idx][view_mask]
+                view_loss = gamma * view_reg * view_conf - alpha * torch.log(view_conf)
+                view_loss = check_and_fix_inf_nan(view_loss, "loss_conf_normal_view")
+                if valid_range > 0:
+                    view_loss = filter_by_quantile(view_loss, valid_range)
+                per_view_conf_losses.append(view_loss.mean())
+        loss_conf_values = None
+        loss_conf = torch.stack(per_view_conf_losses).mean() if per_view_conf_losses else (0.0 * pred).mean()
+    else:
+        raise ValueError("conf_loss_aggregation must be one of 'pixel_mean' or 'active_view_mean'.")
+
+    loss_grad = 0
+    if gradient_loss_fn is not None:
+        gradient_loss_fn = str(gradient_loss_fn).lower()
+        if "normal" in gradient_loss_fn:
+            raise ValueError("Normal-map supervision does not support gradient_loss_fn containing 'normal'. Use 'grad' or None.")
+        if "grad" in gradient_loss_fn:
+            to_feed_conf = conf.reshape(bb * ss, hh, ww)
+            loss_grad = gradient_loss_multi_scale_wrapper(
+                pred.reshape(bb * ss, hh, ww, nc),
+                gt.reshape(bb * ss, hh, ww, nc),
+                mask.reshape(bb * ss, hh, ww),
+                gradient_loss_fn=gradient_loss,
+                scales=3,
+                conf=to_feed_conf,
+            )
+
+    if loss_conf_values is not None:
+        if loss_conf_values.numel() > 0:
+            if valid_range > 0:
+                loss_conf_values = filter_by_quantile(loss_conf_values, valid_range)
+            loss_conf_values = check_and_fix_inf_nan(loss_conf_values, "loss_conf_normal_values")
+            loss_conf = loss_conf_values.mean()
+        else:
+            loss_conf = (0.0 * pred).mean()
+
+    if loss_reg.numel() > 0:
+        if valid_range > 0:
+            loss_reg = filter_by_quantile(loss_reg, valid_range)
+        loss_reg = check_and_fix_inf_nan(loss_reg, "loss_reg_normal")
+        loss_reg = loss_reg.mean()
+    else:
+        loss_reg = (0.0 * pred).mean()
+
+    if not torch.is_tensor(loss_grad):
+        loss_grad = (0.0 * pred).mean()
+
+    return loss_conf, loss_grad, loss_reg
+
+
+def regression_loss(
+    pred, 
+    gt, 
+    mask, 
     conf=None,
     conf_mask=None,
     gradient_loss_fn=None,
@@ -2782,6 +3034,25 @@ def normal_loss(prediction, target, mask, cos_eps=1e-8, conf=None, gamma=1.0, al
             return loss.mean()
 
 
+def cosine_normal_loss(prediction, target, mask, conf=None, gamma=1.0, alpha=0.2, valid_range=-1):
+    """
+    Direct cosine loss between two normal maps of shape (B, S, H, W, 3).
+    """
+    prediction = F.normalize(prediction, p=2, dim=-1, eps=1e-6)
+    target = F.normalize(target, p=2, dim=-1, eps=1e-6)
+    dot = torch.sum(prediction * target, dim=-1).clamp(min=-1.0 + 1e-6, max=1.0 - 1e-6)
+    values = (1.0 - dot)[mask]
+    if values.numel() <= 0:
+        return (0.0 * prediction).mean()
+    if conf is not None:
+        conf_values = check_and_fix_inf_nan(conf, "cosine_normal_loss_conf").clamp_min(1e-8)[mask]
+        values = gamma * values * conf_values - alpha * torch.log(conf_values)
+    if valid_range > 0:
+        values = filter_by_quantile(values, valid_range)
+    values = check_and_fix_inf_nan(values, "cosine_normal_loss")
+    return values.mean()
+
+
 def gradient_loss(prediction, target, mask, conf=None, gamma=1.0, alpha=0.2):
     """
     Gradient-based loss. Computes the L1 difference between adjacent pixels in x and y directions.
@@ -2894,6 +3165,36 @@ def point_map_to_normal(point_map, mask, eps=1e-6):
         normals = F.normalize(normals, p=2, dim=-1, eps=eps)
 
     return normals, valids
+
+
+def point_map_to_normal_map(point_map, mask, eps=1e-6):
+    """
+    Aggregate the directional normals from point_map_to_normal into a single
+    normalized normal map and a per-pixel valid mask.
+    """
+    original_shape = point_map.shape
+    if point_map.ndim == 5:
+        bb, ss, hh, ww, cc = point_map.shape
+        if cc != 3:
+            raise ValueError(f"Expected point_map last dim to be 3, got {original_shape}")
+        point_map = point_map.reshape(bb * ss, hh, ww, cc)
+        mask = mask.reshape(bb * ss, hh, ww)
+    elif point_map.ndim != 4:
+        raise ValueError(f"Expected point_map to have 4 or 5 dims, got {original_shape}")
+
+    normals, valids = point_map_to_normal(point_map, mask, eps=eps)
+    weights = valids.to(dtype=normals.dtype)[..., None]
+    summed = (normals * weights).sum(dim=0)
+    count = weights.sum(dim=0)
+    valid = count[..., 0] > 0
+    safe_count = count.clamp_min(1.0)
+    averaged = summed / safe_count
+    averaged = F.normalize(averaged, p=2, dim=-1, eps=eps)
+    averaged = torch.where(valid.unsqueeze(-1), averaged, torch.zeros_like(averaged))
+    if len(original_shape) == 5:
+        averaged = averaged.reshape(bb, ss, hh, ww, 3)
+        valid = valid.reshape(bb, ss, hh, ww)
+    return averaged, valid
 
 
 def build_quantile_mask(loss_tensor, valid_range, min_elements=1000, hard_max=100):
