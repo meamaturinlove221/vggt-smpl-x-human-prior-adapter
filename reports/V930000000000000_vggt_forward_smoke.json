@@ -1,0 +1,15 @@
+{
+  "created_at": "2026-05-26T18:10:14+00:00",
+  "cases_run": [
+    "current_v895_0021_03",
+    "0021_03_frame001",
+    "0012_11_frame001",
+    "0013_01_frame001"
+  ],
+  "real_vggt_forward_smoke_pass": true,
+  "device": "cpu",
+  "image_size": 56,
+  "note": "This is a real code-path extraction/smoke. V960 remains responsible for Modal GPU final matrix evidence.",
+  "local_runtime_note": "Local CPU smoke command used KMP_DUPLICATE_LIB_OK=TRUE and OMP_NUM_THREADS=1 because this Anaconda/PyTorch stack initializes duplicate Intel OpenMP runtimes; this is not final Modal GPU evidence.",
+  "final_evidence_policy": "V930 proves real VGGT/Aggregator code path and token provenance only; V960 Modal GPU matrix is required before any final mentor-ready claim."
+}

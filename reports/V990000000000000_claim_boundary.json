@@ -1,0 +1,62 @@
+{
+  "created_at": "2026-05-26T18:39:38+00:00",
+  "case_decisions": {
+    "current_v895_0021_03": {
+      "case_id": "current_v895_0021_03",
+      "true_mean_score": 0.7558913027876711,
+      "max_control_name": "same_topology_no_semantic",
+      "max_control_score": 0.4175124793623517,
+      "score_margin": 0.33837882342531944,
+      "controls_weaker": true,
+      "real_vggt_token_gradient_pass": true,
+      "smpl_feature_gradient_pass": true,
+      "binding_delta_pass": true,
+      "posthoc_surfel_beaten": true,
+      "tiny_synthetic_beaten": true,
+      "control_scores_json": "{\"real_vggt_no_smpl_feature\": 0.363056347603488, \"real_vggt_random_smpl_feature\": 0.33549468651753683, \"real_vggt_shuffled_smpl_feature\": 0.3090161366503336, \"same_topology_no_semantic\": 0.4175124793623517, \"real_vggt_baseline_only\": -0.12, \"posthoc_surfel_only\": 0.008815305781324868, \"tiny_v330_synthetic_token_control\": 0.40796032838311624, \"smpl_only_template_control\": 0.2117705991660671, \"source_label_only_control\": -0.12}"
+    },
+    "0021_03_frame001": {
+      "case_id": "0021_03_frame001",
+      "true_mean_score": 0.6526475992887025,
+      "max_control_name": "real_vggt_no_smpl_feature",
+      "max_control_score": 0.5207064837746078,
+      "score_margin": 0.1319411155140947,
+      "controls_weaker": true,
+      "real_vggt_token_gradient_pass": true,
+      "smpl_feature_gradient_pass": true,
+      "binding_delta_pass": true,
+      "posthoc_surfel_beaten": true,
+      "tiny_synthetic_beaten": true,
+      "control_scores_json": "{\"real_vggt_no_smpl_feature\": 0.5207064837746078, \"real_vggt_random_smpl_feature\": 0.3774180480082284, \"real_vggt_shuffled_smpl_feature\": 0.25795272159261995, \"same_topology_no_semantic\": 0.3616174358147468, \"real_vggt_baseline_only\": -0.12, \"posthoc_surfel_only\": 0.029537635421850044, \"tiny_v330_synthetic_token_control\": 0.2943131134809457, \"smpl_only_template_control\": 0.25883146376798516, \"source_label_only_control\": -0.12}"
+    },
+    "0012_11_frame001": {
+      "case_id": "0012_11_frame001",
+      "true_mean_score": 0.6996485118868151,
+      "max_control_name": "real_vggt_no_smpl_feature",
+      "max_control_score": 0.48133496616967025,
+      "score_margin": 0.21831354571714484,
+      "controls_weaker": true,
+      "real_vggt_token_gradient_pass": true,
+      "smpl_feature_gradient_pass": true,
+      "binding_delta_pass": true,
+      "posthoc_surfel_beaten": true,
+      "tiny_synthetic_beaten": true,
+      "control_scores_json": "{\"real_vggt_no_smpl_feature\": 0.48133496616967025, \"real_vggt_random_smpl_feature\": 0.32898445271851845, \"real_vggt_shuffled_smpl_feature\": 0.21626931209859948, \"same_topology_no_semantic\": 0.3479705208327738, \"real_vggt_baseline_only\": -0.12, \"posthoc_surfel_only\": 0.02746566791510612, \"tiny_v330_synthetic_token_control\": 0.16682095226292876, \"smpl_only_template_control\": 0.3128589263420724, \"source_label_only_control\": -0.12}"
+    },
+    "0013_01_frame001": {
+      "case_id": "0013_01_frame001",
+      "true_mean_score": 0.6930518792769663,
+      "max_control_name": "smpl_only_template_control",
+      "max_control_score": 0.3548467480687765,
+      "score_margin": 0.33820513120818985,
+      "controls_weaker": true,
+      "real_vggt_token_gradient_pass": true,
+      "smpl_feature_gradient_pass": true,
+      "binding_delta_pass": true,
+      "posthoc_surfel_beaten": true,
+      "tiny_synthetic_beaten": true,
+      "control_scores_json": "{\"real_vggt_no_smpl_feature\": 0.12996344259008766, \"real_vggt_random_smpl_feature\": 0.34819177372313, \"real_vggt_shuffled_smpl_feature\": 0.23068123862173273, \"same_topology_no_semantic\": 0.35196862165099535, \"real_vggt_baseline_only\": -0.12, \"posthoc_surfel_only\": 0.03065038624470471, \"tiny_v330_synthetic_token_control\": 0.2814527742392113, \"smpl_only_template_control\": 0.3548467480687765, \"source_label_only_control\": -0.12}"
+    }
+  },
+  "claim_policy": "Claim real VGGT token binding + SMPL feature contribution only because true beats baseline, posthoc, same-topology and tiny synthetic controls; source labels remain auxiliary."
+}

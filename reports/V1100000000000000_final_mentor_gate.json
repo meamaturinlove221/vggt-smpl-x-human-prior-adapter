@@ -1,0 +1,20 @@
+{
+  "created_at": "2026-05-26T18:39:39+00:00",
+  "real_vggt_path_pass": true,
+  "smpl_feature_binding_pass": true,
+  "token_gradient_effect_pass": true,
+  "model_owned_student_pass": true,
+  "full_scene_rgb_pointcloud_pass": true,
+  "human_main_pass": true,
+  "partial_environment_pass": true,
+  "true_better_than_real_vggt_baseline_pass": true,
+  "controls_weaker_pass": true,
+  "face_head_hair_non_regression_pass": true,
+  "hand_arm_non_regression_pass": true,
+  "clothing_boundary_non_regression_pass": true,
+  "posthoc_synthetic_token_control_beaten": true,
+  "source_label_auxiliary_only_pass": true,
+  "teacher_leakage_pass": true,
+  "multi_sequence_retained": true,
+  "all_pass": true
+}

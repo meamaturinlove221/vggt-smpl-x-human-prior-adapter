@@ -1,0 +1,211 @@
+{
+  "created_at": "2026-05-26T18:10:14+00:00",
+  "feature_channel_names": [
+    "world_x_norm",
+    "world_y_norm",
+    "world_z_norm",
+    "rgb_r",
+    "rgb_g",
+    "rgb_b",
+    "confidence",
+    "student_active",
+    "body_part_0",
+    "body_part_1",
+    "body_part_2",
+    "body_part_3",
+    "body_part_4",
+    "body_part_5",
+    "body_part_6",
+    "body_part_7",
+    "mask_head_hair",
+    "mask_face_head_silhouette",
+    "mask_torso_clothing_boundary",
+    "mask_arms_hands",
+    "mask_vggt_high_confidence_detail_band"
+  ],
+  "cases": [
+    {
+      "case_id": "current_v895_0021_03",
+      "feature_bank_npz": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V940000000000000_smpl_feature_bank\\current_v895_0021_03\\smpl_feature_bank.npz",
+      "world_points": [
+        32000,
+        3
+      ],
+      "smpl_feature_image": [
+        21,
+        56,
+        56
+      ],
+      "graph_sample_xyz": [
+        4096,
+        3
+      ],
+      "feature_channels": [
+        "world_x_norm",
+        "world_y_norm",
+        "world_z_norm",
+        "rgb_r",
+        "rgb_g",
+        "rgb_b",
+        "confidence",
+        "student_active",
+        "body_part_0",
+        "body_part_1",
+        "body_part_2",
+        "body_part_3",
+        "body_part_4",
+        "body_part_5",
+        "body_part_6",
+        "body_part_7",
+        "mask_head_hair",
+        "mask_face_head_silhouette",
+        "mask_torso_clothing_boundary",
+        "mask_arms_hands",
+        "mask_vggt_high_confidence_detail_band"
+      ],
+      "scene_world_camera_transport": true,
+      "source_label_only": false,
+      "canonical_diagnostic_only": false
+    },
+    {
+      "case_id": "0021_03_frame001",
+      "feature_bank_npz": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V940000000000000_smpl_feature_bank\\0021_03_frame001\\smpl_feature_bank.npz",
+      "world_points": [
+        32000,
+        3
+      ],
+      "smpl_feature_image": [
+        21,
+        56,
+        56
+      ],
+      "graph_sample_xyz": [
+        4096,
+        3
+      ],
+      "feature_channels": [
+        "world_x_norm",
+        "world_y_norm",
+        "world_z_norm",
+        "rgb_r",
+        "rgb_g",
+        "rgb_b",
+        "confidence",
+        "student_active",
+        "body_part_0",
+        "body_part_1",
+        "body_part_2",
+        "body_part_3",
+        "body_part_4",
+        "body_part_5",
+        "body_part_6",
+        "body_part_7",
+        "mask_head_hair",
+        "mask_face_head_silhouette",
+        "mask_torso_clothing_boundary",
+        "mask_arms_hands",
+        "mask_vggt_high_confidence_detail_band"
+      ],
+      "scene_world_camera_transport": true,
+      "source_label_only": false,
+      "canonical_diagnostic_only": false
+    },
+    {
+      "case_id": "0012_11_frame001",
+      "feature_bank_npz": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V940000000000000_smpl_feature_bank\\0012_11_frame001\\smpl_feature_bank.npz",
+      "world_points": [
+        32000,
+        3
+      ],
+      "smpl_feature_image": [
+        21,
+        56,
+        56
+      ],
+      "graph_sample_xyz": [
+        4096,
+        3
+      ],
+      "feature_channels": [
+        "world_x_norm",
+        "world_y_norm",
+        "world_z_norm",
+        "rgb_r",
+        "rgb_g",
+        "rgb_b",
+        "confidence",
+        "student_active",
+        "body_part_0",
+        "body_part_1",
+        "body_part_2",
+        "body_part_3",
+        "body_part_4",
+        "body_part_5",
+        "body_part_6",
+        "body_part_7",
+        "mask_head_hair",
+        "mask_face_head_silhouette",
+        "mask_torso_clothing_boundary",
+        "mask_arms_hands",
+        "mask_vggt_high_confidence_detail_band"
+      ],
+      "scene_world_camera_transport": true,
+      "source_label_only": false,
+      "canonical_diagnostic_only": false
+    },
+    {
+      "case_id": "0013_01_frame001",
+      "feature_bank_npz": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V940000000000000_smpl_feature_bank\\0013_01_frame001\\smpl_feature_bank.npz",
+      "world_points": [
+        32000,
+        3
+      ],
+      "smpl_feature_image": [
+        21,
+        56,
+        56
+      ],
+      "graph_sample_xyz": [
+        4096,
+        3
+      ],
+      "feature_channels": [
+        "world_x_norm",
+        "world_y_norm",
+        "world_z_norm",
+        "rgb_r",
+        "rgb_g",
+        "rgb_b",
+        "confidence",
+        "student_active",
+        "body_part_0",
+        "body_part_1",
+        "body_part_2",
+        "body_part_3",
+        "body_part_4",
+        "body_part_5",
+        "body_part_6",
+        "body_part_7",
+        "mask_head_hair",
+        "mask_face_head_silhouette",
+        "mask_torso_clothing_boundary",
+        "mask_arms_hands",
+        "mask_vggt_high_confidence_detail_band"
+      ],
+      "scene_world_camera_transport": true,
+      "source_label_only": false,
+      "canonical_diagnostic_only": false
+    }
+  ],
+  "gate": {
+    "has_surfel_xyz": true,
+    "has_world_camera_transport": true,
+    "has_body_part": true,
+    "has_visibility": true,
+    "has_projection": true,
+    "has_voxel_sparse_grid": true,
+    "has_graph_adjacency": true,
+    "source_label_only": false,
+    "canonical_diagnostic_only": false
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "created_at": "2026-05-26T18:39:39+00:00",
+  "boards": {
+    "head_face_hair": "boards\\V980000000000000_head_face_hair_detail_board.png",
+    "hand_arm": "boards\\V980000000000000_hand_arm_detail_board.png",
+    "clothing_boundary": "boards\\V980000000000000_clothing_boundary_board.png"
+  },
+  "decision": {
+    "non_regression_pass": true,
+    "at_least_one_local_improvement_pass": true,
+    "case_non_regression_region_counts": {
+      "current_v895_0021_03": 3,
+      "0021_03_frame001": 3,
+      "0012_11_frame001": 3,
+      "0013_01_frame001": 3
+    },
+    "note": "If face-level features are not visible, reports refer to head/face contour and hair region instead of over-claiming facial details."
+  }
+}

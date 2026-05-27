@@ -1,0 +1,167 @@
+{
+  "created_at": "2026-05-26T18:16:26+00:00",
+  "rows": [
+    {
+      "case_id": "0012_11_frame001",
+      "token_npz": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V930000000000000_real_vggt_tokens\\0012_11_frame001\\real_vggt_tokens_and_predictions.npz",
+      "feature_npz": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V940000000000000_smpl_feature_bank\\0012_11_frame001\\smpl_feature_bank.npz",
+      "real_token_shape": [
+        1,
+        2,
+        21,
+        64
+      ],
+      "smpl_feature_image_shape": [
+        1,
+        2,
+        21,
+        56,
+        56
+      ],
+      "student_points_shape": [
+        1,
+        2048,
+        3
+      ],
+      "binding_delta_norm": 0.15335360169410706,
+      "binding_gate_mean": 0.5126980543136597,
+      "real_vggt_token_grad_mean_abs": 0.0015671682776883245,
+      "smpl_feature_image_grad_mean_abs": 7.421182817779481e-05,
+      "smpl_point_feature_grad_mean_abs": 5.746430360886734e-06,
+      "source_label_histogram": {
+        "baseline_preserved": 141,
+        "smpl_feature_completed": 410,
+        "vggt_detail_grafted": 878,
+        "residual_refined": 140,
+        "environment": 340,
+        "auxiliary_control": 139
+      },
+      "forbidden_teacher_input_rejected": true,
+      "model_owned_student_output": true,
+      "no_teacher_points_inference": true,
+      "no_raw_kinect_depth_inference": true
+    },
+    {
+      "case_id": "0013_01_frame001",
+      "token_npz": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V930000000000000_real_vggt_tokens\\0013_01_frame001\\real_vggt_tokens_and_predictions.npz",
+      "feature_npz": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V940000000000000_smpl_feature_bank\\0013_01_frame001\\smpl_feature_bank.npz",
+      "real_token_shape": [
+        1,
+        2,
+        21,
+        64
+      ],
+      "smpl_feature_image_shape": [
+        1,
+        2,
+        21,
+        56,
+        56
+      ],
+      "student_points_shape": [
+        1,
+        2048,
+        3
+      ],
+      "binding_delta_norm": 0.09270457178354263,
+      "binding_gate_mean": 0.29076963663101196,
+      "real_vggt_token_grad_mean_abs": 0.001683827256783843,
+      "smpl_feature_image_grad_mean_abs": 6.057339487597346e-05,
+      "smpl_point_feature_grad_mean_abs": 5.838221113663167e-06,
+      "source_label_histogram": {
+        "smpl_feature_completed": 213,
+        "vggt_detail_grafted": 795,
+        "residual_refined": 1040
+      },
+      "forbidden_teacher_input_rejected": true,
+      "model_owned_student_output": true,
+      "no_teacher_points_inference": true,
+      "no_raw_kinect_depth_inference": true
+    },
+    {
+      "case_id": "0021_03_frame001",
+      "token_npz": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V930000000000000_real_vggt_tokens\\0021_03_frame001\\real_vggt_tokens_and_predictions.npz",
+      "feature_npz": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V940000000000000_smpl_feature_bank\\0021_03_frame001\\smpl_feature_bank.npz",
+      "real_token_shape": [
+        1,
+        2,
+        21,
+        64
+      ],
+      "smpl_feature_image_shape": [
+        1,
+        2,
+        21,
+        56,
+        56
+      ],
+      "student_points_shape": [
+        1,
+        2048,
+        3
+      ],
+      "binding_delta_norm": 0.15458570420742035,
+      "binding_gate_mean": 0.573504626750946,
+      "real_vggt_token_grad_mean_abs": 0.0016766965854912996,
+      "smpl_feature_image_grad_mean_abs": 0.00016779534053057432,
+      "smpl_point_feature_grad_mean_abs": 7.505072971980553e-06,
+      "source_label_histogram": {
+        "baseline_preserved": 58,
+        "vggt_detail_grafted": 73,
+        "residual_refined": 1494,
+        "environment": 166,
+        "auxiliary_control": 257
+      },
+      "forbidden_teacher_input_rejected": true,
+      "model_owned_student_output": true,
+      "no_teacher_points_inference": true,
+      "no_raw_kinect_depth_inference": true
+    },
+    {
+      "case_id": "current_v895_0021_03",
+      "token_npz": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V930000000000000_real_vggt_tokens\\current_v895_0021_03\\real_vggt_tokens_and_predictions.npz",
+      "feature_npz": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V940000000000000_smpl_feature_bank\\current_v895_0021_03\\smpl_feature_bank.npz",
+      "real_token_shape": [
+        1,
+        2,
+        21,
+        64
+      ],
+      "smpl_feature_image_shape": [
+        1,
+        2,
+        21,
+        56,
+        56
+      ],
+      "student_points_shape": [
+        1,
+        2048,
+        3
+      ],
+      "binding_delta_norm": 0.08493667840957642,
+      "binding_gate_mean": 0.32744547724723816,
+      "real_vggt_token_grad_mean_abs": 0.0013137566857039928,
+      "smpl_feature_image_grad_mean_abs": 0.00014703879423905164,
+      "smpl_point_feature_grad_mean_abs": 5.869524557056138e-06,
+      "source_label_histogram": {
+        "baseline_preserved": 596,
+        "vggt_detail_grafted": 127,
+        "environment": 1322,
+        "auxiliary_control": 3
+      },
+      "forbidden_teacher_input_rejected": true,
+      "model_owned_student_output": true,
+      "no_teacher_points_inference": true,
+      "no_raw_kinect_depth_inference": true
+    }
+  ],
+  "decision": {
+    "pass": true,
+    "real_vggt_tokens_affect_output": true,
+    "smpl_feature_binding_affects_output": true,
+    "binding_delta_nonzero": true,
+    "teacher_raw_kinect_rejected": true,
+    "tiny_v330_or_synthetic_tokens_used": false
+  }
+}

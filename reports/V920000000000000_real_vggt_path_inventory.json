@@ -1,0 +1,268 @@
+{
+  "created_at": "2026-05-26T17:55:45+00:00",
+  "repos": [
+    {
+      "root": "D:\\vggt\\vggt-canonical-surfel-adapter",
+      "exists": true,
+      "vggt_py": "D:\\vggt\\vggt-canonical-surfel-adapter\\vggt\\models\\vggt.py",
+      "vggt_py_exists": true,
+      "aggregator_py": "D:\\vggt\\vggt-canonical-surfel-adapter\\vggt\\models\\aggregator.py",
+      "aggregator_py_exists": true,
+      "vggt_forward_exists": true,
+      "aggregator_exists": true,
+      "vggt_forward_accepts_sparse_prior_tokens": true,
+      "aggregator_accepts_sparse_prior_tokens": true,
+      "sparse_prior_adapter_exists": true,
+      "checkpoint_candidates": [
+        {
+          "path": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V7600000000000_surfel_runs\\surfel_random_graph_seed0\\checkpoint.pt",
+          "size_bytes": 646389
+        },
+        {
+          "path": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V7600000000000_surfel_runs\\surfel_random_semantic_seed0\\checkpoint.pt",
+          "size_bytes": 646389
+        },
+        {
+          "path": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V7600000000000_surfel_runs\\surfel_shuffled_semantic_seed0\\checkpoint.pt",
+          "size_bytes": 646389
+        },
+        {
+          "path": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V7600000000000_surfel_runs\\surfel_true_full_seed0\\checkpoint.pt",
+          "size_bytes": 646389
+        },
+        {
+          "path": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V7600000000000_surfel_runs\\surfel_no_smpl_seed0\\checkpoint.pt",
+          "size_bytes": 646325
+        },
+        {
+          "path": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V8851000000000_dense_full_body_student_rebuild\\surfel_no_smpl_no_anchor\\student_model.pt",
+          "size_bytes": 82365
+        },
+        {
+          "path": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V8851000000000_dense_full_body_student_rebuild\\surfel_random_graph\\student_model.pt",
+          "size_bytes": 82365
+        },
+        {
+          "path": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V8851000000000_dense_full_body_student_rebuild\\surfel_random_semantic\\student_model.pt",
+          "size_bytes": 82365
+        },
+        {
+          "path": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V8851000000000_dense_full_body_student_rebuild\\surfel_same_topology_no_semantic\\student_model.pt",
+          "size_bytes": 82365
+        },
+        {
+          "path": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V8851000000000_dense_full_body_student_rebuild\\surfel_shuffled_semantic_full\\student_model.pt",
+          "size_bytes": 82365
+        },
+        {
+          "path": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V8851000000000_dense_full_body_student_rebuild\\surfel_true_full\\student_model.pt",
+          "size_bytes": 82365
+        }
+      ],
+      "checkpoint_candidate_count_limited": 11,
+      "reference_tools": [
+        {
+          "path": "D:\\vggt\\vggt-canonical-surfel-adapter\\tools\\v153_smoke_real_forward.py",
+          "exists": false,
+          "mentions_real_forward": false
+        },
+        {
+          "path": "D:\\vggt\\vggt-canonical-surfel-adapter\\tools\\v390_train_vggt_sparse_token_adapter.py",
+          "exists": true,
+          "mentions_real_forward": false
+        },
+        {
+          "path": "D:\\vggt\\vggt-canonical-surfel-adapter\\tools\\v540_train_vggt_sparse_token_adapter.py",
+          "exists": true,
+          "mentions_real_forward": true
+        },
+        {
+          "path": "D:\\vggt\\vggt-canonical-surfel-adapter\\tools\\v16_human_prior_adapter_probe.py",
+          "exists": true,
+          "mentions_real_forward": false
+        }
+      ]
+    },
+    {
+      "root": "D:\\vggt\\vggt-feature-adapter",
+      "exists": true,
+      "vggt_py": "D:\\vggt\\vggt-feature-adapter\\vggt\\models\\vggt.py",
+      "vggt_py_exists": true,
+      "aggregator_py": "D:\\vggt\\vggt-feature-adapter\\vggt\\models\\aggregator.py",
+      "aggregator_py_exists": true,
+      "vggt_forward_exists": true,
+      "aggregator_exists": true,
+      "vggt_forward_accepts_sparse_prior_tokens": true,
+      "aggregator_accepts_sparse_prior_tokens": true,
+      "sparse_prior_adapter_exists": true,
+      "checkpoint_candidates": [],
+      "checkpoint_candidate_count_limited": 0,
+      "reference_tools": [
+        {
+          "path": "D:\\vggt\\vggt-feature-adapter\\tools\\v153_smoke_real_forward.py",
+          "exists": true,
+          "mentions_real_forward": false
+        },
+        {
+          "path": "D:\\vggt\\vggt-feature-adapter\\tools\\v390_train_vggt_sparse_token_adapter.py",
+          "exists": true,
+          "mentions_real_forward": false
+        },
+        {
+          "path": "D:\\vggt\\vggt-feature-adapter\\tools\\v540_train_vggt_sparse_token_adapter.py",
+          "exists": true,
+          "mentions_real_forward": true
+        },
+        {
+          "path": "D:\\vggt\\vggt-feature-adapter\\tools\\v16_human_prior_adapter_probe.py",
+          "exists": true,
+          "mentions_real_forward": false
+        }
+      ]
+    },
+    {
+      "root": "D:\\vggt\\vggt-main",
+      "exists": true,
+      "vggt_py": "D:\\vggt\\vggt-main\\vggt\\models\\vggt.py",
+      "vggt_py_exists": true,
+      "aggregator_py": "D:\\vggt\\vggt-main\\vggt\\models\\aggregator.py",
+      "aggregator_py_exists": true,
+      "vggt_forward_exists": true,
+      "aggregator_exists": true,
+      "vggt_forward_accepts_sparse_prior_tokens": false,
+      "aggregator_accepts_sparse_prior_tokens": false,
+      "sparse_prior_adapter_exists": false,
+      "checkpoint_candidates": [
+        {
+          "path": "D:\\vggt\\vggt-main\\local_report_auxiliary\\V600_quality_rebuild\\remote_pull\\V636_prior_loss_startup_probe\\V636_prior_loss_startup_probe\\inference_model.pt",
+          "size_bytes": 5914623227
+        },
+        {
+          "path": "D:\\vggt\\vggt-main\\local_report_auxiliary\\V600_quality_rebuild\\remote_pull\\20260429_r20\\checkpoint_0.pt",
+          "size_bytes": 5091226370
+        },
+        {
+          "path": "D:\\vggt\\vggt-main\\local_report_auxiliary\\V600_quality_rebuild\\remote_pull\\V638_base_gate0_0step_v1\\inference_model.pt",
+          "size_bytes": 1763257787
+        },
+        {
+          "path": "D:\\vggt\\vggt-main\\local_report_auxiliary\\V600_quality_rebuild\\remote_pull\\V6910_step2_localdistill_v2_headsonly\\inference_model.pt",
+          "size_bytes": 849747460
+        },
+        {
+          "path": "D:\\vggt\\vggt-main\\local_report_auxiliary\\V600_quality_rebuild\\remote_pull\\V636_prior_loss_startup_probe\\inference_model.pt",
+          "size_bytes": 511954850
+        },
+        {
+          "path": "D:\\vggt\\vggt-main\\local_report_auxiliary\\V600_quality_rebuild\\remote_pull\\V636_prior_loss_step1_scored_v2\\inference_model.pt",
+          "size_bytes": 470114298
+        },
+        {
+          "path": "D:\\vggt\\vggt-main\\local_report_auxiliary\\V600_quality_rebuild\\remote_pull\\V6910_startup_probe_localdistill_v1c\\inference_model.pt",
+          "size_bytes": 437070582
+        },
+        {
+          "path": "D:\\vggt\\vggt-main\\local_report_auxiliary\\V600_quality_rebuild\\remote_pull\\V638_prior_anchor_12step_v2\\inference_model.pt",
+          "size_bytes": 355450548
+        },
+        {
+          "path": "D:\\vggt\\vggt-main\\local_report_auxiliary\\V600_quality_rebuild\\remote_pull\\V6900_official_anchor_step2_probe\\inference_model.pt",
+          "size_bytes": 325705239
+        },
+        {
+          "path": "D:\\vggt\\vggt-main\\local_report_auxiliary\\V600_quality_rebuild\\remote_pull\\V6910_startup_probe_localdistill_v1d\\inference_model.pt",
+          "size_bytes": 278301942
+        },
+        {
+          "path": "D:\\vggt\\vggt-main\\local_report_auxiliary\\V600_quality_rebuild\\remote_pull\\V6900_official_anchor_zero_step_equivalence\\inference_model.pt",
+          "size_bytes": 226668804
+        },
+        {
+          "path": "D:\\vggt\\vggt-main\\local_report_auxiliary\\V600_quality_rebuild\\remote_pull\\V636_prior_loss_startup_probe\\V636_prior_loss_startup_probe\\checkpoint.pt",
+          "size_bytes": 205660399
+        },
+        {
+          "path": "D:\\vggt\\vggt-main\\local_report_auxiliary\\V600_quality_rebuild\\remote_pull\\V6900_official_anchor_startup_probe\\inference_model.pt",
+          "size_bytes": 152978151
+        },
+        {
+          "path": "D:\\vggt\\vggt-main\\local_report_auxiliary\\V600_quality_rebuild\\remote_pull\\V6910_step2_localdistill_v1\\inference_model.pt",
+          "size_bytes": 92413952
+        },
+        {
+          "path": "D:\\vggt\\vggt-main\\local_report_auxiliary\\V600_quality_rebuild\\output\\V940000000000_student_runs\\student_true_full_seed0\\checkpoint.pt",
+          "size_bytes": 4457845
+        },
+        {
+          "path": "D:\\vggt\\vggt-main\\local_report_auxiliary\\V600_quality_rebuild\\output\\V940000000000_student_runs\\student_true_full_seed1\\checkpoint.pt",
+          "size_bytes": 4457845
+        },
+        {
+          "path": "D:\\vggt\\vggt-main\\local_report_auxiliary\\V600_quality_rebuild\\output\\V940000000000_student_runs\\student_true_full_seed2\\checkpoint.pt",
+          "size_bytes": 4457845
+        },
+        {
+          "path": "D:\\vggt\\vggt-main\\local_report_auxiliary\\V600_quality_rebuild\\output\\V940000000000_student_runs\\student_true_full_seed3\\checkpoint.pt",
+          "size_bytes": 4457845
+        },
+        {
+          "path": "D:\\vggt\\vggt-main\\local_report_auxiliary\\V600_quality_rebuild\\output\\V940000000000_student_runs\\student_true_full_seed4\\checkpoint.pt",
+          "size_bytes": 4457845
+        },
+        {
+          "path": "D:\\vggt\\vggt-main\\local_report_auxiliary\\V600_quality_rebuild\\output\\V940000000000_student_runs\\student_true_full_seed970\\checkpoint.pt",
+          "size_bytes": 3891445
+        },
+        {
+          "path": "D:\\vggt\\vggt-main\\local_report_auxiliary\\V600_quality_rebuild\\output\\V10000000_V12000000_modal_sparseconv\\V100_formal_20260520\\V10300000_sparseconv_checkpoint.pt",
+          "size_bytes": 2397166
+        },
+        {
+          "path": "D:\\vggt\\vggt-main\\local_report_auxiliary\\V600_quality_rebuild\\output\\V10000000_V12000000_modal_sparseconv\\V100_smoke_fix_20260520\\V10300000_sparseconv_checkpoint.pt",
+          "size_bytes": 2397166
+        },
+        {
+          "path": "D:\\vggt\\vggt-main\\local_report_auxiliary\\V600_quality_rebuild\\output\\V10000000_V12000000_modal_sparseconv\\V230_smoke_quiet_seed0\\V10300000_sparseconv_checkpoint.pt",
+          "size_bytes": 2397166
+        },
+        {
+          "path": "D:\\vggt\\vggt-main\\local_report_auxiliary\\V600_quality_rebuild\\output\\V10000000_V12000000_modal_sparseconv\\V910_random_smpl_full_seed0\\V10300000_sparseconv_checkpoint.pt",
+          "size_bytes": 2397166
+        },
+        {
+          "path": "D:\\vggt\\vggt-main\\local_report_auxiliary\\V600_quality_rebuild\\output\\V10000000_V12000000_modal_sparseconv\\V910_random_smpl_full_seed1\\V10300000_sparseconv_checkpoint.pt",
+          "size_bytes": 2397166
+        }
+      ],
+      "checkpoint_candidate_count_limited": 25,
+      "reference_tools": [
+        {
+          "path": "D:\\vggt\\vggt-main\\tools\\v153_smoke_real_forward.py",
+          "exists": false,
+          "mentions_real_forward": false
+        },
+        {
+          "path": "D:\\vggt\\vggt-main\\tools\\v390_train_vggt_sparse_token_adapter.py",
+          "exists": false,
+          "mentions_real_forward": false
+        },
+        {
+          "path": "D:\\vggt\\vggt-main\\tools\\v540_train_vggt_sparse_token_adapter.py",
+          "exists": false,
+          "mentions_real_forward": false
+        },
+        {
+          "path": "D:\\vggt\\vggt-main\\tools\\v16_human_prior_adapter_probe.py",
+          "exists": true,
+          "mentions_real_forward": false
+        }
+      ]
+    }
+  ],
+  "evidence_root": "D:\\vggt\\vggt-main\\local_report_auxiliary\\V600_quality_rebuild",
+  "real_vggt_code_path_pass": true,
+  "checkpoint_candidate_count": 36,
+  "checkpoint_required_for_full_pretrained_forward": true,
+  "modal_gpu_feasible": true,
+  "enter_v930_allowed": true
+}

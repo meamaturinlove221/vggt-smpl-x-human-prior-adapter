@@ -1,0 +1,263 @@
+{
+  "created_at": "2026-05-26T18:10:14+00:00",
+  "repo": "D:\\vggt\\vggt-canonical-surfel-adapter",
+  "data_root": "D:\\vggt\\datasets_ascii\\data_used_in_4K4D",
+  "cases": [
+    {
+      "case_id": "current_v895_0021_03",
+      "sequence": "0021_03",
+      "frame_index": 2,
+      "token_npz": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V930000000000000_real_vggt_tokens\\current_v895_0021_03\\real_vggt_tokens_and_predictions.npz",
+      "feature_bank_npz": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V940000000000000_smpl_feature_bank\\current_v895_0021_03\\smpl_feature_bank.npz",
+      "image_provenance": [
+        {
+          "sequence": "0021_03",
+          "camera_id": "0",
+          "frame_index": 2,
+          "source_smc": "D:\\vggt\\datasets_ascii\\data_used_in_4K4D\\main\\0021_03.smc",
+          "source_group": "Camera_5mp/0/color/2",
+          "raw_height": 2448,
+          "raw_width": 2048,
+          "preprocessed_height": 56,
+          "preprocessed_width": 56,
+          "preview_png": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V930000000000000_real_vggt_tokens\\current_v895_0021_03\\input_rgb\\current_v895_0021_03_cam00_frame002_rgb_56.png",
+          "input_role": "real SMC RGB decoded from 4K4D container"
+        },
+        {
+          "sequence": "0021_03",
+          "camera_id": "1",
+          "frame_index": 2,
+          "source_smc": "D:\\vggt\\datasets_ascii\\data_used_in_4K4D\\main\\0021_03.smc",
+          "source_group": "Camera_5mp/1/color/2",
+          "raw_height": 2448,
+          "raw_width": 2048,
+          "preprocessed_height": 56,
+          "preprocessed_width": 56,
+          "preview_png": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V930000000000000_real_vggt_tokens\\current_v895_0021_03\\input_rgb\\current_v895_0021_03_cam01_frame002_rgb_56.png",
+          "input_role": "real SMC RGB decoded from 4K4D container"
+        }
+      ],
+      "real_vggt_forward_executed": true,
+      "real_aggregator_forward_executed": true,
+      "tiny_v330_used": false,
+      "synthetic_scene_tokens_used": false,
+      "teacher_points_used_at_inference": false,
+      "raw_kinect_depth_used_at_inference": false,
+      "image_size": 56,
+      "patch_size": 14,
+      "embed_dim": 32,
+      "device": "cpu",
+      "token_delta_l2": 1.4551942348480225,
+      "token_delta_mean_abs": 0.020108424127101898,
+      "patch_start_idx": 5,
+      "token_shape": [
+        1,
+        2,
+        21,
+        64
+      ],
+      "prediction_world_points_shape": [
+        1,
+        2,
+        56,
+        56,
+        3
+      ],
+      "raw_518_note": "SMC RGB was decoded from original 2448x2048 4K4D camera frames; this local token extraction uses 56x56 preprocessing for CPU-safe real-path evidence. V960 Modal matrix must rerun the same script/config at larger VGGT size when final evidence is required."
+    },
+    {
+      "case_id": "0021_03_frame001",
+      "sequence": "0021_03",
+      "frame_index": 1,
+      "token_npz": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V930000000000000_real_vggt_tokens\\0021_03_frame001\\real_vggt_tokens_and_predictions.npz",
+      "feature_bank_npz": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V940000000000000_smpl_feature_bank\\0021_03_frame001\\smpl_feature_bank.npz",
+      "image_provenance": [
+        {
+          "sequence": "0021_03",
+          "camera_id": "0",
+          "frame_index": 1,
+          "source_smc": "D:\\vggt\\datasets_ascii\\data_used_in_4K4D\\main\\0021_03.smc",
+          "source_group": "Camera_5mp/0/color/1",
+          "raw_height": 2448,
+          "raw_width": 2048,
+          "preprocessed_height": 56,
+          "preprocessed_width": 56,
+          "preview_png": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V930000000000000_real_vggt_tokens\\0021_03_frame001\\input_rgb\\0021_03_frame001_cam00_frame001_rgb_56.png",
+          "input_role": "real SMC RGB decoded from 4K4D container"
+        },
+        {
+          "sequence": "0021_03",
+          "camera_id": "1",
+          "frame_index": 1,
+          "source_smc": "D:\\vggt\\datasets_ascii\\data_used_in_4K4D\\main\\0021_03.smc",
+          "source_group": "Camera_5mp/1/color/1",
+          "raw_height": 2448,
+          "raw_width": 2048,
+          "preprocessed_height": 56,
+          "preprocessed_width": 56,
+          "preview_png": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V930000000000000_real_vggt_tokens\\0021_03_frame001\\input_rgb\\0021_03_frame001_cam01_frame001_rgb_56.png",
+          "input_role": "real SMC RGB decoded from 4K4D container"
+        }
+      ],
+      "real_vggt_forward_executed": true,
+      "real_aggregator_forward_executed": true,
+      "tiny_v330_used": false,
+      "synthetic_scene_tokens_used": false,
+      "teacher_points_used_at_inference": false,
+      "raw_kinect_depth_used_at_inference": false,
+      "image_size": 56,
+      "patch_size": 14,
+      "embed_dim": 32,
+      "device": "cpu",
+      "token_delta_l2": 1.4215927124023438,
+      "token_delta_mean_abs": 0.021066654473543167,
+      "patch_start_idx": 5,
+      "token_shape": [
+        1,
+        2,
+        21,
+        64
+      ],
+      "prediction_world_points_shape": [
+        1,
+        2,
+        56,
+        56,
+        3
+      ],
+      "raw_518_note": "SMC RGB was decoded from original 2448x2048 4K4D camera frames; this local token extraction uses 56x56 preprocessing for CPU-safe real-path evidence. V960 Modal matrix must rerun the same script/config at larger VGGT size when final evidence is required."
+    },
+    {
+      "case_id": "0012_11_frame001",
+      "sequence": "0012_11",
+      "frame_index": 1,
+      "token_npz": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V930000000000000_real_vggt_tokens\\0012_11_frame001\\real_vggt_tokens_and_predictions.npz",
+      "feature_bank_npz": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V940000000000000_smpl_feature_bank\\0012_11_frame001\\smpl_feature_bank.npz",
+      "image_provenance": [
+        {
+          "sequence": "0012_11",
+          "camera_id": "0",
+          "frame_index": 1,
+          "source_smc": "D:\\vggt\\datasets_ascii\\data_used_in_4K4D\\main\\0012_11.smc",
+          "source_group": "Camera_5mp/0/color/1",
+          "raw_height": 2448,
+          "raw_width": 2048,
+          "preprocessed_height": 56,
+          "preprocessed_width": 56,
+          "preview_png": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V930000000000000_real_vggt_tokens\\0012_11_frame001\\input_rgb\\0012_11_frame001_cam00_frame001_rgb_56.png",
+          "input_role": "real SMC RGB decoded from 4K4D container"
+        },
+        {
+          "sequence": "0012_11",
+          "camera_id": "1",
+          "frame_index": 1,
+          "source_smc": "D:\\vggt\\datasets_ascii\\data_used_in_4K4D\\main\\0012_11.smc",
+          "source_group": "Camera_5mp/1/color/1",
+          "raw_height": 2448,
+          "raw_width": 2048,
+          "preprocessed_height": 56,
+          "preprocessed_width": 56,
+          "preview_png": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V930000000000000_real_vggt_tokens\\0012_11_frame001\\input_rgb\\0012_11_frame001_cam01_frame001_rgb_56.png",
+          "input_role": "real SMC RGB decoded from 4K4D container"
+        }
+      ],
+      "real_vggt_forward_executed": true,
+      "real_aggregator_forward_executed": true,
+      "tiny_v330_used": false,
+      "synthetic_scene_tokens_used": false,
+      "teacher_points_used_at_inference": false,
+      "raw_kinect_depth_used_at_inference": false,
+      "image_size": 56,
+      "patch_size": 14,
+      "embed_dim": 32,
+      "device": "cpu",
+      "token_delta_l2": 1.2572541236877441,
+      "token_delta_mean_abs": 0.01912003755569458,
+      "patch_start_idx": 5,
+      "token_shape": [
+        1,
+        2,
+        21,
+        64
+      ],
+      "prediction_world_points_shape": [
+        1,
+        2,
+        56,
+        56,
+        3
+      ],
+      "raw_518_note": "SMC RGB was decoded from original 2448x2048 4K4D camera frames; this local token extraction uses 56x56 preprocessing for CPU-safe real-path evidence. V960 Modal matrix must rerun the same script/config at larger VGGT size when final evidence is required."
+    },
+    {
+      "case_id": "0013_01_frame001",
+      "sequence": "0013_01",
+      "frame_index": 1,
+      "token_npz": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V930000000000000_real_vggt_tokens\\0013_01_frame001\\real_vggt_tokens_and_predictions.npz",
+      "feature_bank_npz": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V940000000000000_smpl_feature_bank\\0013_01_frame001\\smpl_feature_bank.npz",
+      "image_provenance": [
+        {
+          "sequence": "0013_01",
+          "camera_id": "0",
+          "frame_index": 1,
+          "source_smc": "D:\\vggt\\datasets_ascii\\data_used_in_4K4D\\main\\0013_01.smc",
+          "source_group": "Camera_5mp/0/color/1",
+          "raw_height": 2448,
+          "raw_width": 2048,
+          "preprocessed_height": 56,
+          "preprocessed_width": 56,
+          "preview_png": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V930000000000000_real_vggt_tokens\\0013_01_frame001\\input_rgb\\0013_01_frame001_cam00_frame001_rgb_56.png",
+          "input_role": "real SMC RGB decoded from 4K4D container"
+        },
+        {
+          "sequence": "0013_01",
+          "camera_id": "1",
+          "frame_index": 1,
+          "source_smc": "D:\\vggt\\datasets_ascii\\data_used_in_4K4D\\main\\0013_01.smc",
+          "source_group": "Camera_5mp/1/color/1",
+          "raw_height": 2448,
+          "raw_width": 2048,
+          "preprocessed_height": 56,
+          "preprocessed_width": 56,
+          "preview_png": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V930000000000000_real_vggt_tokens\\0013_01_frame001\\input_rgb\\0013_01_frame001_cam01_frame001_rgb_56.png",
+          "input_role": "real SMC RGB decoded from 4K4D container"
+        }
+      ],
+      "real_vggt_forward_executed": true,
+      "real_aggregator_forward_executed": true,
+      "tiny_v330_used": false,
+      "synthetic_scene_tokens_used": false,
+      "teacher_points_used_at_inference": false,
+      "raw_kinect_depth_used_at_inference": false,
+      "image_size": 56,
+      "patch_size": 14,
+      "embed_dim": 32,
+      "device": "cpu",
+      "token_delta_l2": 1.2696596384048462,
+      "token_delta_mean_abs": 0.019694749265909195,
+      "patch_start_idx": 5,
+      "token_shape": [
+        1,
+        2,
+        21,
+        64
+      ],
+      "prediction_world_points_shape": [
+        1,
+        2,
+        56,
+        56,
+        3
+      ],
+      "raw_518_note": "SMC RGB was decoded from original 2448x2048 4K4D camera frames; this local token extraction uses 56x56 preprocessing for CPU-safe real-path evidence. V960 Modal matrix must rerun the same script/config at larger VGGT size when final evidence is required."
+    }
+  ],
+  "gate": {
+    "real_vggt_tokens_from_current_repo": true,
+    "uses_vggt_forward": true,
+    "uses_aggregator_forward": true,
+    "tiny_v330_final_evidence": false,
+    "synthetic_scene_tokens_final_evidence": false,
+    "posthoc_point_composition": false
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "goal_file_path": "D:\\vggt\\vggt-canonical-surfel-adapter\\docs\\goals\\V900100000000000_V1800000000000000_real_vggt_smpl_feature_detail_goal.md",
+  "sha256": "c733ac57f179d8d88d6938dff10c802d61807c16912c60fc70fb4fb9aa80b525",
+  "line_count": 727,
+  "created_at": "2026-05-26T17:51:41+00:00",
+  "repo": "D:\\vggt\\vggt-canonical-surfel-adapter",
+  "source_feature_adapter_repo": "D:\\vggt\\vggt-feature-adapter",
+  "source_scene_context_repo": "D:\\vggt\\vggt-scene-context-evidence",
+  "evidence_root": "D:\\vggt\\vggt-main\\local_report_auxiliary\\V600_quality_rebuild",
+  "previous_status": "V900000000000000_SMPL_FEATURE_BOUND_HUMAN_SCENE_POINTCLOUD_MENTOR_READY_NOT_PROMOTED downgraded to checkpoint",
+  "final_allowed_states": [
+    "V1800000000000000_REAL_VGGT_SMPL_FEATURE_DETAIL_MENTOR_READY_NOT_PROMOTED",
+    "V1800000000000000_TRUE_EXTERNAL_HARD_BLOCK_REQUIRES_USER_ACTION"
+  ],
+  "no_agent_rule": "This round strictly forbids agents/subagents; AGENTS.md is an instruction file only, not permission to launch agents.",
+  "summary": "Downgrade V900 TinyV330/synthetic-token evidence and require real VGGT.forward or real Aggregator token path, SMPL-X 3D feature binding, real-token gradient/effect proof, full-scene human-main RGB point cloud, local detail gates, controls, bundles, and cleanup."
+}
