@@ -1,0 +1,126 @@
+{
+  "created_at": "2026-05-28T19:15:10+00:00",
+  "status": "V13060_ANTI_BILLBOARD_TRAINING_FAIL_CLOSED_CONTINUE",
+  "mentor_ready": false,
+  "external_hard_block": false,
+  "failures": [
+    {
+      "case": "0012_11_frame001",
+      "reason": "true_billboard_fail",
+      "true_score": 0.17277173913043475
+    },
+    {
+      "case": "0012_11_frame001",
+      "reason": "control_close_or_better",
+      "control": "posthoc_surfel_only",
+      "true_score": 0.17277173913043475,
+      "control_score": 0.18138888888888888
+    },
+    {
+      "case": "0012_11_frame001",
+      "reason": "control_close_or_better",
+      "control": "same_topology_no_semantic",
+      "true_score": 0.17277173913043475,
+      "control_score": 0.7315340909090909
+    },
+    {
+      "case": "0012_11_frame001",
+      "reason": "control_close_or_better",
+      "control": "shuffled_smpl_feature",
+      "true_score": 0.17277173913043475,
+      "control_score": 0.47359929078014185
+    },
+    {
+      "case": "0012_11_frame001",
+      "reason": "control_close_or_better",
+      "control": "thickness_only_control",
+      "true_score": 0.17277173913043475,
+      "control_score": 0.2041788321167883
+    },
+    {
+      "case": "0013_01_frame001",
+      "reason": "true_billboard_fail",
+      "true_score": 0.16543478260869565
+    },
+    {
+      "case": "0013_01_frame001",
+      "reason": "control_close_or_better",
+      "control": "same_topology_no_semantic",
+      "true_score": 0.16543478260869565,
+      "control_score": 0.9184172661870503
+    },
+    {
+      "case": "0013_01_frame001",
+      "reason": "control_close_or_better",
+      "control": "shuffled_smpl_feature",
+      "true_score": 0.16543478260869565,
+      "control_score": 0.5587732919254659
+    },
+    {
+      "case": "0013_01_frame001",
+      "reason": "control_close_or_better",
+      "control": "thickness_only_control",
+      "true_score": 0.16543478260869565,
+      "control_score": 0.19724025974025977
+    },
+    {
+      "case": "0021_03_frame001",
+      "reason": "true_billboard_fail",
+      "true_score": 0.3383720930232559
+    },
+    {
+      "case": "0021_03_frame001",
+      "reason": "control_close_or_better",
+      "control": "same_topology_no_semantic",
+      "true_score": 0.3383720930232559,
+      "control_score": 0.6904126213592234
+    },
+    {
+      "case": "0021_03_frame001",
+      "reason": "control_close_or_better",
+      "control": "shuffled_smpl_feature",
+      "true_score": 0.3383720930232559,
+      "control_score": 0.4951923076923077
+    },
+    {
+      "case": "0021_03_frame001",
+      "reason": "control_close_or_better",
+      "control": "thickness_only_control",
+      "true_score": 0.3383720930232559,
+      "control_score": 0.32488372093023254
+    },
+    {
+      "case": "current_v895_0021_03",
+      "reason": "true_billboard_fail",
+      "true_score": 0.3148694029850746
+    },
+    {
+      "case": "current_v895_0021_03",
+      "reason": "control_close_or_better",
+      "control": "same_topology_no_semantic",
+      "true_score": 0.3148694029850746,
+      "control_score": 0.5919852941176471
+    },
+    {
+      "case": "current_v895_0021_03",
+      "reason": "control_close_or_better",
+      "control": "shuffled_smpl_feature",
+      "true_score": 0.3148694029850746,
+      "control_score": 0.4958849557522124
+    },
+    {
+      "case": "current_v895_0021_03",
+      "reason": "control_close_or_better",
+      "control": "thickness_only_control",
+      "true_score": 0.3148694029850746,
+      "control_score": 0.3153571428571429
+    }
+  ],
+  "face_detail_claim_allowed": false,
+  "allowed_face_claim": "head/face contour and hair region only",
+  "modal_required_for_final": true,
+  "boards": {
+    "turntable": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V13060000000000000000_anti_billboard_training_turntable.png",
+    "cross_section": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V13060000000000000000_anti_billboard_training_cross_section.png"
+  }
+}
