@@ -1,31 +1,12 @@
 {
-  "created_at": "2026-05-28T20:07:18+00:00",
+  "created_at": "2026-05-28T20:11:00+00:00",
   "repo": "D:\\vggt\\vggt-canonical-surfel-adapter",
   "branch": "codex/volume-aware-3d-morphology",
   "git_status_short": [
-    "## codex/volume-aware-3d-morphology...origin/codex/volume-aware-3d-morphology",
-    "?? boards/V14300000000000000000_clothing_boundary_3d_closeup.png",
-    "?? boards/V14300000000000000000_hand_arm_endpoint_3d_closeup.png",
-    "?? boards/V14300000000000000000_head_hair_contour_3d_closeup.png",
-    "?? boards/V14300000000000000000_leg_foot_3d_closeup.png",
-    "?? boards/V14300000000000000000_shoulder_neck_3d_closeup.png",
-    "?? boards/V14400000000000000000_environment_realism_gate.png",
-    "?? boards/V15000000000000000000_multicase_anti_billboard_summary.png",
-    "?? reports/V14300000000000000000_local_3d_morphology_decision.json",
-    "?? reports/V14300000000000000000_local_3d_morphology_metrics.csv",
-    "?? reports/V14400000000000000000_environment_gate.json",
-    "?? reports/V14500000000000000000_viewer_integrity.json",
-    "?? reports/V15000000000000000000_multicase_gate.json",
-    "?? reports/V16000000000000000000_failed_gate_router.json",
-    "?? reports/V16000000000000000000_final_mentor_gate.json",
-    "?? reports/V18000000000000000000_advisor_report_guard.md",
-    "?? reports/V18000000000000000000_limitations.md",
-    "?? reports/V18000000000000000000_one_page.md",
-    "?? reports/V19000000000000000000_bundle_integrity.json",
-    "?? reports/V19000000000000000000_upload_manifest_sidecar.json",
-    "?? tools/V14300_V20000_downstream_fail_closed_package.py"
+    "## codex/volume-aware-3d-morphology...origin/codex/volume-aware-3d-morphology"
   ],
-  "dirty_files_before_commit": 20,
+  "dirty_files_after_push": 0,
+  "last_pushed_commit": "deab7df",
   "modal_apps": "not_checked_in_cleanup_script",
   "python_workers": "not_started_by_this_script",
   "registry_changed": false,
@@ -33,5 +14,5 @@
   "active_candidate": "V11700_gap_reduction_branch_520",
   "source_repos_touched": false,
   "agent_subagent_launched": false,
-  "note": "This cleanup report is generated before the final commit/push step; final response must report post-push git status."
+  "note": "Post-push cleanup verification after deab7df. Worktree was clean before this cleanup-report correction commit."
 }
