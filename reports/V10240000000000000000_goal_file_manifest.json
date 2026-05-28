@@ -1,0 +1,17 @@
+{
+  "goal_file_path": "D:\\vggt\\vggt-canonical-surfel-adapter\\docs\\goals\\V10240000000000000000_V30000000000000000000_volume_aware_3d_morphology_goal.md",
+  "sha256": "27b513f1dee24067e8d4f36cf430e2e29d44fd441b057193ea3539975ad10cc3",
+  "line_count": 876,
+  "created_at": "2026-05-28T18:20:44+00:00",
+  "repo": "D:\\vggt\\vggt-canonical-surfel-adapter",
+  "source_feature_adapter_repo": "D:\\vggt\\vggt-feature-adapter",
+  "source_scene_context_repo": "D:\\vggt\\vggt-scene-context-evidence",
+  "evidence_root": "D:\\vggt\\vggt-main\\local_report_auxiliary\\V600_quality_rebuild",
+  "previous_status": "V10230_CURRENT_ROUTE_STATE = checkpoint / internal visual hard block",
+  "final_allowed_states": [
+    "V30000000000000000000_VOLUME_AWARE_3D_MORPHOLOGY_MENTOR_READY_NOT_PROMOTED",
+    "V30000000000000000000_TRUE_EXTERNAL_HARD_BLOCK_REQUIRES_USER_ACTION"
+  ],
+  "no_agent_rule": "No agent/subagent launch in this run.",
+  "summary": "Downgrade V10230 and execute a no-agent volume-aware 3D morphology route: render repair only as auxiliary, build volume-aware/multi-layer representation, enforce true 3D full-scene mentor visual gates, forbid facial-detail overclaim, and continue fail-closed until allowed final states."
+}
