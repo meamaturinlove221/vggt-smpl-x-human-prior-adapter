@@ -109,40 +109,7 @@ SMPL-X 人体参数
 
 ---
 
-## 和几个相关仓库的关系
 
-| 仓库 | 负责内容 |
-| --- | --- |
-| `VGGT-SMPL-X-Human-Prior-Adapter` | 模型侧先验注入、prior 输入、prior supervision、adapter 路线。 |
-| `VGGT-ZJU-MoCap-Adapter` | ZJU-MoCap 多视角人体数据适配、相机对齐、可信样例整理。 |
-| `vggt_for_4k_4d` | 4K4D 风格数据处理、baseline/control 对比、导师展示证据。 |
-| `vggt-human-prior-builder` | 可公开的 preprocessing recipe、schema、toy example 和安全边界说明。 |
-
-这个仓库更偏模型实验；数据整理、展示证据和公开安全包会放到对应仓库里处理。
-
----
-
-## 成果怎么判断
-
-本项目里一直把三种“通过”分开看。
-
-| 层级 | 含义 | 能不能直接当最终成果 |
-| --- | --- | --- |
-| metric pass | loss 或几何指标变好 | 不能，只能说明值得继续看。 |
-| visual pass | 3D 点云里人体结构更清楚 | 还要和 baseline、control 对比。 |
-| advisor pass | full-scene RGB point cloud 中能清楚看到人体为主体，并保留环境上下文 | 可以作为主要展示目标。 |
-
-一些图适合调试，但不能当最终主图：
-
-- isolated human scatter；
-- projection overlay；
-- SMPL-X-only 可视化；
-- teacher-only 或 raw-depth fusion 结果；
-- 只截手、脸、局部区域的诊断图。
-
-它们可以解释问题来源，但不能替代 full-scene 点云证据。
-
----
 
 ## 当前状态
 
@@ -167,12 +134,4 @@ SMPL-X 人体参数
 
 ---
 
-## 适合谁看
 
-这个仓库适合三类人：
-
-1. 想了解 VGGT 如何接入人体先验的人；
-2. 想看多视角人体数据如何转成模型可用监督的人；
-3. 想复盘一个视觉科研项目如何区分 baseline、teacher、student、control 和最终展示证据的人。
-
-如果只想看最后的展示图，可以先看上面的成果展示页面；如果想理解路线，就从首页架构图和这份中文说明开始看。
