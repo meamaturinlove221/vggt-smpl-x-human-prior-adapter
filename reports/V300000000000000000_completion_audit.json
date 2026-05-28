@@ -1,6 +1,13 @@
 {
-  "created_at": "2026-05-27T17:53:59+00:00",
-  "final_status": "V300000000000000000_PHOTOMETRIC_GEOMETRY_VISUAL_TRUTH_MENTOR_READY_NOT_PROMOTED",
-  "all_ok": true,
-  "current_artifact_recheck": true
+  "created_at": "2026-05-27T19:44:59+00:00",
+  "final_status": "V300000000000000000_TRUE_3D_MORPHOLOGY_CHECKPOINT_DOWNGRADED_NOT_FINAL",
+  "all_ok": false,
+  "checkpoint_only": true,
+  "failed_gates": [
+    "V300 final/audit/report consistency failed in uploaded pack",
+    "3D main board lacks convincing full-scene environment",
+    "local close-ups are not sufficient 3D detail proof",
+    "V190 matrix is copied-prediction rescoring, not a new 3D morphology student run",
+    "projection metrics cannot replace mentor 3D morphology gate"
+  ]
 }

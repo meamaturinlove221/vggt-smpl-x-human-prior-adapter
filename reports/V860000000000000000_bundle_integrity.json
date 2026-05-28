@@ -1,0 +1,60 @@
+{
+  "created_at": "2026-05-27T20:01:45+00:00",
+  "final_state_candidate": "V900000000000000000_TRUE_EXTERNAL_HARD_BLOCK_REQUIRES_USER_ACTION",
+  "bundle_count": 5,
+  "all_zip_clean": true,
+  "all_under_500mb": true,
+  "all_non_empty": true,
+  "bundles": [
+    {
+      "bundle": "v860_core",
+      "path": "D:\\vggt\\vggt-canonical-surfel-adapter\\archive\\V860000000000000000_v860_core_bundle.zip",
+      "bytes": 10155,
+      "entry_count": 1,
+      "sha256": "f0668c1ee54dffc85410cdaa87b13ed0f577ef3d579f3a17aa1addad3d9c7354",
+      "zip_clean": true,
+      "under_500mb": true,
+      "non_empty": true
+    },
+    {
+      "bundle": "v860_reports",
+      "path": "D:\\vggt\\vggt-canonical-surfel-adapter\\archive\\V860000000000000000_v860_reports_bundle.zip",
+      "bytes": 5291,
+      "entry_count": 4,
+      "sha256": "9f8ac6dfc6e17e3d0588ecc3a7624646eef552b4cc5e50c1fceab8ee6435fa01",
+      "zip_clean": true,
+      "under_500mb": true,
+      "non_empty": true
+    },
+    {
+      "bundle": "v860_visuals",
+      "path": "D:\\vggt\\vggt-canonical-surfel-adapter\\archive\\V860000000000000000_v860_visuals_bundle.zip",
+      "bytes": 4267590,
+      "entry_count": 4,
+      "sha256": "8a5cd5d9cc8768b21e04aab271f62607928497eba8d84552aa39f86890d3cef6",
+      "zip_clean": true,
+      "under_500mb": true,
+      "non_empty": true
+    },
+    {
+      "bundle": "v860_predictions",
+      "path": "D:\\vggt\\vggt-canonical-surfel-adapter\\archive\\V860000000000000000_v860_predictions_bundle.zip",
+      "bytes": 63181300,
+      "entry_count": 64,
+      "sha256": "96544f85aacd12140e2cac474772ae244d68913878adfe1352a46a81e567dd41",
+      "zip_clean": true,
+      "under_500mb": true,
+      "non_empty": true
+    },
+    {
+      "bundle": "v860_viewer",
+      "path": "D:\\vggt\\vggt-canonical-surfel-adapter\\archive\\V860000000000000000_v860_viewer_bundle.zip",
+      "bytes": 3827628,
+      "entry_count": 8,
+      "sha256": "dd10fb059b46e071961ffc18fa7f657029615b40eb0aa8c9cefaf4c04e783021",
+      "zip_clean": true,
+      "under_500mb": true,
+      "non_empty": true
+    }
+  ]
+}

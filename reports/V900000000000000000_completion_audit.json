@@ -1,0 +1,18 @@
+{
+  "created_at": "2026-05-27T19:45:14+00:00",
+  "final_status": "V900000000000000000_TRUE_EXTERNAL_HARD_BLOCK_REQUIRES_USER_ACTION",
+  "terminal_state_allowed": true,
+  "mentor_ready": false,
+  "all_ok": false,
+  "current_artifact_recheck": true,
+  "failed_gates": [
+    "V300 final/audit/report consistency failed in uploaded pack",
+    "3D main board lacks convincing full-scene environment",
+    "local close-ups are not sufficient 3D detail proof",
+    "V190 matrix is copied-prediction rescoring, not a new 3D morphology student run",
+    "projection metrics cannot replace mentor 3D morphology gate",
+    "Fresh V850 procedural repair candidate still failed mentor 3D visual gate"
+  ],
+  "v850_auto_evolution_attempted": true,
+  "error_count": 6
+}

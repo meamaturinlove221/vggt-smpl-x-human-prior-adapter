@@ -1,36 +1,44 @@
 {
-  "created_at": "2026-05-27T17:53:45+00:00",
+  "created_at": "2026-05-27T19:34:40+00:00",
   "config_neutral_scoring_pass": true,
   "no_detail_bonus_control_penalty_pass": true,
-  "best_control_by_case": {
+  "controls_separated_all_cases": true,
+  "case_decisions": {
     "current_v895_0021_03": {
-      "true_score": 0.8108778814809662,
-      "best_control": "real_vggt_baseline_only",
-      "best_control_score": 0.6677494656273409,
-      "margin": 0.14312841585362523,
-      "controls_separated": true
+      "true_score": 0.8340405609767557,
+      "baseline_score": 0.7123791255506438,
+      "best_control": "same_topology_no_semantic",
+      "best_control_score": 0.7087503058679782,
+      "margin": 0.12529025510877756,
+      "true_gt_baseline": true,
+      "true_gt_best_control": true
     },
     "0021_03_frame001": {
-      "true_score": 0.8105602568322443,
-      "best_control": "real_vggt_baseline_only",
-      "best_control_score": 0.6692345219999104,
-      "margin": 0.1413257348323339,
-      "controls_separated": true
+      "true_score": 0.8337671992157898,
+      "baseline_score": 0.7134875277965229,
+      "best_control": "same_topology_no_semantic",
+      "best_control_score": 0.7076742636990627,
+      "margin": 0.12609293551672707,
+      "true_gt_baseline": true,
+      "true_gt_best_control": true
     },
     "0012_11_frame001": {
-      "true_score": 0.8136324252958264,
+      "true_score": 0.8356860606296184,
+      "baseline_score": 0.7174565697811565,
       "best_control": "same_topology_no_semantic",
-      "best_control_score": 0.6902634607285703,
-      "margin": 0.1233689645672561,
-      "controls_separated": true
+      "best_control_score": 0.7316729045072398,
+      "margin": 0.1040131561223786,
+      "true_gt_baseline": true,
+      "true_gt_best_control": true
     },
     "0013_01_frame001": {
-      "true_score": 0.800527594493516,
-      "best_control": "no_smpl_feature",
-      "best_control_score": 0.6935294009796809,
-      "margin": 0.1069981935138351,
-      "controls_separated": true
+      "true_score": 0.8232557995438538,
+      "baseline_score": 0.7207372536215306,
+      "best_control": "same_topology_no_semantic",
+      "best_control_score": 0.7333768151446581,
+      "margin": 0.08987898439919562,
+      "true_gt_baseline": true,
+      "true_gt_best_control": true
     }
-  },
-  "controls_separated_all_cases": true
+  }
 }

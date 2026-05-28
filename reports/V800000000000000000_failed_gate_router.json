@@ -1,0 +1,13 @@
+{
+  "created_at": "2026-05-27T19:45:01+00:00",
+  "failed_gates": [
+    "V300 final/audit/report consistency failed in uploaded pack",
+    "3D main board lacks convincing full-scene environment",
+    "local close-ups are not sufficient 3D detail proof",
+    "V190 matrix is copied-prediction rescoring, not a new 3D morphology student run",
+    "projection metrics cannot replace mentor 3D morphology gate"
+  ],
+  "route": "V850 auto-evolution",
+  "auto_evolved_goal": "D:\\vggt\\vggt-canonical-surfel-adapter\\docs\\goals\\V850000000000000000_auto_evolved_true_3d_route.md",
+  "no_agent_rule": true
+}

@@ -1,0 +1,65 @@
+{
+  "created_at": "2026-05-27T20:24:13+00:00",
+  "status": "V950000000000000000_TRUE_EXTERNAL_HARD_BLOCK_REQUIRES_USER_ACTION",
+  "mentor_ready": false,
+  "all_pass": false,
+  "decision": {
+    "created_at": "2026-05-27T20:24:13+00:00",
+    "fresh_v910_matrix": true,
+    "copied_prediction_rescore": false,
+    "projection_auxiliary_only": true,
+    "metric_true_gt_baseline_and_controls": true,
+    "case_decisions": {
+      "current_v895_0021_03": {
+        "true_score": 0.7949358333333334,
+        "baseline_score": 0.7794535,
+        "best_control": "posthoc_surfel_only",
+        "best_control_score": 0.7794535,
+        "true_gt_baseline": true,
+        "true_gt_best_control": true,
+        "margin_baseline": 0.015482333333333376,
+        "margin_best_control": 0.015482333333333376
+      },
+      "0021_03_frame001": {
+        "true_score": 0.7947288333333333,
+        "baseline_score": 0.7793373333333333,
+        "best_control": "posthoc_surfel_only",
+        "best_control_score": 0.7793373333333333,
+        "true_gt_baseline": true,
+        "true_gt_best_control": true,
+        "margin_baseline": 0.015391500000000002,
+        "margin_best_control": 0.015391500000000002
+      },
+      "0012_11_frame001": {
+        "true_score": 0.7949703333333333,
+        "baseline_score": 0.7808681666666666,
+        "best_control": "posthoc_surfel_only",
+        "best_control_score": 0.7808681666666666,
+        "true_gt_baseline": true,
+        "true_gt_best_control": true,
+        "margin_baseline": 0.014102166666666749,
+        "margin_best_control": 0.014102166666666749
+      },
+      "0013_01_frame001": {
+        "true_score": 0.792057,
+        "baseline_score": 0.7788395,
+        "best_control": "posthoc_surfel_only",
+        "best_control_score": 0.7788395,
+        "true_gt_baseline": true,
+        "true_gt_best_control": true,
+        "margin_baseline": 0.013217499999999993,
+        "margin_best_control": 0.013217499999999993
+      }
+    }
+  },
+  "main_board": "boards\\V920000000000000000_advisor_3d_main.png",
+  "viewer": "output\\V940000000000000000_viewer\\index.html",
+  "blockers": [
+    "manual mentor 3D visual pass not satisfied by automation alone"
+  ],
+  "no_agent_subagent": true,
+  "no_promotion": true,
+  "no_registry": true,
+  "no_v50_v50r2_change": true,
+  "active_candidate": "V11700_gap_reduction_branch_520"
+}

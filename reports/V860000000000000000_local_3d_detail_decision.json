@@ -1,0 +1,10 @@
+{
+  "created_at": "2026-05-27T20:01:41+00:00",
+  "local_3d_closeup_generated": true,
+  "facial_detail_overclaim": false,
+  "paths": {
+    "head_hair": "boards\\V860000000000000000_head_hair_3d_closeup.png",
+    "hand_arm": "boards\\V860000000000000000_hand_arm_3d_closeup.png",
+    "clothing": "boards\\V860000000000000000_clothing_3d_closeup.png"
+  }
+}

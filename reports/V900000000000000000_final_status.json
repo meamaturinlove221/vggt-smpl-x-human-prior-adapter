@@ -1,0 +1,33 @@
+{
+  "status": "V900000000000000000_TRUE_EXTERNAL_HARD_BLOCK_REQUIRES_USER_ACTION",
+  "mentor_ready": false,
+  "all_pass": false,
+  "failed_gates": [
+    "V300 final/audit/report consistency failed in uploaded pack",
+    "3D main board lacks convincing full-scene environment",
+    "local close-ups are not sufficient 3D detail proof",
+    "V190 matrix is copied-prediction rescoring, not a new 3D morphology student run",
+    "projection metrics cannot replace mentor 3D morphology gate",
+    "Fresh V850 procedural repair candidate still failed mentor 3D visual gate"
+  ],
+  "auto_evolved_goal": "D:\\vggt\\vggt-canonical-surfel-adapter\\docs\\goals\\V850000000000000000_auto_evolved_true_3d_route.md",
+  "requires_user_action": [
+    "Approve or run the V850 fresh true 3D morphology matrix with real environment source.",
+    "Provide/confirm real full-scene VGGT environment assets if current environment remains procedural.",
+    "Review the next 3D main board visually before any mentor-ready claim."
+  ],
+  "no_agent_subagent": true,
+  "no_promotion": true,
+  "no_registry": true,
+  "no_v50_v50r2_change": true,
+  "active_candidate": "V11700_gap_reduction_branch_520",
+  "v850_auto_evolution_attempted": true,
+  "v850_attempt_report": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V850000000000000000_auto_evolution_attempt.json",
+  "continued_iteration": "V880_canonical_surfel_residual_candidate",
+  "continued_iteration_report": "reports/V880000000000000000_iteration_report.md",
+  "latest_candidate_decision": "reports/V880000000000000000_candidate_decision.json",
+  "latest_candidate_metric_true_gt_baseline_and_controls": false,
+  "updated_at": "2026-05-27T20:17:12+00:00",
+  "next_core_goal": "docs\\goals\\V880000000000000000_auto_evolved_canonical_surfel_residual_route.md",
+  "next_core": "learned_local_residual_or_real_per_case_canonical_surfel_feature_extraction"
+}

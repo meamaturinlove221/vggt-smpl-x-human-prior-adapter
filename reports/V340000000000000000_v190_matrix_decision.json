@@ -1,0 +1,6 @@
+{
+  "created_at": "2026-05-27T19:45:01+00:00",
+  "v190_is_copied_prediction_rescore": true,
+  "valid_as_final_training_evidence": false,
+  "decision": "downgrade_to_rescoring_matrix"
+}

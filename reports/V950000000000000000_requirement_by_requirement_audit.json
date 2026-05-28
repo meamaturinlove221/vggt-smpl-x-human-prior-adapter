@@ -1,0 +1,9 @@
+{
+  "created_at": "2026-05-27T20:24:13+00:00",
+  "all_ok": false,
+  "terminal_state_allowed": true,
+  "status": "V950000000000000000_TRUE_EXTERNAL_HARD_BLOCK_REQUIRES_USER_ACTION",
+  "blockers": [
+    "manual mentor 3D visual pass not satisfied by automation alone"
+  ]
+}

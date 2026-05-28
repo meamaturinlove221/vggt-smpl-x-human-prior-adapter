@@ -1,0 +1,6 @@
+{
+  "created_at": "2026-05-27T19:51:45+00:00",
+  "environment_rebuild_pass": false,
+  "diagnostic_board": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V430000000000000000_environment_rebuild_board.png",
+  "reason": "Diagnostic V850 board includes environment context, but it still does not pass the final mentor scene-context gate."
+}

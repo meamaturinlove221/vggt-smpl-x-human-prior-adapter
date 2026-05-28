@@ -1,0 +1,56 @@
+{
+  "created_at": "2026-05-27T20:01:41+00:00",
+  "final_state_candidate": "V900000000000000000_TRUE_EXTERNAL_HARD_BLOCK_REQUIRES_USER_ACTION",
+  "decision": {
+    "created_at": "2026-05-27T20:01:41+00:00",
+    "fresh_v860_matrix": true,
+    "copied_prediction_rescore": false,
+    "all_true_gt_baseline": false,
+    "all_true_gt_controls": false,
+    "case_decisions": {
+      "current_v895_0021_03": {
+        "true_score": 0.7664666666666667,
+        "baseline_score": 0.7794535,
+        "best_control": "posthoc_surfel_only",
+        "best_control_score": 0.7794535,
+        "true_gt_baseline": false,
+        "true_gt_best_control": false,
+        "margin_best_control": -0.01298683333333328
+      },
+      "0021_03_frame001": {
+        "true_score": 0.7667623333333333,
+        "baseline_score": 0.7793373333333333,
+        "best_control": "posthoc_surfel_only",
+        "best_control_score": 0.7793373333333333,
+        "true_gt_baseline": false,
+        "true_gt_best_control": false,
+        "margin_best_control": -0.012575000000000003
+      },
+      "0012_11_frame001": {
+        "true_score": 0.7821640000000001,
+        "baseline_score": 0.7808681666666666,
+        "best_control": "posthoc_surfel_only",
+        "best_control_score": 0.7808681666666666,
+        "true_gt_baseline": true,
+        "true_gt_best_control": true,
+        "margin_best_control": 0.001295833333333496
+      },
+      "0013_01_frame001": {
+        "true_score": 0.7810548333333334,
+        "baseline_score": 0.7788395,
+        "best_control": "posthoc_surfel_only",
+        "best_control_score": 0.7788395,
+        "true_gt_baseline": true,
+        "true_gt_best_control": true,
+        "margin_best_control": 0.002215333333333347
+      }
+    },
+    "mentor_ready_candidate": false
+  },
+  "hard_failures": [
+    "true does not beat VGGT baseline for every case under neutral 3D score",
+    "true does not beat hard controls for every case under neutral 3D score"
+  ],
+  "main_board": "boards\\V860000000000000000_true_3d_morphology_main.png",
+  "viewer": "output\\V860000000000000000_viewer\\index.html"
+}

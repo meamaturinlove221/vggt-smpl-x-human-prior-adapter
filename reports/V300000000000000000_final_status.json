@@ -1,14 +1,18 @@
 {
-  "status": "V300000000000000000_PHOTOMETRIC_GEOMETRY_VISUAL_TRUTH_MENTOR_READY_NOT_PROMOTED",
-  "all_pass": true,
-  "failed_gates": [],
+  "status": "V300000000000000000_TRUE_3D_MORPHOLOGY_CHECKPOINT_DOWNGRADED_NOT_FINAL",
+  "all_pass": false,
+  "mentor_ready": false,
+  "failed_gates": [
+    "V300 final/audit/report consistency failed in uploaded pack",
+    "3D main board lacks convincing full-scene environment",
+    "local close-ups are not sufficient 3D detail proof",
+    "V190 matrix is copied-prediction rescoring, not a new 3D morphology student run",
+    "projection metrics cannot replace mentor 3D morphology gate"
+  ],
+  "superseded_by_goal": "D:\\vggt\\vggt-canonical-surfel-adapter\\docs\\goals\\V300100000000000000_V900000000000000000_true_3d_morphology_detail_goal.md",
   "no_agent_subagent": true,
   "no_promotion": true,
   "no_registry": true,
   "no_v50_v50r2_change": true,
-  "active_candidate": "V11700_gap_reduction_branch_520",
-  "main_board": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V140000000000000000_3d_human_scene_board.png",
-  "projection_board": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V140000000000000000_projection_overlay_board.png",
-  "viewer": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V230000000000000000_viewer\\index.html",
-  "advisor_report": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V280000000000000000_photometric_geometry_advisor_report.md"
+  "active_candidate": "V11700_gap_reduction_branch_520"
 }

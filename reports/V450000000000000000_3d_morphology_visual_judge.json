@@ -1,0 +1,9 @@
+{
+  "created_at": "2026-05-27T19:45:01+00:00",
+  "pass": false,
+  "human_natural": true,
+  "environment_visible": false,
+  "controls_separated": "partial",
+  "projection_used_as_auxiliary_only": true,
+  "decision": "fail_closed"
+}

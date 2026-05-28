@@ -1,0 +1,6 @@
+{
+  "created_at": "2026-05-27T19:45:01+00:00",
+  "local_3d_closeup_pass": false,
+  "no_facial_detail_overclaim_pass": true,
+  "decision": "fail_closed_rebuild_required"
+}

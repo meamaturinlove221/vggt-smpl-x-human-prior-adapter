@@ -1,0 +1,5 @@
+case,status,reason
+current_v895_0021_03,not_run,current artifacts only contain V190 copied-prediction rescoring; fresh V410 matrix required
+0021_03_frame001,not_run,current artifacts only contain V190 copied-prediction rescoring; fresh V410 matrix required
+0012_11_frame001,not_run,current artifacts only contain V190 copied-prediction rescoring; fresh V410 matrix required
+0013_01_frame001,not_run,current artifacts only contain V190 copied-prediction rescoring; fresh V410 matrix required

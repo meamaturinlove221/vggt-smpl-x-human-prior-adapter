@@ -1,20 +1,14 @@
 {
-  "created_at": "2026-05-27T17:53:59+00:00",
-  "checks": {
-    "goal_manifest_saved": true,
-    "v120_downgraded": true,
-    "artifact_audit_pass": true,
-    "config_neutral_scoring_pass": true,
-    "no_detail_bonus_control_penalty_pass": true,
-    "refined_detail_source_pass": true,
-    "projection_assets_pass": true,
-    "hard_controls_pass": true,
-    "viewer_usable_pass": true,
-    "yuque_report_complete_pass": true,
-    "bundles_clean_pass": true,
-    "cleanup_honest_pass": true,
-    "no_agent_subagent": true
-  },
-  "all_ok": true,
-  "error_count": 0
+  "created_at": "2026-05-27T19:44:59+00:00",
+  "all_ok": false,
+  "error_count": 5,
+  "mentor_ready": false,
+  "failed_requirements": [
+    "V300 final/audit/report consistency failed in uploaded pack",
+    "3D main board lacks convincing full-scene environment",
+    "local close-ups are not sufficient 3D detail proof",
+    "V190 matrix is copied-prediction rescoring, not a new 3D morphology student run",
+    "projection metrics cannot replace mentor 3D morphology gate"
+  ],
+  "allowed_as_checkpoint": true
 }
