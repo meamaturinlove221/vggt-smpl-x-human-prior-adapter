@@ -1,0 +1,12 @@
+{
+  "created_at": "2026-05-28T23:01:20+00:00",
+  "status": "V19500_SURFACE_LOCKED_COMPLETION_ROUTE_REQUIRED",
+  "mentor_ready": false,
+  "external_hard_block": false,
+  "v194_status": "V19400_VISIBLE_SURFACE_INFILL_FAIL_CLOSED_CONTINUE",
+  "v194_failure_count": 27,
+  "v194_board": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V19400000000000000000_visible_surface_infill_board.png",
+  "v194_turntable": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V19400000000000000000_visible_surface_infill_turntable_cross_section.png",
+  "route_decision": "V194 preserved the visible body but added noisy infill. Continue with surface-locked sparse topology completion: small, connected, part-local infill bands tied to baseline surface and SMPL adjacency, not large free clouds.",
+  "summary": "Visible-surface preservation improves mentor readability but the infill is noisy and metrics/controls fail. The next repair must constrain infill count, distance, and part continuity instead of adding broad shell clouds."
+}
