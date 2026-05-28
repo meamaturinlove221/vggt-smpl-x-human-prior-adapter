@@ -1,0 +1,51 @@
+{
+  "created_at": "2026-05-28T20:07:17+00:00",
+  "status": "V14400_ENVIRONMENT_GATE_PASS_AS_AUXILIARY",
+  "mentor_ready": false,
+  "external_hard_block": false,
+  "environment_auxiliary_pass": true,
+  "note": "Environment visibility can pass only as auxiliary; it cannot rescue V140 billboard/control failure.",
+  "board": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V14400000000000000000_environment_realism_gate.png",
+  "rows": [
+    {
+      "case": "0012_11_frame001",
+      "config": "real_vggt_baseline_only",
+      "human_points": 60000,
+      "environment_points": 24000,
+      "full_scene_points": 84000,
+      "human_ratio": 0.7142857142857143,
+      "environment_depth_spread_proxy": 0.3656427892678311,
+      "environment_rgb_unique_sample": 330
+    },
+    {
+      "case": "0012_11_frame001",
+      "config": "anti_billboard_topology_volume_true",
+      "human_points": 60000,
+      "environment_points": 24000,
+      "full_scene_points": 84000,
+      "human_ratio": 0.7142857142857143,
+      "environment_depth_spread_proxy": 0.3656427892678311,
+      "environment_rgb_unique_sample": 330
+    },
+    {
+      "case": "0012_11_frame001",
+      "config": "same_topology_no_semantic",
+      "human_points": 60000,
+      "environment_points": 24000,
+      "full_scene_points": 84000,
+      "human_ratio": 0.7142857142857143,
+      "environment_depth_spread_proxy": 0.3656427892678311,
+      "environment_rgb_unique_sample": 330
+    },
+    {
+      "case": "0012_11_frame001",
+      "config": "shuffled_smpl_feature",
+      "human_points": 60000,
+      "environment_points": 24000,
+      "full_scene_points": 84000,
+      "human_ratio": 0.7142857142857143,
+      "environment_depth_spread_proxy": 0.3656427892678311,
+      "environment_rgb_unique_sample": 330
+    }
+  ]
+}

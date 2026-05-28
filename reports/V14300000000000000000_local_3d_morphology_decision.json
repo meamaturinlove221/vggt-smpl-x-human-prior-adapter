@@ -1,0 +1,24 @@
+{
+  "created_at": "2026-05-28T20:07:16+00:00",
+  "status": "V14300_LOCAL_3D_MORPHOLOGY_FAIL_CLOSED_CONTINUE",
+  "mentor_ready": false,
+  "external_hard_block": false,
+  "case": "0012_11_frame001",
+  "best_control_used": "same_topology_no_semantic",
+  "face_detail_claim_allowed": false,
+  "allowed_face_claim": "head/face contour and hair region only",
+  "fine_detail_claim_allowed": false,
+  "failures": [
+    "Global V140 anti-billboard causality failed; local crops cannot override the mentor main-board failure.",
+    "Crops remain diagnostic morphology views, not fine facial/hand detail proof.",
+    "Face invisible gate remains active; facial detail claim is forbidden."
+  ],
+  "boards": {
+    "head_hair_contour": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V14300000000000000000_head_hair_contour_3d_closeup.png",
+    "shoulder_neck": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V14300000000000000000_shoulder_neck_3d_closeup.png",
+    "hand_arm_endpoint": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V14300000000000000000_hand_arm_endpoint_3d_closeup.png",
+    "clothing_boundary": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V14300000000000000000_clothing_boundary_3d_closeup.png",
+    "leg_foot": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V14300000000000000000_leg_foot_3d_closeup.png"
+  },
+  "metrics_csv": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V14300000000000000000_local_3d_morphology_metrics.csv"
+}

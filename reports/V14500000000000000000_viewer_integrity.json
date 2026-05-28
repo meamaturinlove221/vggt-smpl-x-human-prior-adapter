@@ -1,0 +1,68 @@
+{
+  "created_at": "2026-05-28T20:07:17+00:00",
+  "status": "V14500_VIEWER_USABLE_AS_DIAGNOSTIC_AUXILIARY",
+  "mentor_ready": false,
+  "html": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V14500000000000000000_viewer\\index.html",
+  "html_bytes": 5418,
+  "ply_alias_count": 7,
+  "ply_aliases": [
+    {
+      "alias": "true",
+      "config": "anti_billboard_topology_volume_true",
+      "source": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V13700000000000000000_anti_billboard_training_matrix\\0012_11_frame001\\anti_billboard_topology_volume_true\\full_scene_rgb_pointcloud.ply",
+      "path": "ply/true.ply",
+      "exists": true,
+      "bytes": 3134166
+    },
+    {
+      "alias": "baseline",
+      "config": "real_vggt_baseline_only",
+      "source": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V10700000000000000000_volume_aware_training_matrix\\0012_11_frame001\\real_vggt_baseline_only\\full_scene_rgb_pointcloud.ply",
+      "path": "ply/baseline.ply",
+      "exists": true,
+      "bytes": 3134003
+    },
+    {
+      "alias": "same_topology",
+      "config": "same_topology_no_semantic",
+      "source": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V10700000000000000000_volume_aware_training_matrix\\0012_11_frame001\\same_topology_no_semantic\\full_scene_rgb_pointcloud.ply",
+      "path": "ply/same_topology.ply",
+      "exists": true,
+      "bytes": 3133688
+    },
+    {
+      "alias": "shuffled",
+      "config": "shuffled_smpl_feature",
+      "source": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V10700000000000000000_volume_aware_training_matrix\\0012_11_frame001\\shuffled_smpl_feature\\full_scene_rgb_pointcloud.ply",
+      "path": "ply/shuffled.ply",
+      "exists": true,
+      "bytes": 3132679
+    },
+    {
+      "alias": "thickness_only",
+      "config": "thickness_only_control",
+      "source": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V10700000000000000000_volume_aware_training_matrix\\0012_11_frame001\\thickness_only_control\\full_scene_rgb_pointcloud.ply",
+      "path": "ply/thickness_only.ply",
+      "exists": true,
+      "bytes": 3134367
+    },
+    {
+      "alias": "posthoc",
+      "config": "posthoc_surfel_only",
+      "source": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V10700000000000000000_volume_aware_training_matrix\\0012_11_frame001\\posthoc_surfel_only\\full_scene_rgb_pointcloud.ply",
+      "path": "ply/posthoc.ply",
+      "exists": true,
+      "bytes": 3134843
+    },
+    {
+      "alias": "tiny",
+      "config": "tiny_synthetic_token_control",
+      "source": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V10700000000000000000_volume_aware_training_matrix\\0012_11_frame001\\tiny_synthetic_token_control\\full_scene_rgb_pointcloud.ply",
+      "path": "ply/tiny.ply",
+      "exists": true,
+      "bytes": 3120624
+    }
+  ],
+  "non_placeholder": true,
+  "readme": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V14500000000000000000_viewer\\README.md"
+}

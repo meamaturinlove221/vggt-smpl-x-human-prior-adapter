@@ -1,0 +1,185 @@
+{
+  "created_at": "2026-05-28T20:07:17+00:00",
+  "status": "V16000_FINAL_MENTOR_GATE_FAIL_CLOSED_TO_V17000",
+  "mentor_ready": false,
+  "external_hard_block": false,
+  "failed_gate_count": 8,
+  "passed_gate_count": 18,
+  "checks": [
+    {
+      "gate": "V13050 downgraded",
+      "pass": true,
+      "evidence": "checkpoint freeze reports exist"
+    },
+    {
+      "gate": "current artifact audit pass",
+      "pass": true,
+      "evidence": "V131 audit exists"
+    },
+    {
+      "gate": "AGENTS/skill gate updated",
+      "pass": true,
+      "evidence": "V132 policy report exists"
+    },
+    {
+      "gate": "anti-billboard metric v2 implemented",
+      "pass": true,
+      "evidence": "metric script exists"
+    },
+    {
+      "gate": "weak billboard region detection pass",
+      "pass": true,
+      "evidence": "V134 manifest exists"
+    },
+    {
+      "gate": "anti-billboard topology-volume model implemented",
+      "pass": true,
+      "evidence": "V135 model exists"
+    },
+    {
+      "gate": "Modal training matrix complete",
+      "pass": true,
+      "evidence": "V137 runtime exists"
+    },
+    {
+      "gate": "model-owned output pass",
+      "pass": true,
+      "evidence": "V137 manifest marks model-owned student outputs"
+    },
+    {
+      "gate": "no raw Kinect/teacher at inference",
+      "pass": true,
+      "evidence": "V135/V137 reject teacher/Kinect inference keys"
+    },
+    {
+      "gate": "human-main full-scene RGB screenshot exists",
+      "pass": true,
+      "evidence": "V138 advisor board exists"
+    },
+    {
+      "gate": "same-scene controls screenshot exists",
+      "pass": true,
+      "evidence": "V138 controls board exists"
+    },
+    {
+      "gate": "turntable/side-depth/cross-section screenshot exists",
+      "pass": true,
+      "evidence": "V138 turntable board exists"
+    },
+    {
+      "gate": "local morphology screenshots exist",
+      "pass": true,
+      "evidence": "V143 boards exist"
+    },
+    {
+      "gate": "true anti-billboard > baseline",
+      "pass": false,
+      "evidence": "V140 still records true billboard failures and baseline/control closeness"
+    },
+    {
+      "gate": "true anti-billboard > same-topology",
+      "pass": false,
+      "evidence": "same-topology remains close or stronger"
+    },
+    {
+      "gate": "true anti-billboard > shuffled",
+      "pass": false,
+      "evidence": "shuffled remains close or stronger"
+    },
+    {
+      "gate": "true anti-billboard > thickness-only",
+      "pass": false,
+      "evidence": "thickness-only remains close or stronger"
+    },
+    {
+      "gate": "true visually better than baseline",
+      "pass": false,
+      "evidence": "V138/V140 visual gate failed closed"
+    },
+    {
+      "gate": "true visually better than hard controls",
+      "pass": false,
+      "evidence": "V140 causality gate failed closed"
+    },
+    {
+      "gate": "environment real and visible",
+      "pass": true,
+      "evidence": "environment passes only as auxiliary"
+    },
+    {
+      "gate": "no facial detail overclaim",
+      "pass": true,
+      "evidence": "face invisible guard remains active"
+    },
+    {
+      "gate": "projection auxiliary only",
+      "pass": true,
+      "evidence": "no projection-only pass claimed"
+    },
+    {
+      "gate": "viewer usable",
+      "pass": true,
+      "evidence": "V145 diagnostic viewer exists"
+    },
+    {
+      "gate": "Yuque report complete",
+      "pass": false,
+      "evidence": "final advisor report is intentionally withheld until V160 passes"
+    },
+    {
+      "gate": "bundles clean",
+      "pass": false,
+      "evidence": "V190 runs after V160 decision and is diagnostic-only while final gate fails"
+    },
+    {
+      "gate": "no promotion/registry/V50 changes",
+      "pass": true,
+      "evidence": "no promotion or registry action performed"
+    }
+  ],
+  "failures": [
+    {
+      "gate": "true anti-billboard > baseline",
+      "pass": false,
+      "evidence": "V140 still records true billboard failures and baseline/control closeness"
+    },
+    {
+      "gate": "true anti-billboard > same-topology",
+      "pass": false,
+      "evidence": "same-topology remains close or stronger"
+    },
+    {
+      "gate": "true anti-billboard > shuffled",
+      "pass": false,
+      "evidence": "shuffled remains close or stronger"
+    },
+    {
+      "gate": "true anti-billboard > thickness-only",
+      "pass": false,
+      "evidence": "thickness-only remains close or stronger"
+    },
+    {
+      "gate": "true visually better than baseline",
+      "pass": false,
+      "evidence": "V138/V140 visual gate failed closed"
+    },
+    {
+      "gate": "true visually better than hard controls",
+      "pass": false,
+      "evidence": "V140 causality gate failed closed"
+    },
+    {
+      "gate": "Yuque report complete",
+      "pass": false,
+      "evidence": "final advisor report is intentionally withheld until V160 passes"
+    },
+    {
+      "gate": "bundles clean",
+      "pass": false,
+      "evidence": "V190 runs after V160 decision and is diagnostic-only while final gate fails"
+    }
+  ],
+  "v140_status": "V14000_CAUSALITY_GATE_FAIL_CLOSED_CONTINUE",
+  "v150_status": "V15000_MULTICASE_MENTOR_GATE_FAIL_CLOSED_CONTINUE",
+  "router": "V17000 auto-evolution must continue; visual failure is not external hard block."
+}

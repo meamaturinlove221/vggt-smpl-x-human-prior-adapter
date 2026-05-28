@@ -1,0 +1,36 @@
+{
+  "created_at": "2026-05-28T20:07:18+00:00",
+  "status": "V19000_DIAGNOSTIC_UPLOAD_SAFE_BUNDLES_CREATED_NOT_FINAL",
+  "mentor_ready": false,
+  "bundle_root": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V19000000000000000000_upload_safe_bundles",
+  "bundles": [
+    {
+      "path": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V19000000000000000000_upload_safe_bundles\\reports.zip",
+      "bytes": 8683,
+      "sha256": "6267fe5fb242b4f39d2ef8b3ff841eece6c726ead4fb5b9cff0939925a67b23e",
+      "entry_count": 12,
+      "zip_clean": true
+    },
+    {
+      "path": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V19000000000000000000_upload_safe_bundles\\visuals.zip",
+      "bytes": 1501656,
+      "sha256": "606c0b70bdc56ffdec25822ba39c4c0e1925903ec27a8b9cb06178f987401a70",
+      "entry_count": 10,
+      "zip_clean": true
+    },
+    {
+      "path": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V19000000000000000000_upload_safe_bundles\\core.zip",
+      "bytes": 21900,
+      "sha256": "eb0148ad91ea1c92e84a534bfb2a0cf73994012798bfcdd374487ab00f057897",
+      "entry_count": 4,
+      "zip_clean": true
+    },
+    {
+      "path": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V19000000000000000000_upload_safe_bundles\\viewer.zip",
+      "bytes": 3880688,
+      "sha256": "cc4d76095220f3d97f7d7e1955d37590a3493d66cf2bb80a5b75d234c7e41161",
+      "entry_count": 9,
+      "zip_clean": true
+    }
+  ]
+}
