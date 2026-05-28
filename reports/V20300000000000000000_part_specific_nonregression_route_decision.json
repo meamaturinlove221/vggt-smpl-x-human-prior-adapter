@@ -1,0 +1,11 @@
+{
+  "created_at": "2026-05-28T23:46:24+00:00",
+  "status": "V20300_PART_SPECIFIC_NONREGRESSION_ROUTE_READY_CONTINUE",
+  "mentor_ready": false,
+  "external_hard_block": false,
+  "v202_result": "Modal A10 run improved over V200 but still failed full-scene mentor visual and hard controls.",
+  "root_cause": "Global connected infill still contaminates clothing and leg/foot visible boundaries.",
+  "next_required_route": "part-specific visible non-regression and local weak-region infill with clothing/leg/foot hard locks",
+  "face_detail_claim_allowed": false,
+  "allowed_face_claim": "head/face contour and hair region only"
+}
