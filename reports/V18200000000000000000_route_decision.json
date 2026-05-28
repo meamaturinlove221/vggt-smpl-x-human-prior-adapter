@@ -1,0 +1,42 @@
+{
+  "created_at": "2026-05-28T20:58:35+00:00",
+  "status": "V18200_ADJACENCY_TRAINING_FAIL_CLOSED_ROUTE_TO_PART_PAIR_EXCLUSION_DECODER",
+  "mentor_ready": false,
+  "external_hard_block": false,
+  "v180_status": "V18000_ADJACENCY_AWARE_COLLISION_METRIC_FAIL_CLOSED_CONTINUE",
+  "v181_status": "V18100_ADJACENCY_TOPOLOGY_TRAINING_FAIL_CLOSED_CONTINUE",
+  "failure_reasons": [
+    "V181 remains billboard_fail_v2=true / combined_fail_v4=true.",
+    "V181 does not consistently beat V173; 0012 and current_v895 regress versus V173.",
+    "Invalid distant overlap remains high across all four cases.",
+    "The V181 board shows torn multi-layer sheets rather than a stable human-main 3D point cloud.",
+    "Direct pair loss on final shell points is insufficient; the representation itself must decode part-pair exclusion and semantic graph occupancy."
+  ],
+  "allowed_face_claim": "head/face contour and hair region only",
+  "forbidden_claims": [
+    "facial detail improved",
+    "mentor-ready",
+    "external hard block",
+    "route exhausted",
+    "metric pass",
+    "viewer/render fix success"
+  ],
+  "next_route": {
+    "name": "V18250 part-pair exclusion decoder / semantic graph occupancy",
+    "must_not_do": [
+      "increase thickness-only loss",
+      "global part shift",
+      "procedural occupancy repair",
+      "viewer-only repair",
+      "projection-only pass"
+    ],
+    "must_do": [
+      "keep V173 as current best source candidate",
+      "add per-part occupancy fields before point decoding",
+      "add invalid-pair exclusion logits for head-foot, torso-foot, arm-leg, and left-right endpoints",
+      "retain valid adjacent contact for head-torso, torso-arm, torso-leg, and leg-foot",
+      "decode each part in a semantic graph frame instead of copying one global shell",
+      "evaluate with full-scene mentor boards and V180 metric v4"
+    ]
+  }
+}
