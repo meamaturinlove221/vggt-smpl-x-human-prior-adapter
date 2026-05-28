@@ -1,4 +1,4 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 
 import json
 import os
@@ -10,10 +10,10 @@ import modal
 
 
 REPO = Path(r"D:\vggt\vggt-canonical-surfel-adapter")
-APP_NAME = os.environ.get("VGGT_MODAL_V18700_APP_NAME", "vggt-v18700-visible-anchor-canonical-surfel-training")
-VOLUME_NAME = os.environ.get("VGGT_MODAL_V18700_VOLUME", "vggt-v18700-visible-anchor-canonical-surfel-output")
+APP_NAME = os.environ.get("VGGT_MODAL_V19000_APP_NAME", "vggt-v19000-pose-frame-occupancy-repair")
+VOLUME_NAME = os.environ.get("VGGT_MODAL_V19000_VOLUME", "vggt-v19000-pose-frame-occupancy-output")
 REMOTE_REPO = PurePosixPath("/workspace/repo")
-REMOTE_OUT = PurePosixPath("/v18700_out")
+REMOTE_OUT = PurePosixPath("/v19000_out")
 
 
 image = (
@@ -28,6 +28,7 @@ image = (
     .add_local_dir(str(REPO / "output" / "V161000000000000_repaired_detail_regions"), remote_path=str(REMOTE_REPO / "output" / "V161000000000000_repaired_detail_regions"))
     .add_local_dir(str(REPO / "output" / "V1400000000000000000_learned_residual_matrix"), remote_path=str(REMOTE_REPO / "output" / "V1400000000000000000_learned_residual_matrix"))
     .add_local_dir(str(REPO / "output" / "V18600000000000000000_part_coverage_canonical_surfel_training"), remote_path=str(REMOTE_REPO / "output" / "V18600000000000000000_part_coverage_canonical_surfel_training"))
+    .add_local_dir(str(REPO / "output" / "V18700000000000000000_visible_anchor_canonical_surfel_training"), remote_path=str(REMOTE_REPO / "output" / "V18700000000000000000_visible_anchor_canonical_surfel_training"))
 )
 
 app = modal.App(APP_NAME)
@@ -40,13 +41,13 @@ def now() -> str:
 
 @app.function(
     image=image,
-    gpu=os.environ.get("VGGT_MODAL_V18700_GPU", "A10G"),
+    gpu=os.environ.get("VGGT_MODAL_V19000_GPU", "A10G"),
     cpu=4.0,
     memory=24 * 1024,
     timeout=8 * 60 * 60,
     volumes={str(REMOTE_OUT): volume},
 )
-def run_v18700(steps: int = 300, max_points: int = 8192) -> dict[str, Any]:
+def run_v19000(steps: int = 300, max_points: int = 8192) -> dict[str, Any]:
     import os
     import shutil
     import subprocess
@@ -57,12 +58,12 @@ def run_v18700(steps: int = 300, max_points: int = 8192) -> dict[str, Any]:
     os.chdir(repo)
     env = dict(os.environ)
     env["VGGT_REPO_ROOT"] = str(repo)
-    env["V18700_STEPS"] = str(steps)
-    env["V18700_MAX_POINTS"] = str(max_points)
+    env["V19000_STEPS"] = str(steps)
+    env["V19000_MAX_POINTS"] = str(max_points)
     env["PYTHONUTF8"] = "1"
     env["PYTHONIOENCODING"] = "utf-8"
     proc = subprocess.run(
-        [sys.executable, "tools/V18700_visible_anchor_canonical_surfel_training.py"],
+        [sys.executable, "tools/V19000_pose_frame_occupancy_repair.py"],
         cwd=repo,
         env=env,
         text=True,
@@ -73,12 +74,12 @@ def run_v18700(steps: int = 300, max_points: int = 8192) -> dict[str, Any]:
     out_root.mkdir(parents=True, exist_ok=True)
     copied: list[str] = []
     for rel in [
-        "reports/V18700000000000000000_training_manifest.csv",
-        "reports/V18700000000000000000_visible_anchor_scores.csv",
-        "reports/V18700000000000000000_training_decision.json",
-        "reports/V18700000000000000000_runtime_environment.json",
-        "boards/V18700000000000000000_visible_anchor_board.png",
-        "boards/V18700000000000000000_visible_anchor_turntable_cross_section.png",
+        "reports/V19000000000000000000_pose_frame_training_manifest.csv",
+        "reports/V19000000000000000000_pose_frame_scores.csv",
+        "reports/V19000000000000000000_pose_frame_decision.json",
+        "reports/V19000000000000000000_runtime_environment.json",
+        "boards/V19000000000000000000_pose_frame_board.png",
+        "boards/V19000000000000000000_pose_frame_turntable_cross_section.png",
     ]:
         src = repo / rel
         if src.exists():
@@ -86,13 +87,13 @@ def run_v18700(steps: int = 300, max_points: int = 8192) -> dict[str, Any]:
             dst.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(src, dst)
             copied.append(rel)
-    matrix_src = repo / "output" / "V18700000000000000000_visible_anchor_canonical_surfel_training"
-    matrix_dst = out_root / "output" / "V18700000000000000000_visible_anchor_canonical_surfel_training"
+    matrix_src = repo / "output" / "V19000000000000000000_pose_frame_occupancy_repair"
+    matrix_dst = out_root / "output" / "V19000000000000000000_pose_frame_occupancy_repair"
     if matrix_src.exists():
         if matrix_dst.exists():
             shutil.rmtree(matrix_dst)
         shutil.copytree(matrix_src, matrix_dst)
-        copied.append("output/V18700000000000000000_visible_anchor_canonical_surfel_training")
+        copied.append("output/V19000000000000000000_pose_frame_occupancy_repair")
     volume.commit()
     return {
         "created_at": now(),
@@ -108,7 +109,5 @@ def run_v18700(steps: int = 300, max_points: int = 8192) -> dict[str, Any]:
 
 @app.local_entrypoint()
 def main(steps: int = 300, max_points: int = 8192) -> None:
-    result = run_v18700.remote(steps=steps, max_points=max_points)
+    result = run_v19000.remote(steps=steps, max_points=max_points)
     print(json.dumps(result, ensure_ascii=False, indent=2))
-
-
