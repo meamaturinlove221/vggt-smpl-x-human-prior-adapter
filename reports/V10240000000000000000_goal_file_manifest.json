@@ -1,7 +1,7 @@
 {
   "goal_file_path": "D:\\vggt\\vggt-canonical-surfel-adapter\\docs\\goals\\V10240000000000000000_V30000000000000000000_volume_aware_3d_morphology_goal.md",
-  "sha256": "27b513f1dee24067e8d4f36cf430e2e29d44fd441b057193ea3539975ad10cc3",
-  "line_count": 876,
+  "sha256": "8af4f0bcd677f4e028ad8c8b0efedfc6a6432bc247e96d1d33f75bc5fd1c1759",
+  "line_count": 924,
   "created_at": "2026-05-28T18:20:44+00:00",
   "repo": "D:\\vggt\\vggt-canonical-surfel-adapter",
   "source_feature_adapter_repo": "D:\\vggt\\vggt-feature-adapter",
@@ -9,9 +9,10 @@
   "evidence_root": "D:\\vggt\\vggt-main\\local_report_auxiliary\\V600_quality_rebuild",
   "previous_status": "V10230_CURRENT_ROUTE_STATE = checkpoint / internal visual hard block",
   "final_allowed_states": [
-    "V30000000000000000000_VOLUME_AWARE_3D_MORPHOLOGY_MENTOR_READY_NOT_PROMOTED",
+    "V30000000000000000000_ANTI_BILLBOARD_TOPOLOGY_VOLUME_MENTOR_READY_NOT_PROMOTED",
     "V30000000000000000000_TRUE_EXTERNAL_HARD_BLOCK_REQUIRES_USER_ACTION"
   ],
   "no_agent_rule": "No agent/subagent launch in this run.",
-  "summary": "Downgrade V10230 and execute a no-agent volume-aware 3D morphology route: render repair only as auxiliary, build volume-aware/multi-layer representation, enforce true 3D full-scene mentor visual gates, forbid facial-detail overclaim, and continue fail-closed until allowed final states."
+  "summary": "Downgrade V10230 and execute a no-agent anti-billboard topology-volume morphology route: render/thickness remain auxiliary, side-depth/cross-section/turntable billboard failure is a hard gate, preserve VGGT and SMPL-X binding, and continue fail-closed until allowed final states.",
+  "updated_at": "2026-05-28T19:01:20+00:00"
 }

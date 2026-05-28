@@ -22,17 +22,18 @@ This route has made concrete progress but has not reached the final allowed stat
 - V13010 improves 3/4 cases against thickness controls, but `0013_01_frame001` still fails against `thickness_only_control`.
 - V13020 improves topology coherence but still fails `0013_01_frame001` against `thickness_only_control`.
 - Visual boards show better depth cues, but the human still has local shell tearing / sparse edge artifacts and cannot be called mentor-ready.
+- User visual review correctly identified that the current boards still read as a 2D billboard / textured sprite. V13040 formalized this as a hard gate: turntable, side-depth, and cross-section views must show topology-connected 3D body volume, not only a thicker sheet.
 - Face detail remains not applicable; only `head/face contour and hair region` may be claimed.
 
 ## Next Route
 
-Continue to a stronger V13040/V10700 Modal or local longer training route:
+Continue to a stronger anti-billboard topology-volume route:
 
-- train the volume-aware model longer instead of procedural shell pushing;
-- add topology continuity and anti-tear regularization;
-- make `thickness_only_control` a first-class adversarial control during training;
+- train or rebuild the representation around front/back/side shell occupancy rather than procedural shell pushing;
+- add topology continuity, cross-section occupancy, limb/torso continuity, and anti-billboard losses;
+- make `thickness_only_control`, `same_topology_no_semantic`, and shuffled/random controls first-class adversarial controls during training;
 - preserve real VGGT environment and high-confidence baseline zones;
 - generate full-scene human-main boards, controls, turntable/side-depth, and local 3D morphology close-ups;
-- fail closed unless true visibly beats baseline, shuffled, same-topology, tiny, and thickness-only controls.
+- fail closed unless true visibly beats baseline, shuffled, same-topology, tiny, and thickness-only controls in oblique, side-depth, cross-section, and same-scene boards.
 
 This is not an external hard block. It is an internal model/representation/training problem.
