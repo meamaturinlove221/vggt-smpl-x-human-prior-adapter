@@ -1,0 +1,39 @@
+{
+  "created_at": "2026-05-28T17:42:41+00:00",
+  "status": "V10190_THICKNESS_AWARE_GEOMETRY_GAIN_INTERNAL_ONLY",
+  "prediction": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V10190000000000000000_thickness_aware_geometry_candidate\\0012_11_frame001\\thickness_aware_geometry_candidate\\predictions.npz",
+  "board": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V10190000000000000000_0012_11_frame001_thickness_aware_geometry_board.png",
+  "audit_csv": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V10190000000000000000_thickness_aware_geometry_audit.csv",
+  "candidate_meta": {
+    "candidate_type": "thickness_aware_geometry_candidate",
+    "visible_region_points": 7472,
+    "applied_points": 7472,
+    "applied_ratio": 0.12453333333333333,
+    "pca_normal": [
+      0.03597591444849968,
+      0.10845348238945007,
+      0.9934503436088562
+    ],
+    "side_push_min": 0.0065,
+    "side_push_max": 0.0185,
+    "raw_delta_blend": 0.34,
+    "cap": 0.018,
+    "render_only_repair": false,
+    "face_detail_claim_allowed": false
+  },
+  "baseline_human_pca_thickness_ratio": 0.35827475786209106,
+  "candidate_human_pca_thickness_ratio": 0.389149010181427,
+  "thickness_gain": 0.030874252319335938,
+  "baseline_human_z_range": 0.20359379053115845,
+  "candidate_human_z_range": 0.21788209676742554,
+  "z_range_gain": 0.01428830623626709,
+  "geometry_3d_gain": true,
+  "mentor_ready": false,
+  "mentor_visual_pass": false,
+  "external_hard_block": false,
+  "facial_detail_target_applicable": false,
+  "face_detail_claim_allowed": false,
+  "allowed_face_claim": "head/face contour and hair region only",
+  "next_goal": "D:\\vggt\\vggt-canonical-surfel-adapter\\docs\\goals\\V10200000000000000000_auto_evolved_thickness_geometry_visual_gate_route.md",
+  "next_action": "Run V10200 visual gate if geometry gained; otherwise route to stronger canonical surfel/graph training."
+}

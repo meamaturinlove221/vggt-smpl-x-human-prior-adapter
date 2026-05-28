@@ -1,0 +1,7 @@
+case,config,human_points,span_x,span_y,span_z,stripe_artifact_score,body_shape_readable_manual,mentor_visual_pass,face_detail_claim_allowed,allowed_face_claim
+current_v895_0021_03,real_vggt_baseline_only,60000,0.5118895173072815,0.6140038967132568,0.20656251907348633,1.9168000221252441,True,False,False,head/face contour and hair region only
+current_v895_0021_03,smpl_conditioned_local_residual_true,60000,0.5801839232444763,0.6798312067985535,0.25313079357147217,2.6863999366760254,False,False,False,head/face contour and hair region only
+current_v895_0021_03,posthoc_surfel_only,60000,0.5207940936088562,0.6257288455963135,0.20656251907348633,6.985599994659424,False,False,False,head/face contour and hair region only
+current_v895_0021_03,same_topology_no_semantic,60000,0.513759195804596,0.5580711960792542,0.07777547836303711,3.0,False,False,False,head/face contour and hair region only
+current_v895_0021_03,tiny_synthetic_token_control,60000,0.5466005206108093,0.6140038967132568,0.20656251907348633,1.9168000221252441,True,False,False,head/face contour and hair region only
+current_v895_0021_03,shuffled_smpl_feature,60000,0.5801839232444763,0.6798312067985535,0.25313079357147217,2.6863999366760254,False,False,False,head/face contour and hair region only

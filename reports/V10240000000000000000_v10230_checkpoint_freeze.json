@@ -1,0 +1,27 @@
+{
+  "created_at": "2026-05-28T18:37:15+00:00",
+  "status": "V10240_V10230_DOWNGRADED_TO_CHECKPOINT_INTERNAL_VISUAL_HARD_BLOCK",
+  "previous_state": "V10230_CURRENT_ROUTE_STATE_ACTIVE_NOT_COMPLETE",
+  "mentor_ready": false,
+  "external_hard_block": false,
+  "reason_summary": [
+    "V10150/V10170 show render boards using raw XY-style projection are diagnostic only.",
+    "V10180 shows rendering is not the only issue; geometry still lacks stable 3D volume advantage.",
+    "V10190 increases thickness for one candidate but shuffled control is thicker, so thickness gain is not causal mentor success.",
+    "V10220 is model smoke only and does not provide full-scene mentor visual pass.",
+    "V404 proves facial-detail target is not applicable; only head/face contour and hair region can be claimed."
+  ],
+  "sources": {
+    "v10230_state": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V10230000000000000000_current_route_state.json",
+    "v10170_render_decision": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V10170000000000000000_flatness_and_depth_render_decision.json",
+    "v10180_repair_decision": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V10180000000000000000_depth_cue_and_geometry_repair_decision.json",
+    "v10190_candidate_decision": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V10190000000000000000_thickness_aware_geometry_candidate_decision.json",
+    "v404_face_visibility": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V4040000000000000000_face_visibility_gate.json",
+    "v10220_model_smoke": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V10220000000000000000_true_3d_geometry_model_smoke.json"
+  },
+  "final_allowed_states": [
+    "V30000000000000000000_VOLUME_AWARE_3D_MORPHOLOGY_MENTOR_READY_NOT_PROMOTED",
+    "V30000000000000000000_TRUE_EXTERNAL_HARD_BLOCK_REQUIRES_USER_ACTION"
+  ],
+  "no_agent_rule": "No agent/subagent launch in this run."
+}

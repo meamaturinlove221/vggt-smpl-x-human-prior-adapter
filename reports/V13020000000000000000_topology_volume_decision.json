@@ -1,0 +1,27 @@
+{
+  "created_at": "2026-05-28T18:47:07+00:00",
+  "status": "V13020_TOPOLOGY_VOLUME_FAIL_CLOSED_CONTINUE",
+  "failures": [
+    {
+      "case": "0013_01_frame001",
+      "true_thickness": 0.4059361769717844,
+      "real_vggt_baseline_only_thickness": 0.33215459282226123,
+      "shuffled_smpl_feature_thickness": 0.38996626924074734,
+      "thickness_only_control_thickness": 0.4223742724754062,
+      "same_topology_no_semantic_thickness": 0.13344995876017693,
+      "posthoc_surfel_only_thickness": 0.32389897620309216,
+      "tiny_synthetic_token_control_thickness": 0.3296455259126536,
+      "fail_control_count": 1,
+      "fail_controls_json": "{\"thickness_only_control\": 0.4223742724754062}"
+    }
+  ],
+  "mentor_ready": false,
+  "external_hard_block": false,
+  "face_detail_claim_allowed": false,
+  "allowed_face_claim": "head/face contour and hair region only",
+  "boards": {
+    "controls": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V13020000000000000000_topology_volume_controls.png",
+    "side_depth": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V13020000000000000000_topology_volume_side_depth.png"
+  },
+  "note": "Metric precheck is not final; a human-main visual gate and local morphology gate are still required."
+}

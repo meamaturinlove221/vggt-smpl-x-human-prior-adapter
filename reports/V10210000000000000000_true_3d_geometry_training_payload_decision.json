@@ -1,0 +1,22 @@
+{
+  "created_at": "2026-05-28T17:47:15+00:00",
+  "status": "V10210_TRUE_3D_GEOMETRY_TRAINING_PAYLOAD_READY_INTERNAL_ONLY",
+  "asset_manifest": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V10210000000000000000_training_asset_manifest.csv",
+  "loss_contract": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V10210000000000000000_true_3d_geometry_loss_contract.md",
+  "worker_spec": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V10210000000000000000_true_3d_geometry_training_payload\\V10210_worker_spec.json",
+  "eligible_cases": [
+    "0012_11_frame001",
+    "0013_01_frame001",
+    "0021_03_frame001",
+    "current_v895_0021_03"
+  ],
+  "eligible_case_count": 4,
+  "next_goal": "D:\\vggt\\vggt-canonical-surfel-adapter\\docs\\goals\\V10220000000000000000_auto_evolved_true_3d_geometry_smoke_route.md",
+  "mentor_ready": false,
+  "mentor_visual_pass": false,
+  "external_hard_block": false,
+  "facial_detail_target_applicable": false,
+  "face_detail_claim_allowed": false,
+  "allowed_face_claim": "head/face contour and hair region only",
+  "next_action": "Run V10220 local model smoke and payload batch check; then prepare train/gate route."
+}

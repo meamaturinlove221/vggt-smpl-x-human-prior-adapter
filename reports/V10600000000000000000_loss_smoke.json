@@ -1,0 +1,15 @@
+{
+  "created_at": "2026-05-28T18:37:15+00:00",
+  "status": "V106_VOLUME_LOSS_SMOKE_PASS_INTERNAL_ONLY",
+  "case": "0012_11_frame001",
+  "loss": -0.006996601819992065,
+  "baseline_preservation_loss": 0.0,
+  "weak_region_residual_loss": -0.015699105337262154,
+  "thickness_field_loss": -0.01595424674451351,
+  "shell_separation": 0.03721290081739426,
+  "limb_continuity_loss": 0.05619461461901665,
+  "rgb_loss": 0.020687414333224297,
+  "projection_auxiliary_only": true,
+  "mentor_ready": false,
+  "external_hard_block": false
+}

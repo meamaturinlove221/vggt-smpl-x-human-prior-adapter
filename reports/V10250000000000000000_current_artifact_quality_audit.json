@@ -1,0 +1,22 @@
+{
+  "created_at": "2026-05-28T18:37:15+00:00",
+  "status": "V10250_CURRENT_ARTIFACT_AUDIT_COMPLETE_FAIL_CLOSED_FOR_MAIN_VISUAL",
+  "artifact_count": 115,
+  "missing_count": 0,
+  "raw_points_xy_main_risk_count": 0,
+  "raw_points_xy_main_risk_files": [],
+  "zip_count": 44,
+  "npz_count": 28,
+  "png_count": 4,
+  "json_count": 13,
+  "csv_count": 5,
+  "html_count": 0,
+  "mentor_ready": false,
+  "external_hard_block": false,
+  "hard_gate_notes": [
+    "Recovered evidence is current local file evidence, not final mentor success.",
+    "Any raw points[:, :2] mentor main renderer is diagnostic only; rotated/depth-cued projections are allowed as render/audit views.",
+    "Face-invisible cases forbid facial detail claims.",
+    "Thickness metric pass cannot override shuffled/random controls."
+  ]
+}

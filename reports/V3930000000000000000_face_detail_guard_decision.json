@@ -1,0 +1,20 @@
+{
+  "created_at": "2026-05-28T11:47:32+00:00",
+  "status": "FACE_DETAIL_FAIL_CLOSED_CONTOUR_ONLY",
+  "head_hair_board": "boards\\V1700000000000000000_head_hair_3d_closeup.png",
+  "face_pointcloud_has_more_or_clearer_detail": false,
+  "face_level_detail_gate_pass": false,
+  "face_landmark_evidence_exists": false,
+  "face_roi_evidence_exists": false,
+  "eyes_visible_in_3d": false,
+  "nose_visible_in_3d": false,
+  "mouth_visible_in_3d": false,
+  "allowed_face_claim": "head/face contour and hair region only",
+  "forbidden_claims": [
+    "facial detail improved",
+    "eyes/nose/mouth detail improved",
+    "face point cloud is more detailed or clearer than baseline"
+  ],
+  "manual_visual_finding": "The current head/hair close-up is a sparse local 3D region or contour view. It does not prove readable eyes, nose, mouth, or clearer facial surface than baseline.",
+  "next_action": "Add a real 3D face ROI target/evidence path. Keep all mentor claims at head/face contour and hair-region non-regression until a 3D face ROI plus projection auxiliary shows readable facial landmarks."
+}

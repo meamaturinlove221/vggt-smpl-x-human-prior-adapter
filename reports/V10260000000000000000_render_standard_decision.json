@@ -1,0 +1,13 @@
+{
+  "created_at": "2026-05-28T18:37:15+00:00",
+  "status": "V10260_RENDER_STANDARDIZER_COMPLETE_AUXILIARY_ONLY",
+  "outputs": {
+    "oblique_depth": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V10260000000000000000_render_standard_oblique_depth.png",
+    "turntable": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V10260000000000000000_render_standard_turntable.png",
+    "same_scene_controls": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V10260000000000000000_render_standard_same_scene_controls.png"
+  },
+  "uses_raw_points_xy_as_main": false,
+  "render_only_mentor_ready": false,
+  "mentor_ready": false,
+  "external_hard_block": false
+}

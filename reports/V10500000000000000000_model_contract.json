@@ -1,0 +1,23 @@
+{
+  "created_at": "2026-05-28T18:37:15+00:00",
+  "model": "models/v105_volume_aware_visible_morphology_student.py::VolumeAwareVisibleMorphologyStudent",
+  "representation_layers": [
+    "baseline_anchor_layer",
+    "SMPL-X_bound_support_layer",
+    "multi_layer_shell_layer",
+    "weak_region_gated_residual_field",
+    "real_environment_branch"
+  ],
+  "forbidden_inference_inputs": [
+    "dense_teacher",
+    "kinect_depth",
+    "raw_kinect_depth",
+    "teacher_points",
+    "teacher_xyz",
+    "v591_points",
+    "v591_teacher"
+  ],
+  "mentor_ready_from_contract": false,
+  "face_detail_claim_allowed": false,
+  "allowed_face_claim": "head/face contour and hair region only"
+}

@@ -1,0 +1,65 @@
+{
+  "created_at": "2026-05-28T17:48:20+00:00",
+  "status": "V10220_TRUE_3D_GEOMETRY_MODEL_SMOKE_PASS_INTERNAL_ONLY",
+  "generic_smoke": {
+    "student_xyz_shape": [
+      1,
+      128,
+      3
+    ],
+    "residual_xyz_shape": [
+      1,
+      128,
+      3
+    ],
+    "occupancy_shape": [
+      1,
+      128,
+      1
+    ],
+    "visibility_shape": [
+      1,
+      128,
+      1
+    ],
+    "normal_shape": [
+      1,
+      128,
+      3
+    ],
+    "rgb_delta_shape": [
+      1,
+      128,
+      3
+    ],
+    "source_logits_shape": [
+      1,
+      128,
+      6
+    ],
+    "grad_norm_positive": true,
+    "forbidden_key_rejection": true
+  },
+  "case": "0012_11_frame001",
+  "case_batch_points": 1024,
+  "loss": 0.045288074761629105,
+  "fit_loss": 0.03739520534873009,
+  "preservation_loss": 0.003970846999436617,
+  "thickness_loss": -0.0006575448787771165,
+  "rgb_loss": 0.000608721689786762,
+  "grad_norm_positive": true,
+  "grad_norm": 29.2536653294228,
+  "forbidden_teacher_key_rejected": true,
+  "student_shape": [
+    1,
+    1024,
+    3
+  ],
+  "mentor_ready": false,
+  "mentor_visual_pass": false,
+  "external_hard_block": false,
+  "facial_detail_target_applicable": false,
+  "face_detail_claim_allowed": false,
+  "allowed_face_claim": "head/face contour and hair region only",
+  "next_goal": "D:\\vggt\\vggt-canonical-surfel-adapter\\docs\\goals\\V10230000000000000000_auto_evolved_training_execution_or_modal_payload_route.md"
+}
