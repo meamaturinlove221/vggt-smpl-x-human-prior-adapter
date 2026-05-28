@@ -1,0 +1,36 @@
+{
+  "created_at": "2026-05-28T21:29:58+00:00",
+  "status": "V18600_PART_COVERAGE_CANONICAL_SURFEL_FAIL_CLOSED_CONTINUE",
+  "mentor_ready": false,
+  "external_hard_block": false,
+  "cases": [
+    "0012_11_frame001",
+    "0013_01_frame001",
+    "0021_03_frame001",
+    "current_v895_0021_03"
+  ],
+  "failures": [
+    {
+      "case": "0012_11_frame001",
+      "reason": "true_combined_fail_v4",
+      "true_score": 0.6567868053664776
+    },
+    {
+      "case": "0021_03_frame001",
+      "reason": "true_combined_fail_v4",
+      "true_score": 0.6717279473056045
+    },
+    {
+      "case": "current_v895_0021_03",
+      "reason": "true_combined_fail_v4",
+      "true_score": 0.6766571516208613
+    }
+  ],
+  "score_csv": "/workspace/repo/reports/V18600000000000000000_part_coverage_canonical_surfel_scores.csv",
+  "board": "/workspace/repo/boards/V18600000000000000000_part_coverage_canonical_surfel_board.png",
+  "turntable_cross_section": "/workspace/repo/boards/V18600000000000000000_part_coverage_canonical_surfel_turntable_cross_section.png",
+  "face_detail_claim_allowed": false,
+  "allowed_face_claim": "head/face contour and hair region only",
+  "v185_diagnosis": "V185 reduced some distant overlap but decoded only partial semantic coverage (part_presence around 0.5).",
+  "summary": "V186 adds part-balanced surfel selection, coverage loss, and per-part decode quotas. It remains fail-closed unless full-scene mentor visuals and hard controls pass."
+}
