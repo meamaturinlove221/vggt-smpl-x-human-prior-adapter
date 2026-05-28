@@ -1,0 +1,100 @@
+{
+  "created_at": "2026-05-28T20:21:00+00:00",
+  "status": "V17400_MULTISHELL_GATE_FAIL_CLOSED_CONTINUE",
+  "mentor_ready": false,
+  "external_hard_block": false,
+  "cases": [
+    "0012_11_frame001",
+    "0013_01_frame001",
+    "0021_03_frame001",
+    "current_v895_0021_03"
+  ],
+  "failures": [
+    {
+      "case": "0012_11_frame001",
+      "reason": "true_billboard_fail_v2",
+      "true_score": 0.6310092907777177
+    },
+    {
+      "case": "0013_01_frame001",
+      "reason": "true_billboard_fail_v2",
+      "true_score": 0.548878480676602
+    },
+    {
+      "case": "0013_01_frame001",
+      "reason": "control_close_or_better",
+      "control": "same_topology_no_semantic",
+      "true_score": 0.548878480676602,
+      "control_score": 0.6438028617027225
+    },
+    {
+      "case": "0013_01_frame001",
+      "reason": "control_close_or_better",
+      "control": "shuffled_smpl_feature",
+      "true_score": 0.548878480676602,
+      "control_score": 0.5869365525898297
+    },
+    {
+      "case": "0021_03_frame001",
+      "reason": "true_billboard_fail_v2",
+      "true_score": 0.6221475113325841
+    },
+    {
+      "case": "current_v895_0021_03",
+      "reason": "true_billboard_fail_v2",
+      "true_score": 0.6236559423726586
+    }
+  ],
+  "boards": {
+    "advisor": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V17400000000000000000_advisor_human_main_full_scene.png",
+    "controls": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V17400000000000000000_same_scene_controls.png",
+    "v173_board": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V17300000000000000000_multishell_training_board.png",
+    "v173_turntable": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V17300000000000000000_turntable_cross_section.png"
+  },
+  "viewer": {
+    "html": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V17400000000000000000_viewer\\index.html",
+    "html_bytes": 1107,
+    "ply_aliases": [
+      {
+        "alias": "true",
+        "config": "multishell_topology_decoder_true",
+        "path": "ply/true.ply",
+        "exists": true,
+        "bytes": 3169911
+      },
+      {
+        "alias": "baseline",
+        "config": "real_vggt_baseline_only",
+        "path": "ply/baseline.ply",
+        "exists": true,
+        "bytes": 3134003
+      },
+      {
+        "alias": "same_topology",
+        "config": "same_topology_no_semantic",
+        "path": "ply/same_topology.ply",
+        "exists": true,
+        "bytes": 3133688
+      },
+      {
+        "alias": "shuffled",
+        "config": "shuffled_smpl_feature",
+        "path": "ply/shuffled.ply",
+        "exists": true,
+        "bytes": 3132679
+      },
+      {
+        "alias": "thickness_only",
+        "config": "thickness_only_control",
+        "path": "ply/thickness_only.ply",
+        "exists": true,
+        "bytes": 3134367
+      }
+    ],
+    "non_placeholder": true
+  },
+  "face_detail_claim_allowed": false,
+  "allowed_face_claim": "head/face contour and hair region only",
+  "summary": "V173 Modal multi-shell decoding improved anti-billboard scores substantially, but V174 still fails closed because true billboard_fail_v2 remains true and 0013 same-topology/shuffled controls remain stronger.",
+  "next_route": "V175 should target 0013 control separation and adjust metric/decoder for semantic causality, not claim mentor-ready."
+}

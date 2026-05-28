@@ -1,0 +1,68 @@
+{
+  "created_at": "2026-05-28T20:23:40+00:00",
+  "status": "V17500_LAYER_BALANCED_MULTISHELL_FAIL_CLOSED_CONTINUE",
+  "mentor_ready": false,
+  "external_hard_block": false,
+  "cases": [
+    "0012_11_frame001",
+    "0013_01_frame001",
+    "0021_03_frame001",
+    "current_v895_0021_03"
+  ],
+  "training_manifest_rows": 4,
+  "failures": [
+    {
+      "case": "0012_11_frame001",
+      "reason": "true_billboard_fail_v2",
+      "true_score": 0.4875219955161576
+    },
+    {
+      "case": "0012_11_frame001",
+      "reason": "control_close_or_better_v2",
+      "control": "same_topology_no_semantic",
+      "true_score": 0.4875219955161576,
+      "control_score": 0.5611661329441532
+    },
+    {
+      "case": "0012_11_frame001",
+      "reason": "control_close_or_better_v2",
+      "control": "shuffled_smpl_feature",
+      "true_score": 0.4875219955161576,
+      "control_score": 0.516107901549784
+    },
+    {
+      "case": "0013_01_frame001",
+      "reason": "true_billboard_fail_v2",
+      "true_score": 0.5136947643261243
+    },
+    {
+      "case": "0013_01_frame001",
+      "reason": "control_close_or_better_v2",
+      "control": "same_topology_no_semantic",
+      "true_score": 0.5136947643261243,
+      "control_score": 0.6438028617027225
+    },
+    {
+      "case": "0013_01_frame001",
+      "reason": "control_close_or_better_v2",
+      "control": "shuffled_smpl_feature",
+      "true_score": 0.5136947643261243,
+      "control_score": 0.5869365525898298
+    },
+    {
+      "case": "0021_03_frame001",
+      "reason": "true_billboard_fail_v2",
+      "true_score": 0.5822252768132433
+    },
+    {
+      "case": "current_v895_0021_03",
+      "reason": "true_billboard_fail_v2",
+      "true_score": 0.5503952689684712
+    }
+  ],
+  "board": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V17500000000000000000_layer_balanced_board.png",
+  "turntable_cross_section": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V17500000000000000000_turntable_cross_section.png",
+  "face_detail_claim_allowed": false,
+  "allowed_face_claim": "head/face contour and hair region only",
+  "summary": "V175 repairs V173 budget trimming by enforcing layer-balanced shell selection. It remains fail-closed unless true beats controls and billboard_fail_v2 is false."
+}

@@ -1,0 +1,5 @@
+case,true_score,true_billboard_fail_v2,real_vggt_baseline_only_score,true_beats_real_vggt_baseline_only,same_topology_no_semantic_score,true_beats_same_topology_no_semantic,shuffled_smpl_feature_score,true_beats_shuffled_smpl_feature,thickness_only_control_score,true_beats_thickness_only_control
+0012_11_frame001,0.6310092907777177,True,0.3591760440802873,True,0.5611661329441531,True,0.5161079015497834,True,0.42063528728923866,True
+0013_01_frame001,0.548878480676602,True,0.3529421859619089,True,0.6438028617027225,False,0.5869365525898297,False,0.40997880783769064,True
+0021_03_frame001,0.6221475113325841,True,0.42397473523682466,True,0.5310976227401352,True,0.4971418125164344,True,0.46322618975536667,True
+current_v895_0021_03,0.6236559423726586,True,0.4215960286039639,True,0.5255679127685778,True,0.4812033043458524,True,0.4512002929905857,True
