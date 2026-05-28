@@ -1,0 +1,20 @@
+{
+  "created_at": "2026-05-28T22:46:11+00:00",
+  "status": "V19300_VISIBLE_SURFACE_PRESERVATION_ROUTE_REQUIRED",
+  "mentor_ready": false,
+  "external_hard_block": false,
+  "v192_status": "V19200_UPRIGHT_POSE_FRAME_FAIL_CLOSED_CONTINUE",
+  "v192_failure_count": 15,
+  "v192_true_combined_fail_count": 3,
+  "v192_final_completeness_values": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+  ],
+  "baseline_rows_present": 4,
+  "route_decision": "Stop replacing the visible human surface with free shell clouds. Preserve the VGGT visible RGB surface as the front layer and train topology-volume infill only for hidden/back/weak regions, with a mask that forbids degrading source-visible pixels.",
+  "board": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V19200000000000000000_upright_pose_frame_board.png",
+  "turntable": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V19200000000000000000_upright_pose_frame_turntable_cross_section.png",
+  "summary": "V192 still fails because all learned shell routes replace a coherent visible baseline with torn topology-volume clouds. The next route must be visible-surface-preserving infill, not whole-body shell replacement."
+}
