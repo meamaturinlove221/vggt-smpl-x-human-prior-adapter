@@ -1,57 +1,76 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="620" viewBox="0 0 1200 620">
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="700" viewBox="0 0 1200 700">
   <defs>
     <style>
-      text{font-family:Arial,Helvetica,sans-serif;fill:#0f172a}.title{font-size:34px;font-weight:700}.sub{font-size:18px;fill:#475569}.h{font-size:18px;font-weight:700}.small{font-size:13px;fill:#475569}.cap{font-size:15px;fill:#334155}.box{fill:#fff;stroke:#cbd5e1;stroke-width:1.4}.good{fill:#ecfdf5;stroke:#10b981}.warn{fill:#fff7ed;stroke:#f97316}.bad{fill:#fef2f2;stroke:#ef4444}.dotA{fill:#2563eb}.dotB{fill:#06b6d4}.dotC{fill:#f97316}.line{stroke:#94a3b8;stroke-width:1.2;fill:none}.axis{stroke:#cbd5e1;stroke-width:1}
+      text{font-family:Arial,Helvetica,sans-serif;fill:#0f172a}
+      .title{font-size:34px;font-weight:700}
+      .sub{font-size:18px;fill:#475569}
+      .h{font-size:18px;font-weight:700}
+      .small{font-size:13px;fill:#475569}
+      .cap{font-size:13px;fill:#334155}
+      .cap2{font-size:12px;fill:#475569}
+      .box{fill:#fff;stroke:#cbd5e1;stroke-width:1.4}
+      .good{fill:#ecfdf5;stroke:#10b981}
+      .warn{fill:#fff7ed;stroke:#f97316}
+      .bad{fill:#fef2f2;stroke:#ef4444}
+      .dotA{fill:#2563eb}.dotB{fill:#06b6d4}.dotC{fill:#f97316}
+      .line{stroke:#94a3b8;stroke-width:1.2;fill:none}
+      .axis{stroke:#cbd5e1;stroke-width:1}
     </style>
   </defs>
-  <rect width="1200" height="620" fill="#f8fafc"/>
+  <rect width="1200" height="700" fill="#f8fafc"/>
   <text x="600" y="48" text-anchor="middle" class="title">Parallel Engineering Result Snapshot</text>
   <text x="600" y="78" text-anchor="middle" class="sub">6-view face / head ROI re-audit · local structure visible, final continuity still insufficient</text>
 
   <g transform="translate(45 120)">
-    <rect width="250" height="330" rx="18" class="box"/>
+    <rect width="250" height="390" rx="18" class="box"/>
     <text x="125" y="38" text-anchor="middle" class="h">Vanilla VGGT</text>
     <text x="125" y="62" text-anchor="middle" class="small">baseline scatter</text>
     <path d="M80 95 C42 155,50 245,102 278 C160 310,216 268,202 192 C193 139,146 91,80 95" class="line"/>
     <circle cx="92" cy="130" r="4" class="dotA"/><circle cx="131" cy="118" r="3" class="dotB"/><circle cx="160" cy="154" r="4" class="dotA"/>
     <circle cx="79" cy="193" r="4" class="dotC"/><circle cx="120" cy="210" r="3" class="dotA"/><circle cx="166" cy="224" r="4" class="dotB"/>
     <circle cx="111" cy="260" r="3" class="dotA"/><circle cx="189" cy="268" r="3" class="dotC"/><circle cx="56" cy="248" r="4" class="dotB"/>
-    <text x="125" y="310" text-anchor="middle" class="cap">Human outline is unstable</text>
+    <text x="125" y="332" text-anchor="middle" class="cap">Human outline</text>
+    <text x="125" y="350" text-anchor="middle" class="cap">is unstable</text>
   </g>
 
   <g transform="translate(335 120)">
-    <rect width="250" height="330" rx="18" class="good"/>
+    <rect width="250" height="390" rx="18" class="good"/>
     <text x="125" y="38" text-anchor="middle" class="h">Prior Adapter</text>
     <text x="125" y="62" text-anchor="middle" class="small">SMPL-X conditioned route</text>
     <path d="M123 90 C78 100,60 150,72 198 C82 245,113 284,153 281 C200 277,220 224,201 170 C188 128,164 95,123 90" class="line"/>
     <circle cx="112" cy="124" r="5" class="dotA"/><circle cx="142" cy="126" r="4" class="dotB"/><circle cx="96" cy="166" r="4" class="dotA"/>
     <circle cx="151" cy="168" r="4" class="dotB"/><circle cx="83" cy="209" r="4" class="dotC"/><circle cx="172" cy="210" r="4" class="dotA"/>
     <circle cx="105" cy="248" r="4" class="dotA"/><circle cx="154" cy="251" r="4" class="dotB"/><circle cx="132" cy="280" r="4" class="dotC"/>
-    <text x="125" y="310" text-anchor="middle" class="cap">Local facial structure appears</text>
+    <text x="125" y="332" text-anchor="middle" class="cap">Local facial structure</text>
+    <text x="125" y="350" text-anchor="middle" class="cap">appears</text>
   </g>
 
   <g transform="translate(625 120)">
-    <rect width="250" height="330" rx="18" class="warn"/>
+    <rect width="250" height="390" rx="18" class="warn"/>
     <text x="125" y="38" text-anchor="middle" class="h">ROI / Point Count</text>
     <text x="125" y="62" text-anchor="middle" class="small">pseudo-positive risk</text>
     <line x1="55" y1="270" x2="205" y2="270" class="axis"/><line x1="55" y1="95" x2="55" y2="270" class="axis"/>
     <rect x="78" y="190" width="32" height="80" rx="5" fill="#bae6fd"/><rect x="122" y="130" width="32" height="140" rx="5" fill="#fed7aa"/><rect x="166" y="155" width="32" height="115" rx="5" fill="#fecaca"/>
     <text x="94" y="292" text-anchor="middle" class="small">base</text><text x="138" y="292" text-anchor="middle" class="small">ROI</text><text x="182" y="292" text-anchor="middle" class="small">conf</text>
-    <text x="125" y="310" text-anchor="middle" class="cap">More points do not prove better geometry</text>
+    <text x="125" y="332" text-anchor="middle" class="cap">More points do not prove</text>
+    <text x="125" y="350" text-anchor="middle" class="cap">better geometry</text>
   </g>
 
   <g transform="translate(915 120)">
-    <rect width="240" height="330" rx="18" class="bad"/>
+    <rect width="240" height="390" rx="18" class="bad"/>
     <text x="120" y="38" text-anchor="middle" class="h">Final Gate</text>
     <text x="120" y="62" text-anchor="middle" class="small">advisor visual requirement</text>
     <rect x="48" y="100" width="144" height="145" rx="14" fill="#fff" stroke="#ef4444"/>
     <circle cx="91" cy="154" r="20" fill="none" stroke="#ef4444" stroke-width="3"/><path d="M92 175 C73 202,75 227,103 238" class="line"/><path d="M118 174 C147 202,145 229,116 239" class="line"/>
     <circle cx="160" cy="118" r="3" class="dotB"/><circle cx="176" cy="142" r="3" class="dotA"/><circle cx="169" cy="213" r="3" class="dotC"/><circle cx="65" cy="220" r="3" class="dotA"/>
-    <text x="120" y="274" text-anchor="middle" class="cap">Needs full-scene RGB point cloud</text>
-    <text x="120" y="298" text-anchor="middle" class="small">human-main · same view · same bounds</text>
+    <text x="120" y="294" text-anchor="middle" class="cap">Needs full-scene</text>
+    <text x="120" y="312" text-anchor="middle" class="cap">RGB point cloud</text>
+    <text x="120" y="338" text-anchor="middle" class="cap2">human-main · same view</text>
+    <text x="120" y="354" text-anchor="middle" class="cap2">same bounds</text>
   </g>
 
-  <rect x="70" y="500" width="1060" height="76" rx="18" fill="#eef2ff" stroke="#818cf8"/>
-  <text x="600" y="532" text-anchor="middle" class="h">Safe conclusion</text>
-  <text x="600" y="558" text-anchor="middle" class="sub">6-view face/head shows useful local structure, but it is not yet clear, continuous, and stable enough for final promotion.</text>
+  <rect x="70" y="560" width="1060" height="98" rx="18" fill="#eef2ff" stroke="#818cf8"/>
+  <text x="600" y="595" text-anchor="middle" class="h">Safe conclusion</text>
+  <text x="600" y="622" text-anchor="middle" class="sub">6-view face/head shows useful local structure,</text>
+  <text x="600" y="646" text-anchor="middle" class="sub">but it is not yet clear, continuous, and stable enough for final promotion.</text>
 </svg>
