@@ -1,0 +1,67 @@
+{
+  "created_at": "2026-05-28T19:08:10+00:00",
+  "status": "V13050_TOPOLOGY_OCCUPANCY_FAIL_CLOSED_CONTINUE",
+  "mentor_ready": false,
+  "external_hard_block": false,
+  "failures": [
+    {
+      "case": "0012_11_frame001",
+      "reason": "true_billboard_fail",
+      "true_score": 0.438206106870229
+    },
+    {
+      "case": "0012_11_frame001",
+      "reason": "control_close_or_better",
+      "control": "same_topology_no_semantic",
+      "true_score": 0.438206106870229,
+      "control_score": 0.7315340909090909
+    },
+    {
+      "case": "0012_11_frame001",
+      "reason": "control_close_or_better",
+      "control": "shuffled_smpl_feature",
+      "true_score": 0.438206106870229,
+      "control_score": 0.47359929078014185
+    },
+    {
+      "case": "0013_01_frame001",
+      "reason": "true_billboard_fail",
+      "true_score": 0.3498538961038961
+    },
+    {
+      "case": "0013_01_frame001",
+      "reason": "control_close_or_better",
+      "control": "same_topology_no_semantic",
+      "true_score": 0.3498538961038961,
+      "control_score": 0.9184172661870503
+    },
+    {
+      "case": "0013_01_frame001",
+      "reason": "control_close_or_better",
+      "control": "shuffled_smpl_feature",
+      "true_score": 0.3498538961038961,
+      "control_score": 0.5587732919254659
+    },
+    {
+      "case": "0021_03_frame001",
+      "reason": "control_close_or_better",
+      "control": "same_topology_no_semantic",
+      "true_score": 0.5609274193548387,
+      "control_score": 0.6904126213592234
+    },
+    {
+      "case": "current_v895_0021_03",
+      "reason": "control_close_or_better",
+      "control": "same_topology_no_semantic",
+      "true_score": 0.5913999999999999,
+      "control_score": 0.5919852941176471
+    }
+  ],
+  "face_detail_claim_allowed": false,
+  "allowed_face_claim": "head/face contour and hair region only",
+  "boards": {
+    "turntable": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V13050000000000000000_topology_occupancy_turntable.png",
+    "cross_section": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V13050000000000000000_topology_occupancy_cross_section.png"
+  },
+  "note": "This remains a diagnostic candidate. It cannot be mentor-ready without human-main visual pass, local morphology pass, and hard-control separation."
+}
