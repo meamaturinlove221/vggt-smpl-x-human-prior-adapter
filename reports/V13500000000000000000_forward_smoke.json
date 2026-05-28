@@ -1,0 +1,43 @@
+{
+  "created_at": "2026-05-28T19:42:11+00:00",
+  "smoke": {
+    "student_xyz_shape": [
+      1,
+      256,
+      3
+    ],
+    "front_shell_shape": [
+      1,
+      256,
+      3
+    ],
+    "back_shell_shape": [
+      1,
+      256,
+      3
+    ],
+    "left_shell_shape": [
+      1,
+      256,
+      3
+    ],
+    "right_shell_shape": [
+      1,
+      256,
+      3
+    ],
+    "cross_section_occupancy_shape": [
+      1,
+      256,
+      8
+    ],
+    "part_continuity_logits_shape": [
+      1,
+      256,
+      8
+    ],
+    "grad_norm_positive": true,
+    "forbidden_key_rejection": true
+  },
+  "mentor_ready": false
+}

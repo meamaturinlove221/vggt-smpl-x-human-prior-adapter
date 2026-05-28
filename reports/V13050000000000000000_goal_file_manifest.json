@@ -1,0 +1,18 @@
+{
+  "goal_file_path": "D:\\vggt\\vggt-canonical-surfel-adapter\\docs\\goals\\V13050000000000000000_V60000000000000000000_anti_billboard_topology_volume_training_goal.md",
+  "sha256": "8960bcd0da7f79e44e8f645e16093c30271f2c153ad94569469ea06fcbda9ee5",
+  "line_count": 883,
+  "created_at": "2026-05-28T19:23:08+00:00",
+  "repo": "D:\\vggt\\vggt-canonical-surfel-adapter",
+  "branch": "codex/volume-aware-3d-morphology",
+  "source_feature_adapter_repo": "D:\\vggt\\vggt-feature-adapter",
+  "source_scene_context_repo": "D:\\vggt\\vggt-scene-context-evidence",
+  "evidence_root": "D:\\vggt\\vggt-main\\local_report_auxiliary\\V600_quality_rebuild",
+  "previous_status": "V13050 = procedural occupancy checkpoint / internal visual hard block",
+  "final_allowed_states": [
+    "V60000000000000000000_ANTI_BILLBOARD_TOPOLOGY_VOLUME_MENTOR_READY_NOT_PROMOTED",
+    "V60000000000000000000_TRUE_EXTERNAL_HARD_BLOCK_REQUIRES_USER_ACTION"
+  ],
+  "no_agent_rule": "No agent/subagent launch in this run.",
+  "summary": "Downgrade V13050 and execute a no-agent anti-billboard topology-volume training route: audit current artifacts, forbid procedural/thickness-only final claims, implement metric v2, weak billboard regions, trained topology-volume student, Modal matrix, full-scene mentor boards, viewer, Yuque report, bundles, and cleanup."
+}

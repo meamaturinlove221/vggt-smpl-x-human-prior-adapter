@@ -1,0 +1,120 @@
+{
+  "created_at": "2026-05-28T19:49:22+00:00",
+  "status": "V14000_CAUSALITY_GATE_FAIL_CLOSED_CONTINUE",
+  "mentor_ready": false,
+  "external_hard_block": false,
+  "failures": [
+    {
+      "case": "0012_11_frame001",
+      "reason": "true_billboard_fail_v2",
+      "true_score": 0.43837010954060435
+    },
+    {
+      "case": "0012_11_frame001",
+      "reason": "control_close_or_better",
+      "control": "same_topology_no_semantic",
+      "true_score": 0.43837010954060435,
+      "control_score": 0.5611661329441531
+    },
+    {
+      "case": "0012_11_frame001",
+      "reason": "control_close_or_better",
+      "control": "shuffled_smpl_feature",
+      "true_score": 0.43837010954060435,
+      "control_score": 0.5161079015497834
+    },
+    {
+      "case": "0013_01_frame001",
+      "reason": "true_billboard_fail_v2",
+      "true_score": 0.44722775145541044
+    },
+    {
+      "case": "0013_01_frame001",
+      "reason": "control_close_or_better",
+      "control": "same_topology_no_semantic",
+      "true_score": 0.44722775145541044,
+      "control_score": 0.6438028617027225
+    },
+    {
+      "case": "0013_01_frame001",
+      "reason": "control_close_or_better",
+      "control": "shuffled_smpl_feature",
+      "true_score": 0.44722775145541044,
+      "control_score": 0.5869365525898297
+    },
+    {
+      "case": "0021_03_frame001",
+      "reason": "true_billboard_fail_v2",
+      "true_score": 0.46268985660744777
+    },
+    {
+      "case": "0021_03_frame001",
+      "reason": "control_close_or_better",
+      "control": "same_topology_no_semantic",
+      "true_score": 0.46268985660744777,
+      "control_score": 0.5310976227401352
+    },
+    {
+      "case": "0021_03_frame001",
+      "reason": "control_close_or_better",
+      "control": "shuffled_smpl_feature",
+      "true_score": 0.46268985660744777,
+      "control_score": 0.4971418125164344
+    },
+    {
+      "case": "0021_03_frame001",
+      "reason": "control_close_or_better",
+      "control": "thickness_only_control",
+      "true_score": 0.46268985660744777,
+      "control_score": 0.46322618975536667
+    },
+    {
+      "case": "current_v895_0021_03",
+      "reason": "true_billboard_fail_v2",
+      "true_score": 0.43583510984010304
+    },
+    {
+      "case": "current_v895_0021_03",
+      "reason": "control_close_or_better",
+      "control": "real_vggt_baseline_only",
+      "true_score": 0.43583510984010304,
+      "control_score": 0.4215960286039639
+    },
+    {
+      "case": "current_v895_0021_03",
+      "reason": "control_close_or_better",
+      "control": "same_topology_no_semantic",
+      "true_score": 0.43583510984010304,
+      "control_score": 0.5255679127685778
+    },
+    {
+      "case": "current_v895_0021_03",
+      "reason": "control_close_or_better",
+      "control": "shuffled_smpl_feature",
+      "true_score": 0.43583510984010304,
+      "control_score": 0.4812033043458524
+    },
+    {
+      "case": "current_v895_0021_03",
+      "reason": "control_close_or_better",
+      "control": "thickness_only_control",
+      "true_score": 0.43583510984010304,
+      "control_score": 0.4512002929905857
+    },
+    {
+      "case": "current_v895_0021_03",
+      "reason": "control_close_or_better",
+      "control": "posthoc_surfel_only",
+      "true_score": 0.43583510984010304,
+      "control_score": 0.43131285372442085
+    },
+    {
+      "case": "current_v895_0021_03",
+      "reason": "control_close_or_better",
+      "control": "tiny_synthetic_token_control",
+      "true_score": 0.43583510984010304,
+      "control_score": 0.42695540959295164
+    }
+  ],
+  "summary": "True does not beat anti-billboard hard controls across required cases; same-topology/shuffled/thickness-only remain close or stronger."
+}

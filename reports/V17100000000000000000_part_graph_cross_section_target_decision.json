@@ -1,0 +1,10 @@
+{
+  "created_at": "2026-05-28T19:52:50+00:00",
+  "status": "V17100_PART_GRAPH_TARGETS_READY_FOR_V172_TRAINING",
+  "mentor_ready": false,
+  "external_hard_block": false,
+  "case_count": 4,
+  "face_detail_claim_allowed": false,
+  "allowed_face_claim": "head/face contour and hair region only",
+  "note": "Targets are training supervision only; they are not mentor visual evidence."
+}

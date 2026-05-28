@@ -1,0 +1,25 @@
+{
+  "created_at": "2026-05-28T19:25:13+00:00",
+  "failures": [
+    {
+      "gate": "mentor_visual",
+      "reason": "human still reads as billboard/textured sheet"
+    },
+    {
+      "gate": "representation",
+      "reason": "procedural occupancy is not trained topology-volume representation"
+    },
+    {
+      "gate": "controls",
+      "reason": "same-topology/shuffled controls remain close or stronger"
+    },
+    {
+      "gate": "local_detail",
+      "reason": "local morphology remains contour/sheet-level"
+    },
+    {
+      "gate": "claim_boundary",
+      "reason": "face invisible; facial detail claims forbidden"
+    }
+  ]
+}
