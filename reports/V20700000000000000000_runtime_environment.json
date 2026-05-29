@@ -1,0 +1,10 @@
+{
+  "created_at": "2026-05-29T01:13:38+00:00",
+  "torch_cuda_available": true,
+  "selected_device": "cuda",
+  "cuda_error": "",
+  "modal_required_for_final": true,
+  "cuda_device_name": "NVIDIA A10",
+  "steps": 300,
+  "max_points": 8192
+}
