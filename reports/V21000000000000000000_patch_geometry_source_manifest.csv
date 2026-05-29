@@ -1,0 +1,5 @@
+case,patch_npz,patch_count,proposal_points,visible_lock_ratio,mean_patch_radius,mean_patch_thickness,face_detail_claim_allowed,allowed_face_claim
+0012_11_frame001,D:\vggt\vggt-canonical-surfel-adapter\output\V21000000000000000000_patch_geometry_sources\0012_11_frame001\patch_geometry_sources.npz,6,3600,0.52,0.036855801939964294,0.012000001035630703,False,head/face contour and hair region only
+0013_01_frame001,D:\vggt\vggt-canonical-surfel-adapter\output\V21000000000000000000_patch_geometry_sources\0013_01_frame001\patch_geometry_sources.npz,4,3600,0.52,0.07670670747756958,0.012000000104308128,False,head/face contour and hair region only
+0021_03_frame001,D:\vggt\vggt-canonical-surfel-adapter\output\V21000000000000000000_patch_geometry_sources\0021_03_frame001\patch_geometry_sources.npz,9,3600,0.31055,0.06855124980211258,0.013726117089390755,False,head/face contour and hair region only
+current_v895_0021_03,D:\vggt\vggt-canonical-surfel-adapter\output\V21000000000000000000_patch_geometry_sources\current_v895_0021_03\patch_geometry_sources.npz,9,3600,0.3178,0.060987114906311035,0.013953376561403275,False,head/face contour and hair region only
