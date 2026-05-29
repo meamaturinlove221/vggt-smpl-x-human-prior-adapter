@@ -1,0 +1,12 @@
+{
+  "created_at": "2026-05-29T00:08:34+00:00",
+  "status": "V20400_PART_LOCAL_TARGET_ROUTE_READY_CONTINUE",
+  "mentor_ready": false,
+  "external_hard_block": false,
+  "v202_result": "connected infill improved score but polluted visible clothing/leg/foot boundaries",
+  "v203_result": "part-specific quotas protected surface but collapsed near baseline and failed controls",
+  "root_cause": "no explicit part-local target tells the student where improvement is allowed and required",
+  "next_required_route": "construct part-local weak target masks and train local infill heads with no-regression locks",
+  "face_detail_claim_allowed": false,
+  "allowed_face_claim": "head/face contour and hair region only"
+}
