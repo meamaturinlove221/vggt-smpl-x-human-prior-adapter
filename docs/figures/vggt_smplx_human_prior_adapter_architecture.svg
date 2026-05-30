@@ -1,68 +1,26 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1500" height="980" viewBox="0 0 1500 980">
-  <defs>
-    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 0 L10 5 L0 10 Z" fill="#2563eb"/></marker>
-    <style>
-      text{font-family:Arial,Helvetica,sans-serif;fill:#0f172a}.title{font-size:38px;font-weight:700}.sub{font-size:18px;font-style:italic;fill:#475569}.pt{font-size:21px;font-weight:700}.ct{font-size:13px;font-weight:700}.cs{font-size:11px;fill:#475569}.num{font-size:22px;font-weight:700;fill:#fff}.box{fill:#fff;stroke-width:1.4}.arr{stroke:#2563eb;stroke-width:3;marker-end:url(#arrow)}
-    </style>
-  </defs>
-  <rect width="1500" height="980" fill="#fff"/>
-  <text x="750" y="56" text-anchor="middle" class="title">VGGT-SMPL-X Human Prior Adapter</text>
-  <text x="750" y="88" text-anchor="middle" class="sub">Model-side SMPL-X prior injection for VGGT human-scene reconstruction</text>
-
-  <g transform="translate(30 125)">
-    <rect width="260" height="590" rx="18" fill="#eff6ff" stroke="#2563eb" stroke-width="1.8"/>
-    <circle cx="36" cy="34" r="22" fill="#2563eb"/><text x="36" y="42" text-anchor="middle" class="num">1</text>
-    <text x="78" y="42" class="pt" fill="#2563eb">Inputs</text>
-    <g transform="translate(18 86)"><rect width="224" height="86" rx="12" class="box" stroke="#2563eb"/><rect x="16" y="24" width="44" height="28" rx="5" fill="#2563eb"/><text x="84" y="34" class="ct">Multi-view</text><text x="84" y="53" class="ct">RGB images</text></g>
-    <g transform="translate(18 190)"><rect width="224" height="86" rx="12" class="box" stroke="#2563eb"/><line x1="18" y1="42" x2="62" y2="42" stroke="#2563eb" stroke-width="4"/><circle cx="30" cy="42" r="6" fill="#fff" stroke="#2563eb" stroke-width="3"/><text x="84" y="34" class="ct">Camera intrinsics</text><text x="84" y="53" class="ct">and extrinsics</text></g>
-    <g transform="translate(18 294)"><rect width="224" height="86" rx="12" class="box" stroke="#2563eb"/><circle cx="38" cy="42" r="14" fill="none" stroke="#2563eb" stroke-width="3"/><text x="84" y="34" class="ct">Human masks</text><text x="84" y="53" class="ct">or silhouettes</text></g>
-    <g transform="translate(18 398)"><rect width="224" height="110" rx="12" class="box" stroke="#2563eb"/><path d="M22 20 h34 l14 14 v46 h-48z" fill="none" stroke="#2563eb" stroke-width="3"/><text x="84" y="31" class="ct">SMPL-X params</text><text x="84" y="50" class="cs">betas / pose</text><text x="84" y="67" class="cs">expression / scale</text><text x="84" y="88" class="cs">body prior source</text></g>
-  </g>
-
-  <g transform="translate(320 125)">
-    <rect width="260" height="590" rx="18" fill="#f0fdfa" stroke="#0f766e" stroke-width="1.8"/>
-    <circle cx="36" cy="34" r="22" fill="#0f766e"/><text x="36" y="42" text-anchor="middle" class="num">2</text>
-    <text x="78" y="35" class="pt" fill="#0f766e">SMPL-X Prior</text><text x="78" y="58" class="pt" fill="#0f766e">Construction</text>
-    <g transform="translate(18 86)"><rect width="224" height="86" rx="12" class="box" stroke="#0f766e"/><circle cx="38" cy="28" r="10" fill="none" stroke="#0f766e" stroke-width="3"/><path d="M38 40 v28 M24 52 h28" stroke="#0f766e" stroke-width="3"/><text x="84" y="34" class="ct">Build posed</text><text x="84" y="53" class="ct">SMPL-X mesh</text></g>
-    <g transform="translate(18 190)"><rect width="224" height="86" rx="12" class="box" stroke="#0f766e"/><rect x="18" y="28" width="44" height="28" rx="5" fill="#0f766e"/><text x="84" y="34" class="ct">Render visibility</text><text x="84" y="53" class="ct">silhouette, depth</text></g>
-    <g transform="translate(18 294)"><rect width="224" height="100" rx="12" class="box" stroke="#0f766e"/><circle cx="22" cy="34" r="3" fill="#2563eb"/><circle cx="42" cy="50" r="3" fill="#06b6d4"/><circle cx="60" cy="34" r="3" fill="#f97316"/><text x="84" y="32" class="ct">Build prior_maps</text><text x="84" y="51" class="cs">silhouette / keypoint</text><text x="84" y="68" class="cs">body-region channels</text></g>
-    <g transform="translate(18 412)"><rect width="224" height="116" rx="12" class="box" stroke="#0f766e"/><line x1="18" y1="43" x2="62" y2="43" stroke="#0f766e" stroke-width="4"/><circle cx="30" cy="43" r="6" fill="#fff" stroke="#0f766e" stroke-width="3"/><text x="84" y="31" class="ct">Build prior_depths</text><text x="84" y="50" class="ct">prior_points</text><text x="84" y="69" class="ct">prior_mask</text><text x="84" y="92" class="cs">view-aligned targets</text></g>
-  </g>
-
-  <g transform="translate(610 125)">
-    <rect width="260" height="590" rx="18" fill="#ecfeff" stroke="#0891b2" stroke-width="1.8"/>
-    <circle cx="36" cy="34" r="22" fill="#0891b2"/><text x="36" y="42" text-anchor="middle" class="num">3</text>
-    <text x="78" y="35" class="pt" fill="#0891b2">VGGT Student</text><text x="78" y="58" class="pt" fill="#0891b2">Model</text>
-    <g transform="translate(18 86)"><rect width="224" height="86" rx="12" class="box" stroke="#0891b2"/><rect x="18" y="26" width="44" height="28" rx="5" fill="#0891b2"/><text x="84" y="34" class="ct">VGGT RGB</text><text x="84" y="53" class="ct">patch tokens</text></g>
-    <g transform="translate(18 190)"><rect width="224" height="100" rx="12" class="box" stroke="#0891b2"/><circle cx="38" cy="42" r="14" fill="none" stroke="#0891b2" stroke-width="3"/><text x="84" y="32" class="ct">HumanPriorAdapter</text><text x="84" y="51" class="cs">light conv / projection</text><text x="84" y="68" class="cs">learnable gate</text></g>
-    <g transform="translate(18 308)"><rect width="224" height="86" rx="12" class="box" stroke="#0891b2"/><rect x="18" y="26" width="44" height="28" rx="5" fill="#0891b2"/><text x="84" y="34" class="ct">Prior-aware</text><text x="84" y="53" class="ct">VGGT tokens</text></g>
-    <g transform="translate(18 412)"><rect width="224" height="100" rx="12" class="box" stroke="#0891b2"/><line x1="18" y1="42" x2="62" y2="42" stroke="#0891b2" stroke-width="4"/><circle cx="30" cy="42" r="6" fill="#fff" stroke="#0891b2" stroke-width="3"/><text x="84" y="31" class="ct">VGGT heads</text><text x="84" y="50" class="cs">camera / depth</text><text x="84" y="67" class="cs">point map / tracks</text></g>
-  </g>
-
-  <g transform="translate(900 125)">
-    <rect width="260" height="590" rx="18" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.8"/>
-    <circle cx="36" cy="34" r="22" fill="#7c3aed"/><text x="36" y="42" text-anchor="middle" class="num">4</text>
-    <text x="78" y="35" class="pt" fill="#7c3aed">Training and</text><text x="78" y="58" class="pt" fill="#7c3aed">Controls</text>
-    <g transform="translate(18 100)"><rect width="224" height="100" rx="12" class="box" stroke="#7c3aed"/><rect x="18" y="26" width="44" height="28" rx="5" fill="#7c3aed"/><text x="84" y="31" class="ct">Original VGGT</text><text x="84" y="50" class="ct">geometry losses</text><text x="84" y="70" class="cs">depth / point consistency</text></g>
-    <g transform="translate(18 225)"><rect width="224" height="100" rx="12" class="box" stroke="#7c3aed"/><circle cx="38" cy="42" r="14" fill="none" stroke="#7c3aed" stroke-width="3"/><text x="84" y="31" class="ct">Human prior</text><text x="84" y="50" class="ct">supervision</text><text x="84" y="70" class="cs">depth / point / mask</text></g>
-    <g transform="translate(18 350)"><rect width="224" height="116" rx="12" class="box" stroke="#7c3aed"/><line x1="18" y1="43" x2="62" y2="43" stroke="#7c3aed" stroke-width="4"/><circle cx="30" cy="43" r="6" fill="#fff" stroke="#7c3aed" stroke-width="3"/><text x="84" y="31" class="ct">Counterfactual</text><text x="84" y="50" class="ct">controls</text><text x="84" y="72" class="cs">no-prior / random-prior</text><text x="84" y="89" class="cs">shuffled-prior</text></g>
-  </g>
-
-  <g transform="translate(1190 125)">
-    <rect width="260" height="590" rx="18" fill="#ecfdf5" stroke="#047857" stroke-width="1.8"/>
-    <circle cx="36" cy="34" r="22" fill="#047857"/><text x="36" y="42" text-anchor="middle" class="num">5</text>
-    <text x="78" y="35" class="pt" fill="#047857">Evidence</text><text x="78" y="58" class="pt" fill="#047857">Gate</text>
-    <g transform="translate(18 86)"><rect width="224" height="86" rx="12" class="box" stroke="#047857"/><rect x="18" y="26" width="44" height="28" rx="5" fill="#047857"/><text x="84" y="34" class="ct">Vanilla VGGT</text><text x="84" y="53" class="ct">baseline</text></g>
-    <g transform="translate(18 190)"><rect width="224" height="86" rx="12" class="box" stroke="#047857"/><rect x="18" y="26" width="44" height="28" rx="5" fill="#047857"/><text x="84" y="34" class="ct">Prior adapter</text><text x="84" y="53" class="ct">output</text></g>
-    <g transform="translate(18 294)"><rect width="224" height="110" rx="12" class="box" stroke="#047857"/><circle cx="22" cy="34" r="3" fill="#2563eb"/><circle cx="42" cy="50" r="3" fill="#06b6d4"/><circle cx="60" cy="34" r="3" fill="#f97316"/><text x="84" y="31" class="ct">Human-main</text><text x="84" y="50" class="ct">full-scene RGB</text><text x="84" y="69" class="ct">point cloud</text><text x="84" y="91" class="cs">main evidence figure</text></g>
-    <g transform="translate(18 422)"><rect width="224" height="96" rx="12" class="box" stroke="#047857"/><path d="M22 18 h34 l14 14 v44 h-48z" fill="none" stroke="#047857" stroke-width="3"/><text x="84" y="31" class="ct">Manifest and</text><text x="84" y="50" class="ct">visual report</text><text x="84" y="70" class="cs">with failure log</text></g>
-  </g>
-
-  <line x1="292" y1="420" x2="318" y2="420" class="arr"/><line x1="582" y1="420" x2="608" y2="420" class="arr"/><line x1="872" y1="420" x2="898" y2="420" class="arr"/><line x1="1162" y1="420" x2="1188" y2="420" class="arr"/>
-
-  <rect x="50" y="755" width="1400" height="150" rx="18" fill="#f8fbff" stroke="#60a5fa" stroke-width="1.4"/>
-  <text x="750" y="790" text-anchor="middle" class="pt" fill="#2563eb">Evaluation Gate</text>
-  <text x="90" y="825" class="ct">• Metric pass is not the same as visual pass or advisor pass.</text>
-  <text x="90" y="850" class="ct">• Final promotion requires a human-main full-scene RGB point cloud.</text>
-  <text x="90" y="875" class="ct">• Projection overlays, SMPL-only renderings, and teacher references remain auxiliary.</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 520" width="100%" role="img" aria-label="VGGT-SMPL-X Human Prior Adapter architecture">
+<defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#8aa0b8"/></marker><filter id="shadow" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="8" stdDeviation="8" flood-color="#172033" flood-opacity="0.10"/></filter></defs>
+<rect width="1400" height="520" rx="28" fill="#fbfcff"/>
+<text x="48" y="58" font-family="Inter,Arial,sans-serif" font-size="34" font-weight="800" fill="#111827">VGGT-SMPL-X Human Prior Adapter</text>
+<text x="50" y="90" font-family="Inter,Arial,sans-serif" font-size="16" fill="#5b6472">Model-side human-structure prior route built on top of VGGT camera/depth/point-map predictions.</text>
+<path d="M240,203.0 C270.0,203.0 270.0,203.0 300,203.0" fill="none" stroke="#8aa0b8" stroke-width="2" marker-end="url(#arrow)"/><path d="M280,343.0 C295.0,343.0 295.0,343.0 310,343.0" fill="none" stroke="#8aa0b8" stroke-width="2" marker-end="url(#arrow)"/><path d="M530,203.0 C590.0,203.0 590.0,271.0 650,271.0" fill="none" stroke="#8aa0b8" stroke-width="2" marker-end="url(#arrow)"/><path d="M570,343.0 C610.0,343.0 610.0,271.0 650,271.0" fill="none" stroke="#8aa0b8" stroke-width="2" marker-end="url(#arrow)"/><path d="M910,271.0 C950.0,271.0 950.0,271.0 990,271.0" fill="none" stroke="#8aa0b8" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="50" y="160" width="190" height="86" rx="18" fill="#eff6ff" stroke="#93c5fd" stroke-width="1.5" filter="url(#shadow)"/>
+<text x="72" y="194" font-family="Inter,Arial,sans-serif" font-size="18" font-weight="700" fill="#142033"><tspan x="72" dy="0">Multi-view RGB</tspan></text>
+<text x="72" y="222" font-family="Inter,Arial,sans-serif" font-size="13" fill="#526071">VGGT original input</text>
+<circle cx="62" cy="172" r="5" fill="#1d4ed8"/><rect x="300" y="160" width="230" height="86" rx="18" fill="#f5f3ff" stroke="#c4b5fd" stroke-width="1.5" filter="url(#shadow)"/>
+<text x="322" y="194" font-family="Inter,Arial,sans-serif" font-size="18" font-weight="700" fill="#142033"><tspan x="322" dy="0">VGGT backbone</tspan></text>
+<text x="322" y="222" font-family="Inter,Arial,sans-serif" font-size="13" fill="#526071">cameras / depth / point maps / tracks</text>
+<circle cx="312" cy="172" r="5" fill="#6d28d9"/><rect x="50" y="300" width="230" height="86" rx="18" fill="#fffbeb" stroke="#fcd34d" stroke-width="1.5" filter="url(#shadow)"/>
+<text x="72" y="334" font-family="Inter,Arial,sans-serif" font-size="18" font-weight="700" fill="#142033"><tspan x="72" dy="0">SMPL-X prior source</tspan></text>
+<text x="72" y="362" font-family="Inter,Arial,sans-serif" font-size="13" fill="#526071">pose / shape / expression / scale</text>
+<circle cx="62" cy="312" r="5" fill="#b45309"/><rect x="310" y="300" width="260" height="86" rx="18" fill="#fffbeb" stroke="#fcd34d" stroke-width="1.5" filter="url(#shadow)"/>
+<text x="332" y="334" font-family="Inter,Arial,sans-serif" font-size="18" font-weight="700" fill="#142033"><tspan x="332" dy="0">View-aligned prior</tspan><tspan x="332" dy="22">rendering</tspan></text>
+<text x="332" y="362" font-family="Inter,Arial,sans-serif" font-size="13" fill="#526071">prior maps / depth / points / masks</text>
+<circle cx="322" cy="312" r="5" fill="#b45309"/><rect x="650" y="225" width="260" height="92" rx="18" fill="#ecfeff" stroke="#67e8f9" stroke-width="1.5" filter="url(#shadow)"/>
+<text x="672" y="259" font-family="Inter,Arial,sans-serif" font-size="18" font-weight="700" fill="#142033"><tspan x="672" dy="0">HumanPriorAdapter</tspan></text>
+<text x="672" y="293" font-family="Inter,Arial,sans-serif" font-size="13" fill="#526071">light route, not template replacement</text>
+<circle cx="662" cy="237" r="5" fill="#0e7490"/><rect x="990" y="225" width="260" height="92" rx="18" fill="#ecfdf5" stroke="#86efac" stroke-width="1.5" filter="url(#shadow)"/>
+<text x="1012" y="259" font-family="Inter,Arial,sans-serif" font-size="18" font-weight="700" fill="#142033"><tspan x="1012" dy="0">Geometry supervision</tspan></text>
+<text x="1012" y="293" font-family="Inter,Arial,sans-serif" font-size="13" fill="#526071">depth / point / normal / ROI weights</text>
+<circle cx="1002" cy="237" r="5" fill="#047857"/>
 </svg>

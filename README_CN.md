@@ -6,205 +6,204 @@
 
 <p align="center">
   <a href="README.md">English README</a> ·
-  <a href="#这个仓库解决什么问题">项目定位</a> ·
-  <a href="#核心路线">核心路线</a> ·
-  <a href="#并行工程实验记录">并行工程实验</a> ·
-  <a href="#成果怎么判断">成果判断</a> ·
-  <a href="#成果展示页面">成果展示页面</a>
+  <a href="#项目一句话">项目一句话</a> ·
+  <a href="#和原版-vggt-的关系">和原版 VGGT 的关系</a> ·
+  <a href="#我具体做了什么">我具体做了什么</a> ·
+  <a href="#成果图怎么读">成果图怎么读</a> ·
+  <a href="#失败边界">失败边界</a> ·
+  <a href="#面试时怎么讲">面试时怎么讲</a>
 </p>
 
 <p align="center">
-  <img alt="status" src="https://img.shields.io/badge/status-研究路线整理中-2563eb" />
-  <img alt="backbone" src="https://img.shields.io/badge/backbone-VGGT-7c3aed" />
+  <img alt="status" src="https://img.shields.io/badge/status-active_research_route-2563eb" />
+  <img alt="baseline" src="https://img.shields.io/badge/baseline-VGGT-7c3aed" />
   <img alt="prior" src="https://img.shields.io/badge/prior-SMPL--X-d97706" />
+  <img alt="evidence" src="https://img.shields.io/badge/evidence-full--scene_point_cloud-0f766e" />
 </p>
 
-这个仓库记录的是 VGGT + SMPL-X 人体先验路线里的模型侧部分。
+## 项目一句话
 
-它的目标很明确：在不改掉 VGGT 主干定位的前提下，把 SMPL-X 提供的人体拓扑先验接进多视角几何重建流程里，让模型在人体区域有更清楚的结构参考，尤其是头部、躯干、四肢、手部这类容易散掉或变成一团的区域。
+这个仓库记录的是一条 **VGGT + SMPL-X 人体结构先验** 的模型侧实验路线：在保留 VGGT 原本相机、深度、点图、轨迹预测能力的基础上，尝试把 SMPL-X 提供的人体拓扑结构变成可对齐、可监督、可审计的人体先验信号，帮助模型在人体区域生成更清楚、更连续、更可解释的三维几何。
 
-这不是一个“套壳 SMPL-X”的仓库。SMPL-X 在这里提供人体结构参考，最后的几何输出仍然应该来自 VGGT 路线。
-
----
-
-## 这个仓库解决什么问题
-
-VGGT 本身擅长从多视角 RGB 中估计相机、深度、点图和轨迹。问题在于，人体不是普通物体。人体有比较强的拓扑结构，头、躯干、手脚之间的关系不能只靠点云指标来判断。
-
-项目推进中最容易出现的问题是：
-
-- 指标看起来有提升，但点云里看不出完整人体；
-- 投影到图片上似乎还可以，换成 3D 点云后人形散掉；
-- 单独截出人体区域能看，放回场景后比例、位置或结构不对；
-- SMPL-X 本身像人，但模型输出没有真正学到人体结构；
-- teacher、baseline、student 的边界混在一起，最后很难判断到底是哪条路线起作用。
-
-这个仓库把问题收窄到一个模型侧路线：如何把 SMPL-X 的结构信息变成 VGGT 能使用的先验输入和监督信号，并且用清楚的证据标准判断它有没有真正帮助到点云重建。
+它不是“把 SMPL-X 模板直接贴到点云里”。  
+SMPL-X 在这里是 prior / teacher / supervision source，最终能不能成立，仍然要看 **VGGT student route** 产生的 full-scene RGB point cloud。
 
 ---
 
-## 核心路线
+## 和原版 VGGT 的关系
 
-整体流程可以概括成四步。
+原版 VGGT 可以从单张、多张或多视图 RGB 图像中直接预测：
 
-### 1. 从真实相机和人体参数出发
+- 相机参数；
+- 深度图；
+- point map；
+- track / correspondence；
+- 后续可导出 COLMAP 或接入 Gaussian Splatting 类流程。
 
-输入侧保留 VGGT 原本需要的多视角 RGB 和相机信息，同时读取人体相关参数，用 SMPL-X 构造一个姿态对齐的人体结构参考。
+这类 feed-forward visual geometry model 对普通场景很强，但在人体区域会遇到一个问题：  
+人体不是普通刚体。头、躯干、手臂、腿、手脚之间有明显拓扑结构。如果只看 depth loss、point loss 或投影 overlay，可能出现“指标看起来还行，但三维点云里人体仍然像壳、片、团、blob”的情况。
 
-这里强调“真实相机对齐”。如果人体先验只是停留在模板坐标系里，它对多视角重建帮助有限；只有把先验投到同一组相机视角下，才能和 VGGT 的输入、深度、点图监督接上。
+本仓库的改动重点就是：
 
-### 2. 渲染视角对齐的人体先验证据
-
-SMPL-X 人体结构会被转换成和当前视角对应的先验信号，例如：
-
-- `prior_maps`：给模型看的图像空间先验；
-- `prior_depths`：人体区域的深度参考；
-- `prior_points`：由相机几何反投影得到的点参考；
-- `prior_mask`：标记哪些区域可以参与人体先验监督。
-
-这些信号的价值在于，它们和 RGB、相机、深度、点图处在同一套坐标和视角关系里。
-
-### 3. 用 HumanPriorAdapter 接入模型路线
-
-这个仓库采用轻量 prior adapter 的思路，把人体先验接进 VGGT 路线，而不是推翻原来的主干。
-
-这样做的好处是边界清楚：
-
-- VGGT 仍然负责最终几何预测；
-- SMPL-X 负责提供人体结构先验；
-- prior adapter 负责把先验转换成模型能使用的中间信号；
-- 训练和评估阶段可以保留 baseline、no-prior、random-prior、shuffled-prior 等对照。
-
-### 4. 用 full-scene 点云判断结果
-
-最终判断不看单张诊断图，也不只看 loss。导师真正要看的，是人体为主体、同时保留一定环境上下文的 full-scene RGB point cloud。
-
-也就是说，点云里要能看出人体结构，最好能和原始 VGGT baseline、控制组、adapter 输出放在同一视角、同一边界下比较。
+| 原版 VGGT / baseline | 本仓库增加的路线 |
+| --- | --- |
+| RGB 输入为主 | 保留 RGB，同时增加人体先验输入 |
+| 输出 camera / depth / point map / track | 在人体区域增加 prior depth / prior point / prior mask 监督 |
+| 通用场景几何模型 | 加入 SMPL-X 人体拓扑先验 |
+| 指标和可视化通常分开看 | 明确 metric pass / visual pass / advisor pass |
+| 点云后处理容易被误判 | 要求 human-main full-scene RGB point cloud 作为主证据 |
 
 ---
 
-## 并行工程实验记录
+## 我具体做了什么
 
-这条路线后来被放进更大的并行工程里复盘。任务从“把 SMPL-X 接入 VGGT”推进到了“sparse-view 人体高质量几何恢复的工程闭环”。这一阶段跑通了多条链路，也明确暴露出 6-view head / face 点云质量的上限。
+### 1. 设计 SMPL-X prior 的接入方式
 
-主链路可以概括成四层：
+项目不是简单调用 SMPL-X，而是把 SMPL-X 放进 VGGT 的训练/评估链路中：
 
-1. **Pose-aligned SMPL-X driver**：读取 pose / shape / expression / translation / scale，把参数化人体放到当前姿态和场景坐标里。
-2. **Dense prior maps**：把 posed mesh 投到真实相机下，生成逐视角对齐的 dense prior，包括 depth、camera/world points、normal、visibility、canonical coordinates、body-part features 等。
-3. **Input-side / layer-wise fusion**：RGB 提供真实外观和背景，prior maps 提供 pose-aligned 几何位置，mask 限制人体先验的作用范围。先验不只在输入端拼一次，而是在多层特征演化过程中持续参与。
-4. **Output-side supervision**：训练侧支持 depth / point / normal / point-normal 等几何监督，也支持 ROI 和 boundary 加权。
+```text
+多视角 RGB + 相机参数
+        │
+        ├── 原版 VGGT backbone
+        │        └── cameras / depth / point maps / tracks
+        │
+SMPL-X pose / shape / translation / scale
+        │
+        └── 真实相机下的 prior rendering
+                 ├── prior_maps
+                 ├── prior_depths
+                 ├── prior_points
+                 ├── prior_normals
+                 └── prior_mask
+                          │
+                          └── HumanPriorAdapter / supervision route
+                                   │
+                                   └── VGGT-owned human-aware point prediction
+                                            │
+                                            └── full-scene RGB point cloud evidence
+```
 
-SMPL / SMPL-X 在这里的角色不是最终结果，而是 pose-aligned geometry prior。它提供人体大体位置、深度、表面方向和区域约束；真正要证明的仍然是下游模型是否能在 sparse-view 条件下生成更清晰、连续、稳定的 3D 人体点云。
+核心思路是：**SMPL-X 提供人体结构参考，VGGT 仍然负责模型输出。**
 
-这一阶段的经验也说明：只增加 loss 或者让 ROI 点数变多，并不等于几何质量提升。如果 teacher 本身不够连续、对齐，可见面也不完整，就容易出现“点数增加但 Open3D 更差”的伪阳性。
+### 2. 设计 prior maps / prior depth / prior point 数据链路
 
----
+我围绕人体区域构造了几类先验：
 
-## 已排查路线和失败边界
+- `prior_maps`：图像空间的人体提示，例如 silhouette、关键点/部位提示等；
+- `prior_depths`：通过 SMPL-X mesh 在真实相机下渲染得到的人体区域深度；
+- `prior_points`：由深度和相机参数反投影得到的人体点参考；
+- `prior_normals`：局部表面方向，用于约束几何方向；
+- `prior_mask`：限定哪些像素/区域可以参与人体先验监督。
+
+这些先验必须和真实 RGB、mask、camera intrinsic/extrinsic、VGGT 输出坐标保持一致，否则很容易得到看似可视化正常、实际三维错位的伪结果。
+
+### 3. 建立 teacher / student / prototype / diagnostic 的边界
+
+这个项目反复踩过的坑是：很多东西看起来像成果，但不能当最终成果。
+
+| 类型 | 能做什么 | 不能做什么 |
+| --- | --- | --- |
+| SMPL-X / Kinect / external teacher | 作为 dense teacher、参考、诊断 | 不能当 student 输出 |
+| projection overlay | 检查相机和投影是否大致对齐 | 不能证明 3D 点云正确 |
+| isolated human scatter | 看局部人体点分布 | 不能作为导师主图 |
+| ROI / crop / face close-up | 排查头部和手部局部问题 | 不能替代 full-scene point cloud |
+| VGGT student output | 才是模型路线输出 | 必须通过 full-scene 视觉门控 |
+
+### 4. 做过的路线排查
 
 并行实验里排查过多条方向：
 
 - projected targetpatch / summary-token patch；
-- 从同一 checkpoint 继续做 point-normal / humancrop 微调；
+- point-normal / human-crop finetuning；
 - TeacherGeom / ROI combo；
-- confidence-collapse pseudo-positive，也就是 face ROI 点数看起来暴涨，但 confidence threshold 或 Open3D 评估反而说明质量更差；
-- NormalBae、Sapiens、DepthAnything、DepthPro 等外部 teacher 路线。
+- confidence collapse：ROI 点数增加但 Open3D 或 confidence threshold 后反而更差；
+- NormalBae、Sapiens、DepthAnything、DepthPro 等外部 teacher 参考；
+- 6-view face/head ROI 复核；
+- full-scene human-main visual gate。
 
-这些排查得到的结论比较明确：当前瓶颈不是缺少脚本，而是缺少足够高质量、连续、对齐的 head / face geometry teacher，或者缺少一种能直接改善 sparse-view target-view surface 的局部几何优化方法。
-
-所以后续路线必须转向更硬的几件事：
-
-- real 3D learned residual；
-- multi-view detail supervision；
-- baseline high-confidence detail preservation；
-- SMPL feature-conditioned local geometry branch；
-- human-main full-scene visual gate。
+得到的阶段性结论是：当前瓶颈不只是脚本或 viewer，而是 **高质量、连续、对齐的人体局部几何 teacher 不够稳定**，以及需要更强的 **learned 3D residual / feature-conditioned local geometry branch**。
 
 ---
 
-## 当前成果快照
+## 成果图怎么读
 
 <p align="center">
   <img src="docs/figures/parallel_engineering_result_snapshot.svg" alt="parallel engineering result snapshot" width="100%" />
 </p>
 
-<p align="center"><sub>6-view face/head ROI 复核结果：已经能看到局部面部结构，但仍然存在连续性和稳定性问题。</sub></p>
+<p align="center"><sub>6-view face/head ROI 复核结果：局部面部结构已经能看到，但连续性和稳定性还没有达到最终要求。</sub></p>
+
+这张图不要理解成“最终成功图”。它更准确的意义是：
+
+- 说明 6-view 设置下，局部 facial/head ROI 有可见结构；
+- 说明先验和多视角路线能产生一定局部收益；
+- 同时也暴露出点云连续性、稳定性和 full-scene 主图要求之间还有差距；
+- 因此它是 **visual diagnostic / partial visual pass candidate**，不是 advisor pass。
 
 <p align="center">
   <img src="docs/figures/external_reference_control.svg" alt="external reference control" width="100%" />
 </p>
 
-<p align="center"><sub>外部几何参考路线只作为相机、mask、teacher 质量排查记录，不作为 student 输出。</sub></p>
+<p align="center"><sub>外部几何参考路线只用于相机、mask、teacher 质量排查，不作为 student 输出。</sub></p>
 
-目前较安全的结论是：6 视角下已经取得了不错的局部面部结果，但仍然有瑕疵；同协议 6-view face / head 点云还没有达到足够清晰、连续、稳定的最终要求。
-
----
-
-## 架构示意
-
-```text
-多视角 RGB + 真实相机
-        │
-        ├── VGGT 主干
-        │        └── 相机 / 深度 / 点图 / 轨迹
-        │
-SMPL-X 人体参数
-        │
-        └── 真实相机下的人体先验渲染
-                 ├── prior_maps
-                 ├── prior_depths
-                 ├── prior_points
-                 └── prior_mask
-                          │
-                          └── HumanPriorAdapter
-                                   │
-                                   └── VGGT 路线产生的人体感知场景几何
-                                            │
-                                            └── full-scene RGB point cloud 证据
-```
-
-仓库首页上方的 SVG 图对应的就是这条路线。
+这张图的意义是控制组和 teacher 质量审计。它能帮助判断相机、mask 和参考几何是否合理，但不能写成“我的 VGGT 模型输出已经成功”。
 
 ---
 
-## 成果怎么判断
+## 失败边界
 
-这个项目不能只看 metric pass。更准确的判断顺序应该是：
+本项目采用 fail-closed 原则：
 
-| 层级 | 含义 | 是否足够 |
-| --- | --- | --- |
-| metric pass | loss 或几何指标变好 | 不够 |
-| visual pass | 3D 输出能看出更清楚的人体结构 | 有价值，但还要对照 |
-| advisor pass | 同视角、同边界、同点大小下，human-main full-scene RGB point cloud 明显更好 | 最终目标 |
+- 如果 full-scene RGB point cloud 里看不出人体结构，不能写 advisor pass；
+- 如果 projection overlay 像人，但 3D 点云仍是 blob/sheet，不能写 3D 成功；
+- 如果 random / shuffled prior 和 true prior 接近，不能写人体语义因果成立；
+- 如果 teacher 比 student 更像人，不能写模型成功；
+- 如果只完成 viewer、截图、局部 crop，不能替代模型表示重构。
 
-projection overlay、isolated human scatter、SMPL-X-only、teacher/reference 图都只能作为辅助证据。真正能作为主证据的，必须是 VGGT student 路线产生的 full-scene RGB point cloud。
+后续更合理的方向是：
+
+- real 3D learned residual；
+- multi-view detail supervision；
+- baseline high-confidence detail preservation；
+- SMPL feature-conditioned local geometry branch；
+- canonical SMPL-X surfel / graph representation；
+- human-main full-scene visual gate。
 
 ---
 
-## 当前状态
+## 面试时怎么讲
 
-这个仓库处在持续实验阶段，目前最重要的价值是把 SMPL-X 人体先验接入 VGGT 的模型路线，并且把训练、对照、证据判断的边界固定下来。
+可以这样概括：
 
-后续实验如果要继续推进，重点不是单纯调 viewer 或截图角度，而是继续检查：
+> 我这个项目不是直接把 SMPL-X 贴到 VGGT 输出上，而是把 SMPL-X 当作人体结构先验，构造成和真实相机对齐的 prior maps、prior depth、prior points、prior normals 和 prior mask，再通过 adapter / supervision route 让 VGGT 在人体区域获得结构参考。项目过程中我重点做了数据链路、teacher/student 边界、baseline/control 设计和 full-scene point cloud evidence gate。当前阶段不能夸大成最终成功，但它清楚暴露了 sparse-view 人体几何恢复中 teacher 质量、相机对齐、人体拓扑和视觉证据标准之间的关系。
 
-- 先验是否真的进入 VGGT student 路线；
-- true prior 是否明显优于 random / shuffled control；
-- full-scene 点云里人体结构是否比 vanilla VGGT 更清楚；
-- 环境上下文是否仍然保留；
-- 结论是否能被文件、图像、manifest 和对照实验支撑。
+可追问点：
+
+- 为什么不能直接用 SMPL-X 替换点云？
+- prior maps 和 prior points 分别解决什么问题？
+- projection overlay 为什么不能证明 3D 成功？
+- metric pass / visual pass / advisor pass 有什么区别？
+- 为什么下一步要转向 canonical surfel / graph representation？
 
 ---
 
 ## 成果展示页面
-
-下面两个页面用于展示阶段性成果和项目说明：
 
 - 成果展示页面：https://www.yuque.com/maturinlove221/gqr279/emwf87ku108nzvez
 - 成果展示页面：https://www.yuque.com/maturinlove221/gqr279/fg8lq33tgbwiagtt
 
 ---
 
-## 配图文件
+## 当前状态
+
+这个仓库是一个 active research route。  
+它的价值不在于“已经解决 VGGT 人体点云”，而在于把 **VGGT baseline、SMPL-X prior、dense prior maps、adapter/supervision route、teacher/student 边界和 full-scene evidence gate** 串成了一条可复盘的研究工程路线。
+
+---
+
+## 保留图片
+
+本次 README 只重排和补充文字说明，不替换原有图片文件：
 
 ```text
 docs/figures/vggt_smplx_human_prior_adapter_architecture.svg
