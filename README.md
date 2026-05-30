@@ -1,8 +1,3 @@
-<!--
-README rewrite generated for a resume/portfolio-facing research repository.
-Style goal: closer to public research project READMEs: clear motivation, baseline delta,
-architecture, contribution boundary, evidence gallery, results/status, and reproducible usage.
--->
 # VGGT-SMPL-X Human Prior Adapter
 
 <p align="center">
@@ -10,139 +5,121 @@ architecture, contribution boundary, evidence gallery, results/status, and repro
 </p>
 
 <p align="center">
-  <b>Human-structure prior injection for VGGT-style visual geometry.</b><br/>
-  VGGT backbone · SMPL-X prior rendering · dense prior maps · geometry supervision · full-scene evidence gate
-</p>
-
-<p align="center">
   <a href="README_CN.md">中文说明</a> ·
-  <a href="#motivation">Motivation</a> ·
-  <a href="#what-is-new-compared-with-vggt">Delta from VGGT</a> ·
-  <a href="#architecture">Architecture</a> ·
-  <a href="#evidence-gallery">Evidence</a> ·
-  <a href="#current-status">Status</a>
+  <a href="#one-sentence-summary">Summary</a> ·
+  <a href="#relation-to-vggt">Relation to VGGT</a> ·
+  <a href="#what-this-repository-adds">What this adds</a> ·
+  <a href="#engineering-record">Engineering record</a> ·
+  <a href="#visual-record">Visual record</a> ·
+  <a href="#repository-role">Repository role</a>
 </p>
 
 <p align="center">
   <img alt="status" src="https://img.shields.io/badge/status-active_research_route-2563eb" />
-  <img alt="backbone" src="https://img.shields.io/badge/backbone-VGGT-7c3aed" />
+  <img alt="baseline" src="https://img.shields.io/badge/baseline-VGGT-7c3aed" />
   <img alt="prior" src="https://img.shields.io/badge/prior-SMPL--X-d97706" />
-  <img alt="claim boundary" src="https://img.shields.io/badge/claim-conservative-d97706" />
+  <img alt="evidence" src="https://img.shields.io/badge/evidence-full--scene_point_cloud-0f766e" />
 </p>
 
-## Motivation
+## One-sentence summary
 
-[VGGT](https://github.com/facebookresearch/vggt) is a feed-forward visual geometry model that predicts camera parameters, depth maps, point maps, and tracks from one or more input views. This repository starts from that baseline contract and asks a narrower question:
+This repository records the model-side route for adding **SMPL-X human structural priors** to a **VGGT-style feed-forward visual geometry pipeline**. The goal is to keep VGGT as the geometry owner while providing human-region structural cues, prior geometry targets, and evidence-aware evaluation for sparse-view human-scene reconstruction.
 
-> Can a VGGT-style geometry model use a human body prior to produce a clearer human-region 3D structure, without simply replacing the output with an SMPL-X template?
+## Relation to VGGT
 
-The target is not a pretty 2D overlay. The target is a **VGGT-owned human-main full-scene RGB point cloud**, where the human is recognizable while scene context is still retained.
+The original VGGT baseline predicts visual geometry directly from one or more RGB views: cameras, depth maps, point maps, and tracks. That makes it a strong general scene geometry backbone. Human-centric reconstruction, however, adds a different difficulty: the output must preserve recognizable human topology, including head, torso, arms, legs, hands, and feet, while still staying in the surrounding scene.
 
-## What is new compared with VGGT
+This repository is a delta on top of the VGGT baseline:
 
-| Layer | Upstream VGGT baseline | This repository |
-| --- | --- | --- |
-| Input | Multi-view RGB images | Multi-view RGB + optional view-aligned human-prior maps |
-| Geometry output | Cameras, depth, point maps, tracks | Same VGGT-owned output path; SMPL-X is only prior/supervision |
-| Human structure | No explicit body topology | SMPL-X silhouette / depth / point / normal / body-part priors |
-| Training signal | Generic visual geometry supervision | Human ROI geometry supervision and failure-closed controls |
-| Evaluation | Scene-level geometry tasks | Human-main full-scene RGB point-cloud evidence gate |
+| VGGT baseline | This repository |
+| --- | --- |
+| RGB-driven feed-forward geometry | RGB geometry plus SMPL-X human structural prior |
+| General camera / depth / point / track prediction | Human-region prior maps, prior depth, prior points, prior normals, and prior masks |
+| Scene-level geometry output | Human-aware scene geometry under the same camera and scene context |
+| Standard metric / visual inspection | Explicit separation of metrics, visual diagnostics, and full-scene point-cloud evidence |
+| Generic point-map prediction | Human topology constraints through pose-aligned body priors |
 
-## Architecture
+The key design choice is that SMPL-X is not used as a final replacement. It is a structured prior and supervision source. The final output still needs to come from the VGGT student route.
 
-<p align="center">
-  <img src="docs/figures/vggt_smplx_human_prior_adapter_architecture.svg" alt="architecture" width="100%" />
-</p>
+## What this repository adds
 
-### Data and model path
+### 1. Pose-aligned SMPL-X prior construction
 
-```text
-Multi-view RGB + camera parameters
-        │
-        ├── VGGT backbone
-        │       ├── camera prediction
-        │       ├── depth prediction
-        │       └── point-map prediction
-        │
-SMPL-X parameters / fitted human prior
-        │
-        └── view-aligned prior rendering
-                ├── prior_maps
-                ├── prior_depths
-                ├── prior_points
-                ├── prior_normals
-                └── prior_mask
-                         │
-                         ▼
-                  HumanPriorAdapter
-                         │
-                         ▼
-            VGGT-owned human-aware scene geometry
-                         │
-                         ▼
-        human-main full-scene RGB point-cloud evidence
-```
+The route starts with SMPL-X pose / shape / expression / translation / scale parameters and places the body prior into the current pose and scene coordinate system. This creates a human structural reference that can be projected into real camera views.
 
-## My work
+### 2. View-aligned prior rendering
 
-- Designed the **SMPL-X prior route** around `prior_maps`, `prior_depths`, `prior_points`, and `prior_mask` instead of using SMPL-X as a direct final output.
-- Built the project narrative around the VGGT baseline: keep VGGT as the geometry owner, and let the human prior act as a structure signal.
-- Separated **teacher / prior / diagnostic** evidence from **student/model-owned** output.
-- Added conservative evaluation rules: metric pass, visual pass, and advisor pass are different gates.
-- Recorded failure boundaries around pseudo-positive cases, including point-count increase without reliable Open3D geometry improvement.
-- Used the 6-view face/head ROI re-audit to decide that more loss terms alone are not enough; the next route needs stronger local geometry representation or a learned residual branch.
+The posed SMPL-X mesh is rendered under the same cameras used by the RGB inputs. The route can provide:
 
-## Evidence gallery
+- `prior_maps`: image-space human cues for the model;
+- `prior_depths`: human-region depth references;
+- `prior_points`: camera/world point references;
+- `prior_normals`: local surface direction references;
+- `prior_mask`: valid human-prior supervision regions.
+
+These signals are useful only when they remain aligned with the RGB, mask, depth, and camera chain.
+
+### 3. HumanPriorAdapter / supervision path
+
+The repository keeps the main VGGT route intact and adds a light human-prior path. The prior branch can be used as input-side guidance, intermediate feature conditioning, or output-side supervision. This keeps the project closer to a VGGT extension rather than a separate SMPL-X regressor.
+
+### 4. Baseline and control awareness
+
+The project is organized around comparison rather than isolated results. The expected comparison set includes vanilla VGGT, no-prior runs, prior-conditioned runs, teacher/reference routes, and visual controls.
+
+## Engineering record
+
+The route was later reviewed inside a larger sparse-view human geometry loop. Several engineering directions were made runnable or auditable:
+
+- projected target patch / summary-token patch routes;
+- point-normal and human-crop fine-tuning attempts from the same checkpoint;
+- TeacherGeom / ROI combinations;
+- confidence-collapse pseudo-positive cases where ROI point count increased but Open3D or confidence-based inspection got worse;
+- external reference routes such as NormalBae, Sapiens, DepthAnything, and DepthPro;
+- 6-view face/head ROI re-audits;
+- full-scene human-main visual evidence checks.
+
+The main lesson is that adding more loss terms or more ROI points is not automatically a geometry improvement. If the teacher is not continuous, aligned, and complete on visible surfaces, the student can inherit noisy or incomplete structure.
+
+## Visual record
 
 <p align="center">
   <img src="docs/figures/parallel_engineering_result_snapshot.svg" alt="parallel engineering result snapshot" width="100%" />
 </p>
 
-<p align="center"><sub>6-view face/head ROI re-audit. Local facial structure is visible, but continuity and stability are not yet enough for final advisor-pass evidence.</sub></p>
+<p align="center"><sub>6-view face/head ROI re-audit. Local facial structure is visible, while continuity and stability still need stronger geometry support.</sub></p>
 
 <p align="center">
   <img src="docs/figures/external_reference_control.svg" alt="external reference control" width="100%" />
 </p>
 
-<p align="center"><sub>External teacher/reference routes are used for camera, mask, and teacher-quality audits. They are not student model outputs.</sub></p>
+<p align="center"><sub>External reference routes are used for camera, mask, and teacher-quality auditing. They are reference controls, not student outputs.</sub></p>
 
-<p align="center">
-  <img src="docs/figures/vggt_smplx_evidence_matrix.svg" alt="evidence matrix" width="100%" />
-</p>
+## Repository role
 
-## Checked routes and lessons
+This repository is the model-prior side of the broader human-prior VGGT project stack.
 
-| Route | What it tested | Safe conclusion |
-| --- | --- | --- |
-| projected targetpatch / summary-token patch | whether the model can use localized target-view evidence | useful diagnostic, not enough alone |
-| point-normal / human-crop finetuning | local detail supervision | can improve local signals but not guaranteed full-scene geometry |
-| TeacherGeom / ROI combo | teacher-driven human geometry | sensitive to teacher continuity and alignment |
-| NormalBae / Sapiens / DepthAnything / DepthPro controls | external geometry reference quality | reference only; not student output |
-| high-confidence baseline preservation | prevent destroying existing VGGT geometry | necessary for conservative improvements |
+| Repository | Role |
+| --- | --- |
+| `VGGT-SMPL-X-Human-Prior-Adapter` | Model-side SMPL-X prior injection and supervision route |
+| `VGGT-ZJU-Mocap-Adapter` | Dataset adaptation, camera alignment, mask audit, and trusted case export |
+| `vggt-human-prior-builder` | Release-safe public preprocessing recipe and schema boundary |
+| `TuringResearch_plus` | MCP-first research workflow engine used for evidence and planning support |
 
-## Evidence standard
+## What the project demonstrates
 
-| Level | Meaning | Can be promoted? |
-| --- | --- | --- |
-| Metric pass | A loss or numerical score improves. | No, not alone. |
-| Visual pass | A local or diagnostic view looks better. | Useful, but still not final. |
-| Advisor pass | Human-main full-scene RGB point cloud shows a clearer body under the same view/bounds. | Yes, main target. |
+This project demonstrates my work on:
 
-## Current status
+- reading and adapting a visual geometry foundation model baseline;
+- designing a human-prior route that does not replace the model output with a template;
+- aligning human priors to real cameras;
+- building prior maps, prior depth, prior points, prior normals, and prior masks;
+- separating teacher/reference outputs from student/model-owned outputs;
+- organizing experiments around baseline, controls, evidence, and reproducible project records.
 
-This repository is an active research route. The safe current claim is:
+## Results and project links
 
-> The project establishes a VGGT-compatible SMPL-X prior injection and supervision route, plus a conservative evidence gate for human-main full-scene 3D geometry. Some local 6-view face/head results are promising, but the final clear, continuous, stable human-main point-cloud target has not yet been fully reached.
+The following Yuque pages contain additional stage records and project displays:
 
-## Citation / upstream credit
-
-This repository builds on the public VGGT project and should be understood as an adapter / research-route exploration, not as the original VGGT method.
-
-```bibtex
-@inproceedings{wang2025vggt,
-  title={VGGT: Visual Geometry Grounded Transformer},
-  author={Wang, Jianyuan and Chen, Minghao and Karaev, Nikita and Vedaldi, Andrea and Rupprecht, Christian and Novotny, David},
-  booktitle={Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition},
-  year={2025}
-}
-```
+- https://www.yuque.com/maturinlove221/gqr279/emwf87ku108nzvez
+- https://www.yuque.com/maturinlove221/gqr279/fg8lq33tgbwiagtt
