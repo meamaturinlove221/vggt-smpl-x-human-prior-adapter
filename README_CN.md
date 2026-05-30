@@ -125,7 +125,6 @@ SMPL-X pose / shape / translation / scale
 
 ---
 
-## 成果图怎么读
 
 <p align="center">
   <img src="docs/figures/parallel_engineering_result_snapshot.svg" alt="parallel engineering result snapshot" width="100%" />
@@ -133,59 +132,11 @@ SMPL-X pose / shape / translation / scale
 
 <p align="center"><sub>6-view face/head ROI 复核结果：局部面部结构已经能看到，但连续性和稳定性还没有达到最终要求。</sub></p>
 
-这张图不要理解成“最终成功图”。它更准确的意义是：
 
-- 说明 6-view 设置下，局部 facial/head ROI 有可见结构；
+
+- 6-view 设置下，局部 facial/head ROI 有可见结构；
 - 说明先验和多视角路线能产生一定局部收益；
-- 同时也暴露出点云连续性、稳定性和 full-scene 主图要求之间还有差距；
-- 因此它是 **visual diagnostic / partial visual pass candidate**，不是 advisor pass。
-
-<p align="center">
-  <img src="docs/figures/external_reference_control.svg" alt="external reference control" width="100%" />
-</p>
-
-<p align="center"><sub>外部几何参考路线只用于相机、mask、teacher 质量排查，不作为 student 输出。</sub></p>
-
-这张图的意义是控制组和 teacher 质量审计。它能帮助判断相机、mask 和参考几何是否合理，但不能写成“我的 VGGT 模型输出已经成功”。
-
----
-
-## 失败边界
-
-本项目采用 fail-closed 原则：
-
-- 如果 full-scene RGB point cloud 里看不出人体结构，不能写 advisor pass；
-- 如果 projection overlay 像人，但 3D 点云仍是 blob/sheet，不能写 3D 成功；
-- 如果 random / shuffled prior 和 true prior 接近，不能写人体语义因果成立；
-- 如果 teacher 比 student 更像人，不能写模型成功；
-- 如果只完成 viewer、截图、局部 crop，不能替代模型表示重构。
-
-后续更合理的方向是：
-
-- real 3D learned residual；
-- multi-view detail supervision；
-- baseline high-confidence detail preservation；
-- SMPL feature-conditioned local geometry branch；
-- canonical SMPL-X surfel / graph representation；
-- human-main full-scene visual gate。
-
----
-
-## 面试时怎么讲
-
-可以这样概括：
-
-> 我这个项目不是直接把 SMPL-X 贴到 VGGT 输出上，而是把 SMPL-X 当作人体结构先验，构造成和真实相机对齐的 prior maps、prior depth、prior points、prior normals 和 prior mask，再通过 adapter / supervision route 让 VGGT 在人体区域获得结构参考。项目过程中我重点做了数据链路、teacher/student 边界、baseline/control 设计和 full-scene point cloud evidence gate。当前阶段不能夸大成最终成功，但它清楚暴露了 sparse-view 人体几何恢复中 teacher 质量、相机对齐、人体拓扑和视觉证据标准之间的关系。
-
-可追问点：
-
-- 为什么不能直接用 SMPL-X 替换点云？
-- prior maps 和 prior points 分别解决什么问题？
-- projection overlay 为什么不能证明 3D 成功？
-- metric pass / visual pass / advisor pass 有什么区别？
-- 为什么下一步要转向 canonical surfel / graph representation？
-
----
+- 同时也暴露出点云连续性、稳定性和 full-scene 主图要求之间还有差距
 
 ## 成果展示页面
 
@@ -201,12 +152,4 @@ SMPL-X pose / shape / translation / scale
 
 ---
 
-## 保留图片
 
-本次 README 只重排和补充文字说明，不替换原有图片文件：
-
-```text
-docs/figures/vggt_smplx_human_prior_adapter_architecture.svg
-docs/figures/parallel_engineering_result_snapshot.svg
-docs/figures/external_reference_control.svg
-```
