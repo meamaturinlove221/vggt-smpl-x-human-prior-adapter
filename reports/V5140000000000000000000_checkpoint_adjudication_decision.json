@@ -1,0 +1,62 @@
+{
+  "task": "V514_v50r2_checkpoint_adjudicator",
+  "status": "V514_FAIL_CLOSED_NO_ACCEPTED_MODEL_OWNED_STUDENT_CONTINUE_REPAIR_NOT_PROMOTED",
+  "created_at": "2026-06-02T21:33:14.359991Z",
+  "repo": "D:\\vggt\\vggt-canonical-surfel-adapter",
+  "checkpoint": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V5080000000000000000000_v50r2_distillation_matrix\\v50r2_distilled_true\\checkpoint_4000.pt",
+  "candidate_npz": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V5140000000000000000000_v50r2_checkpoint_adjudicator\\v514_model_owned_student_candidate.npz",
+  "true_full_scene_ply": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V5140000000000000000000_v50r2_checkpoint_adjudicator\\v514_true_full_scene_rgb.ply",
+  "baseline_full_scene_ply": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V5140000000000000000000_v50r2_checkpoint_adjudicator\\v514_vggt_baseline_full_scene_rgb.ply",
+  "no_smpl_full_scene_ply": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V5140000000000000000000_v50r2_checkpoint_adjudicator\\v514_no_smpl_full_scene_rgb.ply",
+  "board": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V5140000000000000000000_checkpoint_adjudication_board.png",
+  "metrics_csv": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5140000000000000000000_checkpoint_adjudication_metrics.csv",
+  "teacher_copy_check": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5140000000000000000000_teacher_copy_check.json",
+  "input_policy": {
+    "vggt_points_source": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V50_final_promotion_transaction\\candidate_package_v50r2\\package_files\\v42_prior_enabled_payload__research_points_world.npz",
+    "rgb_source": "D:\\vggt\\vggt-main\\output\\4k4d_scenes\\0012_11_frame0000_12views_tmf_v223_repaired\\images",
+    "mask_source": "D:\\vggt\\vggt-main\\output\\4k4d_scenes\\0012_11_frame0000_12views_tmf_v223_repaired\\masks",
+    "smplx_prior_source": "D:\\vggt\\vggt-main\\output\\4k4d_scenes\\0012_11_frame0000_12views_tmf_v223_repaired\\human_prior\\smplx_vertex_feature_maps.npz",
+    "v50r2_teacher_points_used_at_inference": false,
+    "candidate_points_used_at_inference": false,
+    "kinect_depth_used_at_inference": false,
+    "teacher_used_for_evaluation_only": true
+  },
+  "gates": {
+    "model_owned_forward_ran": true,
+    "teacher_copy_leak_detected": false,
+    "no_teacher_copy": true,
+    "full_scene_environment_visible": true,
+    "human_point_count_ok": true,
+    "true_improves_vggt_baseline": false,
+    "true_improves_no_smpl": false,
+    "true_improves_shuffled_semantic": false,
+    "accepted_model_owned_student": false,
+    "mentor_ready": false,
+    "not_promoted": true
+  },
+  "metrics": {
+    "status": "V514_FAIL_CLOSED_NO_ACCEPTED_MODEL_OWNED_STUDENT_CONTINUE_REPAIR_NOT_PROMOTED",
+    "checkpoint": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V5080000000000000000000_v50r2_distillation_matrix\\v50r2_distilled_true\\checkpoint_4000.pt",
+    "checkpoint_steps": 4000,
+    "human_point_count": 49152,
+    "environment_point_count": 22528,
+    "teacher_copy_leak_detected": false,
+    "true_to_v50r2_nn_mean": 0.034198444336652756,
+    "baseline_to_v50r2_nn_mean": 0.03274044394493103,
+    "no_smpl_to_v50r2_nn_mean": 0.033338144421577454,
+    "shuffled_to_v50r2_nn_mean": 0.03144135698676109,
+    "true_improves_baseline": false,
+    "true_improves_no_smpl": false,
+    "true_improves_shuffled": false,
+    "residual_mean": 0.01248245406895876,
+    "residual_p95": 0.03675812855362892,
+    "accepted_model_owned_student": false
+  },
+  "decision": "Fail closed: the checkpoint can run on VGGT observation inputs and passes direct-copy detection, but it does not clearly beat baseline/no-SMPL/shuffled controls under the V50R2 floor. Continue model repair rather than promoting this candidate.",
+  "artifact_hashes": {
+    "candidate_npz": "0fd445d1282c4e84f92e60b35ec1d2c9c3e311326be0df43f9f5b8d6b3c9dde4",
+    "true_full_scene_ply": "38e5d15e20a0003df330fdbc4d204e6024e30ee7b818965da58c133a5eb9b66c",
+    "baseline_full_scene_ply": "135bafcdc23ff675311119d0dcce1b3975a52c72ac25fc743a0fd6c346bc474a",
+    "board": "b9cd294b0c2421bd60e45b82c101221497a789c0ffcf5f23a65e8ba6595811f6"
+  }
+}

@@ -1,33 +1,33 @@
 {
   "task": "V512_manual_mentor_visual_gate",
   "status": "V512_MANUAL_MENTOR_GATE_FAIL_CLOSED_AUTO_EVOLVE_REQUIRED_NOT_PROMOTED",
-  "created_at": "2026-06-02T21:19:51.757643Z",
+  "created_at": "2026-06-02T21:34:03.394775Z",
   "repo": "D:\\vggt\\vggt-canonical-surfel-adapter",
   "gate_rows": [
     {
       "gate": "full_scene_main",
       "pass": false,
-      "reason": "V509 did not insert an accepted model-owned student"
+      "reason": "V514 generated a full-scene candidate, but V509 did not accept it for mentor insertion"
     },
     {
       "gate": "true_greater_than_vggt_baseline",
       "pass": false,
-      "reason": "No V509 same-scene pass evidence"
+      "reason": "V514 true_improves_vggt_baseline=False"
     },
     {
       "gate": "true_greater_than_hard_controls",
       "pass": false,
-      "reason": "Controls cannot override V50R2 visual regression"
+      "reason": "V514 no-SMPL/shuffled pass=False/False"
     },
     {
       "gate": "student_close_to_v50r2_floor",
       "pass": false,
-      "reason": "V503 found major regression vs V50R2"
+      "reason": "V514 candidate is farther from V50R2 floor than controls"
     },
     {
       "gate": "no_teacher_copy",
       "pass": true,
-      "reason": "V505 smoke catches direct teacher copy"
+      "reason": "V514 and V505 copy checks show no direct teacher copy"
     },
     {
       "gate": "local_fidelity_complete",
@@ -63,7 +63,8 @@
     "v508_modal": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5080000000000000000000_modal_smoke_result.json",
     "v509": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5090000000000000000000_full_scene_decision.json",
     "v510": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5100000000000000000000_local_fidelity_decision.json",
-    "v511": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5110000000000000000000_anti_2d_decision.json"
+    "v511": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5110000000000000000000_anti_2d_decision.json",
+    "v514": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5140000000000000000000_checkpoint_adjudication_decision.json"
   },
   "input_statuses": {
     "v501": "V501_V50R2_VISUAL_FLOOR_INTAKE_COMPLETE_CONTINUE_NOT_PROMOTED",
@@ -77,7 +78,8 @@
     "v508_modal": "V508_MODAL_A10G_SMOKE_PASS_TARGET_MATRIX_PENDING_NOT_PROMOTED",
     "v509": "V509_FULL_SCENE_INSERTION_FAIL_CLOSED_TARGET_MATRIX_COMPLETE_ACCEPTED_STUDENT_PENDING_NOT_PROMOTED",
     "v510": "V510_LOCAL_FIDELITY_FAIL_CLOSED_NO_ACCEPTED_STUDENT_NOT_PROMOTED",
-    "v511": "V511_ANTI_2D_MULTIVIEW_FAIL_CLOSED_NO_ACCEPTED_STUDENT_NOT_PROMOTED"
+    "v511": "V511_ANTI_2D_MULTIVIEW_FAIL_CLOSED_NO_ACCEPTED_STUDENT_NOT_PROMOTED",
+    "v514": "V514_FAIL_CLOSED_NO_ACCEPTED_MODEL_OWNED_STUDENT_CONTINUE_REPAIR_NOT_PROMOTED"
   },
   "gates": {
     "manual_mentor_gate_pass": false,
@@ -94,7 +96,7 @@
   },
   "decision": "Manual mentor gate fails closed. Continue auto-evolution toward a real V508 target-matrix student; do not claim teacher-only, crop-only, metric-only, route-created-only, or external-hard-block success.",
   "blockers": [
-    "No accepted model-owned V508 student checkpoint",
+    "V514 model-owned full-scene candidate failed control separation",
     "V509 full-scene insertion failed",
     "V510 local fidelity failed",
     "V511 anti-2D failed"

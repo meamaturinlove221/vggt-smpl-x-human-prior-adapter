@@ -24,11 +24,13 @@ INPUTS = {
     "v509": REPORTS / "V5090000000000000000000_full_scene_decision.json",
     "v510": REPORTS / "V5100000000000000000000_local_fidelity_decision.json",
     "v511": REPORTS / "V5110000000000000000000_anti_2d_decision.json",
+    "v514": REPORTS / "V5140000000000000000000_checkpoint_adjudication_decision.json",
 }
 
 BOARD_INPUTS = [
     BOARDS / "V5010000000000000000000_v50r2_visual_floor_contact_sheet.png",
     BOARDS / "V5030000000000000000000_student_vs_v50r2_contact_sheet.png",
+    BOARDS / "V5140000000000000000000_checkpoint_adjudication_board.png",
     BOARDS / "V5090000000000000000000_full_scene_student.png",
     BOARDS / "V5100000000000000000000_head_hair_fidelity.png",
     BOARDS / "V5110000000000000000000_turntable_side_depth_cross_section.png",
@@ -82,12 +84,13 @@ def make_board(output: Path, gate_rows: list[dict]) -> None:
 
 def main() -> int:
     data = {name: read_json(path) for name, path in INPUTS.items()}
+    v514_gates = data["v514"].get("gates", {})
     gate_rows = [
-        {"gate": "full_scene_main", "pass": False, "reason": "V509 did not insert an accepted model-owned student"},
-        {"gate": "true_greater_than_vggt_baseline", "pass": False, "reason": "No V509 same-scene pass evidence"},
-        {"gate": "true_greater_than_hard_controls", "pass": False, "reason": "Controls cannot override V50R2 visual regression"},
-        {"gate": "student_close_to_v50r2_floor", "pass": False, "reason": "V503 found major regression vs V50R2"},
-        {"gate": "no_teacher_copy", "pass": True, "reason": "V505 smoke catches direct teacher copy"},
+        {"gate": "full_scene_main", "pass": False, "reason": "V514 generated a full-scene candidate, but V509 did not accept it for mentor insertion"},
+        {"gate": "true_greater_than_vggt_baseline", "pass": False, "reason": f"V514 true_improves_vggt_baseline={v514_gates.get('true_improves_vggt_baseline')}"},
+        {"gate": "true_greater_than_hard_controls", "pass": False, "reason": f"V514 no-SMPL/shuffled pass={v514_gates.get('true_improves_no_smpl')}/{v514_gates.get('true_improves_shuffled_semantic')}"},
+        {"gate": "student_close_to_v50r2_floor", "pass": False, "reason": "V514 candidate is farther from V50R2 floor than controls"},
+        {"gate": "no_teacher_copy", "pass": bool(v514_gates.get("no_teacher_copy", False)), "reason": "V514 and V505 copy checks show no direct teacher copy"},
         {"gate": "local_fidelity_complete", "pass": False, "reason": "V510 failed closed without accepted student"},
         {"gate": "face_policy_honest", "pass": True, "reason": "V502 forbids fine face detail claims"},
         {"gate": "environment_visible", "pass": False, "reason": "Environment source exists but no model-owned insertion"},
@@ -109,7 +112,7 @@ def main() -> int:
             "full_scene_main_pass": False,
             "same_scene_controls_pass": False,
             "student_close_to_v50r2_floor": False,
-            "no_teacher_copy": True,
+            "no_teacher_copy": bool(v514_gates.get("no_teacher_copy", False)),
             "local_fidelity_complete": False,
             "face_policy_honest": True,
             "environment_visible_with_student": False,
@@ -119,7 +122,7 @@ def main() -> int:
         },
         "decision": "Manual mentor gate fails closed. Continue auto-evolution toward a real V508 target-matrix student; do not claim teacher-only, crop-only, metric-only, route-created-only, or external-hard-block success.",
         "blockers": [
-            "No accepted model-owned V508 student checkpoint",
+            "V514 model-owned full-scene candidate failed control separation",
             "V509 full-scene insertion failed",
             "V510 local fidelity failed",
             "V511 anti-2D failed"

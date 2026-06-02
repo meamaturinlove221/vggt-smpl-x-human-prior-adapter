@@ -15,6 +15,8 @@ V508_HASH = REPORTS / "V5080000000000000000000_hash_reconciliation.json"
 V508_MODAL = REPORTS / "V5080000000000000000000_modal_smoke_result.json"
 V508_A10G_4000 = REPORTS / "V5080000000000000000000_modal_a10g_4000_result.json"
 V508_A100_4000 = REPORTS / "V5080000000000000000000_modal_a100_4000_result.json"
+V514_DECISION = REPORTS / "V5140000000000000000000_checkpoint_adjudication_decision.json"
+V514_BOARD = BOARDS / "V5140000000000000000000_checkpoint_adjudication_board.png"
 V50R2_FLOOR = BOARDS / "V5020000000000000000000_v50r2_panel_annotated.png"
 V503_REGRESSION = BOARDS / "V5030000000000000000000_student_vs_v50r2_contact_sheet.png"
 RGB_SCENE = Path(r"D:\vggt\vggt-main\output\4k4d_scenes\0012_11_frame0000_12views_tmf_v223_repaired\rgb_contact_sheet.png")
@@ -74,6 +76,7 @@ def main() -> int:
     v508_modal = read_json(V508_MODAL)
     v508_a10g_4000 = read_json(V508_A10G_4000)
     v508_a100_4000 = read_json(V508_A100_4000)
+    v514 = read_json(V514_DECISION)
     a10g_checkpoints_complete = bool(
         v508_hash.get("modal_matrix_complete")
         and int(v508_hash.get("local_smoke_steps") or 0) >= 4000
@@ -82,7 +85,11 @@ def main() -> int:
     a100_required = bool(v508_hash.get("a10_a100_required", False))
     a100_complete = bool(v508_a100_4000.get("gates", {}).get("a100_checkpoints_complete", False))
     v508_target_matrix_complete = bool(a10g_checkpoints_complete and (not a100_required or a100_complete))
+    v514_accepted = bool(v514.get("gates", {}).get("accepted_model_owned_student", False))
     status = (
+        "V509_FULL_SCENE_INSERTION_READY_FOR_STRICT_VISUAL_GATE_NOT_PROMOTED"
+        if v514_accepted
+        else
         "V509_FULL_SCENE_INSERTION_FAIL_CLOSED_TARGET_MATRIX_COMPLETE_ACCEPTED_STUDENT_PENDING_NOT_PROMOTED"
         if v508_target_matrix_complete
         else "V509_FULL_SCENE_INSERTION_FAIL_CLOSED_A10G_COMPLETE_A100_ACCEPTED_STUDENT_PENDING_NOT_PROMOTED"
@@ -102,7 +109,7 @@ def main() -> int:
             ("Current-student regression", V503_REGRESSION, "student below V50R2"),
             ("V508 A10G 4000", V508_A10G_4000, matrix_note),
             ("V508 A100 4000", V508_A100_4000, "target matrix evidence"),
-            ("V508 hash reconciliation", V508_HASH, "no accepted student yet"),
+            ("V514 adjudication", V514_BOARD, "candidate failed controls" if not v514_accepted else "candidate handoff"),
         ],
     )
     make_board(
@@ -111,7 +118,7 @@ def main() -> int:
         [
             ("V50R2 visual floor", V50R2_FLOOR, "reference only"),
             ("Current controls/regression", V503_REGRESSION, "controls cannot override visual floor"),
-            ("V508 A100 4000", V508_A100_4000, "not mentor pass evidence"),
+            ("V514 controls adjudication", V514_BOARD, "true not better than controls" if not v514_accepted else "requires V512"),
         ],
     )
 
@@ -126,22 +133,28 @@ def main() -> int:
         "input_v508_modal": str(V508_MODAL),
         "input_v508_a10g_4000": str(V508_A10G_4000),
         "input_v508_a100_4000": str(V508_A100_4000),
+        "input_v514_adjudication": str(V514_DECISION),
         "v508_status": v508_hash.get("status"),
         "v508_modal_status": v508_modal.get("status"),
         "v508_a10g_4000_status": v508_a10g_4000.get("status"),
         "v508_a100_4000_status": v508_a100_4000.get("status"),
+        "v514_status": v514.get("status"),
         "gates": {
-            "model_owned_student_checkpoint_ready": False,
+            "model_owned_student_checkpoint_ready": v514_accepted,
             "v508_a10g_checkpoints_complete": a10g_checkpoints_complete,
             "v508_target_checkpoints_complete": v508_target_matrix_complete,
             "modal_a10g_smoke_pass": v508_modal.get("gates", {}).get("modal_a10g_smoke_pass", False),
             "modal_a100_target_complete": a100_complete,
-            "full_scene_student_inserted": False,
-            "same_scene_controls_generated_as_pass_evidence": False,
+            "v514_no_teacher_copy": v514.get("gates", {}).get("no_teacher_copy", False),
+            "v514_true_improves_vggt_baseline": v514.get("gates", {}).get("true_improves_vggt_baseline", False),
+            "v514_true_improves_no_smpl": v514.get("gates", {}).get("true_improves_no_smpl", False),
+            "v514_true_improves_shuffled_semantic": v514.get("gates", {}).get("true_improves_shuffled_semantic", False),
+            "full_scene_student_inserted": v514_accepted,
+            "same_scene_controls_generated_as_pass_evidence": v514_accepted,
             "teacher_or_rgb_copy_used_as_student": False,
             "mentor_visual_gate_pass": False,
             "not_promoted": True,
-            "auto_evolve_required": True,
+            "auto_evolve_required": not v514_accepted,
         },
         "decision": (
             "Do not generate fake insertion from V50R2 or raw RGB. Full-scene insertion must wait for a model-owned "
@@ -149,9 +162,9 @@ def main() -> int:
             "Continue repair/training; this is not an external hard block."
         ),
         "blockers": [
-            "V508 A10G/A100 checkpoint matrix 300/600/1000/2000/4000 is complete, but it has not produced an accepted model-owned full-scene student",
-            "No accepted model-owned student checkpoint is available for V509 insertion"
-        ],
+            "V514 checkpoint adjudication produced model-owned full-scene PLYs, but true did not beat VGGT/no-SMPL/shuffled controls under the V50R2 floor",
+            "No accepted model-owned student checkpoint is available for V509 mentor insertion"
+        ] if not v514_accepted else [],
     }
     decision_json.parent.mkdir(parents=True, exist_ok=True)
     decision_json.write_text(json.dumps(payload, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
