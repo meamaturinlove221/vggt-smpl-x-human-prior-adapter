@@ -1,51 +1,51 @@
 config,control,checkpoint,target_gpu,local_smoke_steps,use_teacher_loss,modal_required,status
-v50r2_distilled_true,true,300,A10/A100,300,True,True,modal_a10g_checkpoint_completed
-v50r2_distilled_true,true,600,A10/A100,300,True,True,local_smoke_completed_modal_target_pending
-v50r2_distilled_true,true,1000,A10/A100,300,True,True,local_smoke_completed_modal_target_pending
-v50r2_distilled_true,true,2000,A10/A100,300,True,True,local_smoke_completed_modal_target_pending
-v50r2_distilled_true,true,4000,A10/A100,300,True,True,local_smoke_completed_modal_target_pending
-VGGT baseline,vggt_baseline,300,A10/A100,300,True,True,modal_a10g_checkpoint_completed
-VGGT baseline,vggt_baseline,600,A10/A100,300,True,True,local_smoke_completed_modal_target_pending
-VGGT baseline,vggt_baseline,1000,A10/A100,300,True,True,local_smoke_completed_modal_target_pending
-VGGT baseline,vggt_baseline,2000,A10/A100,300,True,True,local_smoke_completed_modal_target_pending
-VGGT baseline,vggt_baseline,4000,A10/A100,300,True,True,local_smoke_completed_modal_target_pending
-no SMPL,no_smpl,300,A10/A100,300,True,True,modal_a10g_checkpoint_completed
-no SMPL,no_smpl,600,A10/A100,300,True,True,local_smoke_completed_modal_target_pending
-no SMPL,no_smpl,1000,A10/A100,300,True,True,local_smoke_completed_modal_target_pending
-no SMPL,no_smpl,2000,A10/A100,300,True,True,local_smoke_completed_modal_target_pending
-no SMPL,no_smpl,4000,A10/A100,300,True,True,local_smoke_completed_modal_target_pending
-no teacher loss,true,300,A10/A100,300,False,True,modal_a10g_checkpoint_completed
-no teacher loss,true,600,A10/A100,300,False,True,local_smoke_completed_modal_target_pending
-no teacher loss,true,1000,A10/A100,300,False,True,local_smoke_completed_modal_target_pending
-no teacher loss,true,2000,A10/A100,300,False,True,local_smoke_completed_modal_target_pending
-no teacher loss,true,4000,A10/A100,300,False,True,local_smoke_completed_modal_target_pending
-shuffled semantic,shuffled_semantic,300,A10/A100,300,True,True,modal_a10g_checkpoint_completed
-shuffled semantic,shuffled_semantic,600,A10/A100,300,True,True,local_smoke_completed_modal_target_pending
-shuffled semantic,shuffled_semantic,1000,A10/A100,300,True,True,local_smoke_completed_modal_target_pending
-shuffled semantic,shuffled_semantic,2000,A10/A100,300,True,True,local_smoke_completed_modal_target_pending
-shuffled semantic,shuffled_semantic,4000,A10/A100,300,True,True,local_smoke_completed_modal_target_pending
-same topology no semantic,same_topology_no_semantic,300,A10/A100,300,True,True,modal_a10g_checkpoint_completed
-same topology no semantic,same_topology_no_semantic,600,A10/A100,300,True,True,local_smoke_completed_modal_target_pending
-same topology no semantic,same_topology_no_semantic,1000,A10/A100,300,True,True,local_smoke_completed_modal_target_pending
-same topology no semantic,same_topology_no_semantic,2000,A10/A100,300,True,True,local_smoke_completed_modal_target_pending
-same topology no semantic,same_topology_no_semantic,4000,A10/A100,300,True,True,local_smoke_completed_modal_target_pending
-shell only,shell_only,300,A10/A100,300,True,True,modal_a10g_checkpoint_completed
-shell only,shell_only,600,A10/A100,300,True,True,local_smoke_completed_modal_target_pending
-shell only,shell_only,1000,A10/A100,300,True,True,local_smoke_completed_modal_target_pending
-shell only,shell_only,2000,A10/A100,300,True,True,local_smoke_completed_modal_target_pending
-shell only,shell_only,4000,A10/A100,300,True,True,local_smoke_completed_modal_target_pending
-observation only,observation_only,300,A10/A100,300,True,True,modal_a10g_checkpoint_completed
-observation only,observation_only,600,A10/A100,300,True,True,local_smoke_completed_modal_target_pending
-observation only,observation_only,1000,A10/A100,300,True,True,local_smoke_completed_modal_target_pending
-observation only,observation_only,2000,A10/A100,300,True,True,local_smoke_completed_modal_target_pending
-observation only,observation_only,4000,A10/A100,300,True,True,local_smoke_completed_modal_target_pending
-visible-only,visible_only,300,A10/A100,300,True,True,modal_a10g_checkpoint_completed
-visible-only,visible_only,600,A10/A100,300,True,True,local_smoke_completed_modal_target_pending
-visible-only,visible_only,1000,A10/A100,300,True,True,local_smoke_completed_modal_target_pending
-visible-only,visible_only,2000,A10/A100,300,True,True,local_smoke_completed_modal_target_pending
-visible-only,visible_only,4000,A10/A100,300,True,True,local_smoke_completed_modal_target_pending
-teacher-copy diagnostic,teacher_copy_diagnostic,300,A10/A100,300,True,True,modal_a10g_checkpoint_completed
-teacher-copy diagnostic,teacher_copy_diagnostic,600,A10/A100,300,True,True,local_smoke_completed_modal_target_pending
-teacher-copy diagnostic,teacher_copy_diagnostic,1000,A10/A100,300,True,True,local_smoke_completed_modal_target_pending
-teacher-copy diagnostic,teacher_copy_diagnostic,2000,A10/A100,300,True,True,local_smoke_completed_modal_target_pending
-teacher-copy diagnostic,teacher_copy_diagnostic,4000,A10/A100,300,True,True,local_smoke_completed_modal_target_pending
+v50r2_distilled_true,true,300,A100,4000,True,True,modal_a100_checkpoint_completed
+v50r2_distilled_true,true,600,A100,4000,True,True,modal_a100_checkpoint_completed
+v50r2_distilled_true,true,1000,A100,4000,True,True,modal_a100_checkpoint_completed
+v50r2_distilled_true,true,2000,A100,4000,True,True,modal_a100_checkpoint_completed
+v50r2_distilled_true,true,4000,A100,4000,True,True,modal_a100_checkpoint_completed
+VGGT baseline,vggt_baseline,300,A100,4000,True,True,modal_a100_checkpoint_completed
+VGGT baseline,vggt_baseline,600,A100,4000,True,True,modal_a100_checkpoint_completed
+VGGT baseline,vggt_baseline,1000,A100,4000,True,True,modal_a100_checkpoint_completed
+VGGT baseline,vggt_baseline,2000,A100,4000,True,True,modal_a100_checkpoint_completed
+VGGT baseline,vggt_baseline,4000,A100,4000,True,True,modal_a100_checkpoint_completed
+no SMPL,no_smpl,300,A100,4000,True,True,modal_a100_checkpoint_completed
+no SMPL,no_smpl,600,A100,4000,True,True,modal_a100_checkpoint_completed
+no SMPL,no_smpl,1000,A100,4000,True,True,modal_a100_checkpoint_completed
+no SMPL,no_smpl,2000,A100,4000,True,True,modal_a100_checkpoint_completed
+no SMPL,no_smpl,4000,A100,4000,True,True,modal_a100_checkpoint_completed
+no teacher loss,true,300,A100,4000,False,True,modal_a100_checkpoint_completed
+no teacher loss,true,600,A100,4000,False,True,modal_a100_checkpoint_completed
+no teacher loss,true,1000,A100,4000,False,True,modal_a100_checkpoint_completed
+no teacher loss,true,2000,A100,4000,False,True,modal_a100_checkpoint_completed
+no teacher loss,true,4000,A100,4000,False,True,modal_a100_checkpoint_completed
+shuffled semantic,shuffled_semantic,300,A100,4000,True,True,modal_a100_checkpoint_completed
+shuffled semantic,shuffled_semantic,600,A100,4000,True,True,modal_a100_checkpoint_completed
+shuffled semantic,shuffled_semantic,1000,A100,4000,True,True,modal_a100_checkpoint_completed
+shuffled semantic,shuffled_semantic,2000,A100,4000,True,True,modal_a100_checkpoint_completed
+shuffled semantic,shuffled_semantic,4000,A100,4000,True,True,modal_a100_checkpoint_completed
+same topology no semantic,same_topology_no_semantic,300,A100,4000,True,True,modal_a100_checkpoint_completed
+same topology no semantic,same_topology_no_semantic,600,A100,4000,True,True,modal_a100_checkpoint_completed
+same topology no semantic,same_topology_no_semantic,1000,A100,4000,True,True,modal_a100_checkpoint_completed
+same topology no semantic,same_topology_no_semantic,2000,A100,4000,True,True,modal_a100_checkpoint_completed
+same topology no semantic,same_topology_no_semantic,4000,A100,4000,True,True,modal_a100_checkpoint_completed
+shell only,shell_only,300,A100,4000,True,True,modal_a100_checkpoint_completed
+shell only,shell_only,600,A100,4000,True,True,modal_a100_checkpoint_completed
+shell only,shell_only,1000,A100,4000,True,True,modal_a100_checkpoint_completed
+shell only,shell_only,2000,A100,4000,True,True,modal_a100_checkpoint_completed
+shell only,shell_only,4000,A100,4000,True,True,modal_a100_checkpoint_completed
+observation only,observation_only,300,A100,4000,True,True,modal_a100_checkpoint_completed
+observation only,observation_only,600,A100,4000,True,True,modal_a100_checkpoint_completed
+observation only,observation_only,1000,A100,4000,True,True,modal_a100_checkpoint_completed
+observation only,observation_only,2000,A100,4000,True,True,modal_a100_checkpoint_completed
+observation only,observation_only,4000,A100,4000,True,True,modal_a100_checkpoint_completed
+visible-only,visible_only,300,A100,4000,True,True,modal_a100_checkpoint_completed
+visible-only,visible_only,600,A100,4000,True,True,modal_a100_checkpoint_completed
+visible-only,visible_only,1000,A100,4000,True,True,modal_a100_checkpoint_completed
+visible-only,visible_only,2000,A100,4000,True,True,modal_a100_checkpoint_completed
+visible-only,visible_only,4000,A100,4000,True,True,modal_a100_checkpoint_completed
+teacher-copy diagnostic,teacher_copy_diagnostic,300,A100,4000,True,True,modal_a100_checkpoint_completed
+teacher-copy diagnostic,teacher_copy_diagnostic,600,A100,4000,True,True,modal_a100_checkpoint_completed
+teacher-copy diagnostic,teacher_copy_diagnostic,1000,A100,4000,True,True,modal_a100_checkpoint_completed
+teacher-copy diagnostic,teacher_copy_diagnostic,2000,A100,4000,True,True,modal_a100_checkpoint_completed
+teacher-copy diagnostic,teacher_copy_diagnostic,4000,A100,4000,True,True,modal_a100_checkpoint_completed

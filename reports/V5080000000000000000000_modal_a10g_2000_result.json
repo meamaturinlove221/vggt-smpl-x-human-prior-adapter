@@ -1,0 +1,42 @@
+{
+  "task": "V508_modal_a10g_2000_checkpoint_result",
+  "status": "V508_MODAL_A10G_2000_CHECKPOINT_PASS_TARGET_MATRIX_INCOMPLETE_NOT_PROMOTED",
+  "created_at": "2026-06-02T20:37:30+00:00",
+  "modal_run_url": "https://modal.com/apps/shimakaze22333/main/ap-pGfHHlg6qIs7i1xZuRD4Sl",
+  "gpu": "A10G",
+  "steps": 2000,
+  "max_samples": 256,
+  "seed": 508,
+  "returncode": 0,
+  "downloaded_to": "D:\\vggt\\vggt-canonical-surfel-adapter\\_modal_download\\V508_2000",
+  "synced_to_local_reports": true,
+  "synced_to_local_output": true,
+  "completed_checkpoints": [
+    300,
+    600,
+    1000,
+    2000
+  ],
+  "pending_checkpoints": [
+    4000
+  ],
+  "pending_gpu_targets": [
+    "A100"
+  ],
+  "seed_metric_snapshot": {
+    "v50r2_distilled_true_final_total_loss": 0.05356598272919655,
+    "vggt_baseline_final_total_loss": 0.053249046206474304,
+    "no_smpl_final_total_loss": 0.053522735834121704,
+    "observation_only_final_total_loss": 0.05234735086560249,
+    "visible_only_final_total_loss": 0.052199818193912506,
+    "teacher_copy_diagnostic_pass": true
+  },
+  "interpretation": "A10G 2000-step checkpoint executed, downloaded, and synced back locally. This extends the V508 target matrix through 2000 steps with checkpoint snapshots for 300/600/1000/2000, but 4000 and A100 remain incomplete; V509/V512 still cannot pass.",
+  "gates": {
+    "modal_a10g_2000_pass": true,
+    "target_checkpoints_complete": false,
+    "modal_a100_target_complete": false,
+    "teacher_copy_diagnostic_required": true,
+    "not_promoted": true
+  }
+}

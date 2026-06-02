@@ -4,6 +4,7 @@ import argparse
 import csv
 import hashlib
 import json
+import os
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -222,6 +223,9 @@ def train_config(name: str, control: str, use_teacher_loss: bool, args: argparse
         "environment_points": batch["environment_points"].clone(),
     }
     history = []
+    snapshots: list[dict[str, Any]] = []
+    out_dir = OUT / name.replace(" ", "_").replace("-", "_")
+    out_dir.mkdir(parents=True, exist_ok=True)
     for step in range(1, args.steps + 1):
         opt.zero_grad(set_to_none=True)
         out = model(batch, control=control)
@@ -238,9 +242,21 @@ def train_config(name: str, control: str, use_teacher_loss: bool, args: argparse
         total.backward()
         opt.step()
         history.append(float(total.detach()))
+        if step in TARGET_CHECKPOINTS:
+            ckpt_step = out_dir / f"checkpoint_{step}.pt"
+            torch.save({"model_state_dict": model.state_dict(), "config": cfg.__dict__, "steps": step, "control": control}, ckpt_step)
+            metric_step = {
+                "config": name,
+                "control": control,
+                "use_teacher_loss": use_teacher_loss,
+                "checkpoint": step,
+                "status": "checkpoint_saved",
+                "total_loss": history[-1],
+                "checkpoint_path": str(ckpt_step),
+            }
+            write_json(out_dir / f"metrics_{step}.json", metric_step)
+            snapshots.append(metric_step)
 
-    out_dir = OUT / name.replace(" ", "_").replace("-", "_")
-    out_dir.mkdir(parents=True, exist_ok=True)
     ckpt = out_dir / "local_smoke_checkpoint.pt"
     torch.save({"model_state_dict": model.state_dict(), "config": cfg.__dict__, "steps": args.steps, "control": control}, ckpt)
     metrics_path = out_dir / "metrics.json"
@@ -253,6 +269,7 @@ def train_config(name: str, control: str, use_teacher_loss: bool, args: argparse
         "target_checkpoints": TARGET_CHECKPOINTS,
         "final_total_loss": history[-1],
         "loss_history": history,
+        "checkpoint_snapshots": snapshots,
         "checkpoint": str(ckpt),
         "teacher_copy_detected": None,
     }
@@ -277,6 +294,8 @@ def main() -> int:
     args = parser.parse_args()
 
     OUT.mkdir(parents=True, exist_ok=True)
+    gpu_label = os.environ.get("VGGT_MODAL_V508_GPU", "A10G")
+    modal_matrix_complete = args.mode == "modal_smoke" and args.steps >= max(TARGET_CHECKPOINTS)
     torch.manual_seed(args.seed)
     teacher = load_teacher_subset(args.max_samples, args.seed)
     results = [train_config(name, control, use_teacher_loss, args, teacher) for name, control, use_teacher_loss in CONFIGS]
@@ -285,7 +304,7 @@ def main() -> int:
     for name, control, use_teacher_loss in CONFIGS:
         for checkpoint in TARGET_CHECKPOINTS:
             if args.mode == "modal_smoke" and args.steps >= checkpoint:
-                status = "modal_a10g_checkpoint_completed"
+                status = f"modal_{gpu_label.lower()}_checkpoint_completed"
             elif args.mode == "local_smoke" and args.steps >= checkpoint:
                 status = "local_checkpoint_completed_modal_target_pending"
             else:
@@ -295,7 +314,7 @@ def main() -> int:
                     "config": name,
                     "control": control,
                     "checkpoint": checkpoint,
-                    "target_gpu": "A10/A100",
+                    "target_gpu": gpu_label if args.mode == "modal_smoke" else "A10/A100",
                     "local_smoke_steps": args.steps,
                     "use_teacher_loss": use_teacher_loss,
                     "modal_required": True,
@@ -319,18 +338,27 @@ def main() -> int:
     write_csv(seed_csv, seed_rows)
     reconciliation = {
         "task": "V508_v50r2_distillation_matrix_hash_reconciliation",
-        "status": "V508_LOCAL_MATRIX_HASH_RECONCILED_MODAL_TARGET_PENDING_NOT_PROMOTED",
+        "status": (
+            "V508_MODAL_MATRIX_HASH_RECONCILED_TARGET_COMPLETE_NOT_PROMOTED"
+            if modal_matrix_complete
+            else "V508_LOCAL_MATRIX_HASH_RECONCILED_MODAL_TARGET_PENDING_NOT_PROMOTED"
+        ),
         "created_at": now(),
         "mode": args.mode,
+        "modal_gpu": gpu_label if args.mode == "modal_smoke" else None,
         "teacher_bank": str(TEACHER_BANK),
         "configs": [c[0] for c in CONFIGS],
         "target_checkpoints": TARGET_CHECKPOINTS,
         "local_smoke_steps": args.steps,
-        "modal_matrix_complete": args.mode == "modal_smoke" and args.steps >= max(TARGET_CHECKPOINTS),
+        "modal_matrix_complete": modal_matrix_complete,
         "a10_a100_required": True,
         "teacher_copy_diagnostic_pass": any(r["config"] == "teacher-copy diagnostic" and r["teacher_copy_detected"] for r in results),
         "outputs": hash_outputs(),
-        "decision": "Local matrix smoke and artifact hashes are ready. Modal A10/A100 target matrix remains required before V509 full-scene insertion can be claimed.",
+        "decision": (
+            "Modal checkpoint matrix for this GPU is complete and artifact hashes are ready. This is still not mentor-ready without an accepted model-owned full-scene student."
+            if modal_matrix_complete
+            else "Local matrix smoke and artifact hashes are ready. Modal A10/A100 target matrix remains required before V509 full-scene insertion can be claimed."
+        ),
     }
     recon_json = REPORTS / "V5080000000000000000000_hash_reconciliation.json"
     write_json(recon_json, reconciliation)
@@ -339,10 +367,14 @@ def main() -> int:
         failed_json,
         {
             "task": "V508_failed_jobs",
-            "status": "V508_MODAL_TARGET_PENDING_NO_FAILURE_YET",
+            "status": (
+                "V508_MODAL_MATRIX_COMPLETE_NO_FAILURE_NOT_PROMOTED"
+                if modal_matrix_complete
+                else "V508_MODAL_TARGET_PENDING_NO_FAILURE_YET"
+            ),
             "created_at": now(),
             "failed_jobs": [],
-            "pending_jobs": [{"config": name, "checkpoints": TARGET_CHECKPOINTS, "target_gpu": "A10/A100"} for name, _, _ in CONFIGS],
+            "pending_jobs": [] if modal_matrix_complete else [{"config": name, "checkpoints": TARGET_CHECKPOINTS, "target_gpu": "A10/A100"} for name, _, _ in CONFIGS],
         },
     )
     print(json.dumps({"status": reconciliation["status"], "manifest": str(manifest_csv), "seed_metrics": str(seed_csv), "hash_reconciliation": str(recon_json)}, indent=2))

@@ -12,6 +12,7 @@ import modal
 REPO = Path(r"D:\vggt\vggt-canonical-surfel-adapter")
 APP_NAME = os.environ.get("VGGT_MODAL_V508_APP_NAME", "vggt-v508-v50r2-distillation-matrix")
 VOLUME_NAME = os.environ.get("VGGT_MODAL_V508_VOLUME", "vggt-v508-v50r2-distillation-output")
+GPU_NAME = os.environ.get("VGGT_MODAL_V508_GPU", "A10G")
 REMOTE_REPO = PurePosixPath("/workspace/repo")
 REMOTE_OUT = PurePosixPath("/v508_out")
 
@@ -40,7 +41,7 @@ def now() -> str:
 
 @app.function(
     image=image,
-    gpu=os.environ.get("VGGT_MODAL_V508_GPU", "A10G"),
+    gpu=GPU_NAME,
     cpu=4.0,
     memory=24 * 1024,
     timeout=8 * 60 * 60,
@@ -58,6 +59,7 @@ def run_v508(steps: int = 3, max_samples: int = 384, seed: int = 508) -> dict[st
     env = dict(os.environ)
     env["PYTHONUTF8"] = "1"
     env["PYTHONIOENCODING"] = "utf-8"
+    env["VGGT_MODAL_V508_GPU"] = GPU_NAME
     proc = subprocess.run(
         [
             sys.executable,
@@ -107,7 +109,8 @@ def run_v508(steps: int = 3, max_samples: int = 384, seed: int = 508) -> dict[st
         "stderr_tail": proc.stderr[-5000:],
         "copied": copied,
         "remote_output": str(REMOTE_OUT),
-        "gpu": os.environ.get("VGGT_MODAL_V508_GPU", "A10G"),
+        "gpu": GPU_NAME,
+        "remote_env_gpu_label": os.environ.get("VGGT_MODAL_V508_GPU"),
         "steps": int(steps),
         "max_samples": int(max_samples),
         "seed": int(seed),

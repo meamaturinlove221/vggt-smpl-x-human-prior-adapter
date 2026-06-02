@@ -40,7 +40,7 @@ def now() -> str:
 
 
 def read_json(path: Path) -> dict:
-    return json.loads(path.read_text(encoding="utf-8")) if path.is_file() else {"missing": str(path)}
+    return json.loads(path.read_text(encoding="utf-8-sig")) if path.is_file() else {"missing": str(path)}
 
 
 def fit(path: Path, size: tuple[int, int]) -> Image.Image:

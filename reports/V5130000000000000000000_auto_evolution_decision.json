@@ -1,25 +1,16 @@
 {
   "task": "V513_auto_evolution_after_v512_fail_closed",
-  "status": "V513_AUTO_EVOLUTION_STARTED_A10G300_COMPLETE_CONTINUE_TARGET_MATRIX_NOT_PROMOTED",
+  "status": "V513_AUTO_EVOLUTION_A10G_A100_TARGET_MATRIX_COMPLETE_NO_ACCEPTED_STUDENT_NOT_PROMOTED",
   "created_at": "2026-06-02T20:14:00Z",
   "repo": "D:\\vggt\\vggt-canonical-surfel-adapter",
   "trigger": "V512_MANUAL_MENTOR_GATE_FAIL_CLOSED_AUTO_EVOLVE_REQUIRED_NOT_PROMOTED",
   "route_file": "D:\\vggt\\vggt-canonical-surfel-adapter\\docs\\goals\\V5130000000000000000000_auto_evolved_v508_target_matrix_route.md",
   "executed_step": {
-    "name": "V508 A10G 300-step checkpoint",
-    "result": "V508_MODAL_A10G_300_CHECKPOINT_PASS_TARGET_MATRIX_INCOMPLETE_NOT_PROMOTED",
-    "evidence": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5080000000000000000000_modal_a10g_300_result.json"
+    "name": "V508 A10G and A100 300-step, 600-step, 1000-step, 2000-step, and 4000-step checkpoints",
+    "result": "V508_MODAL_A100_4000_CHECKPOINT_PASS_A10G_A100_TARGET_COMPLETE_NOT_PROMOTED",
+    "evidence": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5080000000000000000000_modal_a100_4000_result.json"
   },
   "pending_steps": [
-    "V508 A10G 600",
-    "V508 A10G 1000",
-    "V508 A10G 2000",
-    "V508 A10G 4000",
-    "V508 A100 300",
-    "V508 A100 600",
-    "V508 A100 1000",
-    "V508 A100 2000",
-    "V508 A100 4000",
     "V509 full-scene insertion retry after accepted checkpoint",
     "V510 local fidelity retry after accepted checkpoint",
     "V511 anti-2D retry after accepted checkpoint",
@@ -28,11 +19,22 @@
   "gates": {
     "auto_evolution_executed_not_route_only": true,
     "a10g_300_complete": true,
-    "target_matrix_complete": false,
+    "a10g_600_complete": true,
+    "a10g_1000_complete": true,
+    "a10g_2000_complete": true,
+    "a10g_4000_complete": true,
+    "a10g_checkpoints_complete": true,
+    "a100_300_complete": true,
+    "a100_600_complete": true,
+    "a100_1000_complete": true,
+    "a100_2000_complete": true,
+    "a100_4000_complete": true,
+    "a100_checkpoints_complete": true,
+    "target_matrix_complete": true,
     "mentor_ready": false,
     "external_hard_block": false,
     "not_promoted": true
   },
-  "decision": "Auto-evolution has begun with real A10G 300-step execution. Continue the target matrix before retrying V509/V512; do not route back to viewer/report polish.",
+  "decision": "Auto-evolution has continued with real A10G and A100 300-step, 600-step, 1000-step, 2000-step, and 4000-step execution. Continue toward an accepted model-owned student and V509/V512 mentor visual gates; do not route back to viewer/report polish.",
   "blockers": []
 }

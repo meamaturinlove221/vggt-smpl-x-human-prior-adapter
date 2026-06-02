@@ -1,0 +1,41 @@
+{
+  "task": "V508_modal_a10g_600_checkpoint_result",
+  "status": "V508_MODAL_A10G_600_CHECKPOINT_PASS_TARGET_MATRIX_INCOMPLETE_NOT_PROMOTED",
+  "created_at": "2026-06-02T20:22:03+00:00",
+  "modal_run_url": "https://modal.com/apps/shimakaze22333/main/ap-zEb7ETMwaTBbXqSi1lKL2F",
+  "gpu": "A10G",
+  "steps": 600,
+  "max_samples": 256,
+  "seed": 508,
+  "returncode": 0,
+  "downloaded_to": "D:\\vggt\\vggt-canonical-surfel-adapter\\_modal_download\\V508_600",
+  "synced_to_local_reports": true,
+  "synced_to_local_output": true,
+  "completed_checkpoints": [
+    300,
+    600
+  ],
+  "pending_checkpoints": [
+    1000,
+    2000,
+    4000
+  ],
+  "pending_gpu_targets": [
+    "A100"
+  ],
+  "seed_metric_snapshot": {
+    "v50r2_distilled_true_final_total_loss": 0.05634058639407158,
+    "vggt_baseline_final_total_loss": 0.0569365993142128,
+    "no_smpl_final_total_loss": 0.057274289429187775,
+    "observation_only_final_total_loss": 0.05572303757071495,
+    "teacher_copy_diagnostic_pass": true
+  },
+  "interpretation": "A10G 600-step checkpoint executed and was synced back locally. This improves the V508 target matrix evidence beyond A10G 300, but 1000/2000/4000 and A100 remain incomplete; V509/V512 still cannot pass.",
+  "gates": {
+    "modal_a10g_600_pass": true,
+    "target_checkpoints_complete": false,
+    "modal_a100_target_complete": false,
+    "teacher_copy_diagnostic_required": true,
+    "not_promoted": true
+  }
+}
