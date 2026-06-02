@@ -1,111 +1,89 @@
 {
   "task": "V512_manual_mentor_visual_gate",
-  "status": "V512_MANUAL_MENTOR_GATE_FAIL_CLOSED_AUTO_EVOLVE_REQUIRED_NOT_PROMOTED",
-  "created_at": "2026-06-02T21:54:07.111721Z",
+  "status": "V512_MANUAL_MENTOR_GATE_V521_VISUAL_RECOVERED_CONTROLS_FAIL_CLOSED_AUTO_EVOLVE_REQUIRED_NOT_PROMOTED",
+  "created_at": "2026-06-02T22:30:24.598294Z",
   "repo": "D:\\vggt\\vggt-canonical-surfel-adapter",
   "gate_rows": [
     {
       "gate": "full_scene_main",
-      "pass": false,
-      "reason": "V517 generated a model-owned full-scene candidate with environment, but the human remains blob-like and not limb-readable"
+      "pass": true,
+      "reason": "V521 main board is full-scene, human-main, RGB, and environment-visible"
     },
     {
       "gate": "true_greater_than_vggt_baseline",
-      "pass": true,
-      "reason": "V516 paired pass=True but V514 full-scene visual remains unaccepted"
+      "pass": false,
+      "reason": "V521 true does not clearly beat the competitive visible-anchor/VGGT-style baseline"
     },
     {
       "gate": "true_greater_than_hard_controls",
       "pass": false,
-      "reason": "V517 same-scene controls exist, but visual separation is not mentor-convincing"
+      "reason": "Same-scene controls exist, but visual separation is not enough for mentor pass"
     },
     {
       "gate": "student_close_to_v50r2_floor",
-      "pass": false,
-      "reason": "V517 paired metrics are close, but the visible human morphology is still worse than the V50R2 visual floor"
+      "pass": true,
+      "reason": "V521 restores V50R2-like human readability in the visual floor comparison"
     },
     {
       "gate": "no_teacher_copy",
       "pass": true,
-      "reason": "V517/V505 copy checks show no direct teacher copy"
+      "reason": "V521 teacher-copy detector reports no direct V50R2/teacher copy"
     },
     {
       "gate": "local_fidelity_complete",
       "pass": false,
-      "reason": "V510 failed closed: local head/hair, limbs, hands/feet remain below V50R2 readability"
+      "reason": "V521 part binding is too coarse; arm/hand and local gates are incomplete"
     },
     {
       "gate": "face_policy_honest",
       "pass": true,
-      "reason": "V502 forbids fine face detail claims"
+      "reason": "No fine facial detail is claimed; face/head policy remains contour/region-only"
     },
     {
       "gate": "environment_visible",
       "pass": true,
-      "reason": "V517 preserves partial VGGT environment, but environment alone cannot pass mentor gate"
+      "reason": "V521 keeps partial real VGGT environment in each full-scene panel"
     },
     {
       "gate": "anti_2d_pass",
-      "pass": false,
-      "reason": "V517 anti-2D proxy passes, but proxy thickness does not replace readable body morphology"
+      "pass": true,
+      "reason": "V521 side/depth proxy passes, but this alone is not enough"
     }
   ],
   "annotated_board": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V5120000000000000000000_manual_gate_annotated.png",
   "source_decisions": {
-    "v501": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5010000000000000000000_v50r2_visual_floor_decision.json",
-    "v502": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5020000000000000000000_v50r2_panel_decision.json",
-    "v503": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5030000000000000000000_regression_decision.json",
-    "v504": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5040000000000000000000_teacher_bank_decision.json",
-    "v505": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5050000000000000000000_firewall_smoke.json",
-    "v506": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5060000000000000000000_forward_smoke.json",
-    "v507": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5070000000000000000000_loss_smoke.json",
-    "v508": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5080000000000000000000_hash_reconciliation.json",
-    "v508_modal": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5080000000000000000000_modal_smoke_result.json",
     "v509": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5090000000000000000000_full_scene_decision.json",
     "v510": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5100000000000000000000_local_fidelity_decision.json",
     "v511": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5110000000000000000000_anti_2d_decision.json",
-    "v514": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5140000000000000000000_checkpoint_adjudication_decision.json",
-    "v516": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5160000000000000000000_paired_visible_surface_decision.json",
-    "v517": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5170000000000000000000_full_scene_clarity_decision.json"
+    "v519": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5190000000000000000000_canonical_surfel_graph_training_decision.json",
+    "v520": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5200000000000000000000_pose_aligned_surfel_graph_decision.json",
+    "v521": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5210000000000000000000_observation_anchored_visible_student_decision.json"
   },
   "input_statuses": {
-    "v501": "V501_V50R2_VISUAL_FLOOR_INTAKE_COMPLETE_CONTINUE_NOT_PROMOTED",
-    "v502": "V502_V50R2_PANEL_AUDIT_COMPLETE_VISUAL_FLOOR_PASS_CONTINUE_NOT_PROMOTED",
-    "v503": "V503_STUDENT_VS_V50R2_REGRESSION_FAIL_CLOSED_TO_DISTILLATION_REPAIR_NOT_PROMOTED",
-    "v504": "V504_V50R2_TEACHER_BANK_READY_CONTINUE_NOT_PROMOTED",
-    "v505": "V505_FIREWALL_SMOKE_PASS_CONTINUE_NOT_PROMOTED",
-    "v506": "V506_FORWARD_SMOKE_PASS_CONTINUE_NOT_PROMOTED",
-    "v507": "V507_LOSS_SMOKE_PASS_CONTINUE_NOT_PROMOTED",
-    "v508": "V508_MODAL_MATRIX_HASH_RECONCILED_TARGET_COMPLETE_NOT_PROMOTED",
-    "v508_modal": "V508_MODAL_A10G_SMOKE_PASS_TARGET_MATRIX_PENDING_NOT_PROMOTED",
-    "v509": "V509_FULL_SCENE_INSERTION_V517_CANDIDATE_VISUAL_FAIL_CLOSED_NOT_PROMOTED",
-    "v510": "V510_LOCAL_FIDELITY_FAIL_CLOSED_V517_LOCAL_MORPHOLOGY_BELOW_V50R2_NOT_PROMOTED",
-    "v511": "V511_ANTI_2D_PROXY_PASS_MANUAL_VISUAL_FAIL_CLOSED_NOT_PROMOTED",
-    "v514": "V514_FAIL_CLOSED_NO_ACCEPTED_MODEL_OWNED_STUDENT_CONTINUE_REPAIR_NOT_PROMOTED",
-    "v516": "V516_PAIRED_VISIBLE_SURFACE_CONTROL_SEPARATION_PASS_NEEDS_V509_V512_NOT_PROMOTED",
-    "v517": "V517_HUMAN_MAIN_FULL_SCENE_CANDIDATE_READY_FOR_V509_V512_NOT_PROMOTED"
+    "v509": "V509_FULL_SCENE_INSERTION_V521_VISUAL_RECOVERED_CONTROLS_FAIL_CLOSED_NOT_PROMOTED",
+    "v510": "V510_LOCAL_FIDELITY_V521_VISUAL_FLOOR_RECOVERED_PART_BINDING_INCOMPLETE_NOT_PROMOTED",
+    "v511": "V511_ANTI_2D_V521_PROXY_PASS_CONTROLS_FAIL_CLOSED_NOT_PROMOTED",
+    "v519": "V519_CANONICAL_SURFEL_GRAPH_TRAINED_CANDIDATE_READY_FOR_V509_REVIEW_NOT_PROMOTED",
+    "v520": "V520_POSE_ALIGNED_SURFEL_GRAPH_CANDIDATE_READY_FOR_V509_REVIEW_NOT_PROMOTED",
+    "v521": "V521_OBSERVATION_ANCHORED_VISIBLE_STUDENT_FAIL_CLOSED_CONTINUE_REPAIR_NOT_PROMOTED"
   },
   "gates": {
     "manual_mentor_gate_pass": false,
-    "full_scene_main_pass": false,
+    "full_scene_main_pass": true,
     "same_scene_controls_pass": false,
-    "v517_candidate_available_for_review": true,
-    "paired_surface_close_to_v50r2": true,
-    "student_close_to_v50r2_floor": false,
+    "student_close_to_v50r2_floor": true,
     "no_teacher_copy": true,
     "local_fidelity_complete": false,
     "face_policy_honest": true,
     "environment_visible_with_student": true,
-    "anti_2d_proxy_pass": true,
-    "anti_2d_pass": false,
+    "anti_2d_pass": true,
     "auto_evolve_required": true,
     "not_promoted": true
   },
-  "decision": "Manual mentor gate fails closed. V517 is a model-owned full-scene candidate, but the visible human is still not as readable as V50R2; continue with canonical SMPL-X surfel/graph representation repair. Do not claim teacher-only, crop-only, metric-only, route-created-only, or external-hard-block success.",
+  "decision": "Manual mentor gate remains fail-closed. V521 fixes the largest visual regression by restoring human readability, but final pass is blocked by control separation against the strong visible anchor and incomplete body-part/local fidelity.",
   "blockers": [
-    "V517 human-main full-scene candidate remains blob-like / limb-unreadable",
-    "V517 visual morphology remains below V50R2 visual floor despite paired metric pass",
-    "V510 local fidelity failed",
-    "V511 anti-2D proxy cannot substitute for mentor-readable human morphology"
+    "True is not clearly better than the competitive visible-anchor/VGGT-style baseline",
+    "Hard-control visual separation is not mentor-convincing enough",
+    "Body-part/local fidelity is incomplete"
   ]
 }

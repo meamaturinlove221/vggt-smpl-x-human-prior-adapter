@@ -1,34 +1,28 @@
 {
   "task": "V510_local_fidelity_gate",
-  "status": "V510_LOCAL_FIDELITY_FAIL_CLOSED_V517_LOCAL_MORPHOLOGY_BELOW_V50R2_NOT_PROMOTED",
-  "created_at": "2026-06-02T21:53:58.102649Z",
+  "status": "V510_LOCAL_FIDELITY_V521_VISUAL_FLOOR_RECOVERED_PART_BINDING_INCOMPLETE_NOT_PROMOTED",
+  "created_at": "2026-06-02T22:30:24.598294Z",
   "repo": "D:\\vggt\\vggt-canonical-surfel-adapter",
   "input_v509_decision": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5090000000000000000000_full_scene_decision.json",
-  "input_v517_decision": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5170000000000000000000_full_scene_clarity_decision.json",
-  "v517_status": "V517_HUMAN_MAIN_FULL_SCENE_CANDIDATE_READY_FOR_V509_V512_NOT_PROMOTED",
+  "input_v521_decision": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5210000000000000000000_observation_anchored_visible_student_decision.json",
   "boards": {
-    "head_hair": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V5100000000000000000000_head_hair_fidelity.png",
-    "shoulder_neck": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V5100000000000000000000_shoulder_neck_fidelity.png",
-    "clothing_boundary": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V5100000000000000000000_clothing_boundary_fidelity.png",
-    "hand_arm": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V5100000000000000000000_hand_arm_fidelity.png",
-    "leg_foot": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V5100000000000000000000_leg_foot_fidelity.png"
+    "v50r2_visual_floor_comparison": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V5210000000000000000000_v50r2_visual_floor_comparison.png",
+    "main": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V5210000000000000000000_human_main_full_scene.png"
   },
   "gates": {
-    "head_hair_fidelity_pass": false,
-    "shoulder_neck_fidelity_pass": false,
-    "clothing_boundary_fidelity_pass": false,
-    "hand_arm_fidelity_pass": false,
-    "leg_foot_fidelity_pass": false,
-    "face_visible_subset_honest": true,
-    "v517_candidate_available_for_review": true,
-    "accepted_student_available": false,
+    "head_hair_readability_recovered": true,
+    "torso_clothing_readability_recovered": true,
+    "leg_foot_readability_recovered": true,
+    "arm_hand_readability_incomplete": true,
+    "body_part_binding_proxy_pass": false,
+    "local_fidelity_complete": false,
     "teacher_floor_available": true,
     "not_promoted": true,
     "auto_evolve_required": true
   },
-  "decision": "V517 provides a model-owned full-scene candidate, but local head/hair, shoulder/neck, clothing, hand/arm, and leg/foot readability is still below the V50R2 visual floor. Fail closed and continue with canonical surfel/graph representation repair.",
+  "decision": "V521 visually matches the V50R2 floor much better than V519/V520, but local fidelity is not complete because arm/hand evidence and robust body-part binding remain incomplete.",
   "blockers": [
-    "V517 full-scene candidate remains blob-like at local body-part level",
-    "V50R2 local morphology is not matched in the mentor-facing view"
+    "V521 body-part labels are too coarse for final local morphology evidence",
+    "Arm/hand and local part gates need a stronger SMPL-X/body-part binding route"
   ]
 }

@@ -1,55 +1,53 @@
 {
   "task": "V513_auto_evolution_after_v512_fail_closed",
-  "status": "V513_AUTO_EVOLUTION_V518_REPRESENTATION_SWITCH_EXECUTED_V519_REQUIRED_NOT_PROMOTED",
-  "created_at": "2026-06-02T22:00:18.148339Z",
+  "status": "V513_AUTO_EVOLUTION_V521_VISUAL_RECOVERED_V523_CONTROL_REPAIR_REQUIRED_NOT_PROMOTED",
+  "created_at": "2026-06-02T22:30:24.598294Z",
   "repo": "D:\\vggt\\vggt-canonical-surfel-adapter",
-  "trigger": "V512_MANUAL_MENTOR_GATE_FAIL_CLOSED_AUTO_EVOLVE_REQUIRED_NOT_PROMOTED",
-  "route_file": "D:\\vggt\\vggt-canonical-surfel-adapter\\docs\\goals\\V5180000000000000000000_auto_evolved_canonical_surfel_graph_repair_route.md",
+  "trigger": "V512_MANUAL_MENTOR_GATE_V521_VISUAL_RECOVERED_CONTROLS_FAIL_CLOSED_AUTO_EVOLVE_REQUIRED_NOT_PROMOTED",
+  "route_file": "D:\\vggt\\vggt-canonical-surfel-adapter\\docs\\goals\\V5230000000000000000000_auto_evolved_observation_anchor_control_part_binding_repair_route.md",
   "executed_steps": [
     {
-      "name": "V516 paired visible-surface control-separation adjudication",
-      "result": "V516_PAIRED_VISIBLE_SURFACE_CONTROL_SEPARATION_PASS_NEEDS_V509_V512_NOT_PROMOTED",
-      "evidence": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5160000000000000000000_paired_visible_surface_decision.json"
+      "name": "V519 canonical SMPL-X surfel graph training/adjudication",
+      "result": "V519_CANONICAL_SURFEL_GRAPH_TRAINED_CANDIDATE_READY_FOR_V509_REVIEW_NOT_PROMOTED",
+      "evidence": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5190000000000000000000_canonical_surfel_graph_training_decision.json",
+      "main_decision": "automatic metrics improved but manual visual remained smeared/blob-like"
     },
     {
-      "name": "V517 full-scene clarity composer",
-      "result": "V517_HUMAN_MAIN_FULL_SCENE_CANDIDATE_READY_FOR_V509_V512_NOT_PROMOTED",
-      "evidence": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5170000000000000000000_full_scene_clarity_decision.json",
-      "main_decision": "candidate generated but manual mentor visual remains fail-closed"
+      "name": "V520 pose-aligned surfel graph repair",
+      "result": "V520_POSE_ALIGNED_SURFEL_GRAPH_CANDIDATE_READY_FOR_V509_REVIEW_NOT_PROMOTED",
+      "evidence": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5200000000000000000000_pose_aligned_surfel_graph_decision.json",
+      "main_decision": "pose/axis alignment improved thickness and metrics but not mentor-readable morphology"
     },
     {
-      "name": "V518 canonical SMPL-X surfel/graph representation repair smoke",
-      "result": "V518_CANONICAL_SURFEL_GRAPH_REPRESENTATION_REPAIR_SMOKE_COMPLETE_NOT_PROMOTED",
-      "evidence": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5180000000000000000000_canonical_surfel_graph_repair_decision.json",
-      "main_decision": "representation switch executed; not accepted for V509 until V519 training/adjudication"
+      "name": "V521 observation-anchored visible student",
+      "result": "V521_OBSERVATION_ANCHORED_VISIBLE_STUDENT_FAIL_CLOSED_CONTINUE_REPAIR_NOT_PROMOTED",
+      "evidence": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5210000000000000000000_observation_anchored_visible_student_decision.json",
+      "main_decision": "human readability recovered with full-scene context, but control separation and part binding failed closed"
+    },
+    {
+      "name": "V522 latest visual gate router",
+      "result": "V522_GATE_ROUTER_RECORDED_V521_VISUAL_RECOVERY_AND_V523_REQUIRED_NOT_PROMOTED",
+      "evidence": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5220000000000000000000_latest_visual_gate_router_decision.json"
     }
   ],
   "pending_steps": [
-    "V519 train/adjudicate canonical SMPL-X surfel graph with VGGT feature sampling, local body-part heads, anti-blob/anti-sheet losses",
-    "V519 same-scene hard controls: no-SMPL-graph, shuffled semantic, weak semantic, VGGT visible baseline, SMPL graph only",
-    "V519 local morphology boards vs V50R2 visual floor",
-    "V509 full-scene insertion retry only if V519 manual visual improves over V517 and controls",
-    "V510 local fidelity retry after accepted V519 student",
-    "V511 anti-2D retry after accepted V519 student",
-    "V512 manual mentor gate retry"
+    "V523 repair control separation without degrading V521 visual readability",
+    "V523 replace coarse y/x part labels with robust SMPL-X/body-part binding",
+    "V509-V512 rerun after V523"
   ],
   "gates": {
     "auto_evolution_executed_not_route_only": true,
-    "v517_model_owned_full_scene_candidate_ready": true,
-    "v517_no_teacher_copy": true,
-    "v517_manual_visual_body_readable": false,
-    "v518_representation_switch_executed": true,
-    "v518_canonical_graph_body_parts_present": true,
-    "v518_no_teacher_copy": true,
-    "v518_accepted_for_v509": false,
+    "v521_human_readability_recovered": true,
+    "v521_no_teacher_copy": true,
+    "v521_true_beats_required_controls": false,
     "mentor_ready": false,
     "external_hard_block": false,
     "not_promoted": true
   },
-  "decision": "Auto-evolution did not stop at V517 visual failure. V518 executed the required representation switch to canonical SMPL-X surfel/graph smoke evidence. It is still not mentor-ready; proceed to V519 training and strict control adjudication before any V509/V512 pass claim.",
+  "decision": "Auto-evolution did not stop at V519/V520 failures. V521 recovered the visual floor direction, but V512 still fails closed because controls and local body-part fidelity are incomplete. Continue with V523; do not promote.",
   "blockers": [
-    "V517 full-scene candidate remains below V50R2 human morphology floor",
-    "V518 smoke is topology-oriented but still visually line-like and untrained",
-    "V519 must train/adjudicate body-part surfel heads before mentor-ready evidence is possible"
+    "V521 true does not clearly beat the competitive visible-anchor baseline",
+    "V521 body-part/local gates are incomplete",
+    "V523 must keep V521 readability while repairing controls"
   ]
 }
