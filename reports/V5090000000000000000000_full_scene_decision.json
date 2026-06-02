@@ -1,7 +1,7 @@
 {
   "task": "V509_full_scene_insertion_gate",
-  "status": "V509_FULL_SCENE_INSERTION_FAIL_CLOSED_TARGET_MATRIX_COMPLETE_ACCEPTED_STUDENT_PENDING_NOT_PROMOTED",
-  "created_at": "2026-06-02T21:41:53.905352Z",
+  "status": "V509_FULL_SCENE_INSERTION_V517_CANDIDATE_VISUAL_FAIL_CLOSED_NOT_PROMOTED",
+  "created_at": "2026-06-02T21:53:47.027158Z",
   "repo": "D:\\vggt\\vggt-canonical-surfel-adapter",
   "full_scene_student_board": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V5090000000000000000000_full_scene_student.png",
   "same_scene_controls_board": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V5090000000000000000000_same_scene_controls.png",
@@ -11,14 +11,17 @@
   "input_v508_a100_4000": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5080000000000000000000_modal_a100_4000_result.json",
   "input_v514_adjudication": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5140000000000000000000_checkpoint_adjudication_decision.json",
   "input_v516_paired_surface": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5160000000000000000000_paired_visible_surface_decision.json",
+  "input_v517_full_scene_clarity": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5170000000000000000000_full_scene_clarity_decision.json",
   "v508_status": "V508_MODAL_MATRIX_HASH_RECONCILED_TARGET_COMPLETE_NOT_PROMOTED",
   "v508_modal_status": "V508_MODAL_A10G_SMOKE_PASS_TARGET_MATRIX_PENDING_NOT_PROMOTED",
   "v508_a10g_4000_status": "V508_MODAL_A10G_4000_CHECKPOINT_PASS_A10G_TARGET_COMPLETE_A100_PENDING_NOT_PROMOTED",
   "v508_a100_4000_status": "V508_MODAL_A100_4000_CHECKPOINT_PASS_A10G_A100_TARGET_COMPLETE_NOT_PROMOTED",
   "v514_status": "V514_FAIL_CLOSED_NO_ACCEPTED_MODEL_OWNED_STUDENT_CONTINUE_REPAIR_NOT_PROMOTED",
   "v516_status": "V516_PAIRED_VISIBLE_SURFACE_CONTROL_SEPARATION_PASS_NEEDS_V509_V512_NOT_PROMOTED",
+  "v517_status": "V517_HUMAN_MAIN_FULL_SCENE_CANDIDATE_READY_FOR_V509_V512_NOT_PROMOTED",
   "gates": {
     "model_owned_student_checkpoint_ready": false,
+    "model_owned_full_scene_candidate_ready": true,
     "v508_a10g_checkpoints_complete": true,
     "v508_target_checkpoints_complete": true,
     "modal_a10g_smoke_pass": true,
@@ -31,16 +34,21 @@
     "v516_paired_true_improves_vggt_baseline": true,
     "v516_paired_true_improves_no_smpl": true,
     "v516_paired_true_improves_shuffled_semantic": true,
-    "full_scene_student_inserted": false,
+    "v517_no_teacher_copy": true,
+    "v517_human_main_full_scene_pass": true,
+    "v517_anti_2d_proxy_pass": true,
+    "full_scene_student_inserted": true,
     "same_scene_controls_generated_as_pass_evidence": false,
     "teacher_or_rgb_copy_used_as_student": false,
+    "manual_visual_body_readable": false,
     "mentor_visual_gate_pass": false,
     "not_promoted": true,
     "auto_evolve_required": true
   },
-  "decision": "Do not generate fake insertion from V50R2 or raw RGB. Full-scene insertion must wait for a model-owned student checkpoint from the V508 target matrix that passes V505 copy firewall and V50R2 non-regression. Continue repair/training; this is not an external hard block.",
+  "decision": "V517 produced a model-owned full-scene candidate with partial VGGT environment and same-scene controls, but manual mentor visual inspection still sees a blob-like human without reliable limb morphology. Do not promote; route back to canonical SMPL-X surfel/graph representation reconstruction.",
   "blockers": [
-    "V516 paired visible-surface auxiliary gate passes, but V514 full-scene/global visual adjudication remains fail-closed",
-    "No accepted model-owned student checkpoint is available for V509 mentor insertion until full-scene visual gate passes"
+    "V517 candidate is full-scene, but human morphology remains below V50R2 visual floor",
+    "Same-scene controls exist, but visual separation is not mentor-convincing",
+    "Next route must repair representation topology rather than polish viewer or metrics"
   ]
 }

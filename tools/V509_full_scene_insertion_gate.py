@@ -19,6 +19,9 @@ V514_DECISION = REPORTS / "V5140000000000000000000_checkpoint_adjudication_decis
 V514_BOARD = BOARDS / "V5140000000000000000000_checkpoint_adjudication_board.png"
 V516_DECISION = REPORTS / "V5160000000000000000000_paired_visible_surface_decision.json"
 V516_BOARD = BOARDS / "V5160000000000000000000_paired_visible_surface_board.png"
+V517_DECISION = REPORTS / "V5170000000000000000000_full_scene_clarity_decision.json"
+V517_MAIN_BOARD = BOARDS / "V5170000000000000000000_human_main_full_scene.png"
+V517_CONTROLS_BOARD = BOARDS / "V5170000000000000000000_same_scene_controls.png"
 V50R2_FLOOR = BOARDS / "V5020000000000000000000_v50r2_panel_annotated.png"
 V503_REGRESSION = BOARDS / "V5030000000000000000000_student_vs_v50r2_contact_sheet.png"
 RGB_SCENE = Path(r"D:\vggt\vggt-main\output\4k4d_scenes\0012_11_frame0000_12views_tmf_v223_repaired\rgb_contact_sheet.png")
@@ -80,6 +83,7 @@ def main() -> int:
     v508_a100_4000 = read_json(V508_A100_4000)
     v514 = read_json(V514_DECISION)
     v516 = read_json(V516_DECISION)
+    v517 = read_json(V517_DECISION)
     a10g_checkpoints_complete = bool(
         v508_hash.get("modal_matrix_complete")
         and int(v508_hash.get("local_smoke_steps") or 0) >= 4000
@@ -90,9 +94,13 @@ def main() -> int:
     v508_target_matrix_complete = bool(a10g_checkpoints_complete and (not a100_required or a100_complete))
     v514_accepted = bool(v514.get("gates", {}).get("accepted_model_owned_student", False))
     v516_paired_pass = bool(v516.get("gates", {}).get("paired_surface_pass", False))
+    v517_candidate_ready = bool(v517.get("gates", {}).get("accepted_for_v509", False))
+    v517_manual_visual_pass = False
     status = (
         "V509_FULL_SCENE_INSERTION_READY_FOR_STRICT_VISUAL_GATE_NOT_PROMOTED"
         if v514_accepted
+        else "V509_FULL_SCENE_INSERTION_V517_CANDIDATE_VISUAL_FAIL_CLOSED_NOT_PROMOTED"
+        if v517_candidate_ready
         else
         "V509_FULL_SCENE_INSERTION_FAIL_CLOSED_TARGET_MATRIX_COMPLETE_ACCEPTED_STUDENT_PENDING_NOT_PROMOTED"
         if v508_target_matrix_complete
@@ -106,23 +114,24 @@ def main() -> int:
 
     make_board(
         full_scene_board,
-        "V509 full-scene insertion gate: failed closed, no accepted model-owned student yet",
+        "V509 full-scene insertion gate: V517 candidate exists, manual visual still fails closed",
         [
             ("V50R2 visual floor", V50R2_FLOOR, "reference only"),
             ("Full-scene RGB observation", RGB_SCENE, "environment source only"),
-            ("Current-student regression", V503_REGRESSION, "student below V50R2"),
-            ("V508 A10G 4000", V508_A10G_4000, matrix_note),
+            ("V517 human-main candidate", V517_MAIN_BOARD, "candidate only, body still blob-like"),
+            ("V517 controls", V517_CONTROLS_BOARD, "same-scene controls generated"),
             ("V514 adjudication", V514_BOARD, "global visual fail" if not v514_accepted else "candidate handoff"),
             ("V516 paired surface", V516_BOARD, "paired pass" if v516_paired_pass else "paired fail"),
         ],
     )
     make_board(
         controls_board,
-        "V509 same-scene controls gate: not generated as pass evidence",
+        "V509 same-scene controls gate: V517 generated controls, visual separation still insufficient",
         [
             ("V50R2 visual floor", V50R2_FLOOR, "reference only"),
-            ("V514 global controls", V514_BOARD, "global NN/visual not accepted"),
+            ("V517 same-scene controls", V517_CONTROLS_BOARD, "candidate controls, not pass evidence"),
             ("V516 paired controls", V516_BOARD, "auxiliary paired pass" if v516_paired_pass else "paired controls fail"),
+            ("Current-student regression", V503_REGRESSION, "visual floor still not met"),
         ],
     )
 
@@ -139,14 +148,17 @@ def main() -> int:
         "input_v508_a100_4000": str(V508_A100_4000),
         "input_v514_adjudication": str(V514_DECISION),
         "input_v516_paired_surface": str(V516_DECISION),
+        "input_v517_full_scene_clarity": str(V517_DECISION),
         "v508_status": v508_hash.get("status"),
         "v508_modal_status": v508_modal.get("status"),
         "v508_a10g_4000_status": v508_a10g_4000.get("status"),
         "v508_a100_4000_status": v508_a100_4000.get("status"),
         "v514_status": v514.get("status"),
         "v516_status": v516.get("status"),
+        "v517_status": v517.get("status"),
         "gates": {
             "model_owned_student_checkpoint_ready": v514_accepted,
+            "model_owned_full_scene_candidate_ready": v517_candidate_ready,
             "v508_a10g_checkpoints_complete": a10g_checkpoints_complete,
             "v508_target_checkpoints_complete": v508_target_matrix_complete,
             "modal_a10g_smoke_pass": v508_modal.get("gates", {}).get("modal_a10g_smoke_pass", False),
@@ -159,22 +171,27 @@ def main() -> int:
             "v516_paired_true_improves_vggt_baseline": v516.get("gates", {}).get("paired_true_improves_vggt_baseline", False),
             "v516_paired_true_improves_no_smpl": v516.get("gates", {}).get("paired_true_improves_no_smpl", False),
             "v516_paired_true_improves_shuffled_semantic": v516.get("gates", {}).get("paired_true_improves_shuffled_semantic", False),
-            "full_scene_student_inserted": v514_accepted,
-            "same_scene_controls_generated_as_pass_evidence": v514_accepted,
+            "v517_no_teacher_copy": v517.get("gates", {}).get("no_teacher_copy", False),
+            "v517_human_main_full_scene_pass": v517.get("gates", {}).get("human_main_full_scene_pass", False),
+            "v517_anti_2d_proxy_pass": v517.get("gates", {}).get("anti_2d_proxy_pass", False),
+            "full_scene_student_inserted": v514_accepted or v517_candidate_ready,
+            "same_scene_controls_generated_as_pass_evidence": False,
             "teacher_or_rgb_copy_used_as_student": False,
-            "mentor_visual_gate_pass": False,
+            "manual_visual_body_readable": v517_manual_visual_pass,
+            "mentor_visual_gate_pass": v517_manual_visual_pass,
             "not_promoted": True,
-            "auto_evolve_required": not v514_accepted,
+            "auto_evolve_required": True,
         },
         "decision": (
-            "Do not generate fake insertion from V50R2 or raw RGB. Full-scene insertion must wait for a model-owned "
-            "student checkpoint from the V508 target matrix that passes V505 copy firewall and V50R2 non-regression. "
-            "Continue repair/training; this is not an external hard block."
+            "V517 produced a model-owned full-scene candidate with partial VGGT environment and same-scene controls, "
+            "but manual mentor visual inspection still sees a blob-like human without reliable limb morphology. "
+            "Do not promote; route back to canonical SMPL-X surfel/graph representation reconstruction."
         ),
         "blockers": [
-            "V516 paired visible-surface auxiliary gate passes, but V514 full-scene/global visual adjudication remains fail-closed",
-            "No accepted model-owned student checkpoint is available for V509 mentor insertion until full-scene visual gate passes"
-        ] if not v514_accepted else [],
+            "V517 candidate is full-scene, but human morphology remains below V50R2 visual floor",
+            "Same-scene controls exist, but visual separation is not mentor-convincing",
+            "Next route must repair representation topology rather than polish viewer or metrics"
+        ],
     }
     decision_json.parent.mkdir(parents=True, exist_ok=True)
     decision_json.write_text(json.dumps(payload, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")

@@ -1,0 +1,68 @@
+{
+  "task": "V517_full_scene_clarity_composer",
+  "status": "V517_HUMAN_MAIN_FULL_SCENE_CANDIDATE_READY_FOR_V509_V512_NOT_PROMOTED",
+  "created_at": "2026-06-02T21:48:25.646845Z",
+  "repo": "D:\\vggt\\vggt-canonical-surfel-adapter",
+  "checkpoint": "output\\V5150000000000000000000_observation_bound_repair_training\\checkpoint_240.pt",
+  "candidate_npz": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V5170000000000000000000_full_scene_clarity_composer\\v517_human_main_model_owned_candidate.npz",
+  "true_human_main_full_scene_ply": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V5170000000000000000000_full_scene_clarity_composer\\v517_true_human_main_full_scene_rgb.ply",
+  "same_scene_controls": {
+    "vggt_baseline": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V5170000000000000000000_full_scene_clarity_composer\\v517_vggt_baseline_same_scene_rgb.ply",
+    "no_smpl": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V5170000000000000000000_full_scene_clarity_composer\\v517_no_smpl_same_scene_rgb.ply",
+    "shuffled_semantic": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V5170000000000000000000_full_scene_clarity_composer\\v517_shuffled_semantic_same_scene_rgb.ply"
+  },
+  "boards": {
+    "human_main_full_scene": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V5170000000000000000000_human_main_full_scene.png",
+    "same_scene_controls": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V5170000000000000000000_same_scene_controls.png",
+    "anti_2d": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V5170000000000000000000_turntable_side_depth_cross_section.png"
+  },
+  "metrics_csv": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5170000000000000000000_full_scene_clarity_metrics.csv",
+  "teacher_copy_check": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5170000000000000000000_teacher_copy_check.json",
+  "input_policy": {
+    "human_points_source": "V515/V516 model-owned checkpoint inference",
+    "environment_points_source": "VGGT observation environment points",
+    "v50r2_used_at_inference": false,
+    "v50r2_used_for_visual_floor_reference_only": true,
+    "kinect_depth_used_at_inference": false
+  },
+  "gates": {
+    "no_teacher_copy": true,
+    "paired_surface_pass": true,
+    "human_main_full_scene_pass": true,
+    "partial_environment_visible": true,
+    "anti_2d_proxy_pass": true,
+    "same_scene_controls_generated": true,
+    "accepted_for_v509": true,
+    "mentor_ready": false,
+    "not_promoted": true
+  },
+  "metrics": {
+    "status": "V517_HUMAN_MAIN_FULL_SCENE_CANDIDATE_READY_FOR_V509_V512_NOT_PROMOTED",
+    "checkpoint": "output\\V5150000000000000000000_observation_bound_repair_training\\checkpoint_240.pt",
+    "checkpoint_steps": 240,
+    "human_point_count": 36000,
+    "environment_point_count": 9000,
+    "environment_ratio": 0.2,
+    "human_span_x": 0.44724178314208984,
+    "human_span_y": 0.47349900007247925,
+    "human_span_z": 0.5645030736923218,
+    "human_thickness_ratio": 0.7922751903533936,
+    "true_paired_dist": 0.00014440430095419288,
+    "baseline_paired_dist": 0.0033717285841703415,
+    "no_smpl_paired_dist": 0.0033717285841703415,
+    "paired_surface_pass": true,
+    "no_teacher_copy": true,
+    "human_main_full_scene_pass": true,
+    "anti_2d_proxy_pass": true,
+    "accepted_for_v509": true,
+    "mentor_ready": false
+  },
+  "decision": "Candidate is ready for strict V509/V512 visual review, but not mentor-ready until those gates pass.",
+  "artifact_hashes": {
+    "candidate_npz": "f219e4f33f97c1e39284c95b2f546e9ab55ce79dfecfef9866a26af09ecd5657",
+    "true_human_main_full_scene_ply": "67ed2781637eebb2934db5825ad54ae415b3eff1095c95e7e250a6749e0dee17",
+    "main_board": "b22fcdf0f975cbbb0fb300a6b7d4e3d70691334a07c4e1eebcee5b26150bc3cd",
+    "controls_board": "7aff474664a5c111a59ae1c06a7f889e7d93756f3d7eed973d876f3bfdb3a2c7",
+    "anti2d_board": "2eb1b35ba163ea3ba509ddf0385519b6ee15368386840189d86653219310b6a4"
+  }
+}

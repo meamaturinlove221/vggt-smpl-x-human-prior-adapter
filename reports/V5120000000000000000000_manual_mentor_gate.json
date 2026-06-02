@@ -1,13 +1,13 @@
 {
   "task": "V512_manual_mentor_visual_gate",
   "status": "V512_MANUAL_MENTOR_GATE_FAIL_CLOSED_AUTO_EVOLVE_REQUIRED_NOT_PROMOTED",
-  "created_at": "2026-06-02T21:41:55.503018Z",
+  "created_at": "2026-06-02T21:54:07.111721Z",
   "repo": "D:\\vggt\\vggt-canonical-surfel-adapter",
   "gate_rows": [
     {
       "gate": "full_scene_main",
       "pass": false,
-      "reason": "V514 generated a full-scene candidate, but V509 did not accept it for mentor insertion"
+      "reason": "V517 generated a model-owned full-scene candidate with environment, but the human remains blob-like and not limb-readable"
     },
     {
       "gate": "true_greater_than_vggt_baseline",
@@ -16,23 +16,23 @@
     },
     {
       "gate": "true_greater_than_hard_controls",
-      "pass": true,
-      "reason": "V516 paired controls pass=True"
+      "pass": false,
+      "reason": "V517 same-scene controls exist, but visual separation is not mentor-convincing"
     },
     {
       "gate": "student_close_to_v50r2_floor",
-      "pass": true,
-      "reason": "V516 paired visible surface passes; V514 global/full-scene visual still fail-closed"
+      "pass": false,
+      "reason": "V517 paired metrics are close, but the visible human morphology is still worse than the V50R2 visual floor"
     },
     {
       "gate": "no_teacher_copy",
       "pass": true,
-      "reason": "V514 and V505 copy checks show no direct teacher copy"
+      "reason": "V517/V505 copy checks show no direct teacher copy"
     },
     {
       "gate": "local_fidelity_complete",
       "pass": false,
-      "reason": "V510 failed closed without accepted student"
+      "reason": "V510 failed closed: local head/hair, limbs, hands/feet remain below V50R2 readability"
     },
     {
       "gate": "face_policy_honest",
@@ -41,13 +41,13 @@
     },
     {
       "gate": "environment_visible",
-      "pass": false,
-      "reason": "Environment source exists but no model-owned insertion"
+      "pass": true,
+      "reason": "V517 preserves partial VGGT environment, but environment alone cannot pass mentor gate"
     },
     {
       "gate": "anti_2d_pass",
       "pass": false,
-      "reason": "V511 failed closed"
+      "reason": "V517 anti-2D proxy passes, but proxy thickness does not replace readable body morphology"
     }
   ],
   "annotated_board": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V5120000000000000000000_manual_gate_annotated.png",
@@ -65,7 +65,8 @@
     "v510": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5100000000000000000000_local_fidelity_decision.json",
     "v511": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5110000000000000000000_anti_2d_decision.json",
     "v514": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5140000000000000000000_checkpoint_adjudication_decision.json",
-    "v516": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5160000000000000000000_paired_visible_surface_decision.json"
+    "v516": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5160000000000000000000_paired_visible_surface_decision.json",
+    "v517": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5170000000000000000000_full_scene_clarity_decision.json"
   },
   "input_statuses": {
     "v501": "V501_V50R2_VISUAL_FLOOR_INTAKE_COMPLETE_CONTINUE_NOT_PROMOTED",
@@ -77,30 +78,34 @@
     "v507": "V507_LOSS_SMOKE_PASS_CONTINUE_NOT_PROMOTED",
     "v508": "V508_MODAL_MATRIX_HASH_RECONCILED_TARGET_COMPLETE_NOT_PROMOTED",
     "v508_modal": "V508_MODAL_A10G_SMOKE_PASS_TARGET_MATRIX_PENDING_NOT_PROMOTED",
-    "v509": "V509_FULL_SCENE_INSERTION_FAIL_CLOSED_TARGET_MATRIX_COMPLETE_ACCEPTED_STUDENT_PENDING_NOT_PROMOTED",
-    "v510": "V510_LOCAL_FIDELITY_FAIL_CLOSED_NO_ACCEPTED_STUDENT_NOT_PROMOTED",
-    "v511": "V511_ANTI_2D_MULTIVIEW_FAIL_CLOSED_NO_ACCEPTED_STUDENT_NOT_PROMOTED",
+    "v509": "V509_FULL_SCENE_INSERTION_V517_CANDIDATE_VISUAL_FAIL_CLOSED_NOT_PROMOTED",
+    "v510": "V510_LOCAL_FIDELITY_FAIL_CLOSED_V517_LOCAL_MORPHOLOGY_BELOW_V50R2_NOT_PROMOTED",
+    "v511": "V511_ANTI_2D_PROXY_PASS_MANUAL_VISUAL_FAIL_CLOSED_NOT_PROMOTED",
     "v514": "V514_FAIL_CLOSED_NO_ACCEPTED_MODEL_OWNED_STUDENT_CONTINUE_REPAIR_NOT_PROMOTED",
-    "v516": "V516_PAIRED_VISIBLE_SURFACE_CONTROL_SEPARATION_PASS_NEEDS_V509_V512_NOT_PROMOTED"
+    "v516": "V516_PAIRED_VISIBLE_SURFACE_CONTROL_SEPARATION_PASS_NEEDS_V509_V512_NOT_PROMOTED",
+    "v517": "V517_HUMAN_MAIN_FULL_SCENE_CANDIDATE_READY_FOR_V509_V512_NOT_PROMOTED"
   },
   "gates": {
     "manual_mentor_gate_pass": false,
     "full_scene_main_pass": false,
     "same_scene_controls_pass": false,
-    "student_close_to_v50r2_floor": true,
+    "v517_candidate_available_for_review": true,
+    "paired_surface_close_to_v50r2": true,
+    "student_close_to_v50r2_floor": false,
     "no_teacher_copy": true,
     "local_fidelity_complete": false,
     "face_policy_honest": true,
-    "environment_visible_with_student": false,
+    "environment_visible_with_student": true,
+    "anti_2d_proxy_pass": true,
     "anti_2d_pass": false,
     "auto_evolve_required": true,
     "not_promoted": true
   },
-  "decision": "Manual mentor gate fails closed. Continue auto-evolution toward a real V508 target-matrix student; do not claim teacher-only, crop-only, metric-only, route-created-only, or external-hard-block success.",
+  "decision": "Manual mentor gate fails closed. V517 is a model-owned full-scene candidate, but the visible human is still not as readable as V50R2; continue with canonical SMPL-X surfel/graph representation repair. Do not claim teacher-only, crop-only, metric-only, route-created-only, or external-hard-block success.",
   "blockers": [
-    "V516 paired visible-surface auxiliary gate passes, but V514/V509 full-scene visual gate remains unaccepted",
-    "V509 full-scene insertion failed",
+    "V517 human-main full-scene candidate remains blob-like / limb-unreadable",
+    "V517 visual morphology remains below V50R2 visual floor despite paired metric pass",
     "V510 local fidelity failed",
-    "V511 anti-2D failed"
+    "V511 anti-2D proxy cannot substitute for mentor-readable human morphology"
   ]
 }

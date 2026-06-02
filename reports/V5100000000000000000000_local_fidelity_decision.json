@@ -1,9 +1,11 @@
 {
   "task": "V510_local_fidelity_gate",
-  "status": "V510_LOCAL_FIDELITY_FAIL_CLOSED_NO_ACCEPTED_STUDENT_NOT_PROMOTED",
-  "created_at": "2026-06-02T21:41:54.809590Z",
+  "status": "V510_LOCAL_FIDELITY_FAIL_CLOSED_V517_LOCAL_MORPHOLOGY_BELOW_V50R2_NOT_PROMOTED",
+  "created_at": "2026-06-02T21:53:58.102649Z",
   "repo": "D:\\vggt\\vggt-canonical-surfel-adapter",
   "input_v509_decision": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5090000000000000000000_full_scene_decision.json",
+  "input_v517_decision": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5170000000000000000000_full_scene_clarity_decision.json",
+  "v517_status": "V517_HUMAN_MAIN_FULL_SCENE_CANDIDATE_READY_FOR_V509_V512_NOT_PROMOTED",
   "boards": {
     "head_hair": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V5100000000000000000000_head_hair_fidelity.png",
     "shoulder_neck": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V5100000000000000000000_shoulder_neck_fidelity.png",
@@ -18,14 +20,15 @@
     "hand_arm_fidelity_pass": false,
     "leg_foot_fidelity_pass": false,
     "face_visible_subset_honest": true,
+    "v517_candidate_available_for_review": true,
     "accepted_student_available": false,
     "teacher_floor_available": true,
     "not_promoted": true,
     "auto_evolve_required": true
   },
-  "decision": "V50R2 local teacher/reference boards exist, but there is no accepted model-owned student from the target matrix to compare. Fail closed and continue training/repair.",
+  "decision": "V517 provides a model-owned full-scene candidate, but local head/hair, shoulder/neck, clothing, hand/arm, and leg/foot readability is still below the V50R2 visual floor. Fail closed and continue with canonical surfel/graph representation repair.",
   "blockers": [
-    "V508 target matrix incomplete",
-    "V509 full-scene insertion failed closed"
+    "V517 full-scene candidate remains blob-like at local body-part level",
+    "V50R2 local morphology is not matched in the mentor-facing view"
   ]
 }
