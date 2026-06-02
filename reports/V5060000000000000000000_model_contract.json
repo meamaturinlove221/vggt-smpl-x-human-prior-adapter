@@ -1,0 +1,73 @@
+{
+  "task": "V506_v50r2_observation_distilled_student_contract",
+  "status": "V506_MODEL_CONTRACT_READY_CONTINUE_NOT_PROMOTED",
+  "created_at": "2026-06-02T19:47:11.713084Z",
+  "model_file": "D:\\vggt\\vggt-canonical-surfel-adapter\\models\\v506_v50r2_observation_distilled_student.py",
+  "inputs_allowed": [
+    "vggt_world_points",
+    "vggt_rgb",
+    "vggt_confidence",
+    "vggt_features",
+    "smplx_graph_features",
+    "smplx_normal",
+    "smplx_local_frame",
+    "camera_features",
+    "human_mask",
+    "body_part_id",
+    "environment_points",
+    "environment_rgb"
+  ],
+  "inputs_forbidden": [
+    "teacher",
+    "v50r2",
+    "kinect",
+    "v591",
+    "raw_depth",
+    "rgbd",
+    "direct_fusion"
+  ],
+  "outputs": [
+    "student_human_points",
+    "student_human_rgb",
+    "residual",
+    "surfel_occupancy",
+    "surfel_visibility",
+    "student_confidence",
+    "student_normal",
+    "part_logits",
+    "control_margin_logits",
+    "environment_points",
+    "environment_rgb"
+  ],
+  "control_modes": [
+    "true",
+    "vggt_baseline",
+    "no_smpl",
+    "shuffled_semantic",
+    "same_topology_no_semantic",
+    "shell_only",
+    "observation_only",
+    "visible_only"
+  ],
+  "config": {
+    "vggt_feature_dim": 12,
+    "smplx_feature_dim": 16,
+    "local_frame_dim": 9,
+    "camera_feature_dim": 6,
+    "hidden_dim": 192,
+    "max_residual": 0.035,
+    "max_rgb_delta": 0.04,
+    "max_normal_delta": 0.18,
+    "part_count": 8
+  },
+  "teacher_student_policy": {
+    "v50r2_teacher_bank_loaded_by_model_forward": false,
+    "teacher_points_allowed_at_inference": false,
+    "teacher_rgb_allowed_at_inference": false,
+    "kinect_depth_allowed_at_inference": false,
+    "training_loss_may_use_teacher_outside_forward": true,
+    "evaluation_may_use_teacher_outside_forward": true
+  },
+  "no_promotion": true,
+  "not_promoted": true
+}

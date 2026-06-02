@@ -1,0 +1,28 @@
+{
+  "task": "V508_modal_a10g_smoke_result",
+  "status": "V508_MODAL_A10G_SMOKE_PASS_TARGET_MATRIX_PENDING_NOT_PROMOTED",
+  "created_at": "2026-06-02T19:59:46+00:00",
+  "modal_run_url": "https://modal.com/apps/shimakaze22333/main/ap-1SHb9qWtI15tKFLN5VMN3F",
+  "gpu": "A10G",
+  "steps": 3,
+  "max_samples": 384,
+  "seed": 508,
+  "returncode": 0,
+  "copied": [
+    "reports/V5080000000000000000000_training_manifest.csv",
+    "reports/V5080000000000000000000_seed_metrics.csv",
+    "reports/V5080000000000000000000_hash_reconciliation.json",
+    "reports/V5080000000000000000000_failed_jobs.json",
+    "output/V5080000000000000000000_v50r2_distillation_matrix"
+  ],
+  "stdout_tail": "{\n  \"status\": \"V508_LOCAL_MATRIX_HASH_RECONCILED_MODAL_TARGET_PENDING_NOT_PROMOTED\",\n  \"manifest\": \"/workspace/repo/reports/V5080000000000000000000_training_manifest.csv\",\n  \"seed_metrics\": \"/workspace/repo/reports/V5080000000000000000000_seed_metrics.csv\",\n  \"hash_reconciliation\": \"/workspace/repo/reports/V5080000000000000000000_hash_reconciliation.json\"\n}\n",
+  "stderr_tail": "",
+  "interpretation": "Modal A10G smoke proves the V508 runner can execute on cloud GPU. It is not the full 300/600/1000/2000/4000 A10/A100 target matrix and cannot unlock V509 mentor-ready insertion by itself.",
+  "gates": {
+    "modal_a10g_smoke_pass": true,
+    "modal_a100_target_complete": false,
+    "target_checkpoints_complete": false,
+    "teacher_copy_diagnostic_required": true,
+    "not_promoted": true
+  }
+}

@@ -1,0 +1,841 @@
+{
+  "task": "V501_v50r2_visual_floor_intake",
+  "status": "V501_V50R2_VISUAL_FLOOR_INTAKE_COMPLETE_CONTINUE_NOT_PROMOTED",
+  "created_at": "2026-06-02T19:36:45.527012Z",
+  "repo": "D:\\vggt\\vggt-canonical-surfel-adapter",
+  "v50r2_source_package": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V50_final_promotion_transaction\\candidate_package_v50r2",
+  "inventory_csv": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5010000000000000000000_v50r2_visual_floor_inventory.csv",
+  "contact_sheet": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V5010000000000000000000_v50r2_visual_floor_contact_sheet.png",
+  "source_visual_floor_png": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\v223_view_consistent_pointcloud\\images\\V223_V50R2_full_body_pointcloud_v42_consistent.png",
+  "source_rgb_contact_sheet": "D:\\vggt\\vggt-main\\output\\4k4d_scenes\\0012_11_frame0000_12views_tmf_v223_repaired\\rgb_contact_sheet.png",
+  "source_mask_contact_sheet": "D:\\vggt\\vggt-main\\output\\4k4d_scenes\\0012_11_frame0000_12views_tmf_v223_repaired\\mask_contact_sheet.png",
+  "cameras": [
+    "cam00",
+    "cam01",
+    "cam06",
+    "cam11",
+    "cam16",
+    "cam21"
+  ],
+  "gates": {
+    "six_camera_v50r2_pointcloud_png_found": true,
+    "matched_rgb_scene_found": true,
+    "matched_masks_found": true,
+    "candidate_points_npz_found": true,
+    "candidate_normals_npz_found": true,
+    "v42_points_normals_confidence_depth_found": true,
+    "shared_ply_found": true,
+    "per_camera_ply_found": false,
+    "v50r2_modified": false,
+    "teacher_bank_input_ready": true,
+    "mentor_visual_floor_ready": true,
+    "full_scene_final_ready": false,
+    "not_promoted": true
+  },
+  "npz": {
+    "candidate_points": {
+      "path": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V50_final_promotion_transaction\\candidate_package_v50r2\\package_files\\candidate_files__candidate_points.npz",
+      "exists": true,
+      "sha256": "4e09398bd4bee9d0859820b2e3ae133d06b1b86324fd0872a2bf72d7e81dd215",
+      "keys": [
+        {
+          "key": "candidate_points_world",
+          "shape": [
+            6,
+            518,
+            518,
+            3
+          ],
+          "dtype": "float32",
+          "finite_ratio": 1.0,
+          "min": -0.7455323934555054,
+          "max": 1.4767510890960693
+        }
+      ]
+    },
+    "candidate_normals": {
+      "path": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V50_final_promotion_transaction\\candidate_package_v50r2\\package_files\\candidate_files__candidate_normals.npz",
+      "exists": true,
+      "sha256": "d3a168f9641f5bb16a8df3110b3342ba188b4cf8b4ae8a3912ba5df02856cbce",
+      "keys": [
+        {
+          "key": "candidate_normals_geometric",
+          "shape": [
+            6,
+            518,
+            518,
+            3
+          ],
+          "dtype": "float32",
+          "finite_ratio": 1.0,
+          "min": -0.9999951124191284,
+          "max": 0.9999952912330627
+        }
+      ]
+    },
+    "v42_points_world": {
+      "path": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V50_final_promotion_transaction\\candidate_package_v50r2\\package_files\\v42_prior_enabled_payload__research_points_world.npz",
+      "exists": true,
+      "sha256": "d8e70e539fe3cb93e2d881abdb0565ef42d33c5915d96d03fe2783362b107215",
+      "keys": [
+        {
+          "key": "frame0000",
+          "shape": [
+            12,
+            518,
+            518,
+            3
+          ],
+          "dtype": "float32",
+          "finite_ratio": 1.0,
+          "min": -0.7733497023582458,
+          "max": 1.4767510890960693
+        },
+        {
+          "key": "frame0000_pose_enc",
+          "shape": [
+            12,
+            9
+          ],
+          "dtype": "float32",
+          "finite_ratio": 1.0,
+          "min": -0.8900865316390991,
+          "max": 1.3775944709777832
+        },
+        {
+          "key": "frame0000_extrinsic",
+          "shape": [
+            12,
+            3,
+            4
+          ],
+          "dtype": "float32",
+          "finite_ratio": 1.0,
+          "min": -0.9871282577514648,
+          "max": 1.3775944709777832
+        },
+        {
+          "key": "frame0000_intrinsic",
+          "shape": [
+            12,
+            3,
+            3
+          ],
+          "dtype": "float32",
+          "finite_ratio": 1.0,
+          "min": 0.0,
+          "max": 541.0394287109375
+        },
+        {
+          "key": "frame0001",
+          "shape": [
+            12,
+            518,
+            518,
+            3
+          ],
+          "dtype": "float32",
+          "finite_ratio": 1.0,
+          "min": -0.7714514136314392,
+          "max": 1.4750853776931763
+        },
+        {
+          "key": "frame0001_pose_enc",
+          "shape": [
+            12,
+            9
+          ],
+          "dtype": "float32",
+          "finite_ratio": 1.0,
+          "min": -0.8889243006706238,
+          "max": 1.3818222284317017
+        },
+        {
+          "key": "frame0001_extrinsic",
+          "shape": [
+            12,
+            3,
+            4
+          ],
+          "dtype": "float32",
+          "finite_ratio": 1.0,
+          "min": -0.9879043102264404,
+          "max": 1.3818222284317017
+        },
+        {
+          "key": "frame0001_intrinsic",
+          "shape": [
+            12,
+            3,
+            3
+          ],
+          "dtype": "float32",
+          "finite_ratio": 1.0,
+          "min": 0.0,
+          "max": 541.465576171875
+        },
+        {
+          "key": "frame0002",
+          "shape": [
+            12,
+            518,
+            518,
+            3
+          ],
+          "dtype": "float32",
+          "finite_ratio": 1.0,
+          "min": -0.7702153325080872,
+          "max": 1.515575885772705
+        },
+        {
+          "key": "frame0002_pose_enc",
+          "shape": [
+            12,
+            9
+          ],
+          "dtype": "float32",
+          "finite_ratio": 1.0,
+          "min": -0.8879045844078064,
+          "max": 1.3791193962097168
+        },
+        {
+          "key": "frame0002_extrinsic",
+          "shape": [
+            12,
+            3,
+            4
+          ],
+          "dtype": "float32",
+          "finite_ratio": 1.0,
+          "min": -0.9883124828338623,
+          "max": 1.3791193962097168
+        },
+        {
+          "key": "frame0002_intrinsic",
+          "shape": [
+            12,
+            3,
+            3
+          ],
+          "dtype": "float32",
+          "finite_ratio": 1.0,
+          "min": 0.0,
+          "max": 540.8247680664062
+        },
+        {
+          "key": "frame_keys",
+          "shape": [
+            3
+          ],
+          "dtype": "<U9"
+        }
+      ]
+    },
+    "v42_normals": {
+      "path": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V50_final_promotion_transaction\\candidate_package_v50r2\\package_files\\v42_prior_enabled_payload__research_normals_geometric.npz",
+      "exists": true,
+      "sha256": "a819da26578afa05ce4cf18a5a68ce9177ae3a25c5bcd5f9b3034eb9dea07c14",
+      "keys": [
+        {
+          "key": "normal_available",
+          "shape": [],
+          "dtype": "bool"
+        },
+        {
+          "key": "frame0000",
+          "shape": [
+            12,
+            518,
+            518,
+            3
+          ],
+          "dtype": "float32",
+          "finite_ratio": 1.0,
+          "min": -0.6274083852767944,
+          "max": 0.9301949739456177
+        },
+        {
+          "key": "frame0001",
+          "shape": [
+            12,
+            518,
+            518,
+            3
+          ],
+          "dtype": "float32",
+          "finite_ratio": 1.0,
+          "min": -0.6268116235733032,
+          "max": 0.9300981760025024
+        },
+        {
+          "key": "frame0002",
+          "shape": [
+            12,
+            518,
+            518,
+            3
+          ],
+          "dtype": "float32",
+          "finite_ratio": 1.0,
+          "min": -0.6264513731002808,
+          "max": 0.9305212497711182
+        },
+        {
+          "key": "frame_keys",
+          "shape": [
+            3
+          ],
+          "dtype": "<U9"
+        }
+      ]
+    },
+    "v42_confidence": {
+      "path": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V50_final_promotion_transaction\\candidate_package_v50r2\\package_files\\v42_prior_enabled_payload__research_confidence.npz",
+      "exists": true,
+      "sha256": "04eba319d53fc954e6567450201119e3ae7e884f39a8a8f49492000b0586bd38",
+      "keys": [
+        {
+          "key": "normal_available",
+          "shape": [],
+          "dtype": "bool"
+        },
+        {
+          "key": "frame0000_depth_conf",
+          "shape": [
+            12,
+            518,
+            518
+          ],
+          "dtype": "float32",
+          "finite_ratio": 1.0,
+          "min": 1.0,
+          "max": 10.874534606933594
+        },
+        {
+          "key": "frame0000_world_points_conf",
+          "shape": [
+            12,
+            518,
+            518
+          ],
+          "dtype": "float32",
+          "finite_ratio": 1.0,
+          "min": 1.0,
+          "max": 8.671518325805664
+        },
+        {
+          "key": "frame0000_normal_conf",
+          "shape": [
+            12,
+            518,
+            518
+          ],
+          "dtype": "float32",
+          "finite_ratio": 1.0,
+          "min": 0.49077466130256653,
+          "max": 0.5021443367004395
+        },
+        {
+          "key": "frame0001_depth_conf",
+          "shape": [
+            12,
+            518,
+            518
+          ],
+          "dtype": "float32",
+          "finite_ratio": 1.0,
+          "min": 1.0,
+          "max": 10.726115226745605
+        },
+        {
+          "key": "frame0001_world_points_conf",
+          "shape": [
+            12,
+            518,
+            518
+          ],
+          "dtype": "float32",
+          "finite_ratio": 1.0,
+          "min": 1.0,
+          "max": 8.692237854003906
+        },
+        {
+          "key": "frame0001_normal_conf",
+          "shape": [
+            12,
+            518,
+            518
+          ],
+          "dtype": "float32",
+          "finite_ratio": 1.0,
+          "min": 0.4907708168029785,
+          "max": 0.5021505355834961
+        },
+        {
+          "key": "frame0002_depth_conf",
+          "shape": [
+            12,
+            518,
+            518
+          ],
+          "dtype": "float32",
+          "finite_ratio": 1.0,
+          "min": 1.0,
+          "max": 11.47301197052002
+        },
+        {
+          "key": "frame0002_world_points_conf",
+          "shape": [
+            12,
+            518,
+            518
+          ],
+          "dtype": "float32",
+          "finite_ratio": 1.0,
+          "min": 1.0,
+          "max": 8.937601089477539
+        },
+        {
+          "key": "frame0002_normal_conf",
+          "shape": [
+            12,
+            518,
+            518
+          ],
+          "dtype": "float32",
+          "finite_ratio": 1.0,
+          "min": 0.4907587468624115,
+          "max": 0.5021608471870422
+        },
+        {
+          "key": "frame_keys",
+          "shape": [
+            3
+          ],
+          "dtype": "<U9"
+        }
+      ]
+    },
+    "v42_depths": {
+      "path": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V50_final_promotion_transaction\\candidate_package_v50r2\\package_files\\v42_prior_enabled_payload__research_depths.npz",
+      "exists": true,
+      "sha256": "ea27ebda9034a57efc41c2af7b979531c35d65ca2fffae05f1dfb648d35fabfa",
+      "keys": [
+        {
+          "key": "frame0000",
+          "shape": [
+            12,
+            518,
+            518,
+            1
+          ],
+          "dtype": "float32",
+          "finite_ratio": 1.0,
+          "min": 0.41003546118736267,
+          "max": 1.476786494255066
+        },
+        {
+          "key": "frame0001",
+          "shape": [
+            12,
+            518,
+            518,
+            1
+          ],
+          "dtype": "float32",
+          "finite_ratio": 1.0,
+          "min": 0.4136143624782562,
+          "max": 1.4722163677215576
+        },
+        {
+          "key": "frame0002",
+          "shape": [
+            12,
+            518,
+            518,
+            1
+          ],
+          "dtype": "float32",
+          "finite_ratio": 1.0,
+          "min": 0.4148617684841156,
+          "max": 1.5268194675445557
+        },
+        {
+          "key": "frame_keys",
+          "shape": [
+            3
+          ],
+          "dtype": "<U9"
+        }
+      ]
+    },
+    "head_face_patch": {
+      "path": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V50_final_promotion_transaction\\candidate_package_v50r2\\package_files\\candidate_files__head_face_patch.npz",
+      "exists": true,
+      "sha256": "469f7da437ed4ddefd0cf69e033f6b9efa5b06a5355d6ccedf7ce1d548394e7c",
+      "keys": [
+        {
+          "key": "refined_points_world",
+          "shape": [
+            6,
+            518,
+            518,
+            3
+          ],
+          "dtype": "float32",
+          "finite_ratio": 1.0,
+          "min": -0.6832332611083984,
+          "max": 1.125240445137024
+        },
+        {
+          "key": "refined_normals_world",
+          "shape": [
+            6,
+            518,
+            518,
+            3
+          ],
+          "dtype": "float32",
+          "finite_ratio": 1.0,
+          "min": -0.9998478889465332,
+          "max": 0.9999882578849792
+        },
+        {
+          "key": "refined_visibility",
+          "shape": [
+            6,
+            518,
+            518
+          ],
+          "dtype": "float32",
+          "finite_ratio": 1.0,
+          "min": 0.0,
+          "max": 1.0
+        },
+        {
+          "key": "refined_uncertainty",
+          "shape": [
+            6,
+            518,
+            518
+          ],
+          "dtype": "float32",
+          "finite_ratio": 1.0,
+          "min": 0.029999999329447746,
+          "max": 1.0
+        },
+        {
+          "key": "refined_region_id_map",
+          "shape": [
+            6,
+            518,
+            518
+          ],
+          "dtype": "uint8",
+          "finite_ratio": 1.0,
+          "min": 0.0,
+          "max": 2.0
+        },
+        {
+          "key": "head_mask",
+          "shape": [
+            6,
+            518,
+            518
+          ],
+          "dtype": "uint8",
+          "finite_ratio": 1.0,
+          "min": 0.0,
+          "max": 1.0
+        },
+        {
+          "key": "face_mask",
+          "shape": [
+            6,
+            518,
+            518
+          ],
+          "dtype": "uint8",
+          "finite_ratio": 1.0,
+          "min": 0.0,
+          "max": 1.0
+        },
+        {
+          "key": "source",
+          "shape": [],
+          "dtype": "<U50"
+        },
+        {
+          "key": "research_only",
+          "shape": [],
+          "dtype": "bool"
+        },
+        {
+          "key": "no_flame",
+          "shape": [],
+          "dtype": "bool"
+        },
+        {
+          "key": "no_formal_outputs",
+          "shape": [],
+          "dtype": "bool"
+        }
+      ]
+    },
+    "hand_patch": {
+      "path": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V50_final_promotion_transaction\\candidate_package_v50r2\\package_files\\candidate_files__hand_patch.npz",
+      "exists": true,
+      "sha256": "d7302d9348ab8d8b8fb5daf3fedae98ecf6a2045f9f79fd14552042ba16cac45",
+      "keys": [
+        {
+          "key": "hand_points_world",
+          "shape": [
+            6,
+            518,
+            518,
+            3
+          ],
+          "dtype": "float32",
+          "finite_ratio": 1.0,
+          "min": -0.6832332611083984,
+          "max": 1.125240445137024
+        },
+        {
+          "key": "hand_normals_world",
+          "shape": [
+            6,
+            518,
+            518,
+            3
+          ],
+          "dtype": "float32",
+          "finite_ratio": 1.0,
+          "min": -0.9999909996986389,
+          "max": 0.9991866946220398
+        },
+        {
+          "key": "hand_visibility",
+          "shape": [
+            6,
+            518,
+            518
+          ],
+          "dtype": "float32",
+          "finite_ratio": 1.0,
+          "min": 0.0,
+          "max": 1.0
+        },
+        {
+          "key": "hand_region_id_map",
+          "shape": [
+            6,
+            518,
+            518
+          ],
+          "dtype": "uint8",
+          "finite_ratio": 1.0,
+          "min": 0.0,
+          "max": 2.0
+        },
+        {
+          "key": "research_only",
+          "shape": [],
+          "dtype": "bool"
+        },
+        {
+          "key": "smplx_native_only",
+          "shape": [],
+          "dtype": "bool"
+        },
+        {
+          "key": "no_mano",
+          "shape": [],
+          "dtype": "bool"
+        }
+      ]
+    },
+    "temporal_teacher": {
+      "path": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V50_final_promotion_transaction\\candidate_package_v50r2\\package_files\\candidate_files__temporal_teacher.npz",
+      "exists": true,
+      "sha256": "1bc5b168c9d49e002f2405095b5e5357f78a17e156da5ebc0850dc94ad346446",
+      "keys": [
+        {
+          "key": "canonical_residual",
+          "shape": [
+            6,
+            518,
+            518,
+            3
+          ],
+          "dtype": "float32",
+          "finite_ratio": 1.0,
+          "min": -0.7923884391784668,
+          "max": 1.3729732036590576
+        },
+        {
+          "key": "canonical_support",
+          "shape": [
+            6,
+            518,
+            518
+          ],
+          "dtype": "uint8",
+          "finite_ratio": 1.0,
+          "min": 0.0,
+          "max": 1.0
+        },
+        {
+          "key": "target_frame_points",
+          "shape": [
+            6,
+            518,
+            518,
+            3
+          ],
+          "dtype": "float32",
+          "finite_ratio": 1.0,
+          "min": -0.6832332611083984,
+          "max": 1.4736874103546143
+        },
+        {
+          "key": "target_frame_region_id_map",
+          "shape": [
+            6,
+            518,
+            518
+          ],
+          "dtype": "uint8",
+          "finite_ratio": 1.0,
+          "min": 0.0,
+          "max": 5.0
+        },
+        {
+          "key": "temporal_variance",
+          "shape": [
+            6,
+            518,
+            518
+          ],
+          "dtype": "float32",
+          "finite_ratio": 1.0,
+          "min": 0.0,
+          "max": 0.04053320735692978
+        },
+        {
+          "key": "temporal_confidence",
+          "shape": [
+            6,
+            518,
+            518
+          ],
+          "dtype": "float32",
+          "finite_ratio": 1.0,
+          "min": 3.3333333249174757e-07,
+          "max": 0.9999971389770508
+        },
+        {
+          "key": "temporal_uncertainty",
+          "shape": [
+            6,
+            518,
+            518
+          ],
+          "dtype": "float32",
+          "finite_ratio": 1.0,
+          "min": 0.029999999329447746,
+          "max": 1.0
+        },
+        {
+          "key": "frame_keys",
+          "shape": [
+            3
+          ],
+          "dtype": "<U9"
+        },
+        {
+          "key": "shared_view_count",
+          "shape": [],
+          "dtype": "int32",
+          "finite_ratio": 1.0,
+          "min": 6.0,
+          "max": 6.0
+        },
+        {
+          "key": "normal_available",
+          "shape": [],
+          "dtype": "bool"
+        }
+      ]
+    }
+  },
+  "ply": {
+    "full_body_shared_ply": {
+      "path": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V32_candidate_inference_research\\v32_candidate_open3d_review_points.ply",
+      "exists": true,
+      "sha256": "4d19139b8d88c7f94f57ff2dc0e192556c68f162d1f309dfe75576006252cd31"
+    },
+    "head_face_ply": {
+      "path": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V33_head_face_detail_route\\v33_head_face_refined_teacher_points.ply",
+      "exists": true,
+      "sha256": "b83d4bac6bf98f42dda4bfa8f0db7562e76dac8ed63bc6648cd04539931e5692"
+    },
+    "hand_ply": {
+      "path": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V34_smplx_native_hand_route\\v34_smplx_native_hand_continuity_patch.ply",
+      "exists": true,
+      "sha256": "46c9e4293b4150275e75b148645fbc182f0a49ecfeaa47a916badb43ab9fe267"
+    },
+    "per_camera_ply_found": false
+  },
+  "metadata": {
+    "v50r2_manifest": {
+      "path": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V50_final_promotion_transaction\\candidate_package_v50r2\\manifest.json",
+      "exists": true,
+      "sha256": "a6447376b17f89f58e272011ef2bae3590a50a7237391ed012f3efdb3f4e1c2f"
+    },
+    "v50r2_hash_manifest": {
+      "path": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V50_final_promotion_transaction\\candidate_package_v50r2\\hash_manifest.json",
+      "exists": true,
+      "sha256": "3e95beb034dd175abf88cb6fe2a885bc77a276516f782b5d4d287b00566b3a01"
+    },
+    "v50r2_registry_entry": {
+      "path": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V50_final_promotion_transaction\\candidate_package_v50r2\\strict_registry_entry_v50r2.json",
+      "exists": true,
+      "sha256": "1013e63442ac3f63c6f896bfff6657e89b02771731a02aa600f89198f4d0cce9"
+    },
+    "v32_summary": {
+      "path": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V32_candidate_inference_research\\summary.json",
+      "exists": true,
+      "sha256": "9af00ab9e8fcc6d8fda6679ad56a159b18dc956b0de30ca5fd1c755f228c8631"
+    },
+    "v33_summary": {
+      "path": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V33_head_face_detail_route\\summary.json",
+      "exists": true,
+      "sha256": "86fbfef0c435b3f29e3c95164214914aaa0cafae27e2e631811ddb5e47e54f1a"
+    },
+    "v34_summary": {
+      "path": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V34_smplx_native_hand_route\\summary.json",
+      "exists": true,
+      "sha256": "cda53d7db8e24c4e07dbf0b93b5e170a0bf7dca3ab563398d29249b9ff11d5e2"
+    },
+    "v44_summary": {
+      "path": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V44_strict_visual_pre_promotion_gate\\summary.json",
+      "exists": true,
+      "sha256": "61128738cd70d90d58762b995a7f5a7d9db12a7d765c893c6138ecf33cf935ee"
+    }
+  },
+  "hard_policy": {
+    "v50r2_roles": [
+      "visual_floor",
+      "teacher",
+      "reference"
+    ],
+    "final_inference_allowed": false,
+    "copy_forbidden": true,
+    "modify_v50_v50r2": false,
+    "promotion": false,
+    "registry": false,
+    "active_candidate_replacement": false
+  },
+  "decision": "V50R2 six-panel morphology floor and matched RGB/mask observations are indexed. NPZ geometry/normal/confidence/depth sources are present; only shared PLYs were found, so per-camera PLY remains missing but is not a hard block because the V50R2 teacher bank can be built from NPZ. Continue to V502 panel audit and V503 regression audit; do not claim final mentor readiness.",
+  "blockers": []
+}

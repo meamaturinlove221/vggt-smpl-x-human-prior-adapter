@@ -1,0 +1,118 @@
+{
+  "task": "V508_failed_jobs",
+  "status": "V508_MODAL_TARGET_PENDING_NO_FAILURE_YET",
+  "created_at": "2026-06-02T20:11:19.932357Z",
+  "failed_jobs": [],
+  "pending_jobs": [
+    {
+      "config": "v50r2_distilled_true",
+      "checkpoints": [
+        300,
+        600,
+        1000,
+        2000,
+        4000
+      ],
+      "target_gpu": "A10/A100"
+    },
+    {
+      "config": "VGGT baseline",
+      "checkpoints": [
+        300,
+        600,
+        1000,
+        2000,
+        4000
+      ],
+      "target_gpu": "A10/A100"
+    },
+    {
+      "config": "no SMPL",
+      "checkpoints": [
+        300,
+        600,
+        1000,
+        2000,
+        4000
+      ],
+      "target_gpu": "A10/A100"
+    },
+    {
+      "config": "no teacher loss",
+      "checkpoints": [
+        300,
+        600,
+        1000,
+        2000,
+        4000
+      ],
+      "target_gpu": "A10/A100"
+    },
+    {
+      "config": "shuffled semantic",
+      "checkpoints": [
+        300,
+        600,
+        1000,
+        2000,
+        4000
+      ],
+      "target_gpu": "A10/A100"
+    },
+    {
+      "config": "same topology no semantic",
+      "checkpoints": [
+        300,
+        600,
+        1000,
+        2000,
+        4000
+      ],
+      "target_gpu": "A10/A100"
+    },
+    {
+      "config": "shell only",
+      "checkpoints": [
+        300,
+        600,
+        1000,
+        2000,
+        4000
+      ],
+      "target_gpu": "A10/A100"
+    },
+    {
+      "config": "observation only",
+      "checkpoints": [
+        300,
+        600,
+        1000,
+        2000,
+        4000
+      ],
+      "target_gpu": "A10/A100"
+    },
+    {
+      "config": "visible-only",
+      "checkpoints": [
+        300,
+        600,
+        1000,
+        2000,
+        4000
+      ],
+      "target_gpu": "A10/A100"
+    },
+    {
+      "config": "teacher-copy diagnostic",
+      "checkpoints": [
+        300,
+        600,
+        1000,
+        2000,
+        4000
+      ],
+      "target_gpu": "A10/A100"
+    }
+  ]
+}

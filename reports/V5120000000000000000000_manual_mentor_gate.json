@@ -1,0 +1,102 @@
+{
+  "task": "V512_manual_mentor_visual_gate",
+  "status": "V512_MANUAL_MENTOR_GATE_FAIL_CLOSED_AUTO_EVOLVE_REQUIRED_NOT_PROMOTED",
+  "created_at": "2026-06-02T20:14:25.037429Z",
+  "repo": "D:\\vggt\\vggt-canonical-surfel-adapter",
+  "gate_rows": [
+    {
+      "gate": "full_scene_main",
+      "pass": false,
+      "reason": "V509 did not insert an accepted model-owned student"
+    },
+    {
+      "gate": "true_greater_than_vggt_baseline",
+      "pass": false,
+      "reason": "No V509 same-scene pass evidence"
+    },
+    {
+      "gate": "true_greater_than_hard_controls",
+      "pass": false,
+      "reason": "Controls cannot override V50R2 visual regression"
+    },
+    {
+      "gate": "student_close_to_v50r2_floor",
+      "pass": false,
+      "reason": "V503 found major regression vs V50R2"
+    },
+    {
+      "gate": "no_teacher_copy",
+      "pass": true,
+      "reason": "V505 smoke catches direct teacher copy"
+    },
+    {
+      "gate": "local_fidelity_complete",
+      "pass": false,
+      "reason": "V510 failed closed without accepted student"
+    },
+    {
+      "gate": "face_policy_honest",
+      "pass": true,
+      "reason": "V502 forbids fine face detail claims"
+    },
+    {
+      "gate": "environment_visible",
+      "pass": false,
+      "reason": "Environment source exists but no model-owned insertion"
+    },
+    {
+      "gate": "anti_2d_pass",
+      "pass": false,
+      "reason": "V511 failed closed"
+    }
+  ],
+  "annotated_board": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V5120000000000000000000_manual_gate_annotated.png",
+  "source_decisions": {
+    "v501": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5010000000000000000000_v50r2_visual_floor_decision.json",
+    "v502": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5020000000000000000000_v50r2_panel_decision.json",
+    "v503": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5030000000000000000000_regression_decision.json",
+    "v504": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5040000000000000000000_teacher_bank_decision.json",
+    "v505": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5050000000000000000000_firewall_smoke.json",
+    "v506": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5060000000000000000000_forward_smoke.json",
+    "v507": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5070000000000000000000_loss_smoke.json",
+    "v508": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5080000000000000000000_hash_reconciliation.json",
+    "v508_modal": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5080000000000000000000_modal_smoke_result.json",
+    "v509": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5090000000000000000000_full_scene_decision.json",
+    "v510": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5100000000000000000000_local_fidelity_decision.json",
+    "v511": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5110000000000000000000_anti_2d_decision.json"
+  },
+  "input_statuses": {
+    "v501": "V501_V50R2_VISUAL_FLOOR_INTAKE_COMPLETE_CONTINUE_NOT_PROMOTED",
+    "v502": "V502_V50R2_PANEL_AUDIT_COMPLETE_VISUAL_FLOOR_PASS_CONTINUE_NOT_PROMOTED",
+    "v503": "V503_STUDENT_VS_V50R2_REGRESSION_FAIL_CLOSED_TO_DISTILLATION_REPAIR_NOT_PROMOTED",
+    "v504": "V504_V50R2_TEACHER_BANK_READY_CONTINUE_NOT_PROMOTED",
+    "v505": "V505_FIREWALL_SMOKE_PASS_CONTINUE_NOT_PROMOTED",
+    "v506": "V506_FORWARD_SMOKE_PASS_CONTINUE_NOT_PROMOTED",
+    "v507": "V507_LOSS_SMOKE_PASS_CONTINUE_NOT_PROMOTED",
+    "v508": "V508_LOCAL_MATRIX_HASH_RECONCILED_MODAL_TARGET_PENDING_NOT_PROMOTED",
+    "v508_modal": "V508_MODAL_A10G_SMOKE_PASS_TARGET_MATRIX_PENDING_NOT_PROMOTED",
+    "v509": "V509_FULL_SCENE_INSERTION_FAIL_CLOSED_TRAINING_MATRIX_PENDING_NOT_PROMOTED",
+    "v510": "V510_LOCAL_FIDELITY_FAIL_CLOSED_NO_ACCEPTED_STUDENT_NOT_PROMOTED",
+    "v511": "V511_ANTI_2D_MULTIVIEW_FAIL_CLOSED_NO_ACCEPTED_STUDENT_NOT_PROMOTED"
+  },
+  "gates": {
+    "manual_mentor_gate_pass": false,
+    "full_scene_main_pass": false,
+    "same_scene_controls_pass": false,
+    "student_close_to_v50r2_floor": false,
+    "no_teacher_copy": true,
+    "local_fidelity_complete": false,
+    "face_policy_honest": true,
+    "environment_visible_with_student": false,
+    "anti_2d_pass": false,
+    "auto_evolve_required": true,
+    "not_promoted": true
+  },
+  "decision": "Manual mentor gate fails closed. Continue auto-evolution toward a real V508 target-matrix student; do not claim teacher-only, crop-only, metric-only, route-created-only, or external-hard-block success.",
+  "blockers": [
+    "No accepted model-owned V508 student checkpoint",
+    "V509 full-scene insertion failed",
+    "V510 local fidelity failed",
+    "V511 anti-2D failed"
+  ]
+}

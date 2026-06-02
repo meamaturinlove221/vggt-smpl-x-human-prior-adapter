@@ -1,0 +1,125 @@
+{
+  "task": "V508_v50r2_distillation_matrix_hash_reconciliation",
+  "status": "V508_LOCAL_MATRIX_HASH_RECONCILED_MODAL_TARGET_PENDING_NOT_PROMOTED",
+  "created_at": "2026-06-02T20:11:19.867564Z",
+  "mode": "modal_smoke",
+  "teacher_bank": "/workspace/repo/output/V5040000000000000000000_v50r2_teacher_bank/v50r2_teacher_bank.npz",
+  "configs": [
+    "v50r2_distilled_true",
+    "VGGT baseline",
+    "no SMPL",
+    "no teacher loss",
+    "shuffled semantic",
+    "same topology no semantic",
+    "shell only",
+    "observation only",
+    "visible-only",
+    "teacher-copy diagnostic"
+  ],
+  "target_checkpoints": [
+    300,
+    600,
+    1000,
+    2000,
+    4000
+  ],
+  "local_smoke_steps": 300,
+  "modal_matrix_complete": false,
+  "a10_a100_required": true,
+  "teacher_copy_diagnostic_pass": true,
+  "outputs": {
+    "output/V5080000000000000000000_v50r2_distillation_matrix/VGGT_baseline/local_smoke_checkpoint.pt": {
+      "sha256": "e4936f53a66c5e4ed9c1871a9735393770c051f2be6644793356fe1e6e7aa15d",
+      "size": 392790
+    },
+    "output/V5080000000000000000000_v50r2_distillation_matrix/VGGT_baseline/metrics.json": {
+      "sha256": "8ee141a84cff2ea3f7ec2eb4077b9de3be7aef7950c13de17fa7bc7bceee587c",
+      "size": 8002
+    },
+    "output/V5080000000000000000000_v50r2_distillation_matrix/no_SMPL/local_smoke_checkpoint.pt": {
+      "sha256": "8214ff5ef2b82bb714abff1ca71f38c4760fd09c5d80b7317396a1e3d97fcecb",
+      "size": 392790
+    },
+    "output/V5080000000000000000000_v50r2_distillation_matrix/no_SMPL/metrics.json": {
+      "sha256": "6503a01a4180cb3c8578ed819a76b0f75bbd2aff9f9ec4f404b0afb5929523a9",
+      "size": 7994
+    },
+    "output/V5080000000000000000000_v50r2_distillation_matrix/no_teacher_loss/local_smoke_checkpoint.pt": {
+      "sha256": "a7ba71021f0708c805e11f81a24b09b57651078b58a91e3a47b7d98184283e10",
+      "size": 392790
+    },
+    "output/V5080000000000000000000_v50r2_distillation_matrix/no_teacher_loss/metrics.json": {
+      "sha256": "75d889a4048e594900cc122c2246c7b9d67e44d5f5a9d29797be99cbf71e34a7",
+      "size": 8595
+    },
+    "output/V5080000000000000000000_v50r2_distillation_matrix/observation_only/local_smoke_checkpoint.pt": {
+      "sha256": "35030820430920c3cbefe879ae5279a3cbc62805f8aed2ab2b1f4e6a9c667be0",
+      "size": 392790
+    },
+    "output/V5080000000000000000000_v50r2_distillation_matrix/observation_only/metrics.json": {
+      "sha256": "d45fe51727c9738bcd6797a8473338d7b51cab63be282ca5660b23a54c6e2cdd",
+      "size": 8018
+    },
+    "output/V5080000000000000000000_v50r2_distillation_matrix/same_topology_no_semantic/local_smoke_checkpoint.pt": {
+      "sha256": "9b025e7cb45abebce782efb95830512ea9f6af48788a7d38fb3edad6ee255981",
+      "size": 392790
+    },
+    "output/V5080000000000000000000_v50r2_distillation_matrix/same_topology_no_semantic/metrics.json": {
+      "sha256": "3454dc95cd65c708e927bd2d214ea9c0cf00c355505270318c835a4d02bc8538",
+      "size": 8028
+    },
+    "output/V5080000000000000000000_v50r2_distillation_matrix/shell_only/local_smoke_checkpoint.pt": {
+      "sha256": "df5c111ad8a77dc7b1c1531d2b4950be013e8095dcfd1c8cde3a04306e67e75d",
+      "size": 392790
+    },
+    "output/V5080000000000000000000_v50r2_distillation_matrix/shell_only/metrics.json": {
+      "sha256": "89754f0eb222c9d9eb4ffe27d8fbb3b429a410c67ac79d06d555ed4f9d06a23c",
+      "size": 7753
+    },
+    "output/V5080000000000000000000_v50r2_distillation_matrix/shuffled_semantic/local_smoke_checkpoint.pt": {
+      "sha256": "66d40b264da64cef32a0ab7a0e2e1c25efc6a5fc87c2674e3b5e3c6772147e12",
+      "size": 392790
+    },
+    "output/V5080000000000000000000_v50r2_distillation_matrix/shuffled_semantic/metrics.json": {
+      "sha256": "710ee80aeea9fee1e566f341413ac8305f1428ef51340469ee2d8c17b995548a",
+      "size": 8014
+    },
+    "output/V5080000000000000000000_v50r2_distillation_matrix/v50r2_distilled_true/local_smoke_checkpoint.pt": {
+      "sha256": "3d94c94520191c9c0f3db2bb49fc85b47401da83695b90d450f1576b46737090",
+      "size": 392790
+    },
+    "output/V5080000000000000000000_v50r2_distillation_matrix/v50r2_distilled_true/metrics.json": {
+      "sha256": "88579793676e41a758bd05f48a89e78e3e6006e699f00b4ab75da740bb872ad8",
+      "size": 8023
+    },
+    "output/V5080000000000000000000_v50r2_distillation_matrix/visible_only/local_smoke_checkpoint.pt": {
+      "sha256": "7df51eab9d9a9fd96b694a7af1c30f94bb2d6c4d22330d62a3faa9898c40f324",
+      "size": 392790
+    },
+    "output/V5080000000000000000000_v50r2_distillation_matrix/visible_only/metrics.json": {
+      "sha256": "d4a51da30c5b5c28ad23da7253cff5bb77274b2db9b5eb49b611d64da3f92544",
+      "size": 8014
+    },
+    "reports/V5080000000000000000000_failed_jobs.json": {
+      "sha256": "869aef7ad70232c14c65ba01825229214ce73f91309719ccd7af989bd00bc7ac",
+      "size": 2087
+    },
+    "reports/V5080000000000000000000_hash_reconciliation.json": {
+      "sha256": "7b8ab1b4590e380d58f5f153500ff95cfe078500a4465485d777d998b37e4cc9",
+      "size": 5863
+    },
+    "reports/V5080000000000000000000_modal_smoke_result.json": {
+      "sha256": "b3aa025e558d929e325c02fbd57c91f5775e0bdb7366e495112e1a0d53be2fad",
+      "size": 1506
+    },
+    "reports/V5080000000000000000000_seed_metrics.csv": {
+      "sha256": "3bfc4b1002a981394dfd7d31d4ad4f66c09527b6f9c0e76166dd8cc60502befe",
+      "size": 666
+    },
+    "reports/V5080000000000000000000_training_manifest.csv": {
+      "sha256": "5cc582dcd49e446bb3022e87de15a2d762ffa5f3c90b7865644bdc67e80d9d4b",
+      "size": 5115
+    }
+  },
+  "decision": "Local matrix smoke and artifact hashes are ready. Modal A10/A100 target matrix remains required before V509 full-scene insertion can be claimed."
+}

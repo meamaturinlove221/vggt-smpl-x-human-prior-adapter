@@ -1,0 +1,146 @@
+{
+  "task": "V506_v50r2_observation_distilled_student_forward_smoke",
+  "status": "V506_FORWARD_SMOKE_PASS_CONTINUE_NOT_PROMOTED",
+  "created_at": "2026-06-02T19:47:11.713144Z",
+  "model_file": "D:\\vggt\\vggt-canonical-surfel-adapter\\models\\v506_v50r2_observation_distilled_student.py",
+  "config": {
+    "vggt_feature_dim": 12,
+    "smplx_feature_dim": 16,
+    "local_frame_dim": 9,
+    "camera_feature_dim": 6,
+    "hidden_dim": 192,
+    "max_residual": 0.035,
+    "max_rgb_delta": 0.04,
+    "max_normal_delta": 0.18,
+    "part_count": 8
+  },
+  "output_shapes": {
+    "student_human_points": [
+      2,
+      256,
+      3
+    ],
+    "student_human_rgb": [
+      2,
+      256,
+      3
+    ],
+    "residual": [
+      2,
+      256,
+      3
+    ],
+    "surfel_occupancy": [
+      2,
+      256,
+      1
+    ],
+    "surfel_visibility": [
+      2,
+      256,
+      1
+    ],
+    "student_confidence": [
+      2,
+      256,
+      1
+    ],
+    "student_normal": [
+      2,
+      256,
+      3
+    ],
+    "part_logits": [
+      2,
+      256,
+      8
+    ],
+    "control_margin_logits": [
+      2,
+      256,
+      1
+    ],
+    "environment_points": [
+      2,
+      64,
+      3
+    ],
+    "environment_rgb": [
+      2,
+      64,
+      3
+    ]
+  },
+  "grad_norm_positive": true,
+  "forbidden_keys_rejected": {
+    "teacher_points": true,
+    "v50r2_teacher_bank": true,
+    "kinect_depth": true,
+    "raw_depth": true
+  },
+  "all_forbidden_rejected": true,
+  "control_modes": [
+    "true",
+    "vggt_baseline",
+    "no_smpl",
+    "shuffled_semantic",
+    "same_topology_no_semantic",
+    "shell_only",
+    "observation_only",
+    "visible_only"
+  ],
+  "control_shapes": {
+    "true": [
+      2,
+      256,
+      3
+    ],
+    "vggt_baseline": [
+      2,
+      256,
+      3
+    ],
+    "no_smpl": [
+      2,
+      256,
+      3
+    ],
+    "shuffled_semantic": [
+      2,
+      256,
+      3
+    ],
+    "same_topology_no_semantic": [
+      2,
+      256,
+      3
+    ],
+    "shell_only": [
+      2,
+      256,
+      3
+    ],
+    "observation_only": [
+      2,
+      256,
+      3
+    ],
+    "visible_only": [
+      2,
+      256,
+      3
+    ]
+  },
+  "model_owned_student_output": true,
+  "no_teacher_points_inference": true,
+  "no_v50r2_inference": true,
+  "no_kinect_depth_inference": true,
+  "gates": {
+    "forward_runs": true,
+    "grad_norm_positive": true,
+    "forbidden_teacher_v50r2_kinect_keys_rejected": true,
+    "model_owned_student_output": true,
+    "not_promoted": true
+  },
+  "decision": "Model contract and forward smoke pass. Continue to V507 losses; this is not visual mentor success."
+}

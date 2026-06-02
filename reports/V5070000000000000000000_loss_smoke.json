@@ -1,0 +1,53 @@
+{
+  "task": "V507_v50r2_distillation_loss_smoke",
+  "status": "V507_LOSS_SMOKE_PASS_CONTINUE_NOT_PROMOTED",
+  "created_at": "2026-06-02T19:48:59.276961Z",
+  "loss_module": "D:\\vggt\\vggt-canonical-surfel-adapter\\training\\losses\\v507_v50r2_distillation_losses.py",
+  "weights": {
+    "local_teacher_chamfer": 1.0,
+    "visible_surface_consistency": 0.45,
+    "rgb_consistency": 0.35,
+    "normal_consistency": 0.25,
+    "silhouette_boundary": 0.2,
+    "head_hair_contour": 0.3,
+    "shoulder_neck_continuity": 0.18,
+    "clothing_boundary": 0.16,
+    "arm_hand_endpoint": 0.2,
+    "leg_foot_continuity": 0.18,
+    "anti_speckle": 0.12,
+    "anti_hole": 0.12,
+    "anti_teacher_copy": 0.25,
+    "environment_preservation": 0.3,
+    "hard_control_separation": 0.4
+  },
+  "loss_terms": {
+    "local_teacher_chamfer": 0.0005685874493792653,
+    "visible_surface_consistency": 0.010477221570909023,
+    "rgb_consistency": 0.01638192869722843,
+    "normal_consistency": 0.0006999496254138649,
+    "silhouette_boundary": 0.08766312897205353,
+    "head_hair_contour": 0.007844214327633381,
+    "shoulder_neck_continuity": 0.048215579241514206,
+    "clothing_boundary": 0.007438447326421738,
+    "arm_hand_endpoint": 0.004491154104471207,
+    "leg_foot_continuity": 0.04275226220488548,
+    "anti_speckle": 0.024000000208616257,
+    "anti_hole": 0.035999998450279236,
+    "anti_teacher_copy": 0.00375732290558517,
+    "environment_preservation": 0.0,
+    "hard_control_separation": 0.0,
+    "total": 0.2902897894382477
+  },
+  "all_loss_terms_finite": true,
+  "grad_positive": true,
+  "teacher_used_outside_model_forward": true,
+  "teacher_points_in_inference": false,
+  "gates": {
+    "all_loss_terms_finite": true,
+    "grad_positive": true,
+    "teacher_used_outside_model_forward": true,
+    "teacher_points_in_inference": false,
+    "not_promoted": true
+  },
+  "decision": "Loss smoke passes and can drive V50R2 observation distillation. Continue to V508 training matrix; this is not mentor visual success."
+}

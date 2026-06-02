@@ -1,0 +1,34 @@
+{
+  "task": "V503_student_vs_v50r2_regression_audit",
+  "status": "V503_STUDENT_VS_V50R2_REGRESSION_FAIL_CLOSED_TO_DISTILLATION_REPAIR_NOT_PROMOTED",
+  "created_at": "2026-06-02T19:41:05.362327Z",
+  "repo": "D:\\vggt\\vggt-canonical-surfel-adapter",
+  "audit_csv": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5030000000000000000000_student_vs_v50r2_regression_audit.csv",
+  "contact_sheet": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V5030000000000000000000_student_vs_v50r2_contact_sheet.png",
+  "previous_status": {
+    "status": "V9100000000000000000000_ADVISOR_HUMAN_MAIN_SCENE_POINTCLOUD_READY_NOT_PROMOTED",
+    "mentor_ready": true,
+    "exists": true,
+    "path": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V9102000000000000000000_final_reconciliation_status.json"
+  },
+  "gates": {
+    "v50r2_visual_floor_established": true,
+    "student_meets_or_exceeds_v50r2_floor": false,
+    "human_roi_quality_regression_found": true,
+    "rgb_observation_fidelity_regression_found": true,
+    "controls_or_report_can_override_visual_floor": false,
+    "mentor_ready_allowed_under_new_guard": false,
+    "enter_distillation_repair": true,
+    "external_hard_block": false,
+    "not_promoted": true
+  },
+  "failed_candidates": [
+    "V352_human_main_full_scene",
+    "V353_manual_gate_assembly",
+    "V300_target_isolated_topology_surfel_scene",
+    "V910_control_safe_subject_clarity",
+    "V900_series"
+  ],
+  "decision": "Current student/main-scene boards are visibly weaker than the V50R2 human morphology floor. The previous V910 ready state is retained only as historical previous_status, not as a pass under the new V50R2 guard. Fail closed and continue into V504 teacher bank, V505 firewall, and V506 observation-distilled student repair.",
+  "blockers": []
+}
