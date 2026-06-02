@@ -1,7 +1,7 @@
 {
   "task": "V509_full_scene_insertion_gate",
   "status": "V509_FULL_SCENE_INSERTION_FAIL_CLOSED_TARGET_MATRIX_COMPLETE_ACCEPTED_STUDENT_PENDING_NOT_PROMOTED",
-  "created_at": "2026-06-02T21:34:01.789284Z",
+  "created_at": "2026-06-02T21:41:53.905352Z",
   "repo": "D:\\vggt\\vggt-canonical-surfel-adapter",
   "full_scene_student_board": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V5090000000000000000000_full_scene_student.png",
   "same_scene_controls_board": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V5090000000000000000000_same_scene_controls.png",
@@ -10,11 +10,13 @@
   "input_v508_a10g_4000": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5080000000000000000000_modal_a10g_4000_result.json",
   "input_v508_a100_4000": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5080000000000000000000_modal_a100_4000_result.json",
   "input_v514_adjudication": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5140000000000000000000_checkpoint_adjudication_decision.json",
+  "input_v516_paired_surface": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5160000000000000000000_paired_visible_surface_decision.json",
   "v508_status": "V508_MODAL_MATRIX_HASH_RECONCILED_TARGET_COMPLETE_NOT_PROMOTED",
   "v508_modal_status": "V508_MODAL_A10G_SMOKE_PASS_TARGET_MATRIX_PENDING_NOT_PROMOTED",
   "v508_a10g_4000_status": "V508_MODAL_A10G_4000_CHECKPOINT_PASS_A10G_TARGET_COMPLETE_A100_PENDING_NOT_PROMOTED",
   "v508_a100_4000_status": "V508_MODAL_A100_4000_CHECKPOINT_PASS_A10G_A100_TARGET_COMPLETE_NOT_PROMOTED",
   "v514_status": "V514_FAIL_CLOSED_NO_ACCEPTED_MODEL_OWNED_STUDENT_CONTINUE_REPAIR_NOT_PROMOTED",
+  "v516_status": "V516_PAIRED_VISIBLE_SURFACE_CONTROL_SEPARATION_PASS_NEEDS_V509_V512_NOT_PROMOTED",
   "gates": {
     "model_owned_student_checkpoint_ready": false,
     "v508_a10g_checkpoints_complete": true,
@@ -25,6 +27,10 @@
     "v514_true_improves_vggt_baseline": false,
     "v514_true_improves_no_smpl": false,
     "v514_true_improves_shuffled_semantic": false,
+    "v516_paired_surface_pass": true,
+    "v516_paired_true_improves_vggt_baseline": true,
+    "v516_paired_true_improves_no_smpl": true,
+    "v516_paired_true_improves_shuffled_semantic": true,
     "full_scene_student_inserted": false,
     "same_scene_controls_generated_as_pass_evidence": false,
     "teacher_or_rgb_copy_used_as_student": false,
@@ -34,7 +40,7 @@
   },
   "decision": "Do not generate fake insertion from V50R2 or raw RGB. Full-scene insertion must wait for a model-owned student checkpoint from the V508 target matrix that passes V505 copy firewall and V50R2 non-regression. Continue repair/training; this is not an external hard block.",
   "blockers": [
-    "V514 checkpoint adjudication produced model-owned full-scene PLYs, but true did not beat VGGT/no-SMPL/shuffled controls under the V50R2 floor",
-    "No accepted model-owned student checkpoint is available for V509 mentor insertion"
+    "V516 paired visible-surface auxiliary gate passes, but V514 full-scene/global visual adjudication remains fail-closed",
+    "No accepted model-owned student checkpoint is available for V509 mentor insertion until full-scene visual gate passes"
   ]
 }

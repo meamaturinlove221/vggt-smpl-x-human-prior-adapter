@@ -1,18 +1,18 @@
 {
   "task": "V513_auto_evolution_after_v512_fail_closed",
-  "status": "V513_AUTO_EVOLUTION_V514_V515_EXECUTED_CONTROL_SEPARATION_FAIL_CONTINUE_REPAIR_NOT_PROMOTED",
+  "status": "V513_AUTO_EVOLUTION_V516_PAIRED_SURFACE_PASS_FULL_SCENE_VISUAL_PENDING_NOT_PROMOTED",
   "created_at": "2026-06-02T20:14:00Z",
   "repo": "D:\\vggt\\vggt-canonical-surfel-adapter",
   "trigger": "V512_MANUAL_MENTOR_GATE_FAIL_CLOSED_AUTO_EVOLVE_REQUIRED_NOT_PROMOTED",
   "route_file": "D:\\vggt\\vggt-canonical-surfel-adapter\\docs\\goals\\V5130000000000000000000_auto_evolved_v508_target_matrix_route.md",
   "executed_step": {
-    "name": "V514 checkpoint adjudication and V515 observation-bound repair training",
-    "result": "V515_OBSERVATION_BOUND_REPAIR_TRAIN_SUBSET_FAIL_CONTINUE_REPAIR_NOT_PROMOTED",
-    "evidence": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5150000000000000000000_observation_bound_repair_decision.json"
+    "name": "V516 paired visible-surface control-separation adjudication",
+    "result": "V516_PAIRED_VISIBLE_SURFACE_CONTROL_SEPARATION_PASS_NEEDS_V509_V512_NOT_PROMOTED",
+    "evidence": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5160000000000000000000_paired_visible_surface_decision.json"
   },
   "pending_steps": [
-    "V516 control-separation / SMPL binding repair after V515 controls remain stronger",
-    "V514 full adjudication retry after V516 checkpoint",
+    "V517 full-scene visual clarity / anti-spray repair after paired surface pass",
+    "V514 full adjudication retry after V517 checkpoint",
     "V509 full-scene insertion retry after accepted checkpoint",
     "V510 local fidelity retry after accepted checkpoint",
     "V511 anti-2D retry after accepted checkpoint",
@@ -39,10 +39,13 @@
     "v515_observation_bound_repair_ran": true,
     "v515_train_subset_true_improves_vggt_baseline": false,
     "v515_train_subset_true_improves_no_smpl": false,
+    "v516_paired_visible_surface_ran": true,
+    "v516_paired_surface_pass": true,
+    "v516_accepted_for_v509": false,
     "mentor_ready": false,
     "external_hard_block": false,
     "not_promoted": true
   },
-  "decision": "Auto-evolution has continued beyond the Modal matrix: V514 ran checkpoint adjudication on real VGGT observation inputs and V515 attempted observation-bound repair training. Both fail closed because true still does not beat VGGT/no-SMPL controls under the V50R2 floor. Continue with a control-separation / SMPL-binding repair rather than viewer/report polish.",
+  "decision": "Auto-evolution has continued beyond the Modal matrix: V514 ran full-scene checkpoint adjudication, V515 trained an observation-bound repair checkpoint, and V516 now passes paired visible-surface control separation. Continue with full-scene visual clarity / anti-spray repair because V509/V512 still fail closed and no mentor-ready insertion is allowed.",
   "blockers": []
 }

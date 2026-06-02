@@ -17,6 +17,8 @@ V508_A10G_4000 = REPORTS / "V5080000000000000000000_modal_a10g_4000_result.json"
 V508_A100_4000 = REPORTS / "V5080000000000000000000_modal_a100_4000_result.json"
 V514_DECISION = REPORTS / "V5140000000000000000000_checkpoint_adjudication_decision.json"
 V514_BOARD = BOARDS / "V5140000000000000000000_checkpoint_adjudication_board.png"
+V516_DECISION = REPORTS / "V5160000000000000000000_paired_visible_surface_decision.json"
+V516_BOARD = BOARDS / "V5160000000000000000000_paired_visible_surface_board.png"
 V50R2_FLOOR = BOARDS / "V5020000000000000000000_v50r2_panel_annotated.png"
 V503_REGRESSION = BOARDS / "V5030000000000000000000_student_vs_v50r2_contact_sheet.png"
 RGB_SCENE = Path(r"D:\vggt\vggt-main\output\4k4d_scenes\0012_11_frame0000_12views_tmf_v223_repaired\rgb_contact_sheet.png")
@@ -77,6 +79,7 @@ def main() -> int:
     v508_a10g_4000 = read_json(V508_A10G_4000)
     v508_a100_4000 = read_json(V508_A100_4000)
     v514 = read_json(V514_DECISION)
+    v516 = read_json(V516_DECISION)
     a10g_checkpoints_complete = bool(
         v508_hash.get("modal_matrix_complete")
         and int(v508_hash.get("local_smoke_steps") or 0) >= 4000
@@ -86,6 +89,7 @@ def main() -> int:
     a100_complete = bool(v508_a100_4000.get("gates", {}).get("a100_checkpoints_complete", False))
     v508_target_matrix_complete = bool(a10g_checkpoints_complete and (not a100_required or a100_complete))
     v514_accepted = bool(v514.get("gates", {}).get("accepted_model_owned_student", False))
+    v516_paired_pass = bool(v516.get("gates", {}).get("paired_surface_pass", False))
     status = (
         "V509_FULL_SCENE_INSERTION_READY_FOR_STRICT_VISUAL_GATE_NOT_PROMOTED"
         if v514_accepted
@@ -108,8 +112,8 @@ def main() -> int:
             ("Full-scene RGB observation", RGB_SCENE, "environment source only"),
             ("Current-student regression", V503_REGRESSION, "student below V50R2"),
             ("V508 A10G 4000", V508_A10G_4000, matrix_note),
-            ("V508 A100 4000", V508_A100_4000, "target matrix evidence"),
-            ("V514 adjudication", V514_BOARD, "candidate failed controls" if not v514_accepted else "candidate handoff"),
+            ("V514 adjudication", V514_BOARD, "global visual fail" if not v514_accepted else "candidate handoff"),
+            ("V516 paired surface", V516_BOARD, "paired pass" if v516_paired_pass else "paired fail"),
         ],
     )
     make_board(
@@ -117,8 +121,8 @@ def main() -> int:
         "V509 same-scene controls gate: not generated as pass evidence",
         [
             ("V50R2 visual floor", V50R2_FLOOR, "reference only"),
-            ("Current controls/regression", V503_REGRESSION, "controls cannot override visual floor"),
-            ("V514 controls adjudication", V514_BOARD, "true not better than controls" if not v514_accepted else "requires V512"),
+            ("V514 global controls", V514_BOARD, "global NN/visual not accepted"),
+            ("V516 paired controls", V516_BOARD, "auxiliary paired pass" if v516_paired_pass else "paired controls fail"),
         ],
     )
 
@@ -134,11 +138,13 @@ def main() -> int:
         "input_v508_a10g_4000": str(V508_A10G_4000),
         "input_v508_a100_4000": str(V508_A100_4000),
         "input_v514_adjudication": str(V514_DECISION),
+        "input_v516_paired_surface": str(V516_DECISION),
         "v508_status": v508_hash.get("status"),
         "v508_modal_status": v508_modal.get("status"),
         "v508_a10g_4000_status": v508_a10g_4000.get("status"),
         "v508_a100_4000_status": v508_a100_4000.get("status"),
         "v514_status": v514.get("status"),
+        "v516_status": v516.get("status"),
         "gates": {
             "model_owned_student_checkpoint_ready": v514_accepted,
             "v508_a10g_checkpoints_complete": a10g_checkpoints_complete,
@@ -149,6 +155,10 @@ def main() -> int:
             "v514_true_improves_vggt_baseline": v514.get("gates", {}).get("true_improves_vggt_baseline", False),
             "v514_true_improves_no_smpl": v514.get("gates", {}).get("true_improves_no_smpl", False),
             "v514_true_improves_shuffled_semantic": v514.get("gates", {}).get("true_improves_shuffled_semantic", False),
+            "v516_paired_surface_pass": v516_paired_pass,
+            "v516_paired_true_improves_vggt_baseline": v516.get("gates", {}).get("paired_true_improves_vggt_baseline", False),
+            "v516_paired_true_improves_no_smpl": v516.get("gates", {}).get("paired_true_improves_no_smpl", False),
+            "v516_paired_true_improves_shuffled_semantic": v516.get("gates", {}).get("paired_true_improves_shuffled_semantic", False),
             "full_scene_student_inserted": v514_accepted,
             "same_scene_controls_generated_as_pass_evidence": v514_accepted,
             "teacher_or_rgb_copy_used_as_student": False,
@@ -162,8 +172,8 @@ def main() -> int:
             "Continue repair/training; this is not an external hard block."
         ),
         "blockers": [
-            "V514 checkpoint adjudication produced model-owned full-scene PLYs, but true did not beat VGGT/no-SMPL/shuffled controls under the V50R2 floor",
-            "No accepted model-owned student checkpoint is available for V509 mentor insertion"
+            "V516 paired visible-surface auxiliary gate passes, but V514 full-scene/global visual adjudication remains fail-closed",
+            "No accepted model-owned student checkpoint is available for V509 mentor insertion until full-scene visual gate passes"
         ] if not v514_accepted else [],
     }
     decision_json.parent.mkdir(parents=True, exist_ok=True)

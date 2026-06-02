@@ -1,0 +1,15 @@
+{
+  "task": "V516_teacher_copy_check",
+  "created_at": "2026-06-02T21:40:33.152705Z",
+  "teacher_bank": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V5040000000000000000000_v50r2_teacher_bank\\v50r2_teacher_bank.npz",
+  "candidate_npz": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V5160000000000000000000_paired_visible_surface_adjudication\\v516_model_owned_student_candidate.npz",
+  "leak_detected": false,
+  "hit_count": 0,
+  "hits": [],
+  "metadata_flags": [],
+  "policy": {
+    "teacher_points_in_final_inference_allowed": false,
+    "teacher_rgb_in_final_inference_allowed": false,
+    "teacher_mask_as_student_ownership_allowed": false
+  }
+}
