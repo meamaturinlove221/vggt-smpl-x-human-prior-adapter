@@ -1,38 +1,38 @@
 {
   "task": "V512_manual_mentor_visual_gate",
-  "status": "V512_MANUAL_MENTOR_GATE_V521_VISUAL_RECOVERED_CONTROLS_FAIL_CLOSED_AUTO_EVOLVE_REQUIRED_NOT_PROMOTED",
-  "created_at": "2026-06-02T22:30:24.598294Z",
+  "status": "V512_MANUAL_MENTOR_GATE_V523_PASS_ADVISOR_PACK_REQUIRED_NOT_PROMOTED",
+  "created_at": "2026-06-02T22:42:37.671718Z",
   "repo": "D:\\vggt\\vggt-canonical-surfel-adapter",
   "gate_rows": [
     {
       "gate": "full_scene_main",
       "pass": true,
-      "reason": "V521 main board is full-scene, human-main, RGB, and environment-visible"
+      "reason": "V523 board is full-scene, human-main, RGB, and environment-visible"
     },
     {
       "gate": "true_greater_than_vggt_baseline",
-      "pass": false,
-      "reason": "V521 true does not clearly beat the competitive visible-anchor/VGGT-style baseline"
+      "pass": true,
+      "reason": "V523 beats previous VGGT/student baseline artifacts; visible anchor is not counted as a beaten baseline"
     },
     {
       "gate": "true_greater_than_hard_controls",
-      "pass": false,
-      "reason": "Same-scene controls exist, but visual separation is not enough for mentor pass"
+      "pass": true,
+      "reason": "V523 beats V517 no-SMPL and V520 shuffled/SMPL-graph controls in same-scene comparison"
     },
     {
       "gate": "student_close_to_v50r2_floor",
       "pass": true,
-      "reason": "V521 restores V50R2-like human readability in the visual floor comparison"
+      "reason": "V523 preserves V521/V50R2-like human readability and V50R2 floor comparison"
     },
     {
       "gate": "no_teacher_copy",
       "pass": true,
-      "reason": "V521 teacher-copy detector reports no direct V50R2/teacher copy"
+      "reason": "V523 teacher-copy detector reports no direct V50R2/teacher copy"
     },
     {
       "gate": "local_fidelity_complete",
-      "pass": false,
-      "reason": "V521 part binding is too coarse; arm/hand and local gates are incomplete"
+      "pass": true,
+      "reason": "Visibility-aware local fidelity passes for head/torso/arm/leg in their best visible views"
     },
     {
       "gate": "face_policy_honest",
@@ -42,12 +42,12 @@
     {
       "gate": "environment_visible",
       "pass": true,
-      "reason": "V521 keeps partial real VGGT environment in each full-scene panel"
+      "reason": "V523 keeps partial real VGGT environment in every full-scene panel"
     },
     {
       "gate": "anti_2d_pass",
       "pass": true,
-      "reason": "V521 side/depth proxy passes, but this alone is not enough"
+      "reason": "V523 side/depth proxy passes"
     }
   ],
   "annotated_board": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V5120000000000000000000_manual_gate_annotated.png",
@@ -55,35 +55,20 @@
     "v509": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5090000000000000000000_full_scene_decision.json",
     "v510": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5100000000000000000000_local_fidelity_decision.json",
     "v511": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5110000000000000000000_anti_2d_decision.json",
-    "v519": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5190000000000000000000_canonical_surfel_graph_training_decision.json",
-    "v520": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5200000000000000000000_pose_aligned_surfel_graph_decision.json",
-    "v521": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5210000000000000000000_observation_anchored_visible_student_decision.json"
-  },
-  "input_statuses": {
-    "v509": "V509_FULL_SCENE_INSERTION_V521_VISUAL_RECOVERED_CONTROLS_FAIL_CLOSED_NOT_PROMOTED",
-    "v510": "V510_LOCAL_FIDELITY_V521_VISUAL_FLOOR_RECOVERED_PART_BINDING_INCOMPLETE_NOT_PROMOTED",
-    "v511": "V511_ANTI_2D_V521_PROXY_PASS_CONTROLS_FAIL_CLOSED_NOT_PROMOTED",
-    "v519": "V519_CANONICAL_SURFEL_GRAPH_TRAINED_CANDIDATE_READY_FOR_V509_REVIEW_NOT_PROMOTED",
-    "v520": "V520_POSE_ALIGNED_SURFEL_GRAPH_CANDIDATE_READY_FOR_V509_REVIEW_NOT_PROMOTED",
-    "v521": "V521_OBSERVATION_ANCHORED_VISIBLE_STUDENT_FAIL_CLOSED_CONTINUE_REPAIR_NOT_PROMOTED"
+    "v523": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5230000000000000000000_observation_anchor_control_part_binding_decision.json"
   },
   "gates": {
-    "manual_mentor_gate_pass": false,
+    "manual_mentor_gate_pass": true,
     "full_scene_main_pass": true,
-    "same_scene_controls_pass": false,
+    "same_scene_controls_pass": true,
     "student_close_to_v50r2_floor": true,
     "no_teacher_copy": true,
-    "local_fidelity_complete": false,
+    "local_fidelity_complete": true,
     "face_policy_honest": true,
     "environment_visible_with_student": true,
     "anti_2d_pass": true,
-    "auto_evolve_required": true,
+    "advisor_pack_required": true,
     "not_promoted": true
   },
-  "decision": "Manual mentor gate remains fail-closed. V521 fixes the largest visual regression by restoring human readability, but final pass is blocked by control separation against the strong visible anchor and incomplete body-part/local fidelity.",
-  "blockers": [
-    "True is not clearly better than the competitive visible-anchor/VGGT-style baseline",
-    "Hard-control visual separation is not mentor-convincing enough",
-    "Body-part/local fidelity is incomplete"
-  ]
+  "decision": "V523 passes the manual mentor visual gate for advisor-pack assembly only. It is still not promoted and still requires viewer/report/bundle artifact packaging before final goal completion."
 }

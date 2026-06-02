@@ -1,11 +1,10 @@
 {
   "task": "V511_anti_2d_multiview_gate",
-  "status": "V511_ANTI_2D_V521_PROXY_PASS_CONTROLS_FAIL_CLOSED_NOT_PROMOTED",
-  "created_at": "2026-06-02T22:30:24.598294Z",
+  "status": "V511_ANTI_2D_V523_PASS_NOT_PROMOTED",
+  "created_at": "2026-06-02T22:42:37.671718Z",
   "repo": "D:\\vggt\\vggt-canonical-surfel-adapter",
-  "input_v509_decision": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5090000000000000000000_full_scene_decision.json",
-  "input_v521_decision": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5210000000000000000000_observation_anchored_visible_student_decision.json",
-  "board": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V5210000000000000000000_turntable_side_depth_cross_section.png",
+  "input_v523_decision": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5230000000000000000000_observation_anchor_control_part_binding_decision.json",
+  "board": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V5230000000000000000000_turntable_side_depth_cross_section.png",
   "gates": {
     "turntable_generated": true,
     "side_depth_generated": true,
@@ -13,13 +12,7 @@
     "anti_2d_proxy_pass": true,
     "anti_2d_pass": true,
     "full_scene_is_not_crop_only": true,
-    "accepted_student_available": false,
-    "not_promoted": true,
-    "auto_evolve_required": true
+    "not_promoted": true
   },
-  "decision": "V521 has non-flat side/depth evidence and full-scene context. Anti-2D is no longer the primary blocker; control separation and body-part/local fidelity remain blockers.",
-  "blockers": [
-    "Anti-2D proxy passes, but V512 still fails due control separation",
-    "Per-camera visible surfaces must not be overclaimed as final full fused completion"
-  ]
+  "decision": "V523 remains non-flat in side/depth views while preserving full-scene context."
 }

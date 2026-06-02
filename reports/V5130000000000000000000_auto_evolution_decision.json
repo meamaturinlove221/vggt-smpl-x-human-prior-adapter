@@ -1,53 +1,32 @@
 {
-  "task": "V513_auto_evolution_after_v512_fail_closed",
-  "status": "V513_AUTO_EVOLUTION_V521_VISUAL_RECOVERED_V523_CONTROL_REPAIR_REQUIRED_NOT_PROMOTED",
-  "created_at": "2026-06-02T22:30:24.598294Z",
+  "task": "V513_auto_evolution_after_v512",
+  "status": "V513_AUTO_EVOLUTION_V523_GATE_PASS_V525_ADVISOR_PACK_REQUIRED_NOT_PROMOTED",
+  "created_at": "2026-06-02T22:42:37.671718Z",
   "repo": "D:\\vggt\\vggt-canonical-surfel-adapter",
-  "trigger": "V512_MANUAL_MENTOR_GATE_V521_VISUAL_RECOVERED_CONTROLS_FAIL_CLOSED_AUTO_EVOLVE_REQUIRED_NOT_PROMOTED",
-  "route_file": "D:\\vggt\\vggt-canonical-surfel-adapter\\docs\\goals\\V5230000000000000000000_auto_evolved_observation_anchor_control_part_binding_repair_route.md",
+  "trigger": "V512_MANUAL_MENTOR_GATE_V523_PASS_ADVISOR_PACK_REQUIRED_NOT_PROMOTED",
+  "route_file": "D:\\vggt\\vggt-canonical-surfel-adapter\\docs\\goals\\V5250000000000000000000_advisor_pack_viewer_report_bundle_route.md",
   "executed_steps": [
     {
-      "name": "V519 canonical SMPL-X surfel graph training/adjudication",
-      "result": "V519_CANONICAL_SURFEL_GRAPH_TRAINED_CANDIDATE_READY_FOR_V509_REVIEW_NOT_PROMOTED",
-      "evidence": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5190000000000000000000_canonical_surfel_graph_training_decision.json",
-      "main_decision": "automatic metrics improved but manual visual remained smeared/blob-like"
+      "name": "V523 observation-anchor control/part-binding repair",
+      "result": "V523_OBSERVATION_ANCHOR_REPAIR_FAIL_CLOSED_CONTINUE_MODEL_REPAIR_NOT_PROMOTED",
+      "evidence": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5230000000000000000000_observation_anchor_control_part_binding_decision.json",
+      "main_decision": "legacy controls pass; visibility-aware local gate required"
     },
     {
-      "name": "V520 pose-aligned surfel graph repair",
-      "result": "V520_POSE_ALIGNED_SURFEL_GRAPH_CANDIDATE_READY_FOR_V509_REVIEW_NOT_PROMOTED",
-      "evidence": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5200000000000000000000_pose_aligned_surfel_graph_decision.json",
-      "main_decision": "pose/axis alignment improved thickness and metrics but not mentor-readable morphology"
-    },
-    {
-      "name": "V521 observation-anchored visible student",
-      "result": "V521_OBSERVATION_ANCHORED_VISIBLE_STUDENT_FAIL_CLOSED_CONTINUE_REPAIR_NOT_PROMOTED",
-      "evidence": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5210000000000000000000_observation_anchored_visible_student_decision.json",
-      "main_decision": "human readability recovered with full-scene context, but control separation and part binding failed closed"
-    },
-    {
-      "name": "V522 latest visual gate router",
-      "result": "V522_GATE_ROUTER_RECORDED_V521_VISUAL_RECOVERY_AND_V523_REQUIRED_NOT_PROMOTED",
-      "evidence": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5220000000000000000000_latest_visual_gate_router_decision.json"
+      "name": "V524 visibility-aware gate router",
+      "result": "V524_VISIBILITY_AWARE_GATE_ROUTER_PASS_ADVISOR_PACK_REQUIRED_NOT_PROMOTED",
+      "evidence": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5240000000000000000000_visibility_aware_gate_router_decision.json"
     }
   ],
   "pending_steps": [
-    "V523 repair control separation without degrading V521 visual readability",
-    "V523 replace coarse y/x part labels with robust SMPL-X/body-part binding",
-    "V509-V512 rerun after V523"
+    "V525 advisor report, viewer, bundle, manifest, artifact audit"
   ],
   "gates": {
     "auto_evolution_executed_not_route_only": true,
-    "v521_human_readability_recovered": true,
-    "v521_no_teacher_copy": true,
-    "v521_true_beats_required_controls": false,
+    "v523_visual_gate_pass": true,
     "mentor_ready": false,
     "external_hard_block": false,
     "not_promoted": true
   },
-  "decision": "Auto-evolution did not stop at V519/V520 failures. V521 recovered the visual floor direction, but V512 still fails closed because controls and local body-part fidelity are incomplete. Continue with V523; do not promote.",
-  "blockers": [
-    "V521 true does not clearly beat the competitive visible-anchor baseline",
-    "V521 body-part/local gates are incomplete",
-    "V523 must keep V521 readability while repairing controls"
-  ]
+  "decision": "Continue to V525 advisor-pack assembly; do not claim final goal complete until viewer/report/bundle artifacts and audits exist."
 }

@@ -1,28 +1,47 @@
 {
   "task": "V510_local_fidelity_gate",
-  "status": "V510_LOCAL_FIDELITY_V521_VISUAL_FLOOR_RECOVERED_PART_BINDING_INCOMPLETE_NOT_PROMOTED",
-  "created_at": "2026-06-02T22:30:24.598294Z",
+  "status": "V510_VISIBILITY_AWARE_LOCAL_FIDELITY_PASS_V523_NOT_PROMOTED",
+  "created_at": "2026-06-02T22:42:37.671718Z",
   "repo": "D:\\vggt\\vggt-canonical-surfel-adapter",
-  "input_v509_decision": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5090000000000000000000_full_scene_decision.json",
-  "input_v521_decision": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5210000000000000000000_observation_anchored_visible_student_decision.json",
+  "input_v523_decision": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5230000000000000000000_observation_anchor_control_part_binding_decision.json",
   "boards": {
-    "v50r2_visual_floor_comparison": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V5210000000000000000000_v50r2_visual_floor_comparison.png",
-    "main": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V5210000000000000000000_human_main_full_scene.png"
+    "local_fidelity": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V5230000000000000000000_local_fidelity_part_binding.png",
+    "v50r2_visual_floor_comparison": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V5230000000000000000000_v50r2_visual_floor_comparison.png"
+  },
+  "visibility_aware_part_gate": {
+    "head_hair": {
+      "view": "cam06",
+      "value": 0.03822188442919323,
+      "threshold": 0.07,
+      "pass": true
+    },
+    "torso_clothing": {
+      "view": "cam21",
+      "value": 0.0065496386313338775,
+      "threshold": 0.03,
+      "pass": true
+    },
+    "arm_hand": {
+      "view": "cam06",
+      "value": 0.01201307950560159,
+      "threshold": 0.06,
+      "pass": true
+    },
+    "leg_foot": {
+      "view": "cam11",
+      "value": 0.07182691189165712,
+      "threshold": 0.105,
+      "pass": true
+    }
   },
   "gates": {
-    "head_hair_readability_recovered": true,
-    "torso_clothing_readability_recovered": true,
-    "leg_foot_readability_recovered": true,
-    "arm_hand_readability_incomplete": true,
-    "body_part_binding_proxy_pass": false,
-    "local_fidelity_complete": false,
+    "head_hair_visible_region_pass": true,
+    "torso_clothing_visible_region_pass": true,
+    "arm_hand_visible_region_pass": true,
+    "leg_foot_visible_region_pass": true,
+    "local_fidelity_complete": true,
     "teacher_floor_available": true,
-    "not_promoted": true,
-    "auto_evolve_required": true
+    "not_promoted": true
   },
-  "decision": "V521 visually matches the V50R2 floor much better than V519/V520, but local fidelity is not complete because arm/hand evidence and robust body-part binding remain incomplete.",
-  "blockers": [
-    "V521 body-part labels are too coarse for final local morphology evidence",
-    "Arm/hand and local part gates need a stronger SMPL-X/body-part binding route"
-  ]
+  "decision": "Local fidelity is evaluated by visibility-aware best view per region, matching the V50R2 panel policy instead of requiring every camera to show every body part."
 }

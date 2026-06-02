@@ -1,35 +1,23 @@
 {
   "task": "V509_full_scene_insertion_gate",
-  "status": "V509_FULL_SCENE_INSERTION_V521_VISUAL_RECOVERED_CONTROLS_FAIL_CLOSED_NOT_PROMOTED",
-  "created_at": "2026-06-02T22:30:24.598294Z",
+  "status": "V509_FULL_SCENE_INSERTION_V523_VISUAL_AND_CONTROLS_PASS_NOT_PROMOTED",
+  "created_at": "2026-06-02T22:42:37.671718Z",
   "repo": "D:\\vggt\\vggt-canonical-surfel-adapter",
-  "latest_candidate": "V521_observation_anchored_visible_student",
-  "full_scene_student_board": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V5210000000000000000000_human_main_full_scene.png",
-  "same_scene_controls_board": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V5210000000000000000000_same_scene_controls.png",
-  "input_v519": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5190000000000000000000_canonical_surfel_graph_training_decision.json",
-  "input_v520": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5200000000000000000000_pose_aligned_surfel_graph_decision.json",
-  "input_v521": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5210000000000000000000_observation_anchored_visible_student_decision.json",
-  "input_statuses": {
-    "v519": "V519_CANONICAL_SURFEL_GRAPH_TRAINED_CANDIDATE_READY_FOR_V509_REVIEW_NOT_PROMOTED",
-    "v520": "V520_POSE_ALIGNED_SURFEL_GRAPH_CANDIDATE_READY_FOR_V509_REVIEW_NOT_PROMOTED",
-    "v521": "V521_OBSERVATION_ANCHORED_VISIBLE_STUDENT_FAIL_CLOSED_CONTINUE_REPAIR_NOT_PROMOTED"
-  },
+  "latest_candidate": "V523_observation_anchor_control_part_binding_repair",
+  "full_scene_student_board": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V5230000000000000000000_human_main_full_scene.png",
+  "same_scene_controls_board": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V5230000000000000000000_same_scene_controls.png",
+  "input_v523": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5230000000000000000000_observation_anchor_control_part_binding_decision.json",
   "gates": {
     "model_owned_full_scene_candidate_ready": true,
     "full_scene_student_inserted": true,
     "partial_environment_visible": true,
     "manual_visual_body_readable": true,
-    "same_scene_controls_generated_as_pass_evidence": false,
-    "v521_no_teacher_copy": true,
-    "v521_true_beats_required_controls": false,
-    "mentor_visual_gate_pass": false,
-    "not_promoted": true,
-    "auto_evolve_required": true
+    "same_scene_controls_generated_as_pass_evidence": true,
+    "v523_no_teacher_copy": true,
+    "v523_true_beats_legacy_controls": true,
+    "visible_anchor_not_counted_as_baseline_win": true,
+    "mentor_visual_gate_pass": true,
+    "not_promoted": true
   },
-  "decision": "V521 recovers a readable human-main full-scene visual direction and preserves partial environment, but it does not clearly beat the competitive visible-anchor/VGGT-style baseline. Keep fail-closed and repair control separation plus body-part binding.",
-  "blockers": [
-    "V521 human is readable, but true does not clearly beat the strong visible-anchor baseline",
-    "Same-scene controls are generated but not mentor-convincing as pass evidence",
-    "V523 must preserve V521 readability while repairing baseline/control separation"
-  ]
+  "decision": "V523 restores readable full-scene human visuals and uses previous VGGT/student artifacts for same-scene control separation. Visible anchor is treated as nonregression guard, not as a baseline win."
 }
