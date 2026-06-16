@@ -1,0 +1,86 @@
+{
+  "task": "v34_smplx_native_hand_continuity_refiner",
+  "status": "DONE_PASS",
+  "created_utc": "2026-05-08T21:45:13Z",
+  "research_only": true,
+  "smplx_native_only": true,
+  "no_mano": true,
+  "no_candidate_export": true,
+  "no_teacher_export": true,
+  "no_predictions_write": true,
+  "no_registry_write": true,
+  "metrics": {
+    "left": {
+      "pixels": 760,
+      "views_with_pixels": 6,
+      "per_view_pixels": [
+        28,
+        55,
+        424,
+        72,
+        47,
+        134
+      ],
+      "wrist_bridge_pixels": 4847,
+      "finger_pixels": {
+        "thumb_left": 183,
+        "index_left": 152,
+        "middle_left": 114,
+        "ring_left": 82,
+        "pinky_left": 61
+      },
+      "finger_bands_nonempty": 5,
+      "hand_to_wrist_centroid_distance": {
+        "count": 6,
+        "finite": 6,
+        "min": 0.051034096628427505,
+        "median": 0.17596739530563354,
+        "mean": 0.16944502294063568,
+        "p95": 0.2722291052341461,
+        "max": 0.27305737137794495
+      }
+    },
+    "right": {
+      "pixels": 535,
+      "views_with_pixels": 4,
+      "per_view_pixels": [
+        0,
+        0,
+        216,
+        246,
+        17,
+        56
+      ],
+      "wrist_bridge_pixels": 6941,
+      "finger_pixels": {
+        "thumb_right": 112,
+        "index_right": 74,
+        "middle_right": 180,
+        "ring_right": 168,
+        "pinky_right": 150
+      },
+      "finger_bands_nonempty": 5,
+      "hand_to_wrist_centroid_distance": {
+        "count": 4,
+        "finite": 4,
+        "min": 0.05618523061275482,
+        "median": 0.17933177947998047,
+        "mean": 0.1761351078748703,
+        "p95": 0.2870867848396301,
+        "max": 0.28969162702560425
+      }
+    }
+  },
+  "pass_flags": {
+    "left": true,
+    "right": true
+  },
+  "outputs": {
+    "hand_patch_npz": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V34_smplx_native_hand_route\\v34_smplx_native_hand_continuity_patch.npz",
+    "hand_patch_ply": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V34_smplx_native_hand_route\\v34_smplx_native_hand_continuity_patch.ply",
+    "summary_json": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V34_smplx_native_hand_route\\summary.json",
+    "report_json": "D:\\vggt\\vggt-main\\reports\\20260508_v34_smplx_native_hand_route.json",
+    "report_md": "D:\\vggt\\vggt-main\\reports\\20260508_v34_smplx_native_hand_route.md"
+  },
+  "blockers": []
+}

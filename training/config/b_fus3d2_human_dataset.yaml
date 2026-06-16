@@ -1,0 +1,53 @@
+# V8-A research-only Fus3D-Human dataset-level train smoke.
+# This config is consumed by tools/b_fus3d2_human_dataset_train.py and is
+# intentionally separate from formal cloud guard/referee configs.
+
+task: b_fus3d2_human_dataset_train_smoke
+status: research_only_dataset_train_smoke_no_export
+
+strict_facts:
+  strict_candidate_passes: 0
+  strict_teacher_passes: 0
+  formal_cloud_train_infer_export: blocked
+
+contract:
+  research_only: true
+  dataset_level_train_smoke: true
+  synthetic_mesh_supervision_allowed: true
+  no_predictions_write: true
+  no_teacher_export: true
+  no_candidate_export: true
+  no_registry_write: true
+  no_strict_pass_write: true
+  writes_checkpoint: false
+  not_teacher: true
+  not_candidate: true
+
+inputs:
+  query_cache: output/surface_research_preflight_local/B_Fus3D6_query_evidence_cache_hybrid6_layer23/b_fus3d_query_evidence_cache.npz
+  template_payload: output/surface_research_preflight_local/connected_payload_self_describing/connected_human_surface_template_payload_self_describing.npz
+  external_case_roots: []
+
+run_limits:
+  max_steps: 80
+  max_cases: 3
+  max_hours: 0.15
+  seed: 20260507
+
+dataset:
+  shell_offsets: [-0.014, -0.007, 0.0, 0.007, 0.014]
+  feature_bins: 32
+  train_fraction: 0.72
+
+model:
+  hidden_dim: 64
+  learning_rate: 0.01
+  weight_decay: 0.0001
+  batch_size: 512
+
+controls: [real, zero, shuffle, random]
+
+outputs:
+  output_dir: output/surface_research_cloud_preflight/Cloud_A_B_Fus3D2_human_dataset_train_smoke
+  status_report_md: reports/20260507_v8_cloud_a_b_fus3d2_status.md
+  status_report_json: reports/20260507_v8_cloud_a_b_fus3d2_status.json

@@ -1,0 +1,85 @@
+{
+  "task": "v33_face_normal_relief_audit",
+  "status": "DONE_PASS",
+  "created_utc": "2026-05-08T21:45:23Z",
+  "research_only": true,
+  "smplx_native_only": true,
+  "no_flame": true,
+  "metrics": {
+    "head": {
+      "pixels": 4247,
+      "views_with_pixels": 6,
+      "normal_length": {
+        "count": 4247,
+        "finite": 4247,
+        "min": 0.9999998807907104,
+        "median": 1.0,
+        "mean": 1.0,
+        "p95": 1.0,
+        "max": 1.0000001192092896
+      },
+      "normal_alignment_to_v24": {
+        "count": 4247,
+        "finite": 4247,
+        "min": 0.9035078287124634,
+        "median": 0.9257861375808716,
+        "mean": 0.9333328008651733,
+        "p95": 0.9854756593704224,
+        "max": 1.0000001192092896
+      },
+      "relief_norm": {
+        "count": 4247,
+        "finite": 4247,
+        "min": 0.0,
+        "median": 0.08784862607717514,
+        "mean": 0.10500603169202805,
+        "p95": 0.2722913920879364,
+        "max": 0.4811273515224457
+      },
+      "normal_pass": true,
+      "relief_nonexplosive": true
+    },
+    "face": {
+      "pixels": 2535,
+      "views_with_pixels": 6,
+      "normal_length": {
+        "count": 2535,
+        "finite": 2535,
+        "min": 0.9999998807907104,
+        "median": 1.0,
+        "mean": 1.0,
+        "p95": 1.0,
+        "max": 1.0000001192092896
+      },
+      "normal_alignment_to_v24": {
+        "count": 2535,
+        "finite": 2535,
+        "min": 0.9035080671310425,
+        "median": 0.9284932613372803,
+        "mean": 0.9391276240348816,
+        "p95": 0.9963053464889526,
+        "max": 1.0000001192092896
+      },
+      "relief_norm": {
+        "count": 2535,
+        "finite": 2535,
+        "min": 0.0,
+        "median": 0.12754033505916595,
+        "mean": 0.1268315315246582,
+        "p95": 0.27536827325820923,
+        "max": 0.45602622628211975
+      },
+      "normal_pass": true,
+      "relief_nonexplosive": true
+    }
+  },
+  "inputs": {
+    "refined_npz": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V33_head_face_detail_route\\v33_head_face_refined_teacher.npz",
+    "v24_targets": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V24_residual_teacher_v2\\v24_residual_teacher_targets_v2.npz"
+  },
+  "outputs": {
+    "report_json": "D:\\vggt\\vggt-main\\reports\\20260508_v33_face_normal_relief_audit.json",
+    "report_md": "D:\\vggt\\vggt-main\\reports\\20260508_v33_face_normal_relief_audit.md"
+  },
+  "blockers": []
+}

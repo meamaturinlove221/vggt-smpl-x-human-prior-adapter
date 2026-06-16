@@ -1,0 +1,165 @@
+defaults:
+  - 4k4d_prior_case_sparseproto_humancrop_depthnormal_coupled_r20_point_to_point_xview
+  - _self_
+
+exp_name: 4k4d_prior_case_sparseproto_headshoulder_teacher_target_r65_mixed_fullbody
+
+max_img_per_gpu: 6
+num_workers: 0
+limit_train_batches: 32
+limit_val_batches: 2
+max_epochs: 2
+
+distributed:
+  backend: single
+
+data:
+  train:
+    common_config:
+      fix_img_num: 6
+      img_nums: [6, 6]
+      repeat_batch: False
+      prior_pose_noise:
+        enabled: False
+    dataset:
+      _target_: data.composed_dataset.ComposedDataset
+      dataset_configs:
+        - _target_: data.datasets.dna4k4d_pseudo.DNA4K4DPseudoDataset
+          split: train
+          len_train: 128
+          len_test: 4
+          case_roots:
+            - D:/vggt/vggt-main/output/training_cases/0012_11_frame0000_6views_sparseproto_headshoulder_teacher_target_r65
+            - D:/vggt/vggt-main/output/training_cases/0012_11_frame0000_6views_sparseproto_humancrop_teachernormal_r1
+  val:
+    common_config:
+      fix_img_num: 6
+      img_nums: [6, 6]
+      repeat_batch: False
+      prior_pose_noise:
+        enabled: False
+    dataset:
+      _target_: data.composed_dataset.ComposedDataset
+      dataset_configs:
+        - _target_: data.datasets.dna4k4d_pseudo.DNA4K4DPseudoDataset
+          split: test
+          len_train: 128
+          len_test: 4
+          case_roots:
+            - D:/vggt/vggt-main/output/training_cases/0012_11_frame0000_6views_sparseproto_headshoulder_teacher_target_r65
+            - D:/vggt/vggt-main/output/training_cases/0012_11_frame0000_6views_sparseproto_humancrop_teachernormal_r1
+
+checkpoint:
+  save_dir: output/local_training_results/r65_teacher_target_mixed_fullbody_smoke/ckpts
+  save_freq: 1
+  save_optimizer_state: False
+  resume_checkpoint_path: D:/vggt/vggt-main/output/modal_training_results/20260429_normal_r20_point_to_point_xview_smoke20_from_ckpt4/inference_model.pt
+  strict: False
+
+optim:
+  frozen_module_names:
+    - aggregator
+    - camera_head
+    - normal_head
+  optimizer:
+    lr: 8e-7
+
+loss:
+  depth:
+    weight: 0.35
+    supervise_conf: true
+    gamma: 0.25
+    alpha: 0.08
+    head_roi_weight: 2.5
+    face_roi_weight: 4.5
+    hairline_roi_weight: 4.0
+    ear_band_roi_weight: 2.5
+    boundary_boost: 2.0
+  point:
+    weight: 0.35
+    supervise_conf: true
+    gamma: 0.25
+    alpha: 0.08
+    head_roi_weight: 2.5
+    face_roi_weight: 4.5
+    hairline_roi_weight: 4.0
+    ear_band_roi_weight: 2.5
+    boundary_boost: 2.0
+  human_prior:
+    weight: 0.12
+    depth:
+      loss_weight: 0.15
+      gamma: 0.25
+      alpha: 0.08
+      gradient_loss_fn: null
+      valid_range: 0.98
+      supervise_conf: true
+      head_roi_weight: 2.0
+      face_roi_weight: 4.0
+      hairline_roi_weight: 3.5
+      ear_band_roi_weight: 2.0
+      boundary_boost: 2.0
+    point:
+      loss_weight: 0.35
+      gamma: 0.25
+      alpha: 0.08
+      gradient_loss_fn: null
+      valid_range: 0.98
+      supervise_conf: true
+      head_roi_weight: 2.0
+      face_roi_weight: 4.0
+      hairline_roi_weight: 3.5
+      ear_band_roi_weight: 2.0
+      boundary_boost: 2.0
+    point_normal:
+      teacher_weight: 0.0
+      consistency_weight: 0.02
+      orientation: oriented
+      flip_point_normal: true
+      normal_target_detach: true
+      valid_range: 0.96
+      supervise_conf: false
+      head_roi_weight: 2.0
+      face_roi_weight: 3.0
+      hairline_roi_weight: 3.0
+      ear_band_roi_weight: 2.0
+      boundary_boost: 2.0
+    depth_normal:
+      consistency_weight: 0.02
+      orientation: oriented
+      flip_depth_normal: true
+      normal_target_detach: true
+      valid_range: 0.96
+      head_roi_weight: 2.0
+      face_roi_weight: 3.0
+      hairline_roi_weight: 3.0
+      ear_band_roi_weight: 2.0
+      boundary_boost: 2.0
+    depth_point:
+      consistency_weight: 0.03
+      xyz_weight: 0.50
+      z_weight: 0.80
+      valid_range: 0.96
+      relative_scale: true
+      head_roi_weight: 2.0
+      face_roi_weight: 3.0
+      hairline_roi_weight: 3.0
+      ear_band_roi_weight: 2.0
+      boundary_boost: 2.0
+    cross_view:
+      consistency_weight: 0.02
+      depth_weight: 0.20
+      point_weight: 0.50
+      normal_weight: 0.0
+      point_projection_source: world_points
+      valid_range: 0.96
+      stride: 8
+      max_pairs: 8
+      min_depth: 0.0001
+      orientation: unoriented
+      detach_projection: true
+      head_roi_weight: 2.0
+      face_roi_weight: 3.0
+      hairline_roi_weight: 3.0
+      ear_band_roi_weight: 2.0
+      boundary_boost: 2.0

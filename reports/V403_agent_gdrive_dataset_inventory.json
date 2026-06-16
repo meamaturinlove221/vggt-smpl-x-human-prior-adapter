@@ -1,0 +1,485 @@
+{
+  "report_id": "V403_agent_gdrive_dataset_inventory",
+  "created_local": "2026-05-09",
+  "workspace": "D:\\vggt\\vggt-main",
+  "mode": "read_only_data_inventory",
+  "write_scope": [
+    "D:\\vggt\\vggt-main\\reports\\V403_agent_gdrive_dataset_inventory.json",
+    "D:\\vggt\\vggt-main\\reports\\V403_agent_gdrive_dataset_inventory.md"
+  ],
+  "mutation_constraints": {
+    "trained": false,
+    "deleted": false,
+    "moved": false,
+    "wrote_outside_reports": false
+  },
+  "scan_roots": [
+    {
+      "path": "G:\\数据集",
+      "exists": true,
+      "note": "Top-level dataset folder. Contains dataset_practice.zip and datasets."
+    },
+    {
+      "path": "G:\\数据集\\datasets",
+      "exists": true,
+      "note": "Primary G-drive dataset root."
+    },
+    {
+      "path": "D:\\vggt",
+      "exists": true,
+      "note": "Project/output/model root on D."
+    },
+    {
+      "path": "D:\\vggt\\vggt-main",
+      "exists": true,
+      "note": "Requested workspace."
+    },
+    {
+      "path": "F:\\datasets",
+      "exists": true,
+      "note": "Dataset mirror root on F."
+    },
+    {
+      "path": "F:\\vggt",
+      "exists": true,
+      "note": "Older VGGT checkout/output root on F."
+    },
+    {
+      "path": "G:\\vggt",
+      "exists": false
+    },
+    {
+      "path": "D:\\datasets",
+      "exists": false
+    },
+    {
+      "path": "G:\\datasets",
+      "exists": false
+    }
+  ],
+  "primary_usable_roots": {
+    "raw_4k4d_dna_subset": {
+      "root": "G:\\数据集\\datasets\\data_used_in_4K4D",
+      "exists": true,
+      "readme_summary": "The folder is data used in 4K4D and is not part of the official DNA-Rendering release. It shares remaining 4K4D cases for fair comparison.",
+      "readiness": "ready_raw_for_v50_rebuild",
+      "reason": "Has extracted main/annotations/kinect/apose/preview data, file gid manifest, and rgb camera zip.",
+      "top_level": [
+        "annotations",
+        "apose",
+        "data_used_in_4K4D_file_gid.json",
+        "data_used_in_4K4D_rgb_cams.zip",
+        "kinect",
+        "main",
+        "preview",
+        "ReadMe.txt"
+      ],
+      "file_gid_count": 48,
+      "file_gid_categories": {
+        "ReadMe.txt": 1,
+        "annotations": 8,
+        "apose/apose_kinect": 7,
+        "apose/apose_main": 7,
+        "data_used_in_4K4D_rgb_cams.zip": 1,
+        "kinect": 8,
+        "main": 8,
+        "preview": 8
+      },
+      "rgb_cams_zip": {
+        "path": "G:\\数据集\\datasets\\data_used_in_4K4D\\data_used_in_4K4D_rgb_cams.zip",
+        "exists": true,
+        "member_count": 8,
+        "members": [
+          "0012_11_rgb_cams.smc",
+          "0013_01_rgb_cams.smc",
+          "0013_03_rgb_cams.smc",
+          "0013_09_rgb_cams.smc",
+          "0013_11_rgb_cams.smc",
+          "0019_08_rgb_cams.smc",
+          "0021_03_rgb_cams.smc",
+          "0023_06_rgb_cams.smc"
+        ]
+      },
+      "sequences": [
+        "0012_11",
+        "0013_01",
+        "0013_03",
+        "0013_09",
+        "0013_11",
+        "0019_08",
+        "0021_03",
+        "0023_06"
+      ],
+      "zip_parts_seen_beside_extracted_root": [
+        "data_used_in_4K4D-20260204T055307Z-3-001.zip",
+        "data_used_in_4K4D-20260204T055307Z-3-003.zip",
+        "data_used_in_4K4D-20260204T055307Z-3-008.zip",
+        "data_used_in_4K4D-20260204T055307Z-3-009.zip",
+        "data_used_in_4K4D-20260204T055307Z-3-010.zip",
+        "data_used_in_4K4D-20260204T055307Z-3-011.zip",
+        "data_used_in_4K4D-20260204T055307Z-3-012.zip",
+        "data_used_in_4K4D-20260204T055307Z-3-013.zip",
+        "data_used_in_4K4D-20260204T055307Z-3-014.zip",
+        "data_used_in_4K4D-20260204T055307Z-3-015.zip",
+        "data_used_in_4K4D-20260204T055307Z-3-016.zip",
+        "data_used_in_4K4D-20260204T055307Z-3-017.zip"
+      ],
+      "partial_duplicate_or_part_extract": {
+        "path": "G:\\数据集\\datasets\\data_used_in_4K4D-20260204T055307Z-3-011",
+        "exists": true,
+        "note": "Contains a nested data_used_in_4K4D subtree with only partial files; prefer the complete extracted root above."
+      }
+    },
+    "smplx_model_root": {
+      "root": "G:\\数据集\\datasets\\smplx",
+      "exists": true,
+      "readiness": "ready_for_smplx_model_loading",
+      "files": [
+        {
+          "path": "G:\\数据集\\datasets\\smplx\\SMPLX_NEUTRAL.npz",
+          "exists": true,
+          "bytes": 108752058
+        },
+        {
+          "path": "G:\\数据集\\datasets\\smplx\\SMPLX_NEUTRAL.pkl",
+          "exists": true,
+          "bytes": 544173380
+        },
+        {
+          "path": "G:\\数据集\\datasets\\smplx\\SMPLX_MALE.npz",
+          "exists": true,
+          "bytes": 108753445
+        },
+        {
+          "path": "G:\\数据集\\datasets\\smplx\\SMPLX_FEMALE.npz",
+          "exists": true,
+          "bytes": 108794146
+        },
+        {
+          "path": "G:\\数据集\\datasets\\smplx\\smplx_npz\\SMPLX_NEUTRAL.npz",
+          "exists": true,
+          "bytes": 30304063
+        }
+      ]
+    },
+    "zju_mocap_gdrive": {
+      "root": "G:\\数据集\\datasets\\ZJU_MoCap\\data\\zju_mocap\\CoreView_390",
+      "exists": true,
+      "readiness": "ready_for_zju_smoke_or_training_inputs",
+      "camera_dir_count": 23,
+      "camera_dirs_sample": [
+        "Camera_B1",
+        "Camera_B10",
+        "Camera_B11",
+        "Camera_B12",
+        "Camera_B13"
+      ],
+      "mask_camera_count": 23,
+      "mask_cihp_camera_count": 23,
+      "keypoints2d_camera_count": 23,
+      "annots_camera_count": 4,
+      "params_file_count": 1171,
+      "new_params_file_count": 1171,
+      "vertices_file_count": 1171,
+      "new_vertices_file_count": 1171,
+      "required_files": {
+        "annots.npy": {
+          "exists": true,
+          "bytes": 24659531
+        },
+        "annots_python2.npy": {
+          "exists": true,
+          "bytes": 24659531
+        },
+        "intri.yml": {
+          "exists": true,
+          "bytes": 10005
+        },
+        "extri.yml": {
+          "exists": true,
+          "bytes": 15059
+        },
+        "match_info.json": {
+          "exists": true,
+          "bytes": 1821496
+        }
+      }
+    },
+    "zju_mocap_f_mirror": {
+      "root": "F:\\datasets\\ZJU_MoCap\\data\\zju_mocap\\CoreView_390",
+      "exists": true,
+      "readiness": "ready_mirror",
+      "camera_dir_count": 23,
+      "params_file_count": 1171,
+      "new_params_file_count": 1171,
+      "vertices_file_count": 1171,
+      "new_vertices_file_count": 1171
+    },
+    "zju_ascii_junction": {
+      "path": "F:\\vggt\\_zju_ascii_link",
+      "exists": true,
+      "link_type": "Junction",
+      "target": "G:\\数据集\\datasets\\ZJU_MoCap\\data\\zju_mocap",
+      "readiness": "useful_when_chinese_paths_break_local_loaders"
+    }
+  },
+  "critical_0012_11_frame_signals": {
+    "raw_main_smc": {
+      "path": "G:\\数据集\\datasets\\data_used_in_4K4D\\main\\0012_11.smc",
+      "exists": true,
+      "camera_groups": {
+        "Camera_5mp": {
+          "camera_count": 48,
+          "sample_camera": "0",
+          "sample_color_frame_count": 150,
+          "sample_color_frames_first3": [
+            "0",
+            "1",
+            "2"
+          ]
+        },
+        "Camera_12mp": {
+          "camera_count": 12,
+          "sample_camera": "48",
+          "sample_color_frame_count": 150,
+          "sample_color_frames_first3": [
+            "0",
+            "1",
+            "2"
+          ]
+        }
+      },
+      "readiness": "frames_0000_0001_0002_available_as_hdf5_frame_keys_0_1_2"
+    },
+    "raw_annots_smc": {
+      "path": "G:\\数据集\\datasets\\data_used_in_4K4D\\annotations\\0012_11_annots.smc",
+      "exists": true,
+      "root_keys": [
+        "Camera_Parameter",
+        "Keypoints_2D",
+        "Keypoints_3D",
+        "Mask",
+        "SMPLx"
+      ],
+      "camera_parameter_count": 60,
+      "mask_camera_count": 60,
+      "sample_mask_frame_count": 150,
+      "sample_mask_frames_first3": [
+        "0",
+        "1",
+        "2"
+      ],
+      "smplx_arrays": {
+        "betas": {
+          "shape": [
+            150,
+            10
+          ],
+          "dtype": "float32"
+        },
+        "expression": {
+          "shape": [
+            150,
+            10
+          ],
+          "dtype": "float32"
+        },
+        "fullpose": {
+          "shape": [
+            150,
+            55,
+            3
+          ],
+          "dtype": "float32"
+        },
+        "scale": {
+          "shape": [],
+          "dtype": "float64"
+        },
+        "transl": {
+          "shape": [
+            150,
+            3
+          ],
+          "dtype": "float32"
+        }
+      },
+      "readiness": "images_masks_cameras_smplx_params_available_for_frame0000_0001_0002_rebuild"
+    },
+    "raw_kinect_smc": {
+      "path": "G:\\数据集\\datasets\\data_used_in_4K4D\\kinect\\0012_11_kinect.smc",
+      "exists": true,
+      "root_keys": [
+        "Calibration",
+        "Kinect"
+      ],
+      "kinect_device_count": 8,
+      "readiness": "available_if_kinect_prior_or_temporal_offset_rebuild_is_needed"
+    }
+  },
+  "project_output_inventory": {
+    "d_workspace_4k4d_scene_shells": {
+      "root": "D:\\vggt\\vggt-main\\output\\4k4d_scenes",
+      "exists": true,
+      "matching_scene_dirs": [
+        "0012_11_frame0000_6views_sparseproto",
+        "0012_11_frame0000_8views_sparseproto",
+        "0012_11_frame0000_12views_sparseproto",
+        "0012_11_frame0000_20views_sparseproto",
+        "0012_11_frame0000_60views",
+        "0012_11_frame0001_12views_tmf",
+        "0012_11_frame0002_12views_tmf"
+      ],
+      "observed_issue": "Scene directories exist but sampled images/masks counts were 0 and scene_manifest.json was absent in the D workspace copy.",
+      "readiness": "not_sufficient_as_existing_extracted_scene; rebuild_from_raw_gdrive_root"
+    },
+    "d_workspace_training_case_shells": {
+      "root": "D:\\vggt\\vggt-main\\output\\training_cases",
+      "exists": true,
+      "matching_0012_11_frame000x_dir_count": 123,
+      "frame_counts": {
+        "0000": 123
+      },
+      "view_counts": {
+        "6": 82,
+        "7": 7,
+        "8": 8,
+        "12": 8,
+        "13": 7,
+        "20": 8,
+        "60": 3
+      },
+      "sampled_specific_cases": {
+        "0012_11_frame0000_6views_smplx_native_prior_v15": {
+          "exists": true,
+          "file_count": 0,
+          "manifest_exists": false,
+          "sample_prior_case_package_exists": false
+        },
+        "0012_11_frame0000_20views_sparseproto_smplxsurfacepose_v2": {
+          "exists": true,
+          "file_count": 0,
+          "manifest_exists": false,
+          "sample_prior_case_package_exists": false
+        },
+        "0012_11_frame0000_60views_headshoulder_refinednormal_r1": {
+          "exists": true,
+          "top_dirs": [
+            "teacher_normal_previews"
+          ],
+          "manifest_exists": false,
+          "sample_prior_case_package_exists": false
+        }
+      },
+      "readiness": "names_and_layout_hints_only; not_ready_as_training_cases_without_regeneration_or_file_restore"
+    },
+    "f_workspace_fullview_scene": {
+      "root": "F:\\vggt\\vggt-main\\output\\4k4d_scenes\\0012_11_frame0000_fullviews",
+      "exists": true,
+      "images_count": 60,
+      "masks_count": 60,
+      "scene_manifest_exists": true,
+      "scene_manifest_bytes": 29948,
+      "rgb_contact_sheet_exists": true,
+      "mask_contact_sheet_exists": true,
+      "readiness": "usable_reference_fullview_extracted_scene_on_f_drive"
+    },
+    "f_workspace_fullview_modal_results": {
+      "root": "F:\\vggt\\vggt-main\\output\\4k4d_fullview_rerun_20260416\\modal_results\\0012_11_frame0000_fullviews",
+      "exists": true,
+      "preview_count": 180,
+      "pointcloud_outputs_seen": [
+        "pointcloud\\fused_pointcloud_masked.ply",
+        "pointcloud\\fused_pointcloud_raw.ply",
+        "pointcloud\\pointcloud_summary.json",
+        "pointcloud_depth_unprojection\\fused_pointcloud_masked.ply",
+        "pointcloud_depth_unprojection\\fused_pointcloud_raw.ply",
+        "pointcloud_depth_unprojection\\pointcloud_summary.json"
+      ],
+      "predictions_npz_exists": false,
+      "readiness": "usable_as_prior_reference_artifacts; predictions_npz_not_present"
+    }
+  },
+  "v50_candidate_and_rebuild_artifacts": {
+    "empty_original_v50_shell": {
+      "path": "D:\\vggt\\vggt-main\\output\\frozen_candidates\\V50_smplx_native_candidate_pass",
+      "exists": true,
+      "file_count": 0,
+      "readiness": "not_usable_currently_empty_shell"
+    },
+    "empty_v50_final_transaction_shell": {
+      "path": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V50_final_promotion_transaction",
+      "exists": true,
+      "file_count": 0,
+      "readiness": "not_usable_currently_empty_shell"
+    },
+    "rebuilt_after_artifact_loss": {
+      "path": "D:\\vggt\\vggt-main\\output\\frozen_candidates\\V50R_rebuilt_after_artifact_loss",
+      "exists": true,
+      "manifest_exists": true,
+      "hash_manifest_exists": true,
+      "readiness": "candidate_rebuild_artifact_present"
+    },
+    "rebuilt_candidate_zip": {
+      "path": "D:\\vggt\\vggt-main\\archive\\V223_rebuilt_candidate_package.zip",
+      "exists": true,
+      "bytes": 504782072,
+      "member_count": 16,
+      "members_sample": [
+        "V223_rebuilt_candidate_package/manifest.json",
+        "V223_rebuilt_candidate_package/package_files/candidate_confidence_from_v42.npz",
+        "V223_rebuilt_candidate_package/package_files/candidate_depths_from_v42.npz",
+        "V223_rebuilt_candidate_package/package_files/candidate_normals_from_v42.npz",
+        "V223_rebuilt_candidate_package/package_files/candidate_points_from_v42.npz",
+        "V223_rebuilt_candidate_package/package_files/control_audit_from_v42.json",
+        "V223_rebuilt_candidate_package/package_files/prior_effect_from_v42.json",
+        "V223_rebuilt_candidate_package/package_files/v16_case_manifest.json",
+        "V223_rebuilt_candidate_package/package_files/v16_prior_inputs.npz",
+        "V223_rebuilt_candidate_package/package_files/v16_prior_targets.npz",
+        "V223_rebuilt_candidate_package/package_files/v25_baseline_depths.npz",
+        "V223_rebuilt_candidate_package/package_files/v25_baseline_points.npz",
+        "V223_rebuilt_candidate_package/package_files/v42_guard.json",
+        "V223_rebuilt_candidate_package/visual_board/full_xy.png",
+        "V223_rebuilt_candidate_package/visual_board/full_xz.png",
+        "V223_rebuilt_candidate_package/visual_board/full_yz.png"
+      ],
+      "readiness": "compact_rebuilt_package_available_but_not_identical_to_original_v50_expected_candidate_files_names"
+    }
+  },
+  "dna_search_result": {
+    "official_dna_rendering_root_found": false,
+    "notes": [
+      "No obvious standalone DNA-Rendering/DNA_Rendering data root was found under scanned D/F/G roots.",
+      "The 4K4D ReadMe explicitly says data_used_in_4K4D is not part of the official DNA-Rendering release.",
+      "Names containing dna outside datasets were mostly repo tools, reports, or Python package idna noise."
+    ]
+  },
+  "v50_rebuild_readiness": {
+    "overall": "ready_to_rebuild_from_raw_gdrive_data; existing_d_workspace_derivatives_need_regeneration_or_restore",
+    "ready_inputs": [
+      "G:\\数据集\\datasets\\data_used_in_4K4D",
+      "G:\\数据集\\datasets\\data_used_in_4K4D\\main\\0012_11.smc",
+      "G:\\数据集\\datasets\\data_used_in_4K4D\\annotations\\0012_11_annots.smc",
+      "G:\\数据集\\datasets\\data_used_in_4K4D\\kinect\\0012_11_kinect.smc",
+      "G:\\数据集\\datasets\\smplx",
+      "G:\\数据集\\datasets\\ZJU_MoCap\\data\\zju_mocap\\CoreView_390",
+      "F:\\vggt\\_zju_ascii_link"
+    ],
+    "rebuild_targets_supported_by_raw_inventory": [
+      "0012_11 frame0000",
+      "0012_11 frame0001",
+      "0012_11 frame0002",
+      "60-camera image/mask/camera export",
+      "SMPL-X prior parameter extraction",
+      "Kinect auxiliary data if needed",
+      "ZJU CoreView_390 geometry/prior smoke validation"
+    ],
+    "caveats": [
+      "D:\\vggt\\vggt-main\\output\\4k4d_scenes contains matching scene directory names but sampled directories were empty.",
+      "D:\\vggt\\vggt-main\\output\\training_cases contains many matching case directory names but sampled V50-relevant case directories were empty and lacked manifests/packages.",
+      "The original V50_smplx_native_candidate_pass and V50_final_promotion_transaction directories currently have zero files in this workspace.",
+      "F:\\vggt\\vggt-main retains a full 60-view extracted scene and modal result reference for 0012_11 frame0000.",
+      "No official standalone DNA-Rendering root was found; only the 4K4D non-official subset is locally ready."
+    ]
+  }
+}

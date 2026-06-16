@@ -1,0 +1,22 @@
+{
+  "task": "v34_hand_wrist_bridge_merge",
+  "status": "DONE_PASS",
+  "created_utc": "2026-05-08T21:45:24Z",
+  "research_only": true,
+  "smplx_native_only": true,
+  "no_mano": true,
+  "candidate_optional_missing": false,
+  "candidate_path": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V32_candidate_inference_research\\candidate_points_world_research.npz",
+  "metrics": {
+    "left_region_pixels": 4742,
+    "right_region_pixels": 6954,
+    "merged_region_pixels": 11696
+  },
+  "outputs": {
+    "merged_npz": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V34_smplx_native_hand_route\\v34_hand_wrist_bridge_merged_research.npz",
+    "merged_ply": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V34_smplx_native_hand_route\\v34_hand_wrist_bridge_merged_research.ply",
+    "report_json": "D:\\vggt\\vggt-main\\reports\\20260508_v34_hand_wrist_bridge_merge.json",
+    "report_md": "D:\\vggt\\vggt-main\\reports\\20260508_v34_hand_wrist_bridge_merge.md"
+  },
+  "blockers": []
+}

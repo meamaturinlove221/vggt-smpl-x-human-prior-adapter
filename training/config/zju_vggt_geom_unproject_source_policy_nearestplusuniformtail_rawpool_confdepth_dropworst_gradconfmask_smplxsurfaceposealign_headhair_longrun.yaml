@@ -1,0 +1,23 @@
+defaults:
+  - zju_vggt_geom_unproject_source_policy_nearestplusuniformtail_rawpool_confdepth_dropworst_gradconfmask_smplprior_headhair_longrun
+  - _self_
+
+exp_name: zju_vggt_geom_unproject_source_policy_nearestplusuniformtail_rawpool_confdepth_dropworst_gradconfmask_smplxsurfaceposealign_headhair_longrun
+
+zju_smpl_prior_pose_noise_prob: 0.50
+zju_smpl_prior_pose_noise_rot_deg: 2.5
+zju_smpl_prior_pose_noise_trans_scale: 0.020
+zju_smpl_prior_pose_noise_scale_std: 0.015
+
+model:
+  enable_human_prior_fusion: True
+  human_prior_in_chans: 17
+  human_prior_hidden_dim: 128
+  human_prior_scales: [1, 2, 4]
+  enable_human_prior_summary: True
+  human_prior_summary_in_dim: 12
+  human_prior_summary_num_heads: 4
+  enable_normal: True
+
+optim:
+  frozen_module_names: []

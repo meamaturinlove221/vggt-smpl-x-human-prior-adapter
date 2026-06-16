@@ -1,0 +1,682 @@
+{
+  "blockers": [],
+  "conditions": {
+    "face_front_nonempty": true,
+    "head_nonempty": true,
+    "left_right_hand_nonempty": true,
+    "strict_pass_claimed": false,
+    "wrist_bridge_nonempty": true
+  },
+  "created_utc": "2026-05-08T21:38:45Z",
+  "decision": "Runnable V16 SMPL-X-native ROI maps were produced without MANO/FLAME; sparse subregions use documented spatial fallbacks and no strict pass is claimed.",
+  "fallback_policy": {
+    "face_front": "Primary label uses SMPL-X lmk_faces_idx and dynamic_lmk_faces_idx vertices; sparse views fall back to a centered crop inside the head ROI.",
+    "fingers": "If native per-finger skinning support is too sparse, split the SMPL-X-native hand ROI into thumb/index/middle/ring/pinky spatial bands and mark the source.",
+    "hand_and_wrist": "Primary labels use SMPL-X joint2num/dominant skinning and V15 native hand anchors; wrist bridges dilate hand ROIs onto wrist/elbow support.",
+    "head": "Primary label uses SMPL-X Head/Jaw/Eye/Neck skinning and V15 head map; sparse views fall back to top silhouette support excluding hands."
+  },
+  "inputs": {
+    "case_root": "D:\\vggt\\vggt-main\\output\\training_cases\\0012_11_frame0000_6views_smplx_native_prior_v15",
+    "inputs_npz": "D:\\vggt\\vggt-main\\output\\training_cases\\0012_11_frame0000_6views_smplx_native_prior_v15\\inputs.npz",
+    "manifest": "D:\\vggt\\vggt-main\\output\\training_cases\\0012_11_frame0000_6views_smplx_native_prior_v15\\case_manifest.json",
+    "model_path": "G:\\数据集\\datasets\\smplx\\SMPLX_NEUTRAL.npz",
+    "smplx_root": "G:\\数据集\\datasets\\smplx",
+    "targets_npz": "D:\\vggt\\vggt-main\\output\\training_cases\\0012_11_frame0000_6views_smplx_native_prior_v15\\targets.npz",
+    "v15_raster_dir": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V15_SMPLX_native_camera_raster_export"
+  },
+  "metrics": {
+    "body_visible_pixels": 68130,
+    "canonical_query_coverage": 1.0,
+    "canonical_query_valid_pixels": 68130,
+    "canonical_query_visible_pixels": 68130,
+    "dominant_joint_stats": {
+      "count": 68130,
+      "finite": 68130,
+      "max": 54.0,
+      "mean": 7.015235579040071,
+      "median": 5.0,
+      "min": 0.0,
+      "p10": 0.0,
+      "p90": 16.0
+    },
+    "face_front_pixels": 2535,
+    "head_pixels": 6782,
+    "height": 518,
+    "left_hand_pixels": 762,
+    "native_lmk_fields": [
+      "dynamic_lmk_bary_coords",
+      "dynamic_lmk_faces_idx",
+      "lmk_bary_coords",
+      "lmk_faces_idx"
+    ],
+    "prior_mask_pixels": 25046,
+    "required_nonempty": {
+      "face_front": true,
+      "head": true,
+      "left_hand": true,
+      "right_hand": true,
+      "wrist_bridge_left": true,
+      "wrist_bridge_right": true
+    },
+    "right_hand_pixels": 547,
+    "roi_count": 19,
+    "roi_pixels_total": {
+      "body_visible": 68130,
+      "face_front": 2535,
+      "face_lmk_dynamic": 2361,
+      "face_lmk_static": 849,
+      "head": 6782,
+      "index_left": 152,
+      "index_right": 76,
+      "left_hand": 762,
+      "middle_left": 114,
+      "middle_right": 187,
+      "pinky_left": 61,
+      "pinky_right": 150,
+      "right_hand": 547,
+      "ring_left": 83,
+      "ring_right": 169,
+      "thumb_left": 184,
+      "thumb_right": 112,
+      "wrist_bridge_left": 4875,
+      "wrist_bridge_right": 6996
+    },
+    "silhouette_pixels": 68130,
+    "smplx_face_count": 20908,
+    "smplx_joint_count": 55,
+    "smplx_vertex_count": 10475,
+    "view_count": 6,
+    "width": 518,
+    "wrist_bridge_left_pixels": 4875,
+    "wrist_bridge_right_pixels": 6996
+  },
+  "native_metadata": {
+    "finger_groups": {
+      "index_left": [
+        25,
+        26,
+        27
+      ],
+      "index_right": [
+        40,
+        41,
+        42
+      ],
+      "middle_left": [
+        28,
+        29,
+        30
+      ],
+      "middle_right": [
+        43,
+        44,
+        45
+      ],
+      "pinky_left": [
+        31,
+        32,
+        33
+      ],
+      "pinky_right": [
+        46,
+        47,
+        48
+      ],
+      "ring_left": [
+        34,
+        35,
+        36
+      ],
+      "ring_right": [
+        49,
+        50,
+        51
+      ],
+      "thumb_left": [
+        37,
+        38,
+        39
+      ],
+      "thumb_right": [
+        52,
+        53,
+        54
+      ]
+    },
+    "head_groups": {
+      "face_front": [
+        15,
+        22,
+        23,
+        24
+      ],
+      "head": [
+        12,
+        15,
+        22,
+        23,
+        24
+      ]
+    },
+    "joint2num_keys": [
+      "Head",
+      "Jaw",
+      "L_Ankle",
+      "L_Collar",
+      "L_Elbow",
+      "L_Eye",
+      "L_Foot",
+      "L_Hip",
+      "L_Index1",
+      "L_Index2",
+      "L_Index3",
+      "L_Knee",
+      "L_Middle1",
+      "L_Middle2",
+      "L_Middle3",
+      "L_Pinky1",
+      "L_Pinky2",
+      "L_Pinky3",
+      "L_Ring1",
+      "L_Ring2",
+      "L_Ring3",
+      "L_Shoulder",
+      "L_Thumb1",
+      "L_Thumb2",
+      "L_Thumb3",
+      "L_Wrist",
+      "Neck",
+      "Pelvis",
+      "R_Ankle",
+      "R_Collar",
+      "R_Elbow",
+      "R_Eye",
+      "R_Foot",
+      "R_Hip",
+      "R_Index1",
+      "R_Index2",
+      "R_Index3",
+      "R_Knee",
+      "R_Middle1",
+      "R_Middle2",
+      "R_Middle3",
+      "R_Pinky1",
+      "R_Pinky2",
+      "R_Pinky3",
+      "R_Ring1",
+      "R_Ring2",
+      "R_Ring3",
+      "R_Shoulder",
+      "R_Thumb1",
+      "R_Thumb2",
+      "R_Thumb3",
+      "R_Wrist",
+      "Spine1",
+      "Spine2",
+      "Spine3"
+    ],
+    "lmk_fields": [
+      "dynamic_lmk_bary_coords",
+      "dynamic_lmk_faces_idx",
+      "lmk_bary_coords",
+      "lmk_faces_idx"
+    ],
+    "part2num_keys": [
+      "Global",
+      "Head",
+      "Jaw",
+      "L_Calf",
+      "L_Eye",
+      "L_Foot",
+      "L_ForeArm",
+      "L_Hand",
+      "L_Index1",
+      "L_Index2",
+      "L_Index3",
+      "L_Middle1",
+      "L_Middle2",
+      "L_Middle3",
+      "L_Pinky1",
+      "L_Pinky2",
+      "L_Pinky3",
+      "L_Ring1",
+      "L_Ring2",
+      "L_Ring3",
+      "L_Shoulder",
+      "L_Thigh",
+      "L_Thumb1",
+      "L_Thumb2",
+      "L_Thumb3",
+      "L_Toes",
+      "L_UpperArm",
+      "Neck",
+      "R_Calf",
+      "R_Eye",
+      "R_Foot",
+      "R_ForeArm",
+      "R_Hand",
+      "R_Index1",
+      "R_Index2",
+      "R_Index3",
+      "R_Middle1",
+      "R_Middle2",
+      "R_Middle3",
+      "R_Pinky1",
+      "R_Pinky2",
+      "R_Pinky3",
+      "R_Ring1",
+      "R_Ring2",
+      "R_Ring3",
+      "R_Shoulder",
+      "R_Thigh",
+      "R_Thumb1",
+      "R_Thumb2",
+      "R_Thumb3",
+      "R_Toes",
+      "R_UpperArm",
+      "Spine",
+      "Spine1",
+      "Spine2"
+    ]
+  },
+  "no_candidate_export": true,
+  "no_flame": true,
+  "no_mano": true,
+  "no_predictions_write": true,
+  "no_registry_write": true,
+  "no_strict_pass_claim": true,
+  "no_teacher_export": true,
+  "outputs": {
+    "roi_contact_sheet": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V16_smplx_native_region_roi_builder\\roi_contact_sheet.png",
+    "roi_maps_npz": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V16_smplx_native_region_roi_builder\\v16_smplx_native_region_roi_maps.npz",
+    "summary_json": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V16_smplx_native_region_roi_builder\\summary.json",
+    "view_support_table_json": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V16_smplx_native_region_roi_builder\\view_support_table.json",
+    "view_support_table_md": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V16_smplx_native_region_roi_builder\\view_support_table.md"
+  },
+  "research_only": true,
+  "smplx_native_only": true,
+  "status": "v16_smplx_native_region_roi_builder_ready_with_documented_fallbacks",
+  "task": "v16_smplx_native_region_roi_builder",
+  "view_support_table": [
+    {
+      "bbox_xyxy": [
+        202,
+        106,
+        343,
+        418
+      ],
+      "nonempty_views": 6,
+      "per_view_pixels": [
+        11490,
+        14720,
+        9515,
+        9819,
+        11538,
+        11048
+      ],
+      "region": "body_visible",
+      "source": "v15_prior_mask_or_silhouette",
+      "total_pixels": 68130
+    },
+    {
+      "bbox_xyxy": [
+        211,
+        220,
+        309,
+        303
+      ],
+      "nonempty_views": 6,
+      "per_view_pixels": [
+        28,
+        55,
+        424,
+        73,
+        48,
+        134
+      ],
+      "region": "left_hand",
+      "source": "smplx_native_joint2num_dominant_skinning_plus_v15_anchor",
+      "total_pixels": 762
+    },
+    {
+      "bbox_xyxy": [
+        215,
+        169,
+        298,
+        244
+      ],
+      "nonempty_views": 4,
+      "per_view_pixels": [
+        0,
+        0,
+        223,
+        248,
+        19,
+        57
+      ],
+      "region": "right_hand",
+      "source": "smplx_native_joint2num_dominant_skinning_plus_v15_anchor",
+      "total_pixels": 547
+    },
+    {
+      "bbox_xyxy": [
+        202,
+        161,
+        343,
+        307
+      ],
+      "nonempty_views": 6,
+      "per_view_pixels": [
+        575,
+        743,
+        2384,
+        257,
+        423,
+        493
+      ],
+      "region": "wrist_bridge_left",
+      "source": "smplx_native_wrist_elbow_skinning_with_dilated_hand_bridge",
+      "total_pixels": 4875
+    },
+    {
+      "bbox_xyxy": [
+        215,
+        154,
+        322,
+        258
+      ],
+      "nonempty_views": 6,
+      "per_view_pixels": [
+        852,
+        977,
+        730,
+        1900,
+        1206,
+        1331
+      ],
+      "region": "wrist_bridge_right",
+      "source": "smplx_native_wrist_elbow_skinning_with_dilated_hand_bridge",
+      "total_pixels": 6996
+    },
+    {
+      "bbox_xyxy": [
+        211,
+        224,
+        296,
+        299
+      ],
+      "nonempty_views": 6,
+      "per_view_pixels": [
+        15,
+        36,
+        48,
+        17,
+        20,
+        48
+      ],
+      "region": "thumb_left",
+      "source": "mixed_smplx_native_finger_and_spatial_fallback_for_sparse_views",
+      "total_pixels": 184
+    },
+    {
+      "bbox_xyxy": [
+        213,
+        223,
+        299,
+        299
+      ],
+      "nonempty_views": 6,
+      "per_view_pixels": [
+        14,
+        24,
+        33,
+        20,
+        9,
+        52
+      ],
+      "region": "index_left",
+      "source": "mixed_smplx_native_finger_and_spatial_fallback_for_sparse_views",
+      "total_pixels": 152
+    },
+    {
+      "bbox_xyxy": [
+        215,
+        222,
+        302,
+        301
+      ],
+      "nonempty_views": 6,
+      "per_view_pixels": [
+        13,
+        24,
+        31,
+        17,
+        6,
+        23
+      ],
+      "region": "middle_left",
+      "source": "mixed_smplx_native_finger_and_spatial_fallback_for_sparse_views",
+      "total_pixels": 114
+    },
+    {
+      "bbox_xyxy": [
+        216,
+        220,
+        306,
+        300
+      ],
+      "nonempty_views": 6,
+      "per_view_pixels": [
+        6,
+        12,
+        28,
+        20,
+        6,
+        11
+      ],
+      "region": "ring_left",
+      "source": "mixed_smplx_native_finger_and_spatial_fallback_for_sparse_views",
+      "total_pixels": 83
+    },
+    {
+      "bbox_xyxy": [
+        218,
+        220,
+        309,
+        295
+      ],
+      "nonempty_views": 6,
+      "per_view_pixels": [
+        5,
+        10,
+        18,
+        16,
+        3,
+        9
+      ],
+      "region": "pinky_left",
+      "source": "mixed_smplx_native_finger_and_spatial_fallback_for_sparse_views",
+      "total_pixels": 61
+    },
+    {
+      "bbox_xyxy": [
+        228,
+        169,
+        294,
+        243
+      ],
+      "nonempty_views": 4,
+      "per_view_pixels": [
+        0,
+        0,
+        5,
+        47,
+        9,
+        51
+      ],
+      "region": "thumb_right",
+      "source": "mixed_smplx_native_finger_and_spatial_fallback_for_sparse_views",
+      "total_pixels": 112
+    },
+    {
+      "bbox_xyxy": [
+        215,
+        182,
+        298,
+        239
+      ],
+      "nonempty_views": 4,
+      "per_view_pixels": [
+        0,
+        0,
+        54,
+        9,
+        4,
+        9
+      ],
+      "region": "index_right",
+      "source": "mixed_smplx_native_finger_and_spatial_fallback_for_sparse_views",
+      "total_pixels": 76
+    },
+    {
+      "bbox_xyxy": [
+        226,
+        169,
+        290,
+        242
+      ],
+      "nonempty_views": 4,
+      "per_view_pixels": [
+        0,
+        0,
+        71,
+        93,
+        9,
+        14
+      ],
+      "region": "middle_right",
+      "source": "documented_spatial_fallback_within_smplx_native_hand_roi",
+      "total_pixels": 187
+    },
+    {
+      "bbox_xyxy": [
+        221,
+        169,
+        286,
+        242
+      ],
+      "nonempty_views": 4,
+      "per_view_pixels": [
+        0,
+        0,
+        61,
+        84,
+        9,
+        15
+      ],
+      "region": "ring_right",
+      "source": "documented_spatial_fallback_within_smplx_native_hand_roi",
+      "total_pixels": 169
+    },
+    {
+      "bbox_xyxy": [
+        215,
+        169,
+        282,
+        242
+      ],
+      "nonempty_views": 4,
+      "per_view_pixels": [
+        0,
+        0,
+        50,
+        73,
+        9,
+        18
+      ],
+      "region": "pinky_right",
+      "source": "documented_spatial_fallback_within_smplx_native_hand_roi",
+      "total_pixels": 150
+    },
+    {
+      "bbox_xyxy": [
+        219,
+        106,
+        305,
+        190
+      ],
+      "nonempty_views": 6,
+      "per_view_pixels": [
+        1148,
+        1091,
+        1345,
+        1135,
+        1243,
+        820
+      ],
+      "region": "head",
+      "source": "smplx_native_head_jaw_eye_neck_skinning_plus_spatial_fallback_when_sparse",
+      "total_pixels": 6782
+    },
+    {
+      "bbox_xyxy": [
+        238,
+        110,
+        302,
+        189
+      ],
+      "nonempty_views": 6,
+      "per_view_pixels": [
+        253,
+        267,
+        527,
+        702,
+        410,
+        376
+      ],
+      "region": "face_front",
+      "source": "smplx_native_lmk_faces_dynamic_lmk_plus_v15_or_spatial_front_fallback",
+      "total_pixels": 2535
+    },
+    {
+      "bbox_xyxy": [
+        245,
+        110,
+        286,
+        174
+      ],
+      "nonempty_views": 4,
+      "per_view_pixels": [
+        0,
+        0,
+        227,
+        431,
+        112,
+        79
+      ],
+      "region": "face_lmk_static",
+      "source": "smplx_native_lmk_faces_idx_projected_via_nearest_canonical_vertex",
+      "total_pixels": 849
+    },
+    {
+      "bbox_xyxy": [
+        238,
+        113,
+        302,
+        189
+      ],
+      "nonempty_views": 6,
+      "per_view_pixels": [
+        253,
+        267,
+        517,
+        546,
+        402,
+        376
+      ],
+      "region": "face_lmk_dynamic",
+      "source": "smplx_native_dynamic_lmk_faces_idx_projected_via_nearest_canonical_vertex",
+      "total_pixels": 2361
+    }
+  ]
+}

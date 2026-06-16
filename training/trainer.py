@@ -210,6 +210,28 @@ class Trainer:
         )
         self.rank = dist.get_rank()
 
+    def _load_model_state_with_shape_filter(self, model_state_dict: Mapping[str, torch.Tensor]):
+        current_state = self.model.state_dict()
+        filtered_state = {}
+        skipped_shape_mismatch = {}
+        unexpected_input_keys = []
+
+        for key, value in model_state_dict.items():
+            if key not in current_state:
+                unexpected_input_keys.append(key)
+                continue
+            if current_state[key].shape != value.shape:
+                skipped_shape_mismatch[key] = {
+                    "checkpoint_shape": tuple(value.shape),
+                    "model_shape": tuple(current_state[key].shape),
+                }
+                continue
+            filtered_state[key] = value
+
+        missing, unexpected_loaded = self.model.load_state_dict(filtered_state, strict=False)
+        unexpected = list(dict.fromkeys(list(unexpected_input_keys) + list(unexpected_loaded)))
+        return missing, unexpected, skipped_shape_mismatch
+
     def _load_resuming_checkpoint(self, ckpt_path: str):
         """Loads a checkpoint from the given path to resume training."""
         logging.info(f"Resuming training from {ckpt_path} (rank {self.rank})")
@@ -219,20 +241,66 @@ class Trainer:
         
         # Load model state
         model_state_dict = checkpoint["model"] if "model" in checkpoint else checkpoint
-        missing, unexpected = self.model.load_state_dict(
-            model_state_dict, strict=self.checkpoint_conf.strict
-        )
+        missing, unexpected, skipped_shape_mismatch = self._load_model_state_with_shape_filter(model_state_dict)
         if self.rank == 0:
             logging.info(f"Model state loaded. Missing keys: {missing or 'None'}. Unexpected keys: {unexpected or 'None'}.")
+            if skipped_shape_mismatch:
+                preview = {
+                    key: value
+                    for key, value in list(skipped_shape_mismatch.items())[:16]
+                }
+                logging.info(
+                    "Model state skipped %d shape-mismatched key(s). Preview: %s",
+                    len(skipped_shape_mismatch),
+                    preview,
+                )
 
         # Load optimizer state if available and in training mode
-        if "optimizer" in checkpoint:
+        if "optimizer" in checkpoint and getattr(self, "optims", None) is not None:
             logging.info(f"Loading optimizer state dict (rank {self.rank})")
-            self.optims.optimizer.load_state_dict(checkpoint["optimizer"])
+            optimizer_wrappers = (
+                list(self.optims)
+                if isinstance(self.optims, (list, tuple))
+                else [self.optims]
+            )
+            optimizer_states = checkpoint["optimizer"]
+            if not isinstance(optimizer_states, list):
+                optimizer_states = [optimizer_states]
+
+            if len(optimizer_wrappers) == len(optimizer_states):
+                for optim_wrapper, optimizer_state in zip(optimizer_wrappers, optimizer_states):
+                    optimizer = getattr(optim_wrapper, "optimizer", optim_wrapper)
+                    try:
+                        optimizer.load_state_dict(optimizer_state)
+                    except ValueError as exc:
+                        logging.warning(
+                            "Skipping optimizer state load because the resumed optimizer param groups "
+                            "do not match the current model structure: %s",
+                            exc,
+                        )
+            elif len(optimizer_wrappers) == 1 and len(optimizer_states) == 1:
+                optimizer = getattr(optimizer_wrappers[0], "optimizer", optimizer_wrappers[0])
+                try:
+                    optimizer.load_state_dict(optimizer_states[0])
+                except ValueError as exc:
+                    logging.warning(
+                        "Skipping optimizer state load because the resumed optimizer param groups "
+                        "do not match the current model structure: %s",
+                        exc,
+                    )
+            else:
+                logging.warning(
+                    "Skipping optimizer state load because checkpoint stores %d optimizer state(s) "
+                    "but trainer initialized %d optimizer wrapper(s).",
+                    len(optimizer_states),
+                    len(optimizer_wrappers),
+                )
 
         # Load training progress
         if "epoch" in checkpoint:
             self.epoch = checkpoint["epoch"]
+        elif "prev_epoch" in checkpoint:
+            self.epoch = int(checkpoint["prev_epoch"]) + 1
         self.steps = checkpoint["steps"] if "steps" in checkpoint else {"train": 0, "val": 0}
         self.ckpt_time_elapsed = checkpoint.get("time_elapsed", 0)
 
@@ -770,6 +838,26 @@ class Trainer:
         tensor_keys = [
             "images", "depths", "extrinsics", "intrinsics", 
             "cam_points", "world_points", "point_masks", "foreground_masks", "conf_depth_point_masks",
+            "depth_conf_maps",
+            "smpl_prior_masks",
+            "smpl_prior_feature_maps",
+            "smpl_vertex_feature_maps",
+            "prior_maps",
+            "prior_mask",
+            "prior_depths",
+            "prior_points",
+            "prior_normals",
+            "teacher_mask",
+            "smplx_bodyhand_anchor_mask",
+            "smplx_body_anchor_mask",
+            "smplx_hand_anchor_mask",
+            "smplx_left_hand_anchor_mask",
+            "smplx_right_hand_anchor_mask",
+            "smplx_native_visible_mask",
+            "human_prior_completion_masks",
+            "human_prior_completion_depths", "human_prior_completion_world_points", "human_prior_completion_point_masks",
+            "head_hair_region_masks",
+            "head_hair_detail_masks",
             "selection_anchor_quality_score",
             "selection_sample_manifest_applied",
         ]        
@@ -784,6 +872,10 @@ class Trainer:
                     else original_tensor
                 )
                 batch[key] = torch.concatenate([original_tensor, flipped_tensor], dim=0)
+
+        if "smpl_summary_tokens" in batch:
+            original_tokens = batch["smpl_summary_tokens"]
+            batch["smpl_summary_tokens"] = torch.concatenate([original_tokens, original_tokens], dim=0)
         
         for key in string_keys:
             if key in batch and batch[key] is not None:
@@ -807,6 +899,73 @@ class Trainer:
         
         return batch
 
+    def _compute_batch_scene_normalization_stats(self, batch: Mapping):
+        extrinsics = batch["extrinsics"]
+        world_points = batch["world_points"]
+        point_masks = batch["point_masks"]
+
+        first_cam_rotation = extrinsics[:, 0, :3, :3]
+        first_cam_translation = extrinsics[:, 0, :3, 3]
+        normalized_world_points = (
+            world_points @ first_cam_rotation.transpose(-1, -2).unsqueeze(1).unsqueeze(2)
+        ) + first_cam_translation.unsqueeze(1).unsqueeze(2).unsqueeze(3)
+        dist = normalized_world_points.norm(dim=-1)
+        dist_sum = (dist * point_masks).sum(dim=[1, 2, 3])
+        valid_count = point_masks.sum(dim=[1, 2, 3])
+        avg_scale = (dist_sum / (valid_count + 1e-3)).clamp(min=1e-6, max=1e6)
+        return first_cam_rotation, first_cam_translation, avg_scale
+
+    def _normalize_human_prior_completion_batch_tensors(self, batch: Mapping) -> None:
+        first_cam_rotation, first_cam_translation, avg_scale = self._compute_batch_scene_normalization_stats(batch)
+
+        prior_point_masks = batch.get("human_prior_completion_point_masks", None)
+        prior_world_points = batch.get("human_prior_completion_world_points", None)
+        prior_depths = batch.get("human_prior_completion_depths", None)
+        if prior_point_masks is not None and (prior_world_points is not None or prior_depths is not None):
+            if prior_world_points is not None:
+                normalized_prior_world_points = (
+                    prior_world_points @ first_cam_rotation.transpose(-1, -2).unsqueeze(1).unsqueeze(2)
+                ) + first_cam_translation.unsqueeze(1).unsqueeze(2).unsqueeze(3)
+                normalized_prior_world_points = normalized_prior_world_points / avg_scale.view(-1, 1, 1, 1, 1)
+                batch["human_prior_completion_world_points"] = torch.where(
+                    prior_point_masks.unsqueeze(-1),
+                    normalized_prior_world_points,
+                    torch.zeros_like(normalized_prior_world_points),
+                )
+
+            if prior_depths is not None:
+                normalized_prior_depths = prior_depths / avg_scale.view(-1, 1, 1, 1)
+                batch["human_prior_completion_depths"] = torch.where(
+                    prior_point_masks,
+                    normalized_prior_depths,
+                    torch.zeros_like(normalized_prior_depths),
+                )
+
+        native_prior_mask = batch.get("prior_mask", None)
+        native_prior_points = batch.get("prior_points", None)
+        native_prior_depths = batch.get("prior_depths", None)
+        if native_prior_mask is None or (native_prior_points is None and native_prior_depths is None):
+            return
+
+        if native_prior_points is not None:
+            normalized_prior_world_points = (
+                native_prior_points @ first_cam_rotation.transpose(-1, -2).unsqueeze(1).unsqueeze(2)
+            ) + first_cam_translation.unsqueeze(1).unsqueeze(2).unsqueeze(3)
+            normalized_prior_world_points = normalized_prior_world_points / avg_scale.view(-1, 1, 1, 1, 1)
+            batch["prior_points"] = torch.where(
+                native_prior_mask.unsqueeze(-1),
+                normalized_prior_world_points,
+                torch.zeros_like(normalized_prior_world_points),
+            )
+
+        if native_prior_depths is not None:
+            normalized_prior_depths = native_prior_depths / avg_scale.view(-1, 1, 1, 1)
+            batch["prior_depths"] = torch.where(
+                native_prior_mask,
+                normalized_prior_depths,
+                torch.zeros_like(normalized_prior_depths),
+            )
+
     def _process_batch(self, batch: Mapping):      
         if self.data_conf.train.common_config.repeat_batch:
             batch = self._apply_batch_repetition(batch)
@@ -820,6 +979,8 @@ class Trainer:
                 depths=batch["depths"],
                 point_masks=batch["point_masks"],
             )
+
+        self._normalize_human_prior_completion_batch_tensors(batch)
 
         # Replace the original values in the batch with the normalized ones.
         batch["extrinsics"] = normalized_extrinsics
@@ -837,7 +998,12 @@ class Trainer:
             A dictionary containing the computed losses.
         """
         # Forward pass
-        y_hat = model(images=batch["images"])
+        model_kwargs = {"images": batch["images"]}
+        if "smpl_vertex_feature_maps" in batch and batch["smpl_vertex_feature_maps"] is not None:
+            model_kwargs["human_prior_feature_maps"] = batch["smpl_vertex_feature_maps"]
+        if "smpl_summary_tokens" in batch and batch["smpl_summary_tokens"] is not None:
+            model_kwargs["human_prior_summary_tokens"] = batch["smpl_summary_tokens"]
+        y_hat = model(**model_kwargs)
         
         # Loss computation
         loss_batch = dict(batch)

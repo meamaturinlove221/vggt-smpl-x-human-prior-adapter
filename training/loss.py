@@ -70,14 +70,16 @@ class MultitaskLoss(torch.nn.Module):
     - Point loss
     - Tracking loss (not cleaned yet, dirty code is at the bottom of this file)
     """
-    def __init__(self, camera=None, depth=None, point=None, track=None, unproject_geometry=None, **kwargs):
+    def __init__(self, camera=None, depth=None, point=None, normal=None, track=None, unproject_geometry=None, human_prior=None, **kwargs):
         super().__init__()
         # Loss configuration dictionaries for each task
         self.camera = camera
         self.depth = depth
         self.point = point
+        self.normal = normal
         self.track = track
         self.unproject_geometry = unproject_geometry
+        self.human_prior = human_prior
 
     def forward(self, predictions, batch) -> torch.Tensor:
         """
@@ -94,7 +96,7 @@ class MultitaskLoss(torch.nn.Module):
         loss_dict = {}
         
         # Camera pose loss - if pose encodings are predicted
-        if "pose_enc_list" in predictions:
+        if "pose_enc_list" in predictions and self.camera is not None:
             camera_loss_dict = compute_camera_loss(
                 predictions, batch, **_loss_call_kwargs(self.camera)
             )
@@ -110,7 +112,7 @@ class MultitaskLoss(torch.nn.Module):
             loss_dict.update(camera_loss_dict)
         
         # Depth estimation loss - if depth maps are predicted
-        if "depth" in predictions:
+        if "depth" in predictions and self.depth is not None:
             depth_loss_dict = compute_depth_loss(
                 predictions, batch, **_loss_call_kwargs(self.depth)
             )
@@ -127,7 +129,7 @@ class MultitaskLoss(torch.nn.Module):
             loss_dict.update(depth_loss_dict)
 
         # 3D point reconstruction loss - if world points are predicted
-        if "world_points" in predictions:
+        if "world_points" in predictions and self.point is not None:
             point_loss_dict = compute_point_loss(
                 predictions, batch, **_loss_call_kwargs(self.point)
             )
@@ -142,6 +144,28 @@ class MultitaskLoss(torch.nn.Module):
             point_loss = point_loss * point_weight
             total_loss = total_loss + point_loss
             loss_dict.update(point_loss_dict)
+
+        # Explicit normal-map loss - if a normal head is enabled
+        if "normal" in predictions and self.normal is not None:
+            normal_loss_dict = compute_normal_loss(
+                predictions, batch, **_loss_call_kwargs(self.normal)
+            )
+            normal_loss = (
+                normal_loss_dict["loss_conf_normal"]
+                + normal_loss_dict["loss_reg_normal"]
+                + normal_loss_dict["loss_grad_normal"]
+                + normal_loss_dict["loss_normal_depth_consistency"]
+            )
+            normal_weight = resolve_two_stage_scalar(
+                self.normal["weight"],
+                batch,
+                start=self.normal.get("weight_stage2_start"),
+                end=self.normal.get("weight_stage2_end"),
+                stage2_value=self.normal.get("weight_stage2_value"),
+            )
+            normal_loss = normal_loss * normal_weight
+            total_loss = total_loss + normal_loss
+            loss_dict.update(normal_loss_dict)
 
         # Geometry-chain auxiliary loss built from predicted depth + predicted camera.
         if self.unproject_geometry is not None and "depth" in predictions and "pose_enc" in predictions:
@@ -165,6 +189,31 @@ class MultitaskLoss(torch.nn.Module):
             )
             total_loss = total_loss + unproject_geometry_loss
             loss_dict.update(unproject_geometry_loss_dict)
+
+        # SMPL-X / human-prior auxiliary losses.  These are deliberately
+        # separate from the base depth/point losses so prior supervision cannot
+        # be mistaken for the original VGGT target.
+        if self.human_prior is not None:
+            human_prior_loss_dict = compute_human_prior_loss(
+                predictions,
+                batch,
+                **_loss_call_kwargs(self.human_prior),
+            )
+            human_prior_weight = resolve_scheduled_loss_weight(
+                self.human_prior.get("weight", 1.0),
+                self.human_prior,
+                batch,
+            )
+            human_prior_weight = resolve_two_stage_scalar(
+                human_prior_weight,
+                batch,
+                start=self.human_prior.get("weight_stage2_start"),
+                end=self.human_prior.get("weight_stage2_end"),
+                stage2_value=self.human_prior.get("weight_stage2_value"),
+            )
+            human_prior_loss = human_prior_loss_dict["loss_human_prior"] * human_prior_weight
+            total_loss = total_loss + human_prior_loss
+            loss_dict.update(human_prior_loss_dict)
 
         # Tracking loss - not cleaned yet, dirty code is at the bottom of this file
         if "track" in predictions:
@@ -578,6 +627,258 @@ def unproject_depth_and_pose_to_world_points(
     return world_points
 
 
+def unproject_depth_to_camera_points(pred_depth, intrinsics):
+    """Differentiably reconstruct camera-space points from depth and known intrinsics."""
+    if pred_depth.shape[-1] != 1:
+        raise ValueError(f"Expected pred_depth to have a singleton channel dim, got {pred_depth.shape}")
+
+    depth = pred_depth[..., 0]
+    bb, ss, hh, ww = depth.shape
+    device = depth.device
+    dtype = depth.dtype
+
+    ys = torch.arange(hh, device=device, dtype=dtype)
+    xs = torch.arange(ww, device=device, dtype=dtype)
+    grid_y, grid_x = torch.meshgrid(ys, xs, indexing="ij")
+    grid_x = grid_x.view(1, 1, hh, ww)
+    grid_y = grid_y.view(1, 1, hh, ww)
+
+    fx = intrinsics[..., 0, 0].unsqueeze(-1).unsqueeze(-1).to(dtype=dtype)
+    fy = intrinsics[..., 1, 1].unsqueeze(-1).unsqueeze(-1).to(dtype=dtype)
+    cx = intrinsics[..., 0, 2].unsqueeze(-1).unsqueeze(-1).to(dtype=dtype)
+    cy = intrinsics[..., 1, 2].unsqueeze(-1).unsqueeze(-1).to(dtype=dtype)
+
+    cam_x = (grid_x - cx) * depth / fx
+    cam_y = (grid_y - cy) * depth / fy
+    cam_z = depth
+    return torch.stack((cam_x, cam_y, cam_z), dim=-1)
+
+
+def _images_to_rgb01(images):
+    if images is None:
+        return None
+    if images.ndim != 5:
+        raise ValueError(f"Expected batch['images'] to have 5 dims, got {images.shape}")
+    if images.shape[2] in (1, 3):
+        rgb = images.permute(0, 1, 3, 4, 2).to(torch.float32)
+    elif images.shape[-1] in (1, 3):
+        rgb = images.to(torch.float32)
+    else:
+        raise ValueError(f"Unable to infer image channel axis from {images.shape}")
+
+    max_value = float(rgb.detach().amax().item()) if rgb.numel() else 1.0
+    min_value = float(rgb.detach().amin().item()) if rgb.numel() else 0.0
+    if max_value > 1.5:
+        rgb = rgb / 255.0
+    elif min_value < 0.0:
+        rgb = (rgb + 1.0) / 2.0
+    return rgb.clamp(0.0, 1.0)
+
+
+def _build_bottom_band_mask_like(mask_hw: torch.Tensor, bottom_band_ratio: float) -> torch.Tensor:
+    bottom_band_ratio = float(max(0.0, min(0.95, bottom_band_ratio)))
+    if bottom_band_ratio <= 0.0:
+        return torch.zeros_like(mask_hw, dtype=torch.bool)
+    hh = int(mask_hw.shape[-2])
+    cutoff = int(hh * (1.0 - bottom_band_ratio))
+    bottom = torch.zeros_like(mask_hw, dtype=torch.bool)
+    if cutoff < hh:
+        bottom[..., cutoff:, :] = True
+    return bottom
+
+
+def _profile_peak_surrogate(coords01, weights, *, bin_count=32, sigma=0.045):
+    if coords01.numel() == 0 or weights.numel() == 0:
+        return weights.new_zeros(())
+    centers = torch.linspace(0.0, 1.0, steps=int(bin_count), device=coords01.device, dtype=coords01.dtype)
+    sigma = max(float(sigma), 1e-4)
+    basis = torch.exp(-((coords01.unsqueeze(-1) - centers.view(1, -1)) ** 2) / (2.0 * sigma * sigma))
+    profile = (basis * weights.unsqueeze(-1)).sum(dim=0)
+    profile = profile / profile.sum().clamp_min(1e-8)
+    return 1.0 - (profile * profile).sum()
+
+
+def _compute_anchor_projection_alignment_losses(
+    pred_world_points,
+    predictions,
+    batch,
+    *,
+    image_size_hw,
+    pose_encoding_type,
+    eps,
+    support_pull_to_fg_weight,
+    support_pull_bottom_band_extra_scale,
+    bg_black_weight,
+    bg_black_bottom_band_extra_scale,
+    fg_support_spread_weight,
+    fg_profile_peak_surrogate_weight,
+    profile_peak_bin_count,
+    profile_peak_sigma,
+    alignment_bottom_band_ratio,
+    exclude_anchor_source_view=True,
+):
+    if (
+        support_pull_to_fg_weight <= 0.0
+        and bg_black_weight <= 0.0
+        and fg_support_spread_weight <= 0.0
+        and fg_profile_peak_surrogate_weight <= 0.0
+    ):
+        zero = (0.0 * pred_world_points).mean()
+        return zero, zero, zero, zero
+
+    foreground_masks = batch.get("foreground_masks", None)
+    images = batch.get("images", None)
+    pred_depth_conf = predictions.get("depth_conf", None)
+    if foreground_masks is None or images is None:
+        zero = (0.0 * pred_world_points).mean()
+        return zero, zero, zero, zero
+
+    anchor_view_indices = _normalize_batch_anchor_view_indices(
+        batch.get("selection_anchor_view_index"),
+        pred_world_points.shape[0],
+    )
+    if not anchor_view_indices:
+        zero = (0.0 * pred_world_points).mean()
+        return zero, zero, zero, zero
+
+    pred_extrinsics, pred_intrinsics = pose_encoding_to_extri_intri(
+        predictions["pose_enc"],
+        image_size_hw=image_size_hw,
+        pose_encoding_type=pose_encoding_type,
+        build_intrinsics=True,
+    )
+    images01 = _images_to_rgb01(images)
+    bb, ss, hh, ww, _ = pred_world_points.shape
+
+    support_total = pred_world_points.new_zeros(())
+    support_denom = pred_world_points.new_zeros(())
+    black_total = pred_world_points.new_zeros(())
+    black_denom = pred_world_points.new_zeros(())
+    spread_total = pred_world_points.new_zeros(())
+    spread_count = pred_world_points.new_zeros(())
+    peak_total = pred_world_points.new_zeros(())
+    peak_count = pred_world_points.new_zeros(())
+
+    for batch_idx, anchor_idx in enumerate(anchor_view_indices):
+        if anchor_idx is None or not (0 <= int(anchor_idx) < ss):
+            continue
+        anchor_idx = int(anchor_idx)
+        anchor_fg = foreground_masks[batch_idx, anchor_idx].to(device=pred_world_points.device, dtype=torch.float32)
+        anchor_fg_input = anchor_fg.unsqueeze(0).unsqueeze(0)
+        bottom_band = _build_bottom_band_mask_like(anchor_fg > 0.5, alignment_bottom_band_ratio).to(torch.float32)
+        bottom_band_input = bottom_band.unsqueeze(0).unsqueeze(0)
+
+        anchor_extrinsic = pred_extrinsics[batch_idx, anchor_idx]
+        anchor_intrinsic = pred_intrinsics[batch_idx, anchor_idx]
+        anchor_R = anchor_extrinsic[:3, :3]
+        anchor_t = anchor_extrinsic[:3, 3]
+        fx = anchor_intrinsic[0, 0]
+        fy = anchor_intrinsic[1, 1]
+        cx = anchor_intrinsic[0, 2]
+        cy = anchor_intrinsic[1, 2]
+        sample_inside_x = []
+        sample_inside_y = []
+        sample_inside_w = []
+
+        for view_idx in range(ss):
+            if exclude_anchor_source_view and view_idx == anchor_idx:
+                continue
+
+            world_points = pred_world_points[batch_idx, view_idx]
+            if not torch.isfinite(world_points).any():
+                continue
+
+            cam_points = torch.einsum("ij,hwj->hwi", anchor_R, world_points)
+            cam_points = cam_points + anchor_t.view(1, 1, 3)
+            z = cam_points[..., 2]
+            valid = torch.isfinite(cam_points).all(dim=-1) & (z > eps)
+            if not bool(valid.any().item()):
+                continue
+
+            u = (fx * cam_points[..., 0] / z.clamp_min(eps)) + cx
+            v = (fy * cam_points[..., 1] / z.clamp_min(eps)) + cy
+            x_norm = (u / max(float(ww - 1), 1.0)) * 2.0 - 1.0
+            y_norm = (v / max(float(hh - 1), 1.0)) * 2.0 - 1.0
+            grid = torch.stack((x_norm, y_norm), dim=-1).unsqueeze(0)
+
+            fg_sample = F.grid_sample(
+                anchor_fg_input,
+                grid,
+                mode="bilinear",
+                padding_mode="zeros",
+                align_corners=True,
+            ).squeeze(0).squeeze(0)
+            bottom_sample = F.grid_sample(
+                bottom_band_input,
+                grid,
+                mode="bilinear",
+                padding_mode="zeros",
+                align_corners=True,
+            ).squeeze(0).squeeze(0)
+
+            outside_fg = (1.0 - fg_sample).clamp(0.0, 1.0)
+            if pred_depth_conf is not None:
+                source_support = check_and_fix_inf_nan(pred_depth_conf[batch_idx, view_idx], "anchor_projection_depth_conf").to(dtype=pred_world_points.dtype).clamp_min(0.0)
+                support_weight = torch.where(valid, source_support, torch.zeros_like(source_support))
+            else:
+                support_weight = valid.to(dtype=pred_world_points.dtype)
+            if not bool(support_weight.any().item()):
+                continue
+
+            inside_fg_weight = support_weight * fg_sample
+            if bool((inside_fg_weight > 0).any().item()):
+                x01 = ((x_norm + 1.0) * 0.5).clamp(0.0, 1.0)
+                y01 = ((y_norm + 1.0) * 0.5).clamp(0.0, 1.0)
+                sample_inside_x.append(x01.reshape(-1))
+                sample_inside_y.append(y01.reshape(-1))
+                sample_inside_w.append(inside_fg_weight.reshape(-1))
+
+            if support_pull_to_fg_weight > 0.0:
+                outside_penalty = outside_fg * (
+                    1.0 + bottom_sample * max(float(support_pull_bottom_band_extra_scale) - 1.0, 0.0)
+                )
+                support_total = support_total + (outside_penalty * support_weight).sum()
+                support_denom = support_denom + support_weight.sum()
+
+            if bg_black_weight > 0.0:
+                source_rgb = images01[batch_idx, view_idx]
+                source_intensity = source_rgb.mean(dim=-1)
+                black_penalty = source_intensity * outside_fg * (
+                    1.0 + bottom_sample * max(float(bg_black_bottom_band_extra_scale) - 1.0, 0.0)
+                )
+                black_total = black_total + (black_penalty * support_weight).sum()
+                black_denom = black_denom + support_weight.sum()
+
+        if sample_inside_w:
+            inside_x = torch.cat(sample_inside_x, dim=0)
+            inside_y = torch.cat(sample_inside_y, dim=0)
+            inside_w = torch.cat(sample_inside_w, dim=0).clamp_min(0.0)
+            valid_inside = inside_w > 0.0
+            inside_x = inside_x[valid_inside]
+            inside_y = inside_y[valid_inside]
+            inside_w = inside_w[valid_inside]
+            if inside_w.numel() > 0 and float(inside_w.sum().detach().item()) > 0.0:
+                prob = inside_w / inside_w.sum().clamp_min(1e-8)
+                center_x = (prob * inside_x).sum()
+                center_y = (prob * inside_y).sum()
+                spread_loss = (prob * ((inside_x - center_x) ** 2 + (inside_y - center_y) ** 2)).sum()
+                peak_loss = (
+                    _profile_peak_surrogate(inside_x, prob, bin_count=int(profile_peak_bin_count), sigma=float(profile_peak_sigma))
+                    + _profile_peak_surrogate(inside_y, prob, bin_count=int(profile_peak_bin_count), sigma=float(profile_peak_sigma))
+                )
+                spread_total = spread_total + spread_loss
+                spread_count = spread_count + 1.0
+                peak_total = peak_total + peak_loss
+                peak_count = peak_count + 1.0
+
+    zero = (0.0 * pred_world_points).mean()
+    support_loss = support_total / support_denom.clamp_min(eps) if float(support_denom.detach().item()) > 0.0 else zero
+    black_loss = black_total / black_denom.clamp_min(eps) if float(black_denom.detach().item()) > 0.0 else zero
+    spread_loss = spread_total / spread_count.clamp_min(1.0) if float(spread_count.detach().item()) > 0.0 else zero
+    peak_loss = peak_total / peak_count.clamp_min(1.0) if float(peak_count.detach().item()) > 0.0 else zero
+    return support_loss, black_loss, spread_loss, peak_loss
+
+
 def compute_unproject_geometry_loss(
     predictions,
     batch,
@@ -593,6 +894,28 @@ def compute_unproject_geometry_loss(
     use_foreground_region_mask=False,
     foreground_erode_px=0,
     foreground_drop_bottom_ratio=0.0,
+    human_prior_mask_key=None,
+    human_prior_feature_map_key=None,
+    human_prior_mask_floor=0.35,
+    human_prior_scale=1.0,
+    human_prior_train_only=True,
+    human_prior_anchor_view_only=False,
+    human_prior_conf_floor_weight=0.0,
+    human_prior_conf_floor=0.35,
+    human_prior_depth_presence_weight=0.0,
+    human_prior_pseudo_mask_key=None,
+    human_prior_pseudo_world_key=None,
+    human_prior_pseudo_weight=0.0,
+    support_pull_to_fg_weight=0.0,
+    support_pull_bottom_band_extra_scale=2.0,
+    bg_black_weight=0.0,
+    bg_black_bottom_band_extra_scale=3.0,
+    fg_support_spread_weight=0.0,
+    fg_profile_peak_surrogate_weight=0.0,
+    profile_peak_bin_count=32,
+    profile_peak_sigma=0.045,
+    alignment_bottom_band_ratio=0.2,
+    exclude_anchor_source_view=True,
     **kwargs,
 ):
     """
@@ -613,6 +936,18 @@ def compute_unproject_geometry_loss(
     gt_mask = batch["point_masks"].clone()
     valid_mask = gt_mask & pred_depth_mask & torch.isfinite(pred_world_points).all(dim=-1)
     conf_weights = None
+    zero = (0.0 * predictions["depth"]).mean()
+    region_mask = None
+    human_prior_pseudo_mask, _, human_prior_pseudo_world_points = _build_human_prior_pseudo_supervision_components(
+        batch,
+        gt_mask,
+        human_prior_pseudo_mask_key=human_prior_pseudo_mask_key,
+        human_prior_pseudo_world_key=human_prior_pseudo_world_key,
+        human_prior_train_only=human_prior_train_only,
+        human_prior_anchor_view_only=human_prior_anchor_view_only,
+    )
+    if human_prior_pseudo_mask is not None:
+        human_prior_pseudo_mask = human_prior_pseudo_mask & ~gt_mask
 
     if use_foreground_region_mask:
         foreground_masks = batch.get("foreground_masks", None)
@@ -625,6 +960,8 @@ def compute_unproject_geometry_loss(
             drop_bottom_ratio=float(foreground_drop_bottom_ratio),
         )
         valid_mask = valid_mask & region_mask
+        if human_prior_pseudo_mask is not None:
+            human_prior_pseudo_mask = human_prior_pseudo_mask & region_mask
 
     if use_depth_conf_gate:
         pred_depth_conf = predictions.get("depth_conf", None)
@@ -637,37 +974,193 @@ def compute_unproject_geometry_loss(
         if depth_conf_threshold > 0:
             valid_mask = valid_mask & (pred_depth_conf >= depth_conf_threshold)
 
-    if valid_mask.sum() < min_valid_points:
-        dummy_loss = (0.0 * predictions["depth"]).mean()
-        return {"loss_unproject_geometry": dummy_loss}
+    has_gt_supervision = int(valid_mask.sum().item()) >= int(min_valid_points)
+    has_pseudo_supervision = human_prior_pseudo_mask is not None and bool(human_prior_pseudo_mask.any().item())
+    if not has_gt_supervision and not has_pseudo_supervision:
+        return {
+            "loss_unproject_geometry": zero,
+            "loss_unproject_geometry_base": zero,
+            "loss_support_pull_to_fg": zero,
+            "loss_bg_black": zero,
+            "loss_fg_support_spread": zero,
+            "loss_fg_profile_peak_surrogate": zero,
+            "loss_human_prior_conf_floor": zero,
+            "loss_human_prior_depth_presence": zero,
+            "loss_human_prior_pseudo_unproject": zero,
+        }
 
-    diff = pred_world_points[valid_mask] - gt_world_points[valid_mask]
-    if use_depth_conf_gate:
-        conf_weights = pred_depth_conf[valid_mask].clamp_min(eps).pow(depth_conf_power)
-    if loss_type == "l1":
-        loss_values = diff.abs().mean(dim=-1)
-    elif loss_type == "l2":
-        loss_values = diff.norm(dim=-1)
-    else:
-        raise ValueError(f"Unknown loss_type for unproject geometry loss: {loss_type}")
+    human_prior_mask, human_prior_feature_map = _build_human_prior_region_components(
+        batch,
+        valid_mask,
+        human_prior_mask_key=human_prior_mask_key,
+        human_prior_feature_map_key=human_prior_feature_map_key,
+        human_prior_train_only=human_prior_train_only,
+        human_prior_anchor_view_only=human_prior_anchor_view_only,
+    )
+    human_prior_scale_map = _build_human_prior_scale_map(
+        batch,
+        predictions["depth"][..., 0],
+        human_prior_mask_key=human_prior_mask_key,
+        human_prior_feature_map_key=human_prior_feature_map_key,
+        human_prior_mask_floor=human_prior_mask_floor,
+        human_prior_scale=human_prior_scale,
+        human_prior_train_only=human_prior_train_only,
+        human_prior_anchor_view_only=human_prior_anchor_view_only,
+    )
+    human_prior_target_mask = _build_human_prior_target_mask(
+        human_prior_mask,
+        human_prior_feature_map,
+    )
 
-    loss_values = check_and_fix_inf_nan(loss_values, "loss_unproject_geometry")
-    if valid_range > 0:
-        quantile_mask = build_quantile_mask(loss_values, valid_range)
-        if quantile_mask is not None:
-            loss_values = loss_values[quantile_mask]
-            if conf_weights is not None:
-                conf_weights = conf_weights[quantile_mask]
+    loss = zero
+    if has_gt_supervision:
+        diff = pred_world_points[valid_mask] - gt_world_points[valid_mask]
+        if use_depth_conf_gate:
+            conf_weights = pred_depth_conf[valid_mask].clamp_min(eps).pow(depth_conf_power)
+        if loss_type == "l1":
+            loss_values = diff.abs().mean(dim=-1)
+        elif loss_type == "l2":
+            loss_values = diff.norm(dim=-1)
+        else:
+            raise ValueError(f"Unknown loss_type for unproject geometry loss: {loss_type}")
 
-    if loss_values.numel() == 0:
-        loss = (0.0 * predictions["depth"]).mean()
-    elif conf_weights is not None:
-        conf_weights = check_and_fix_inf_nan(conf_weights, "loss_unproject_geometry_conf_weights")
-        loss = (loss_values * conf_weights).sum() / conf_weights.sum().clamp_min(eps)
-    else:
-        loss = loss_values.mean()
+        loss_values = check_and_fix_inf_nan(loss_values, "loss_unproject_geometry")
+        human_prior_loss_scale = None
+        if human_prior_scale_map is not None:
+            human_prior_loss_scale = check_and_fix_inf_nan(
+                human_prior_scale_map[valid_mask],
+                "loss_unproject_geometry_human_prior_scale",
+            ).clamp_min(1e-6)
+        if valid_range > 0:
+            quantile_mask = build_quantile_mask(loss_values, valid_range)
+            if quantile_mask is not None:
+                loss_values = loss_values[quantile_mask]
+                if conf_weights is not None:
+                    conf_weights = conf_weights[quantile_mask]
+                if human_prior_loss_scale is not None:
+                    human_prior_loss_scale = human_prior_loss_scale[quantile_mask]
 
-    return {"loss_unproject_geometry": loss}
+        if human_prior_loss_scale is not None:
+            loss_values = loss_values * human_prior_loss_scale
+
+        if loss_values.numel() == 0:
+            loss = zero
+        elif conf_weights is not None:
+            conf_weights = check_and_fix_inf_nan(conf_weights, "loss_unproject_geometry_conf_weights")
+            loss = (loss_values * conf_weights).sum() / conf_weights.sum().clamp_min(eps)
+        else:
+            loss = loss_values.mean()
+
+    human_prior_pseudo_unproject_loss = zero
+    if (
+        float(human_prior_pseudo_weight) > 0.0
+        and human_prior_pseudo_mask is not None
+        and human_prior_pseudo_world_points is not None
+    ):
+        pseudo_valid_mask = human_prior_pseudo_mask & pred_depth_mask & torch.isfinite(pred_world_points).all(dim=-1)
+        if use_depth_conf_gate:
+            pseudo_valid_mask = pseudo_valid_mask & torch.isfinite(pred_depth_conf)
+        if bool(pseudo_valid_mask.any().item()):
+            pseudo_diff = pred_world_points[pseudo_valid_mask] - human_prior_pseudo_world_points[pseudo_valid_mask]
+            if loss_type == "l1":
+                pseudo_loss_values = pseudo_diff.abs().mean(dim=-1)
+            elif loss_type == "l2":
+                pseudo_loss_values = pseudo_diff.norm(dim=-1)
+            else:
+                raise ValueError(f"Unknown loss_type for unproject geometry loss: {loss_type}")
+
+            pseudo_loss_values = check_and_fix_inf_nan(
+                pseudo_loss_values,
+                "loss_human_prior_pseudo_unproject",
+            )
+            if human_prior_scale_map is not None:
+                pseudo_scale = check_and_fix_inf_nan(
+                    human_prior_scale_map[pseudo_valid_mask],
+                    "loss_human_prior_pseudo_unproject_scale",
+                ).clamp_min(1e-6)
+                pseudo_loss_values = pseudo_loss_values * pseudo_scale
+            if valid_range > 0:
+                pseudo_quantile_mask = build_quantile_mask(pseudo_loss_values, valid_range)
+                if pseudo_quantile_mask is not None:
+                    pseudo_loss_values = pseudo_loss_values[pseudo_quantile_mask]
+            if pseudo_loss_values.numel() > 0:
+                human_prior_pseudo_unproject_loss = pseudo_loss_values.mean()
+
+    human_prior_supervision_mask = gt_mask
+    if human_prior_pseudo_mask is not None:
+        human_prior_supervision_mask = human_prior_supervision_mask | human_prior_pseudo_mask
+
+    human_prior_conf_floor_loss = zero
+    if float(human_prior_conf_floor_weight) > 0.0:
+        pred_depth_conf = predictions.get("depth_conf", None)
+        if pred_depth_conf is None:
+            raise ValueError(
+                "human_prior_conf_floor_weight > 0 requires predictions['depth_conf']."
+            )
+        if human_prior_target_mask is not None:
+            conf_target_mask = human_prior_target_mask & human_prior_supervision_mask & torch.isfinite(pred_depth_conf)
+            if bool(conf_target_mask.any().item()):
+                pred_depth_conf = check_and_fix_inf_nan(
+                    pred_depth_conf,
+                    "human_prior_conf_floor_depth_conf",
+                ).clamp(0.0, 1.0)
+                human_prior_conf_floor_loss = F.relu(
+                    float(human_prior_conf_floor) - pred_depth_conf[conf_target_mask]
+                ).mean()
+
+    human_prior_depth_presence_loss = zero
+    if float(human_prior_depth_presence_weight) > 0.0 and human_prior_target_mask is not None:
+        presence_target_mask = human_prior_target_mask & human_prior_supervision_mask
+        if bool(presence_target_mask.any().item()):
+            human_prior_depth_presence_loss = (
+                ~pred_depth_mask[presence_target_mask]
+            ).to(dtype=predictions["depth"].dtype).mean()
+
+    support_pull_loss, bg_black_loss, fg_spread_loss, fg_peak_loss = _compute_anchor_projection_alignment_losses(
+        pred_world_points,
+        predictions,
+        batch,
+        image_size_hw=image_hw,
+        pose_encoding_type=pose_encoding_type,
+        eps=eps,
+        support_pull_to_fg_weight=float(support_pull_to_fg_weight),
+        support_pull_bottom_band_extra_scale=float(support_pull_bottom_band_extra_scale),
+        bg_black_weight=float(bg_black_weight),
+        bg_black_bottom_band_extra_scale=float(bg_black_bottom_band_extra_scale),
+        fg_support_spread_weight=float(fg_support_spread_weight),
+        fg_profile_peak_surrogate_weight=float(fg_profile_peak_surrogate_weight),
+        profile_peak_bin_count=int(profile_peak_bin_count),
+        profile_peak_sigma=float(profile_peak_sigma),
+        alignment_bottom_band_ratio=float(alignment_bottom_band_ratio),
+        exclude_anchor_source_view=bool(exclude_anchor_source_view),
+    )
+    total_loss = loss
+    if float(support_pull_to_fg_weight) > 0.0:
+        total_loss = total_loss + float(support_pull_to_fg_weight) * support_pull_loss
+    if float(bg_black_weight) > 0.0:
+        total_loss = total_loss + float(bg_black_weight) * bg_black_loss
+    if float(fg_support_spread_weight) > 0.0:
+        total_loss = total_loss + float(fg_support_spread_weight) * fg_spread_loss
+    if float(fg_profile_peak_surrogate_weight) > 0.0:
+        total_loss = total_loss + float(fg_profile_peak_surrogate_weight) * fg_peak_loss
+    if float(human_prior_conf_floor_weight) > 0.0:
+        total_loss = total_loss + float(human_prior_conf_floor_weight) * human_prior_conf_floor_loss
+    if float(human_prior_depth_presence_weight) > 0.0:
+        total_loss = total_loss + float(human_prior_depth_presence_weight) * human_prior_depth_presence_loss
+    if float(human_prior_pseudo_weight) > 0.0:
+        total_loss = total_loss + float(human_prior_pseudo_weight) * human_prior_pseudo_unproject_loss
+
+    return {
+        "loss_unproject_geometry": total_loss,
+        "loss_unproject_geometry_base": loss,
+        "loss_support_pull_to_fg": support_pull_loss,
+        "loss_bg_black": bg_black_loss,
+        "loss_fg_support_spread": fg_spread_loss,
+        "loss_fg_profile_peak_surrogate": fg_peak_loss,
+        "loss_human_prior_conf_floor": human_prior_conf_floor_loss,
+        "loss_human_prior_depth_presence": human_prior_depth_presence_loss,
+        "loss_human_prior_pseudo_unproject": human_prior_pseudo_unproject_loss,
+    }
 
 
 def build_reliable_foreground_region_mask(mask, erode_px=0, drop_bottom_ratio=0.0, edge_band_px=0):
@@ -858,6 +1351,460 @@ def compute_point_loss(predictions, batch, gamma=1.0, alpha=0.2, gradient_loss_f
     return loss_dict
 
 
+def compute_normal_loss(
+    predictions,
+    batch,
+    gamma=1.0,
+    alpha=0.2,
+    gradient_loss_fn=None,
+    valid_range=-1,
+    target_point_key="cam_points",
+    target_mask_key="point_masks",
+    human_mask_key="human_prior_completion_masks",
+    depth_consistency_weight=0.0,
+    depth_consistency_mask_key=None,
+):
+    """
+    Supervise an explicit normal-map prediction branch.
+
+    Ground-truth normals are derived online from dense 3D point maps, which
+    keeps the normal supervision tied to the same geometry source as the depth
+    and point objectives. By default, supervision is focused on the human area.
+    """
+    pred_normal = predictions["normal"]
+    pred_normal_conf = predictions["normal_conf"]
+
+    target_points = check_and_fix_inf_nan(
+        batch[target_point_key].to(device=pred_normal.device, dtype=pred_normal.dtype),
+        f"{target_point_key}_for_normal",
+    )
+    target_point_mask = batch[target_mask_key].to(device=pred_normal.device).bool()
+    gt_normal, gt_normal_valid = point_map_to_normal_map(target_points, target_point_mask)
+
+    target_mask = gt_normal_valid
+    if human_mask_key is not None:
+        human_mask = batch.get(human_mask_key, None)
+        if human_mask is None:
+            raise KeyError(f"human_mask_key='{human_mask_key}' not found in batch.")
+        target_mask = target_mask & human_mask.to(device=pred_normal.device).bool()
+
+    zero = (0.0 * pred_normal).mean()
+    if int(target_mask.sum().item()) <= 0:
+        return {
+            "loss_conf_normal": zero,
+            "loss_reg_normal": zero,
+            "loss_grad_normal": zero,
+            "loss_normal_depth_consistency": zero,
+        }
+
+    loss_conf_normal, loss_grad_normal, loss_reg_normal = compute_normal_regression_loss(
+        pred_normal,
+        gt_normal,
+        target_mask,
+        conf=pred_normal_conf,
+        gamma=gamma,
+        alpha=alpha,
+        gradient_loss_fn=gradient_loss_fn,
+        valid_range=valid_range,
+    )
+
+    depth_consistency_loss = zero
+    depth_consistency_weight = float(depth_consistency_weight or 0.0)
+    if depth_consistency_weight > 0.0 and "depth" in predictions:
+        intrinsics = batch.get("intrinsics", None)
+        if intrinsics is None:
+            raise KeyError("depth_consistency_weight > 0 requires batch['intrinsics'].")
+
+        pred_cam_points = unproject_depth_to_camera_points(
+            predictions["depth"],
+            intrinsics.to(device=pred_normal.device, dtype=predictions["depth"].dtype),
+        )
+        pred_depth_normal, pred_depth_valid = point_map_to_normal_map(
+            pred_cam_points,
+            predictions["depth"][..., 0] > 0.0,
+        )
+        consistency_mask = pred_depth_valid & target_mask
+        if depth_consistency_mask_key is not None:
+            consistency_extra_mask = batch.get(depth_consistency_mask_key, None)
+            if consistency_extra_mask is None:
+                raise KeyError(
+                    f"depth_consistency_mask_key='{depth_consistency_mask_key}' not found in batch."
+                )
+            consistency_mask = consistency_mask & consistency_extra_mask.to(device=pred_normal.device).bool()
+
+        if int(consistency_mask.sum().item()) > 0:
+            depth_consistency_loss = cosine_normal_loss(
+                pred_normal,
+                pred_depth_normal,
+                consistency_mask,
+                conf=pred_normal_conf,
+                gamma=gamma,
+                alpha=alpha,
+                valid_range=valid_range,
+            )
+            depth_consistency_loss = (
+                check_and_fix_inf_nan(depth_consistency_loss, "loss_normal_depth_consistency")
+                * depth_consistency_weight
+            )
+
+    return {
+        "loss_conf_normal": loss_conf_normal,
+        "loss_reg_normal": loss_reg_normal,
+        "loss_grad_normal": loss_grad_normal,
+        "loss_normal_depth_consistency": depth_consistency_loss,
+    }
+
+
+def _zero_like_prediction(predictions, key="world_points"):
+    value = predictions.get(key)
+    if value is None:
+        for item in predictions.values():
+            if torch.is_tensor(item):
+                return item.sum() * 0.0
+        return torch.zeros(())
+    return value.sum() * 0.0
+
+
+def _as_bool_mask(batch, key, reference, *, allow_missing=False):
+    value = batch.get(key, None)
+    if value is None:
+        if allow_missing:
+            return None
+        raise KeyError(f"human-prior loss requires batch['{key}'].")
+    mask = value.to(device=reference.device, dtype=torch.bool)
+    if tuple(mask.shape) != tuple(reference.shape):
+        raise ValueError(
+            f"batch['{key}'] shape {tuple(mask.shape)} does not match reference shape {tuple(reference.shape)}."
+        )
+    return mask
+
+
+def _as_float_tensor(batch, key, reference, *, last_dim=None, allow_missing=False):
+    value = batch.get(key, None)
+    if value is None:
+        if allow_missing:
+            return None
+        raise KeyError(f"human-prior loss requires batch['{key}'].")
+    tensor = value.to(device=reference.device, dtype=reference.dtype)
+    expected = tuple(reference.shape) if last_dim is None else tuple(reference.shape) + (int(last_dim),)
+    if tuple(tensor.shape) != expected:
+        raise ValueError(
+            f"batch['{key}'] shape {tuple(tensor.shape)} does not match expected shape {expected}."
+        )
+    return check_and_fix_inf_nan(tensor, f"{key}_human_prior_target", hard_max=None)
+
+
+def _valid_prior_mask(base_mask, target, *, require_positive_depth=False):
+    mask = base_mask & torch.isfinite(target).all(dim=-1 if target.ndim == base_mask.ndim + 1 else 0)
+    if require_positive_depth:
+        mask = mask & (target > 0.0) & torch.isfinite(target)
+    return mask
+
+
+def _resolve_prior_mask(batch, reference_mask, mask_key=None):
+    for key in (mask_key, "prior_mask", "smplx_native_visible_mask", "teacher_mask"):
+        if not key:
+            continue
+        value = batch.get(key, None)
+        if value is not None:
+            return _as_bool_mask(batch, key, reference_mask, allow_missing=False)
+    return reference_mask.clone()
+
+
+def _masked_mean_values(values, mask, zero, valid_range=-1, min_valid=1, name="human_prior_loss"):
+    if values is None:
+        return zero
+    values = values[mask]
+    if values.numel() < int(min_valid):
+        return zero
+    values = check_and_fix_inf_nan(values, name, hard_max=None)
+    if valid_range and float(valid_range) > 0:
+        values = filter_by_quantile(values, float(valid_range))
+    if values.numel() <= 0:
+        return zero
+    return values.mean()
+
+
+def _confidence_loss_from_reg(reg_map, conf, mask, zero, gamma=1.0, alpha=0.0, valid_range=-1, name="human_prior_conf"):
+    if conf is None:
+        return zero
+    conf = check_and_fix_inf_nan(conf, name).clamp_min(1e-8)
+    values = float(gamma) * reg_map[mask] * conf[mask] - float(alpha) * torch.log(conf[mask])
+    if values.numel() <= 0:
+        return zero
+    values = check_and_fix_inf_nan(values, name, hard_max=None)
+    if valid_range and float(valid_range) > 0:
+        values = filter_by_quantile(values, float(valid_range))
+    if values.numel() <= 0:
+        return zero
+    return values.mean()
+
+
+def _region_mask_without_exclusions(batch, base_mask, *, exclude_head_roi=True, exclude_face_roi=True, exclude_hairline_roi=True, exclude_ear_band_roi=True):
+    mask = base_mask.clone()
+    exclusions = []
+    if exclude_head_roi:
+        exclusions.extend(("head_roi_mask", "head_face_mask"))
+    if exclude_face_roi:
+        exclusions.append("face_mask")
+    if exclude_hairline_roi:
+        exclusions.extend(("hairline_mask", "head_hair_detail_masks"))
+    if exclude_ear_band_roi:
+        exclusions.append("ear_band_mask")
+    for key in exclusions:
+        value = batch.get(key, None)
+        if value is not None and tuple(value.shape) == tuple(mask.shape):
+            mask = mask & ~value.to(device=mask.device, dtype=torch.bool)
+    return mask
+
+
+def compute_human_prior_loss(
+    predictions,
+    batch,
+    weight=1.0,
+    depth=None,
+    point=None,
+    normal=None,
+    depth_point=None,
+    smplx_weak_anchor=None,
+    mask_key="prior_mask",
+    depth_key="prior_depths",
+    point_key="prior_points",
+    normal_key="prior_normals",
+    eps=1e-8,
+    **kwargs,
+):
+    """Active SMPL-X/native-prior auxiliary objective.
+
+    This loss is intentionally explicit: prior depth supervises the depth head,
+    prior points supervise predictions["world_points"], prior normals supervise
+    the normal head, and depth-point coupling keeps predicted depth unprojection
+    aligned with the predicted point map.  The returned keys match the V15
+    logging config so missing branches are visible instead of silently inert.
+    """
+    del kwargs, weight
+
+    reference = predictions.get("world_points")
+    if reference is None:
+        reference = predictions.get("depth")
+    if reference is None:
+        zero = _zero_like_prediction(predictions)
+        return {"loss_human_prior": zero}
+
+    if reference.ndim == 5 and reference.shape[-1] == 3:
+        reference_mask = torch.isfinite(reference).all(dim=-1)
+    elif reference.ndim == 5 and reference.shape[-1] == 1:
+        reference_mask = torch.isfinite(reference[..., 0])
+    else:
+        raise ValueError(f"Unsupported human-prior reference prediction shape: {tuple(reference.shape)}")
+
+    prior_mask = _resolve_prior_mask(batch, reference_mask, mask_key=mask_key)
+    zero = _zero_like_prediction(predictions, "world_points" if "world_points" in predictions else "depth")
+
+    total = zero
+    out = {
+        "loss_prior_depth": zero,
+        "loss_prior_depth_conf": zero,
+        "loss_prior_depth_reg": zero,
+        "loss_prior_depth_grad": zero,
+        "loss_prior_point": zero,
+        "loss_prior_point_conf": zero,
+        "loss_prior_point_reg": zero,
+        "loss_prior_point_grad": zero,
+        "loss_prior_normal": zero,
+        "loss_prior_normal_conf": zero,
+        "loss_prior_normal_reg": zero,
+        "loss_prior_depth_point": zero,
+        "loss_prior_depth_point_consistency": zero,
+        "loss_prior_smplx_body_depth": zero,
+        "loss_prior_smplx_body_point": zero,
+        "loss_prior_smplx_body_weak": zero,
+        "loss_prior_smplx_hand_depth": zero,
+        "loss_prior_smplx_hand_point": zero,
+        "loss_prior_smplx_hand_weak": zero,
+        "loss_prior_smplx_weak_anchor": zero,
+    }
+
+    if depth is not None and "depth" in predictions and depth_key in batch:
+        cfg = depth
+        pred_depth = predictions["depth"][..., 0]
+        target_depth = _as_float_tensor(batch, depth_key, pred_depth, allow_missing=False)
+        depth_mask = prior_mask & torch.isfinite(target_depth) & (target_depth > 0.0)
+        if int(depth_mask.sum().item()) > 0:
+            reg_map = (pred_depth - target_depth).abs()
+            out["loss_prior_depth_reg"] = _masked_mean_values(
+                reg_map,
+                depth_mask,
+                zero,
+                valid_range=cfg.get("valid_range", -1),
+                name="loss_prior_depth_reg",
+            )
+            out["loss_prior_depth_conf"] = _confidence_loss_from_reg(
+                reg_map,
+                predictions.get("depth_conf"),
+                depth_mask,
+                zero,
+                gamma=cfg.get("gamma", 1.0),
+                alpha=cfg.get("alpha", 0.0),
+                valid_range=cfg.get("valid_range", -1),
+                name="loss_prior_depth_conf",
+            ) if bool(cfg.get("supervise_conf", False)) else zero
+            if cfg.get("gradient_loss_fn", None):
+                out["loss_prior_depth_grad"] = gradient_loss_multi_scale_wrapper(
+                    pred_depth.unsqueeze(-1).reshape(-1, pred_depth.shape[-2], pred_depth.shape[-1], 1),
+                    target_depth.unsqueeze(-1).reshape(-1, target_depth.shape[-2], target_depth.shape[-1], 1),
+                    depth_mask.reshape(-1, depth_mask.shape[-2], depth_mask.shape[-1]),
+                    gradient_loss_fn=gradient_loss,
+                    scales=3,
+                )
+            out["loss_prior_depth"] = (
+                out["loss_prior_depth_conf"] + out["loss_prior_depth_reg"] + out["loss_prior_depth_grad"]
+            )
+            total = total + out["loss_prior_depth"]
+
+    if point is not None and "world_points" in predictions and point_key in batch:
+        cfg = point
+        pred_points = predictions["world_points"]
+        target_points = _as_float_tensor(batch, point_key, pred_points[..., 0], last_dim=3, allow_missing=False)
+        point_mask = prior_mask & torch.isfinite(target_points).all(dim=-1)
+        if int(point_mask.sum().item()) > 0:
+            reg_map = torch.norm(pred_points - target_points, dim=-1)
+            out["loss_prior_point_reg"] = _masked_mean_values(
+                reg_map,
+                point_mask,
+                zero,
+                valid_range=cfg.get("valid_range", -1),
+                name="loss_prior_point_reg",
+            )
+            out["loss_prior_point_conf"] = _confidence_loss_from_reg(
+                reg_map,
+                predictions.get("world_points_conf"),
+                point_mask,
+                zero,
+                gamma=cfg.get("gamma", 1.0),
+                alpha=cfg.get("alpha", 0.0),
+                valid_range=cfg.get("valid_range", -1),
+                name="loss_prior_point_conf",
+            ) if bool(cfg.get("supervise_conf", False)) else zero
+            if cfg.get("gradient_loss_fn", None):
+                out["loss_prior_point_grad"] = gradient_loss_multi_scale_wrapper(
+                    pred_points.reshape(-1, pred_points.shape[-3], pred_points.shape[-2], 3),
+                    target_points.reshape(-1, target_points.shape[-3], target_points.shape[-2], 3),
+                    point_mask.reshape(-1, point_mask.shape[-2], point_mask.shape[-1]),
+                    gradient_loss_fn=normal_loss if "normal" in str(cfg.get("gradient_loss_fn")).lower() else gradient_loss,
+                    scales=3,
+                )
+            out["loss_prior_point"] = (
+                out["loss_prior_point_conf"] + out["loss_prior_point_reg"] + out["loss_prior_point_grad"]
+            )
+            total = total + out["loss_prior_point"]
+
+    if normal is not None and "normal" in predictions and normal_key in batch:
+        cfg = normal
+        pred_normal = predictions["normal"]
+        target_normal = _as_float_tensor(batch, normal_key, pred_normal[..., 0], last_dim=3, allow_missing=False)
+        normal_mask = prior_mask & torch.isfinite(target_normal).all(dim=-1)
+        if int(normal_mask.sum().item()) > 0:
+            out["loss_prior_normal_reg"] = cosine_normal_loss(
+                pred_normal,
+                target_normal,
+                normal_mask,
+                conf=predictions.get("normal_conf") if bool(cfg.get("supervise_conf", False)) else None,
+                gamma=cfg.get("gamma", 1.0),
+                alpha=cfg.get("alpha", 0.0),
+                valid_range=cfg.get("valid_range", -1),
+            )
+            out["loss_prior_normal"] = out["loss_prior_normal_conf"] + out["loss_prior_normal_reg"]
+            total = total + out["loss_prior_normal"]
+
+    if depth_point is not None and "depth" in predictions and "world_points" in predictions:
+        cfg = depth_point
+        intrinsics = batch.get("intrinsics", None)
+        extrinsics = batch.get("extrinsics", None)
+        if intrinsics is not None and extrinsics is not None:
+            pred_depth = predictions["depth"]
+            cam_points = unproject_depth_to_camera_points(
+                pred_depth,
+                intrinsics.to(device=pred_depth.device, dtype=pred_depth.dtype),
+            )
+            world_to_cam_R = extrinsics[..., :3, :3].to(device=pred_depth.device, dtype=pred_depth.dtype)
+            world_to_cam_t = extrinsics[..., :3, 3].to(device=pred_depth.device, dtype=pred_depth.dtype)
+            cam_to_world_R = world_to_cam_R.transpose(-1, -2)
+            cam_to_world_t = -torch.matmul(cam_to_world_R, world_to_cam_t.unsqueeze(-1)).squeeze(-1)
+            depth_world_points = torch.einsum("bsij,bshwj->bshwi", cam_to_world_R, cam_points)
+            depth_world_points = depth_world_points + cam_to_world_t.unsqueeze(-2).unsqueeze(-2)
+            consistency_mask = prior_mask & (pred_depth[..., 0] > 0.0) & torch.isfinite(depth_world_points).all(dim=-1)
+            if int(consistency_mask.sum().item()) > 0:
+                consistency_map = torch.norm(predictions["world_points"] - depth_world_points, dim=-1)
+                out["loss_prior_depth_point_consistency"] = _masked_mean_values(
+                    consistency_map,
+                    consistency_mask,
+                    zero,
+                    valid_range=cfg.get("valid_range", -1),
+                    name="loss_prior_depth_point_consistency",
+                )
+                out["loss_prior_depth_point"] = (
+                    float(cfg.get("consistency_weight", 1.0)) * out["loss_prior_depth_point_consistency"]
+                )
+                total = total + out["loss_prior_depth_point"]
+
+    if smplx_weak_anchor is not None:
+        cfg = smplx_weak_anchor
+        body_mask = batch.get("smplx_body_anchor_mask", None)
+        hand_mask = batch.get("smplx_hand_anchor_mask", None)
+        masks = []
+        if body_mask is not None:
+            masks.append(("body", body_mask.to(device=prior_mask.device, dtype=torch.bool), float(cfg.get("body_weight", 0.0))))
+        if hand_mask is not None:
+            masks.append(("hand", hand_mask.to(device=prior_mask.device, dtype=torch.bool), float(cfg.get("hand_weight", 0.0))))
+        for region, region_mask, region_weight in masks:
+            region_mask = region_mask & prior_mask
+            if region == "body":
+                region_mask = _region_mask_without_exclusions(
+                    batch,
+                    region_mask,
+                    exclude_head_roi=cfg.get("exclude_head_roi", True),
+                    exclude_face_roi=cfg.get("exclude_face_roi", True),
+                    exclude_hairline_roi=cfg.get("exclude_hairline_roi", True),
+                    exclude_ear_band_roi=cfg.get("exclude_ear_band_roi", True),
+                )
+            if int(region_mask.sum().item()) < int(cfg.get("min_pixels", 64)):
+                continue
+            region_total = zero
+            if "depth" in predictions and depth_key in batch:
+                target_depth = _as_float_tensor(batch, depth_key, predictions["depth"][..., 0], allow_missing=False)
+                depth_mask = region_mask & torch.isfinite(target_depth) & (target_depth > 0.0)
+                if int(depth_mask.sum().item()) > 0:
+                    depth_loss = _masked_mean_values(
+                        (predictions["depth"][..., 0] - target_depth).abs(),
+                        depth_mask,
+                        zero,
+                        valid_range=cfg.get("valid_range", -1),
+                        name=f"loss_prior_smplx_{region}_depth",
+                    )
+                    out[f"loss_prior_smplx_{region}_depth"] = depth_loss
+                    region_total = region_total + float(cfg.get("depth_loss_weight", 0.0)) * depth_loss
+            if "world_points" in predictions and point_key in batch:
+                target_points = _as_float_tensor(batch, point_key, predictions["world_points"][..., 0], last_dim=3, allow_missing=False)
+                point_mask = region_mask & torch.isfinite(target_points).all(dim=-1)
+                if int(point_mask.sum().item()) > 0:
+                    point_loss = _masked_mean_values(
+                        torch.norm(predictions["world_points"] - target_points, dim=-1),
+                        point_mask,
+                        zero,
+                        valid_range=cfg.get("valid_range", -1),
+                        name=f"loss_prior_smplx_{region}_point",
+                    )
+                    out[f"loss_prior_smplx_{region}_point"] = point_loss
+                    region_total = region_total + float(cfg.get("point_loss_weight", 0.0)) * point_loss
+            out[f"loss_prior_smplx_{region}_weak"] = region_weight * region_total
+            total = total + out[f"loss_prior_smplx_{region}_weak"]
+        out["loss_prior_smplx_weak_anchor"] = out["loss_prior_smplx_body_weak"] + out["loss_prior_smplx_hand_weak"]
+
+    out["loss_human_prior"] = total
+    return out
+
+
 def compute_depth_loss(
     predictions,
     batch,
@@ -915,6 +1862,16 @@ def compute_depth_loss(
     anchor_conditioned_unproject_consistency_conf_scale=1.0,
     anchor_conditioned_unproject_consistency_reg_scale=1.0,
     anchor_conditioned_unproject_consistency_train_only=True,
+    human_prior_mask_key=None,
+    human_prior_feature_map_key=None,
+    human_prior_mask_floor=0.35,
+    human_prior_reg_scale=1.0,
+    human_prior_conf_scale=1.0,
+    human_prior_train_only=True,
+    human_prior_anchor_view_only=False,
+    human_prior_pseudo_depth_key=None,
+    human_prior_pseudo_mask_key=None,
+    human_prior_pseudo_weight=0.0,
     **kwargs,
 ):
     """
@@ -954,12 +1911,28 @@ def compute_depth_loss(
         # the underlying gt_depth mask unchanged for the regression branch.
         conf_depth_mask = conf_depth_mask & ~anchor_conditioned_conf_mask_drop_map
 
-    if gt_depth_mask.sum() < 100:
+    human_prior_pseudo_mask, human_prior_pseudo_depth, _ = _build_human_prior_pseudo_supervision_components(
+        batch,
+        gt_depth_mask,
+        human_prior_pseudo_mask_key=human_prior_pseudo_mask_key,
+        human_prior_pseudo_depth_key=human_prior_pseudo_depth_key,
+        human_prior_train_only=human_prior_train_only,
+        human_prior_anchor_view_only=human_prior_anchor_view_only,
+    )
+    if human_prior_pseudo_mask is not None:
+        human_prior_pseudo_mask = human_prior_pseudo_mask & ~gt_depth_mask
+
+    if gt_depth_mask.sum() < 100 and (
+        human_prior_pseudo_mask is None or not bool(human_prior_pseudo_mask.any().item())
+    ):
         # If there are less than 100 valid points, skip this batch
         dummy_loss = (0.0 * pred_depth).mean()
-        loss_dict = {f"loss_conf_depth": dummy_loss,
-                    f"loss_reg_depth": dummy_loss,
-                    f"loss_grad_depth": dummy_loss,}
+        loss_dict = {
+            f"loss_conf_depth": dummy_loss,
+            f"loss_reg_depth": dummy_loss,
+            f"loss_grad_depth": dummy_loss,
+            f"loss_human_prior_pseudo_depth": dummy_loss,
+        }
         return loss_dict
 
     # NOTE: we put conf inside regression_loss so that we can also apply conf loss to the gradient loss in a multi-scale manner
@@ -1022,13 +1995,41 @@ def compute_depth_loss(
         anchor_conditioned_unproject_consistency_train_only=anchor_conditioned_unproject_consistency_train_only,
         anchor_conditioned_unproject_consistency_pred_pose_enc=predictions.get("pose_enc", None),
         anchor_conditioned_unproject_consistency_image_size_hw=batch["images"].shape[-2:] if "images" in batch else None,
+        human_prior_mask_key=human_prior_mask_key,
+        human_prior_feature_map_key=human_prior_feature_map_key,
+        human_prior_mask_floor=human_prior_mask_floor,
+        human_prior_reg_scale=human_prior_reg_scale,
+        human_prior_conf_scale=human_prior_conf_scale,
+        human_prior_train_only=human_prior_train_only,
+        human_prior_anchor_view_only=human_prior_anchor_view_only,
         **regression_loss_extra_kwargs,
     )
 
+    human_prior_pseudo_depth_loss = (0.0 * pred_depth).mean()
+    if (
+        float(human_prior_pseudo_weight) > 0.0
+        and human_prior_pseudo_mask is not None
+        and human_prior_pseudo_depth is not None
+        and bool(human_prior_pseudo_mask.any().item())
+    ):
+        pseudo_depth_loss_values = (
+            pred_depth[..., 0][human_prior_pseudo_mask] - human_prior_pseudo_depth[human_prior_pseudo_mask]
+        ).abs()
+        if pseudo_depth_loss_values.numel() > 0:
+            if valid_range > 0:
+                pseudo_depth_loss_values = filter_by_quantile(pseudo_depth_loss_values, valid_range)
+            pseudo_depth_loss_values = check_and_fix_inf_nan(
+                pseudo_depth_loss_values,
+                "loss_human_prior_pseudo_depth",
+            )
+            if pseudo_depth_loss_values.numel() > 0:
+                human_prior_pseudo_depth_loss = pseudo_depth_loss_values.mean()
+
     loss_dict = {
         f"loss_conf_depth": loss_conf,
-        f"loss_reg_depth": loss_reg,    
+        f"loss_reg_depth": loss_reg + float(human_prior_pseudo_weight) * human_prior_pseudo_depth_loss,
         f"loss_grad_depth": loss_grad,
+        f"loss_human_prior_pseudo_depth": human_prior_pseudo_depth_loss,
     }
 
     return loss_dict
@@ -1142,6 +2143,266 @@ def _build_anchor_view_only_mask(batch, reference_mask):
     if not bool(anchor_view_mask.any().item()):
         return None
     return anchor_view_mask
+
+
+def _should_apply_human_prior(batch, human_prior_train_only):
+    if not bool(human_prior_train_only):
+        return True
+    phase = str(batch.get("_loss_phase", "")).lower()
+    return phase == "train"
+
+
+def _build_human_prior_region_components(
+    batch,
+    reference_mask,
+    *,
+    human_prior_mask_key=None,
+    human_prior_feature_map_key=None,
+    human_prior_train_only=True,
+    human_prior_anchor_view_only=False,
+):
+    if batch is None or reference_mask is None:
+        return None, None
+    if not human_prior_mask_key and not human_prior_feature_map_key:
+        return None, None
+
+    if not _should_apply_human_prior(batch, human_prior_train_only):
+        return None, None
+
+    prior_mask = None
+    if human_prior_mask_key:
+        prior_mask = batch.get(human_prior_mask_key, None)
+        if prior_mask is None:
+            raise ValueError(
+                f"human prior mask key '{human_prior_mask_key}' requires batch['{human_prior_mask_key}']."
+            )
+        prior_mask = prior_mask.to(device=reference_mask.device, dtype=torch.bool)
+        if tuple(prior_mask.shape) != tuple(reference_mask.shape):
+            raise ValueError(
+                f"batch['{human_prior_mask_key}'] shape {tuple(prior_mask.shape)} does not match "
+                f"reference shape {tuple(reference_mask.shape)}."
+            )
+
+    prior_feature_map = None
+    if human_prior_feature_map_key:
+        prior_feature_map = batch.get(human_prior_feature_map_key, None)
+        if prior_feature_map is None:
+            raise ValueError(
+                "human prior feature map key "
+                f"'{human_prior_feature_map_key}' requires batch['{human_prior_feature_map_key}']."
+            )
+        prior_feature_map = prior_feature_map.to(device=reference_mask.device, dtype=torch.float32)
+        if tuple(prior_feature_map.shape) != tuple(reference_mask.shape):
+            raise ValueError(
+                f"batch['{human_prior_feature_map_key}'] shape {tuple(prior_feature_map.shape)} does not match "
+                f"reference shape {tuple(reference_mask.shape)}."
+            )
+        prior_feature_map = check_and_fix_inf_nan(
+            prior_feature_map,
+            f"{human_prior_feature_map_key}_human_prior_feature_map",
+        ).clamp_min(0.0)
+        max_per_view = prior_feature_map.reshape(prior_feature_map.shape[0], prior_feature_map.shape[1], -1).amax(
+            dim=-1,
+            keepdim=True,
+        ).unsqueeze(-1)
+        prior_feature_map = torch.where(
+            max_per_view > 0.0,
+            prior_feature_map / max_per_view.clamp_min(1e-6),
+            torch.zeros_like(prior_feature_map),
+        )
+
+    if human_prior_anchor_view_only:
+        anchor_view_mask = _build_anchor_view_only_mask(batch, reference_mask)
+        if anchor_view_mask is None:
+            return None, None
+        prior_mask = anchor_view_mask if prior_mask is None else (prior_mask & anchor_view_mask)
+        if prior_feature_map is not None:
+            prior_feature_map = prior_feature_map * anchor_view_mask.to(dtype=prior_feature_map.dtype)
+
+    if prior_mask is not None and not bool(prior_mask.any().item()) and prior_feature_map is None:
+        return None, None
+    if prior_feature_map is not None and float(prior_feature_map.detach().amax().item()) <= 0.0 and prior_mask is None:
+        return None, None
+    return prior_mask, prior_feature_map
+
+
+def _build_human_prior_pseudo_supervision_components(
+    batch,
+    reference_mask,
+    *,
+    human_prior_pseudo_mask_key=None,
+    human_prior_pseudo_depth_key=None,
+    human_prior_pseudo_world_key=None,
+    human_prior_train_only=True,
+    human_prior_anchor_view_only=False,
+):
+    if batch is None or reference_mask is None:
+        return None, None, None
+    if not human_prior_pseudo_mask_key and not human_prior_pseudo_depth_key and not human_prior_pseudo_world_key:
+        return None, None, None
+    if not _should_apply_human_prior(batch, human_prior_train_only):
+        return None, None, None
+
+    pseudo_mask = None
+    if human_prior_pseudo_mask_key:
+        pseudo_mask = batch.get(human_prior_pseudo_mask_key, None)
+        if pseudo_mask is None:
+            raise ValueError(
+                "human prior pseudo mask key "
+                f"'{human_prior_pseudo_mask_key}' requires batch['{human_prior_pseudo_mask_key}']."
+            )
+        pseudo_mask = pseudo_mask.to(device=reference_mask.device, dtype=torch.bool)
+        if tuple(pseudo_mask.shape) != tuple(reference_mask.shape):
+            raise ValueError(
+                f"batch['{human_prior_pseudo_mask_key}'] shape {tuple(pseudo_mask.shape)} does not match "
+                f"reference shape {tuple(reference_mask.shape)}."
+            )
+
+    pseudo_depth = None
+    if human_prior_pseudo_depth_key:
+        pseudo_depth = batch.get(human_prior_pseudo_depth_key, None)
+        if pseudo_depth is None:
+            raise ValueError(
+                "human prior pseudo depth key "
+                f"'{human_prior_pseudo_depth_key}' requires batch['{human_prior_pseudo_depth_key}']."
+            )
+        pseudo_depth = pseudo_depth.to(device=reference_mask.device, dtype=torch.float32)
+        if tuple(pseudo_depth.shape) != tuple(reference_mask.shape):
+            raise ValueError(
+                f"batch['{human_prior_pseudo_depth_key}'] shape {tuple(pseudo_depth.shape)} does not match "
+                f"reference shape {tuple(reference_mask.shape)}."
+            )
+        pseudo_depth = check_and_fix_inf_nan(
+            pseudo_depth,
+            f"{human_prior_pseudo_depth_key}_human_prior_pseudo_depth",
+        )
+
+    pseudo_world = None
+    if human_prior_pseudo_world_key:
+        pseudo_world = batch.get(human_prior_pseudo_world_key, None)
+        if pseudo_world is None:
+            raise ValueError(
+                "human prior pseudo world key "
+                f"'{human_prior_pseudo_world_key}' requires batch['{human_prior_pseudo_world_key}']."
+            )
+        pseudo_world = pseudo_world.to(device=reference_mask.device, dtype=torch.float32)
+        expected_shape = tuple(reference_mask.shape) + (3,)
+        if tuple(pseudo_world.shape) != expected_shape:
+            raise ValueError(
+                f"batch['{human_prior_pseudo_world_key}'] shape {tuple(pseudo_world.shape)} does not match "
+                f"reference shape {expected_shape}."
+            )
+        pseudo_world = check_and_fix_inf_nan(
+            pseudo_world,
+            f"{human_prior_pseudo_world_key}_human_prior_pseudo_world",
+            hard_max=None,
+        )
+
+    if human_prior_anchor_view_only:
+        anchor_view_mask = _build_anchor_view_only_mask(batch, reference_mask)
+        if anchor_view_mask is None:
+            return None, None, None
+        pseudo_mask = anchor_view_mask if pseudo_mask is None else (pseudo_mask & anchor_view_mask)
+        if pseudo_depth is not None:
+            pseudo_depth = torch.where(anchor_view_mask, pseudo_depth, torch.zeros_like(pseudo_depth))
+        if pseudo_world is not None:
+            pseudo_world = torch.where(
+                anchor_view_mask.unsqueeze(-1),
+                pseudo_world,
+                torch.zeros_like(pseudo_world),
+            )
+
+    resolved_mask = pseudo_mask
+    if pseudo_depth is not None:
+        depth_valid_mask = torch.isfinite(pseudo_depth) & (pseudo_depth > 0.0)
+        resolved_mask = depth_valid_mask if resolved_mask is None else (resolved_mask & depth_valid_mask)
+    if pseudo_world is not None:
+        world_valid_mask = torch.isfinite(pseudo_world).all(dim=-1)
+        resolved_mask = world_valid_mask if resolved_mask is None else (resolved_mask & world_valid_mask)
+
+    if resolved_mask is None or not bool(resolved_mask.any().item()):
+        return None, None, None
+
+    if pseudo_depth is not None:
+        pseudo_depth = torch.where(resolved_mask, pseudo_depth, torch.zeros_like(pseudo_depth))
+    if pseudo_world is not None:
+        pseudo_world = torch.where(
+            resolved_mask.unsqueeze(-1),
+            pseudo_world,
+            torch.zeros_like(pseudo_world),
+        )
+    return resolved_mask, pseudo_depth, pseudo_world
+
+
+def _build_human_prior_weight_map(
+    reference_map,
+    *,
+    prior_mask=None,
+    prior_feature_map=None,
+    human_prior_mask_floor=0.35,
+):
+    if prior_mask is None and prior_feature_map is None:
+        return None
+
+    mask_floor = float(max(0.0, min(1.0, human_prior_mask_floor)))
+    weight_map = torch.zeros_like(reference_map, dtype=reference_map.dtype)
+    if prior_feature_map is not None:
+        weight_map = torch.maximum(
+            weight_map,
+            prior_feature_map.to(device=reference_map.device, dtype=reference_map.dtype),
+        )
+    if prior_mask is not None and mask_floor > 0.0:
+        weight_map = torch.maximum(
+            weight_map,
+            prior_mask.to(device=reference_map.device, dtype=reference_map.dtype) * mask_floor,
+        )
+    return weight_map.clamp(0.0, 1.0)
+
+
+def _build_human_prior_scale_map(
+    batch,
+    reference_map,
+    *,
+    human_prior_mask_key=None,
+    human_prior_feature_map_key=None,
+    human_prior_mask_floor=0.35,
+    human_prior_scale=1.0,
+    human_prior_train_only=True,
+    human_prior_anchor_view_only=False,
+):
+    scale_value = float(human_prior_scale)
+    if scale_value == 1.0:
+        return None
+    prior_mask, prior_feature_map = _build_human_prior_region_components(
+        batch,
+        reference_map,
+        human_prior_mask_key=human_prior_mask_key,
+        human_prior_feature_map_key=human_prior_feature_map_key,
+        human_prior_train_only=human_prior_train_only,
+        human_prior_anchor_view_only=human_prior_anchor_view_only,
+    )
+    prior_weight_map = _build_human_prior_weight_map(
+        reference_map,
+        prior_mask=prior_mask,
+        prior_feature_map=prior_feature_map,
+        human_prior_mask_floor=human_prior_mask_floor,
+    )
+    if prior_weight_map is None:
+        return None
+    return 1.0 + prior_weight_map * (scale_value - 1.0)
+
+
+def _build_human_prior_target_mask(
+    prior_mask,
+    prior_feature_map,
+    *,
+    feature_threshold=1e-6,
+):
+    target_mask = prior_mask
+    if prior_feature_map is not None:
+        feature_mask = prior_feature_map > float(feature_threshold)
+        target_mask = feature_mask if target_mask is None else (target_mask | feature_mask)
+    return target_mask
 
 
 def _build_anchor_conditioned_disagreement_scale_maps(
@@ -1658,10 +2919,108 @@ def _build_anchor_conditioned_conf_mask_drop_map(
     return drop_map & target_region_mask & reference_mask
 
 
-def regression_loss(
+def compute_normal_regression_loss(
     pred,
     gt,
     mask,
+    conf=None,
+    gamma=1.0,
+    alpha=0.2,
+    gradient_loss_fn=None,
+    valid_range=-1,
+    conf_loss_aggregation="pixel_mean",
+):
+    """
+    Regression loss for explicit normal-map prediction.
+
+    The regression term is angular: 1 - cos(theta). Optional gradient
+    regularization is applied directly on the normal map.
+    """
+    bb, ss, hh, ww, nc = pred.shape
+    if nc != 3 or gt.shape[-1] != 3:
+        raise ValueError(
+            f"Normal regression expects 3 channels, got pred={tuple(pred.shape)} gt={tuple(gt.shape)}"
+        )
+    if conf is None:
+        raise ValueError("Explicit normal prediction requires predictions['normal_conf'].")
+
+    pred = F.normalize(pred, p=2, dim=-1, eps=1e-6)
+    gt = F.normalize(gt, p=2, dim=-1, eps=1e-6)
+    conf = check_and_fix_inf_nan(conf, "pred_normal_conf").clamp_min(1e-8)
+
+    reg_map = 1.0 - torch.sum(pred * gt, dim=-1).clamp(min=-1.0 + 1e-6, max=1.0 - 1e-6)
+    reg_map = check_and_fix_inf_nan(reg_map, "loss_reg_normal_map")
+    loss_reg = reg_map[mask]
+
+    if conf_loss_aggregation == "pixel_mean":
+        conf_reg = reg_map[mask]
+        conf_reg = check_and_fix_inf_nan(conf_reg, "conf_reg_normal")
+        loss_conf_values = gamma * conf_reg * conf[mask] - alpha * torch.log(conf[mask])
+        loss_conf_values = check_and_fix_inf_nan(loss_conf_values, "loss_conf_normal")
+        loss_conf = None
+    elif conf_loss_aggregation == "active_view_mean":
+        per_view_conf_losses = []
+        for batch_idx in range(bb):
+            for view_idx in range(ss):
+                view_mask = mask[batch_idx, view_idx]
+                if int(view_mask.sum().item()) <= 0:
+                    continue
+                view_reg = reg_map[batch_idx, view_idx][view_mask]
+                view_reg = check_and_fix_inf_nan(view_reg, "conf_reg_normal_view")
+                view_conf = conf[batch_idx, view_idx][view_mask]
+                view_loss = gamma * view_reg * view_conf - alpha * torch.log(view_conf)
+                view_loss = check_and_fix_inf_nan(view_loss, "loss_conf_normal_view")
+                if valid_range > 0:
+                    view_loss = filter_by_quantile(view_loss, valid_range)
+                per_view_conf_losses.append(view_loss.mean())
+        loss_conf_values = None
+        loss_conf = torch.stack(per_view_conf_losses).mean() if per_view_conf_losses else (0.0 * pred).mean()
+    else:
+        raise ValueError("conf_loss_aggregation must be one of 'pixel_mean' or 'active_view_mean'.")
+
+    loss_grad = 0
+    if gradient_loss_fn is not None:
+        gradient_loss_fn = str(gradient_loss_fn).lower()
+        if "normal" in gradient_loss_fn:
+            raise ValueError("Normal-map supervision does not support gradient_loss_fn containing 'normal'. Use 'grad' or None.")
+        if "grad" in gradient_loss_fn:
+            to_feed_conf = conf.reshape(bb * ss, hh, ww)
+            loss_grad = gradient_loss_multi_scale_wrapper(
+                pred.reshape(bb * ss, hh, ww, nc),
+                gt.reshape(bb * ss, hh, ww, nc),
+                mask.reshape(bb * ss, hh, ww),
+                gradient_loss_fn=gradient_loss,
+                scales=3,
+                conf=to_feed_conf,
+            )
+
+    if loss_conf_values is not None:
+        if loss_conf_values.numel() > 0:
+            if valid_range > 0:
+                loss_conf_values = filter_by_quantile(loss_conf_values, valid_range)
+            loss_conf_values = check_and_fix_inf_nan(loss_conf_values, "loss_conf_normal_values")
+            loss_conf = loss_conf_values.mean()
+        else:
+            loss_conf = (0.0 * pred).mean()
+
+    if loss_reg.numel() > 0:
+        if valid_range > 0:
+            loss_reg = filter_by_quantile(loss_reg, valid_range)
+        loss_reg = check_and_fix_inf_nan(loss_reg, "loss_reg_normal")
+        loss_reg = loss_reg.mean()
+    else:
+        loss_reg = (0.0 * pred).mean()
+
+    if not torch.is_tensor(loss_grad):
+        loss_grad = (0.0 * pred).mean()
+
+    return loss_conf, loss_grad, loss_reg
+
+
+def regression_loss(
+    pred, 
+    gt, 
+    mask, 
     conf=None,
     conf_mask=None,
     gradient_loss_fn=None,
@@ -1716,6 +3075,13 @@ def regression_loss(
     anchor_conditioned_unproject_consistency_pred_pose_enc=None,
     anchor_conditioned_unproject_consistency_image_size_hw=None,
     anchor_conditioned_unproject_consistency_pose_encoding_type="absT_quaR_FoV",
+    human_prior_mask_key=None,
+    human_prior_feature_map_key=None,
+    human_prior_mask_floor=0.35,
+    human_prior_reg_scale=1.0,
+    human_prior_conf_scale=1.0,
+    human_prior_train_only=True,
+    human_prior_anchor_view_only=False,
 ):
     """
     Core regression loss function with confidence weighting and optional gradient loss.
@@ -1829,6 +3195,31 @@ def regression_loss(
     if unproject_consistency_conf_scale_map is not None:
         conf_reg_map = conf_reg_map * unproject_consistency_conf_scale_map
 
+    human_prior_reg_scale_map = _build_human_prior_scale_map(
+        batch,
+        reg_target_map,
+        human_prior_mask_key=human_prior_mask_key,
+        human_prior_feature_map_key=human_prior_feature_map_key,
+        human_prior_mask_floor=human_prior_mask_floor,
+        human_prior_scale=human_prior_reg_scale,
+        human_prior_train_only=human_prior_train_only,
+        human_prior_anchor_view_only=human_prior_anchor_view_only,
+    )
+    human_prior_conf_scale_map = _build_human_prior_scale_map(
+        batch,
+        conf_reg_map,
+        human_prior_mask_key=human_prior_mask_key,
+        human_prior_feature_map_key=human_prior_feature_map_key,
+        human_prior_mask_floor=human_prior_mask_floor,
+        human_prior_scale=human_prior_conf_scale,
+        human_prior_train_only=human_prior_train_only,
+        human_prior_anchor_view_only=human_prior_anchor_view_only,
+    )
+    if human_prior_reg_scale_map is not None:
+        reg_target_map = reg_target_map * human_prior_reg_scale_map
+    if human_prior_conf_scale_map is not None:
+        conf_reg_map = conf_reg_map * human_prior_conf_scale_map
+
     # Compute L2 distance between predicted and ground truth points
     loss_reg = reg_target_map[mask]
     loss_reg = check_and_fix_inf_nan(loss_reg, "loss_reg")
@@ -1887,7 +3278,7 @@ def regression_loss(
         to_feed_conf = None
 
     # Compute gradient loss if specified for spatial smoothness
-    if "normal" in gradient_loss_fn:
+    if gradient_loss_fn is not None and "normal" in gradient_loss_fn:
         # Surface normal-based gradient loss
         loss_grad = gradient_loss_multi_scale_wrapper(
             pred.reshape(bb*ss, hh, ww, nc),
@@ -1897,7 +3288,7 @@ def regression_loss(
             scales=3,
             conf=to_feed_conf,
         )
-    elif "grad" in gradient_loss_fn:
+    elif gradient_loss_fn is not None and "grad" in gradient_loss_fn:
         # Standard gradient-based loss
         loss_grad = gradient_loss_multi_scale_wrapper(
             pred.reshape(bb*ss, hh, ww, nc),
@@ -2019,6 +3410,25 @@ def normal_loss(prediction, target, mask, cos_eps=1e-8, conf=None, gamma=1.0, al
             return loss.mean()
 
 
+def cosine_normal_loss(prediction, target, mask, conf=None, gamma=1.0, alpha=0.2, valid_range=-1):
+    """
+    Direct cosine loss between two normal maps of shape (B, S, H, W, 3).
+    """
+    prediction = F.normalize(prediction, p=2, dim=-1, eps=1e-6)
+    target = F.normalize(target, p=2, dim=-1, eps=1e-6)
+    dot = torch.sum(prediction * target, dim=-1).clamp(min=-1.0 + 1e-6, max=1.0 - 1e-6)
+    values = (1.0 - dot)[mask]
+    if values.numel() <= 0:
+        return (0.0 * prediction).mean()
+    if conf is not None:
+        conf_values = check_and_fix_inf_nan(conf, "cosine_normal_loss_conf").clamp_min(1e-8)[mask]
+        values = gamma * values * conf_values - alpha * torch.log(conf_values)
+    if valid_range > 0:
+        values = filter_by_quantile(values, valid_range)
+    values = check_and_fix_inf_nan(values, "cosine_normal_loss")
+    return values.mean()
+
+
 def gradient_loss(prediction, target, mask, conf=None, gamma=1.0, alpha=0.2):
     """
     Gradient-based loss. Computes the L1 difference between adjacent pixels in x and y directions.
@@ -2131,6 +3541,36 @@ def point_map_to_normal(point_map, mask, eps=1e-6):
         normals = F.normalize(normals, p=2, dim=-1, eps=eps)
 
     return normals, valids
+
+
+def point_map_to_normal_map(point_map, mask, eps=1e-6):
+    """
+    Aggregate the directional normals from point_map_to_normal into a single
+    normalized normal map and a per-pixel valid mask.
+    """
+    original_shape = point_map.shape
+    if point_map.ndim == 5:
+        bb, ss, hh, ww, cc = point_map.shape
+        if cc != 3:
+            raise ValueError(f"Expected point_map last dim to be 3, got {original_shape}")
+        point_map = point_map.reshape(bb * ss, hh, ww, cc)
+        mask = mask.reshape(bb * ss, hh, ww)
+    elif point_map.ndim != 4:
+        raise ValueError(f"Expected point_map to have 4 or 5 dims, got {original_shape}")
+
+    normals, valids = point_map_to_normal(point_map, mask, eps=eps)
+    weights = valids.to(dtype=normals.dtype)[..., None]
+    summed = (normals * weights).sum(dim=0)
+    count = weights.sum(dim=0)
+    valid = count[..., 0] > 0
+    safe_count = count.clamp_min(1.0)
+    averaged = summed / safe_count
+    averaged = F.normalize(averaged, p=2, dim=-1, eps=eps)
+    averaged = torch.where(valid.unsqueeze(-1), averaged, torch.zeros_like(averaged))
+    if len(original_shape) == 5:
+        averaged = averaged.reshape(bb, ss, hh, ww, 3)
+        valid = valid.reshape(bb, ss, hh, ww)
+    return averaged, valid
 
 
 def build_quantile_mask(loss_tensor, valid_range, min_elements=1000, hard_max=100):

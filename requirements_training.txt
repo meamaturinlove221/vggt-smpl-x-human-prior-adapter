@@ -7,3 +7,5 @@ wcmatch
 tensorboard
 tqdm
 opencv-python
+h5py
+matplotlib

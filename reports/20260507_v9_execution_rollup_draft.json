@@ -1,0 +1,301 @@
+{
+  "task": "v9_execution_rollup_draft",
+  "created_local": "2026-05-07T23:45:15+08:00",
+  "created_utc": "2026-05-07T15:45:15Z",
+  "repo": "D:\\vggt\\vggt-main",
+  "status": "draft_fact_index_research_only",
+  "scope": {
+    "role": "V9 execution rollup worker",
+    "write_scope": [
+      "D:\\vggt\\vggt-main\\reports\\20260507_v9_execution_rollup_draft.md",
+      "D:\\vggt\\vggt-main\\reports\\20260507_v9_execution_rollup_draft.json",
+      "D:\\vggt\\vggt-main\\output\\surface_research_cloud_preflight\\V9_execution_rollup_draft\\summary.json",
+      "D:\\vggt\\vggt-main\\output\\surface_research_cloud_preflight\\V9_execution_rollup_draft\\report.md"
+    ],
+    "no_parallel_script_edits": true,
+    "draft_for_main_thread_integration": true
+  },
+  "contract": {
+    "formal_cloud_unblocked": false,
+    "research_only": true,
+    "no_strict_pass_write": true,
+    "no_teacher_export": true,
+    "no_candidate_export": true,
+    "no_export": true,
+    "no_predictions_write": true,
+    "no_registry_write": true
+  },
+  "inputs_read": {
+    "v9_cloud_asset_staging_status": "D:\\vggt\\vggt-main\\reports\\20260507_v9_cloud_asset_staging_status.json",
+    "v9_cloud_asset_verification_status": "D:\\vggt\\vggt-main\\reports\\20260507_v9_cloud_asset_verification_status.json",
+    "v9_a5x2_true_backend_status": "D:\\vggt\\vggt-main\\reports\\20260507_v9_a5x2_true_backend_status.json",
+    "v9_a5x2_must3r_artifact_audit": "D:\\vggt\\vggt-main\\reports\\20260507_v9_a5x2_must3r_artifact_audit.json",
+    "cloud_b_v9_must3r_audit_summary": "D:\\vggt\\vggt-main\\output\\surface_research_cloud_preflight\\Cloud_B_V9\\a5x2_must3r_true_backend_audit\\summary.json",
+    "cloud_a_v9_real_asset_wrapper_summary": "D:\\vggt\\vggt-main\\output\\surface_research_cloud_preflight\\Cloud_A_V9\\b_fus3d3_real_asset_train_preflight\\v9_cloud_a_real_asset_wrapper_summary.json",
+    "cloud_a_v9_real_asset_train_summary": "D:\\vggt\\vggt-main\\output\\surface_research_cloud_preflight\\Cloud_A_V9\\b_fus3d3_real_asset_train_preflight\\summary.json",
+    "v9_backend_dependency_smoke_status": "D:\\vggt\\vggt-main\\reports\\20260507_v9_backend_dependency_smoke_status.json",
+    "v9_hand_hair_real_module_status": "D:\\vggt\\vggt-main\\reports\\20260507_v9_hand_hair_real_module_status.json",
+    "v9_unified_surface_precheck_status": "D:\\vggt\\vggt-main\\reports\\20260507_v9_unified_surface_precheck_status.json",
+    "v9_dline_final_guard_refresh": "D:\\vggt\\vggt-main\\reports\\20260507_v9_dline_final_guard_refresh.json",
+    "v9_2dgs_colmap_scene_report": "D:\\vggt\\vggt-main\\output\\surface_research_cloud_preflight\\Cloud_B_V9\\a5x2_2dgs_colmap_scene_smoke\\report.md"
+  },
+  "completed_real_tasks": [
+    {
+      "id": "v9_asset_staging_and_verification",
+      "status": "completed",
+      "kind": "local_and_remote_asset_verification",
+      "facts": {
+        "asset_status": "v9_cloud_assets_verified",
+        "local_complete": true,
+        "remote_complete": true,
+        "image_count": 60,
+        "mask_count": 60,
+        "camera_count": 60,
+        "query_count": 576,
+        "query_feature_dim": 2048,
+        "token_cache_npz_count": 1,
+        "token_shape": [
+          1,
+          6,
+          1374,
+          2048
+        ],
+        "template_hybrid_vertices": 39962,
+        "missing_assets": []
+      },
+      "evidence": [
+        "D:\\vggt\\vggt-main\\reports\\20260507_v9_cloud_asset_staging_status.json",
+        "D:\\vggt\\vggt-main\\reports\\20260507_v9_cloud_asset_verification_status.json"
+      ]
+    },
+    {
+      "id": "a5x2_must3r_true_backend_audit",
+      "status": "completed_weak_pool_only",
+      "kind": "real_backend_artifact_audit",
+      "facts": {
+        "backend": "MUSt3R",
+        "checkpoint_name": "MUSt3R_224_cvpr.pth",
+        "input_image_count": 6,
+        "best_vertex_count": 301056,
+        "finite_ratio": 1.0,
+        "ready_for_weak_teacher_pool": true,
+        "strict_teacher_ready": false
+      },
+      "evidence": [
+        "D:\\vggt\\vggt-main\\reports\\20260507_v9_a5x2_must3r_artifact_audit.json",
+        "D:\\vggt\\vggt-main\\output\\surface_research_cloud_preflight\\Cloud_B_V9\\a5x2_must3r_true_backend_audit\\summary.json"
+      ]
+    },
+    {
+      "id": "cloud_a_v9_b_fus3d3_real_asset_preflight",
+      "status": "completed_research_only_not_candidate",
+      "kind": "bounded_cloud_preflight",
+      "facts": {
+        "returncode": 0,
+        "train_success": true,
+        "train_summary_present": true,
+        "query_cache_exists": true,
+        "template_payload_exists": true,
+        "allow_procedural_fallback": false,
+        "procedural_fallback_used": false,
+        "max_steps": 5000,
+        "max_cases": 8,
+        "real_eval_iou": 0.9824561403508771,
+        "real_minus_shuffle_eval_iou": 0.34983014565591697,
+        "real_minus_random_eval_iou": 0.4178963209377846,
+        "real_minus_zero_eval_iou": 0.3278076142737796,
+        "research_progress": true
+      },
+      "evidence": [
+        "D:\\vggt\\vggt-main\\output\\surface_research_cloud_preflight\\Cloud_A_V9\\b_fus3d3_real_asset_train_preflight\\v9_cloud_a_real_asset_wrapper_summary.json",
+        "D:\\vggt\\vggt-main\\output\\surface_research_cloud_preflight\\Cloud_A_V9\\b_fus3d3_real_asset_train_preflight\\summary.json"
+      ]
+    },
+    {
+      "id": "v9_backend_dependency_smokes",
+      "status": "completed_with_mixed_results",
+      "kind": "dependency_preflight",
+      "facts": {
+        "d_root_repos_confirmed": [
+          "D:\\2d-gaussian-splatting-main",
+          "D:\\MASt3R-SLAM-main",
+          "D:\\must3r-main"
+        ],
+        "live_modal_tasks_after_cleanup": 0,
+        "formal_cloud_unblocked": false
+      },
+      "evidence": [
+        "D:\\vggt\\vggt-main\\reports\\20260507_v9_backend_dependency_smoke_status.json"
+      ]
+    },
+    {
+      "id": "dline_final_guard_refresh",
+      "status": "completed_red",
+      "kind": "guard_refresh",
+      "facts": {
+        "candidate_cloud_allowed": false,
+        "teacher_supervised_cloud_allowed": false,
+        "strict_candidate_passes": 0,
+        "strict_teacher_passes": 0,
+        "research_gate_status": "research_cloud_preflight_allowed",
+        "research_only_outputs_clean": true
+      },
+      "evidence": [
+        "D:\\vggt\\vggt-main\\reports\\20260507_v9_dline_final_guard_refresh.json"
+      ]
+    }
+  ],
+  "a5x2_must3r_weak_pool_conclusion": {
+    "status": "weak_pool_only",
+    "decision": "A5X2_MUST3R_WEAK_POOL_ONLY: real MUSt3R backend produced a non-empty pointcloud, but it is not a strict teacher.",
+    "observed_artifact": "D:\\vggt\\vggt-main\\output\\surface_research_cloud_preflight\\Cloud_B_V9\\a5x2_must3r_true_backend\\must3r_run\\scene_lowconf_0.0.ply",
+    "best_vertex_count": 301056,
+    "strict_teacher_ready": false,
+    "blockers": [
+      "MUSt3R export is not known-camera aligned to original 4K4D camera frame yet.",
+      "Default confidence thresholds exported zero vertices; usable output requires low confidence threshold.",
+      "No depth residual / original 6-view reprojection audit has passed.",
+      "No full/head/face/hairline/hands Open3D visual gate has passed."
+    ],
+    "allowed_use": "weak external teacher evidence only; no strict teacher, candidate, predictions, export, registry, or pass write"
+  },
+  "cloud_a_b_fus3d3_real_asset_preflight_conclusion": {
+    "status": "research_ready_not_candidate",
+    "decision": "CLOUD_A_REAL_ASSET_PREFLIGHT_COMPLETE_NO_FALLBACK: remote training consumed staged query/template assets and completed under bounds; still research-only.",
+    "query_cache_exists": true,
+    "template_payload_exists": true,
+    "allow_procedural_fallback": false,
+    "procedural_fallback_used": false,
+    "train_success": true,
+    "research_progress": true,
+    "real_eval_iou": 0.9824561403508771,
+    "controls": {
+      "real_beats_shuffle": true,
+      "real_beats_random": true,
+      "real_beats_zero": true,
+      "real_minus_shuffle_eval_iou": 0.34983014565591697,
+      "real_minus_random_eval_iou": 0.4178963209377846,
+      "real_minus_zero_eval_iou": 0.3278076142737796
+    },
+    "not_promotable_reason": "strict_candidate_passes and strict_teacher_passes remain 0; smoke writes diagnostics only and is not a teacher/candidate/predictions artifact"
+  },
+  "two_dgs_colmap_status": {
+    "dependency_status": "dependency_import_ready_needs_colmap_scene",
+    "dependency_decision": "2DGS cloud dependencies imported; next blocker is preparing a COLMAP-format 4K4D scene.",
+    "dependency_import_probe": {
+      "returncode": 0,
+      "stdout_tail": "2.0.0+cu118 11.8 True"
+    },
+    "dependency_evidence": "D:\\vggt\\vggt-main\\output\\surface_research_cloud_preflight\\V9_backend_dependency_smokes\\2dgs_fixed\\2dgs_summary.json",
+    "scene_smoke": {
+      "status": "pending_summary",
+      "summary_json_present": false,
+      "report_status": "loader_ready_train_smoke_blocked_or_skipped",
+      "report_path": "D:\\vggt\\vggt-main\\output\\surface_research_cloud_preflight\\Cloud_B_V9\\a5x2_2dgs_colmap_scene_smoke\\report.md",
+      "observed_files": [
+        {
+          "path": "D:\\vggt\\vggt-main\\output\\surface_research_cloud_preflight\\Cloud_B_V9\\a5x2_2dgs_colmap_scene_smoke\\model_smoke\\input.ply",
+          "bytes": 8128817
+        },
+        {
+          "path": "D:\\vggt\\vggt-main\\output\\surface_research_cloud_preflight\\Cloud_B_V9\\a5x2_2dgs_colmap_scene_smoke\\model_smoke\\cameras.json",
+          "bytes": 2434
+        },
+        {
+          "path": "D:\\vggt\\vggt-main\\output\\surface_research_cloud_preflight\\Cloud_B_V9\\a5x2_2dgs_colmap_scene_smoke\\model_smoke\\cfg_args",
+          "bytes": 272
+        }
+      ],
+      "conclusion": "Do not claim scene smoke success until a current summary.json or equivalent completed summary is present."
+    }
+  },
+  "current_blockers": [
+    {
+      "lane": "MASt3R-SLAM",
+      "status": "blocked_dependency_build_or_import_failed",
+      "blockers": [
+        "mast3r import missing",
+        "imgui build requires clang++",
+        "curope build missed torch during setup",
+        "lietorch build hit CUDA 11.8 vs PyTorch 12.4 mismatch"
+      ],
+      "evidence": "D:\\vggt\\vggt-main\\reports\\20260507_v9_backend_dependency_smoke_status.json"
+    },
+    {
+      "lane": "Hair-GS",
+      "status": "blocked_dependency_build_or_import_failed",
+      "blockers": [
+        "diff_gaussian_rasterization build failed",
+        "Hair-GS import missing pytorch3d",
+        "pip found no pytorch3d wheel"
+      ],
+      "evidence": "D:\\vggt\\vggt-main\\reports\\20260507_v9_backend_dependency_smoke_status.json"
+    },
+    {
+      "lane": "B-hand11",
+      "status": "blocked_missing_real_hand_token_decoder",
+      "blockers": [
+        "B-hand10 remains a synthetic/proxy HGGT-style smoke",
+        "No true B-hand11 VGGT-token/HGGT hand decoder asset was found",
+        "No hand-specific learned decoder checkpoint or MANO plus residual decoder asset was found"
+      ],
+      "evidence": "D:\\vggt\\vggt-main\\reports\\20260507_v9_hand_hair_real_module_status.json"
+    },
+    {
+      "lane": "B-hair4",
+      "status": "blocked_missing_real_hair_topology_module",
+      "blockers": [
+        "B-hair3 remains a synthetic/proxy HairGS-style topology smoke",
+        "No true B-hair4 HairGS/topology module asset was found",
+        "Missing learned root/strand topology network, checkpoint, differentiable multiview projection loss, and real hair/head segmentation merging"
+      ],
+      "evidence": "D:\\vggt\\vggt-main\\reports\\20260507_v9_hand_hair_real_module_status.json"
+    }
+  ],
+  "dline_guard": {
+    "verdict": "FORMAL_CLOUD_STILL_BLOCKED_RESEARCH_ONLY_ALLOWED",
+    "formal_cloud_unblocked": false,
+    "research_cloud_preflight_allowed": true,
+    "strict_candidate_passes": 0,
+    "strict_teacher_passes": 0,
+    "forbidden_outputs": [
+      "predictions.npz",
+      "candidate package",
+      "teacher package",
+      "strict registry write",
+      "strict pass write"
+    ],
+    "guard_registry": "D:\\vggt\\vggt-main\\reports\\20260504_strict_gate_registry.json"
+  },
+  "pending_slots_for_main_thread": [
+    {
+      "slot": "2dgs_colmap_scene_smoke_summary",
+      "status": "pending",
+      "reason": "Only report.md and model_smoke files were observed; summary.json was not present at rollup time."
+    },
+    {
+      "slot": "strict_teacher_or_candidate_gate",
+      "status": "blocked",
+      "reason": "strict_candidate_passes=0 and strict_teacher_passes=0."
+    },
+    {
+      "slot": "unified_surface_candidate_precheck",
+      "status": "blocked",
+      "reason": "A5-X2 strict teacher intake, B-hand11, and B-hair4 are not ready."
+    }
+  ],
+  "non_claims": [
+    "No strict pass was written.",
+    "No teacher package/export was written.",
+    "No candidate package/export was written.",
+    "No predictions.npz was written.",
+    "No registry write was performed.",
+    "This draft does not claim full V9 breakthrough or formal cloud unblock."
+  ],
+  "outputs": {
+    "report_md": "D:\\vggt\\vggt-main\\reports\\20260507_v9_execution_rollup_draft.md",
+    "report_json": "D:\\vggt\\vggt-main\\reports\\20260507_v9_execution_rollup_draft.json",
+    "summary_json": "D:\\vggt\\vggt-main\\output\\surface_research_cloud_preflight\\V9_execution_rollup_draft\\summary.json",
+    "output_report_md": "D:\\vggt\\vggt-main\\output\\surface_research_cloud_preflight\\V9_execution_rollup_draft\\report.md"
+  }
+}

@@ -4,9 +4,13 @@ import random
 import sys
 from pathlib import Path
 
+import matplotlib
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
 import numpy as np
 from omegaconf import OmegaConf
 from PIL import Image
+import torch
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -17,6 +21,10 @@ for root in (str(REPO_ROOT), str(TRAINING_ROOT)):
         sys.path.insert(0, root)
 
 from training.data.datasets.zju_vggt_geom import ZjuVggtGeomDataset
+from training.loss import (
+    _build_human_prior_region_components,
+    _build_human_prior_target_mask,
+)
 
 
 def parse_args():
@@ -78,6 +86,10 @@ def parse_args():
     parser.add_argument("--allow_duplicate_img", action="store_true", help="Allow duplicate view sampling in the probe.")
     parser.add_argument("--min_depth_conf", type=float, default=0.0)
     parser.add_argument("--holdout_stride", type=int, default=10)
+    parser.add_argument("--smpl_prior_pose_noise_prob", type=float, default=0.0)
+    parser.add_argument("--smpl_prior_pose_noise_rot_deg", type=float, default=0.0)
+    parser.add_argument("--smpl_prior_pose_noise_trans_scale", type=float, default=0.0)
+    parser.add_argument("--smpl_prior_pose_noise_scale_std", type=float, default=0.0)
     parser.add_argument("--output_dir", type=str, default="output/zju_vggt_geom_probe")
     return parser.parse_args()
 
@@ -158,7 +170,7 @@ def load_config_with_defaults(config_ref: str):
 def apply_config_defaults(args):
     config_ref = str(getattr(args, "config", "") or "").strip()
     if not config_ref:
-        return None
+        return None, None
 
     config_path, cfg = load_config_with_defaults(config_ref)
 
@@ -180,6 +192,10 @@ def apply_config_defaults(args):
         "zju_conf_depth_view_quality_filter": "conf_depth_view_quality_filter",
         "zju_min_depth_conf": "min_depth_conf",
         "zju_holdout_stride": "holdout_stride",
+        "zju_smpl_prior_pose_noise_prob": "smpl_prior_pose_noise_prob",
+        "zju_smpl_prior_pose_noise_rot_deg": "smpl_prior_pose_noise_rot_deg",
+        "zju_smpl_prior_pose_noise_trans_scale": "smpl_prior_pose_noise_trans_scale",
+        "zju_smpl_prior_pose_noise_scale_std": "smpl_prior_pose_noise_scale_std",
         "zju_geom_subdir": "geom_subdir",
         "zju_camera_source": "camera_source",
         "zju_mask_source": "mask_source",
@@ -197,40 +213,22 @@ def apply_config_defaults(args):
             args.seq_names = [str(item) for item in seq_names]
 
     zju_dir = _resolved("zju_dir", None)
-    if zju_dir not in (None, "", "/YOUR/PATH/TO/ZJU"):
+    if zju_dir not in (None, "", "/YOUR/PATH/TO/ZJU") and not str(getattr(args, "zju_dir", "") or "").strip():
         args.zju_dir = str(zju_dir)
 
-    return config_path
+    return config_path, cfg
 
 
 def resolve_zju_dir(requested, seq_names, geom_subdir):
-    candidates = []
-    requested = str(requested).strip()
-    if requested:
-        candidates.append(Path(requested))
-    g_datasets = "G:\\" + chr(0x6570) + chr(0x636E) + chr(0x96C6)
-    candidates.extend(
-        [
-            Path(r"F:\datasets\ZJU_MoCap\data\zju_mocap"),
-            Path(g_datasets) / "datasets" / "ZJU_MoCap" / "data" / "zju_mocap",
-        ]
-    )
-
-    geom_subdirs = [item.strip() for item in str(geom_subdir).split(",") if item.strip()]
-    seen = set()
-    best_candidate = None
-    best_score = None
-    for candidate in candidates:
+    def _normalize_candidate(candidate):
         try:
-            candidate = candidate.resolve()
+            return candidate.resolve()
         except OSError:
-            candidate = candidate.absolute()
-        candidate_key = str(candidate).lower()
-        if candidate_key in seen:
-            continue
-        seen.add(candidate_key)
+            return candidate.absolute()
+
+    def _score_candidate(candidate):
         if not candidate.is_dir():
-            continue
+            return None
         valid_subdir_count = 0
         total_frame_count = 0
         for seq_name in seq_names:
@@ -243,8 +241,38 @@ def resolve_zju_dir(requested, seq_names, geom_subdir):
                     valid_subdir_count += 1
                     total_frame_count += frame_count
         if valid_subdir_count <= 0:
+            return None
+        return int(valid_subdir_count), int(total_frame_count)
+
+    candidates = []
+    requested = str(requested).strip()
+    geom_subdirs = [item.strip() for item in str(geom_subdir).split(",") if item.strip()]
+    if requested:
+        explicit_candidate = Path(requested).absolute()
+        explicit_score = _score_candidate(explicit_candidate)
+        if explicit_score is not None:
+            return explicit_candidate
+        candidates.append(explicit_candidate)
+    g_datasets = "G:\\" + chr(0x6570) + chr(0x636E) + chr(0x96C6)
+    candidates.extend(
+        [
+            Path(r"F:\datasets\ZJU_MoCap\data\zju_mocap"),
+            Path(g_datasets) / "datasets" / "ZJU_MoCap" / "data" / "zju_mocap",
+        ]
+    )
+
+    seen = set()
+    best_candidate = None
+    best_score = None
+    for candidate in candidates:
+        candidate = _normalize_candidate(candidate)
+        candidate_key = str(candidate).lower()
+        if candidate_key in seen:
             continue
-        score = (int(valid_subdir_count), int(total_frame_count))
+        seen.add(candidate_key)
+        score = _score_candidate(candidate)
+        if score is None:
+            continue
         if best_candidate is None or score > best_score:
             best_candidate = candidate
             best_score = score
@@ -292,6 +320,139 @@ def write_binary_ply(path, points, colors):
         vertex_data.tofile(handle)
 
 
+def normalize_extrinsics_matrices(extrinsics):
+    extrinsics = np.asarray(extrinsics, dtype=np.float32)
+    if extrinsics.ndim != 3:
+        raise ValueError(f"Expected extrinsics with shape [N,3,4] or [N,4,4], got {extrinsics.shape}")
+    if extrinsics.shape[1:] == (4, 4):
+        return extrinsics
+    if extrinsics.shape[1:] == (3, 4):
+        padded = np.tile(np.eye(4, dtype=np.float32), (extrinsics.shape[0], 1, 1))
+        padded[:, :3, :4] = extrinsics
+        return padded
+    raise ValueError(f"Unsupported extrinsics shape: {extrinsics.shape}")
+
+
+def closed_form_inverse_se3_numpy(se3):
+    se3 = normalize_extrinsics_matrices(se3)
+    rotation = se3[:, :3, :3]
+    translation = se3[:, :3, 3:]
+    rotation_t = np.transpose(rotation, (0, 2, 1))
+    top_right = -np.matmul(rotation_t, translation)
+    inverted = np.tile(np.eye(4, dtype=se3.dtype), (len(rotation), 1, 1))
+    inverted[:, :3, :3] = rotation_t
+    inverted[:, :3, 3:] = top_right
+    return inverted
+
+
+def camera_centers_from_extrinsics(extrinsics):
+    extrinsics = normalize_extrinsics_matrices(extrinsics)
+    rotation = extrinsics[:, :3, :3]
+    translation = extrinsics[:, :3, 3]
+    return (-(np.transpose(rotation, (0, 2, 1)) @ translation[..., None])).squeeze(-1).astype(np.float32)
+
+
+def unproject_depth_map_to_world_points(depth_map, extrinsics_cam, intrinsics_cam):
+    depth_map = np.asarray(depth_map, dtype=np.float32)
+    extrinsics_cam = normalize_extrinsics_matrices(extrinsics_cam)
+    intrinsics_cam = np.asarray(intrinsics_cam, dtype=np.float32)
+    cam_to_world = closed_form_inverse_se3_numpy(extrinsics_cam)
+    world_points = []
+    for frame_idx in range(depth_map.shape[0]):
+        depth = depth_map[frame_idx]
+        if depth.ndim == 3:
+            depth = depth[..., 0]
+        intrinsic = intrinsics_cam[frame_idx]
+
+        height, width = depth.shape
+        u, v = np.meshgrid(np.arange(width, dtype=np.float32), np.arange(height, dtype=np.float32))
+
+        fu, fv = intrinsic[0, 0], intrinsic[1, 1]
+        cu, cv = intrinsic[0, 2], intrinsic[1, 2]
+
+        x_cam = (u - cu) * depth / max(float(fu), 1e-6)
+        y_cam = (v - cv) * depth / max(float(fv), 1e-6)
+        z_cam = depth
+        cam_coords = np.stack((x_cam, y_cam, z_cam), axis=-1)
+
+        rotation = cam_to_world[frame_idx, :3, :3]
+        translation = cam_to_world[frame_idx, :3, 3]
+        world = np.dot(cam_coords, rotation.T) + translation
+        world_points.append(world.astype(np.float32))
+
+    return np.stack(world_points, axis=0)
+
+
+def render_point_cloud_views(output_path, points, colors, title, camera_xyz=None, max_points=180000):
+    points = np.asarray(points, dtype=np.float32)
+    colors = np.asarray(colors, dtype=np.uint8)
+    if points.shape[0] == 0:
+        fig, ax = plt.subplots(figsize=(8, 8), dpi=220, facecolor="black")
+        ax.set_facecolor("black")
+        ax.text(0.5, 0.5, "No points", color="white", ha="center", va="center", fontsize=20)
+        ax.set_axis_off()
+        fig.suptitle(title, color="white", fontsize=14)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        fig.savefig(output_path, bbox_inches="tight", pad_inches=0.05, facecolor=fig.get_facecolor())
+        plt.close(fig)
+        return
+
+    points, colors = downsample_point_cloud(points, colors, max_points=max_points)
+    camera_xyz = None if camera_xyz is None else np.asarray(camera_xyz, dtype=np.float32)
+    norm_colors = np.clip(colors.astype(np.float32) / 255.0, 0.0, 1.0)
+    point_size = float(np.clip(30000.0 / max(points.shape[0], 1), 0.06, 0.45))
+
+    def _project(cloud, mode):
+        if mode == "front":
+            return cloud[:, 0], cloud[:, 1]
+        if mode == "side":
+            return cloud[:, 2], cloud[:, 1]
+        if mode == "top":
+            return cloud[:, 0], cloud[:, 2]
+        if mode == "oblique":
+            return cloud[:, 0] + 0.45 * cloud[:, 2], cloud[:, 1] - 0.18 * cloud[:, 2]
+        raise ValueError(f"Unsupported render mode: {mode}")
+
+    def _set_limits(ax, x, y):
+        if x.size <= 1 or y.size <= 1:
+            return
+        x_lo, x_hi = np.percentile(x, [1.0, 99.0])
+        y_lo, y_hi = np.percentile(y, [1.0, 99.0])
+        span = max(float(x_hi - x_lo), float(y_hi - y_lo), 1e-3)
+        pad = span * 0.08
+        x_center = float((x_lo + x_hi) * 0.5)
+        y_center = float((y_lo + y_hi) * 0.5)
+        ax.set_xlim(x_center - span * 0.5 - pad, x_center + span * 0.5 + pad)
+        ax.set_ylim(y_center - span * 0.5 - pad, y_center + span * 0.5 + pad)
+
+    view_specs = (
+        ("Front (X/Y)", "front"),
+        ("Side (Z/Y)", "side"),
+        ("Top (X/Z)", "top"),
+        ("Oblique", "oblique"),
+    )
+    fig, axes = plt.subplots(2, 2, figsize=(16, 16), dpi=220, facecolor="black")
+    for ax, (label, mode) in zip(axes.flatten(), view_specs):
+        ax.set_facecolor("black")
+        x_vals, y_vals = _project(points, mode)
+        ax.scatter(x_vals, y_vals, s=point_size, c=norm_colors, linewidths=0, alpha=0.82)
+        if camera_xyz is not None and camera_xyz.size > 0:
+            cam_x, cam_y = _project(camera_xyz, mode)
+            ax.scatter(cam_x, cam_y, s=28, c="#ff5a36", marker="^", linewidths=0, alpha=0.95)
+        _set_limits(ax, x_vals, y_vals)
+        ax.set_aspect("equal", adjustable="box")
+        ax.set_xticks([])
+        ax.set_yticks([])
+        for spine in ax.spines.values():
+            spine.set_visible(False)
+        ax.set_title(label, color="white", fontsize=12)
+    fig.suptitle(title, color="white", fontsize=18)
+    fig.tight_layout(rect=(0, 0, 1, 0.97))
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    fig.savefig(output_path, bbox_inches="tight", pad_inches=0.06, facecolor=fig.get_facecolor())
+    plt.close(fig)
+
+
 def save_mosaic(path, images_hwc):
     labeled = [Image.fromarray(np.asarray(img, dtype=np.uint8)) for img in images_hwc]
     width = max(im.width for im in labeled)
@@ -304,6 +465,350 @@ def save_mosaic(path, images_hwc):
         col = idx % cols
         canvas.paste(image, (col * width, row * height))
     canvas.save(path)
+
+
+def save_scalar_mosaic(path, arrays, normalize_mode="binary"):
+    arrays = [np.asarray(arr) for arr in arrays]
+    vis_images = []
+    for arr in arrays:
+        if normalize_mode == "binary":
+            gray = (arr > 0).astype(np.uint8) * 255
+        else:
+            arr = np.asarray(arr, dtype=np.float32)
+            finite = np.isfinite(arr)
+            if finite.any():
+                active = arr[finite]
+                lo = float(active.min())
+                hi = float(np.percentile(active, 99.0))
+                if hi <= lo:
+                    hi = lo + 1e-6
+                scaled = np.clip((arr - lo) / (hi - lo), 0.0, 1.0)
+            else:
+                scaled = np.zeros_like(arr, dtype=np.float32)
+            gray = (scaled * 255.0).astype(np.uint8)
+        vis_images.append(np.stack([gray, gray, gray], axis=-1))
+    save_mosaic(path, vis_images)
+
+
+def stack_optional(sample, key, dtype=None):
+    if key not in sample or sample[key] is None:
+        return None
+    array = np.stack(sample[key])
+    if dtype is not None:
+        array = array.astype(dtype)
+    return array
+
+
+def summarize_optional_mask(mask_array):
+    if mask_array is None:
+        return {"present": False}
+    mask_array = np.asarray(mask_array, dtype=bool)
+    per_view_coverage = mask_array.reshape(mask_array.shape[0], -1).mean(axis=1)
+    return {
+        "present": True,
+        "any_nonzero": bool(mask_array.any()),
+        "nonzero_views": int(np.sum(per_view_coverage > 0.0)),
+        "pixel_count": int(mask_array.sum()),
+        "coverage_mean": float(per_view_coverage.mean()),
+        "coverage_max": float(per_view_coverage.max()),
+        "per_view_coverage": [float(x) for x in per_view_coverage.tolist()],
+    }
+
+
+def summarize_optional_feature_map(feature_array):
+    if feature_array is None:
+        return {"present": False}
+    feature_array = np.asarray(feature_array, dtype=np.float32)
+    flat = feature_array.reshape(feature_array.shape[0], -1)
+    per_view_nonzero = (flat > 0.0).mean(axis=1)
+    per_view_max = flat.max(axis=1)
+    return {
+        "present": True,
+        "any_nonzero": bool(np.any(flat > 0.0)),
+        "nonzero_views": int(np.sum(per_view_nonzero > 0.0)),
+        "value_mean": float(feature_array.mean()),
+        "value_max": float(feature_array.max()),
+        "nonzero_coverage_mean": float(per_view_nonzero.mean()),
+        "per_view_nonzero_coverage": [float(x) for x in per_view_nonzero.tolist()],
+        "per_view_max": [float(x) for x in per_view_max.tolist()],
+    }
+
+
+def summarize_optional_depth_map(depth_array):
+    if depth_array is None:
+        return {"present": False}
+    depth_array = np.asarray(depth_array, dtype=np.float32)
+    valid = np.isfinite(depth_array) & (depth_array > 0.0)
+    per_view_coverage = valid.reshape(valid.shape[0], -1).mean(axis=1)
+    if valid.any():
+        active = depth_array[valid]
+        p50, p95 = np.percentile(active, [50.0, 95.0])
+        value_mean = float(active.mean())
+        value_max = float(active.max())
+    else:
+        p50 = 0.0
+        p95 = 0.0
+        value_mean = 0.0
+        value_max = 0.0
+    return {
+        "present": True,
+        "any_nonzero": bool(valid.any()),
+        "nonzero_views": int(np.sum(per_view_coverage > 0.0)),
+        "pixel_count": int(valid.sum()),
+        "coverage_mean": float(per_view_coverage.mean()),
+        "coverage_max": float(per_view_coverage.max()),
+        "depth_mean": value_mean,
+        "depth_p50": float(p50),
+        "depth_p95": float(p95),
+        "depth_max": value_max,
+        "per_view_coverage": [float(x) for x in per_view_coverage.tolist()],
+    }
+
+
+def resolve_human_prior_target_spec(cfg):
+    fallback = {
+        "scope": "unproject_geometry",
+        "mask_key": "human_prior_completion_masks",
+        "feature_map_key": "smpl_prior_feature_maps",
+        "train_only": False,
+        "anchor_view_only": False,
+    }
+    if cfg is None:
+        return fallback
+    for scope in ("unproject_geometry", "depth"):
+        scope_cfg = OmegaConf.select(cfg, f"loss.{scope}")
+        if scope_cfg is None:
+            continue
+        mask_key = str(scope_cfg.get("human_prior_mask_key", "") or "").strip()
+        feature_map_key = str(scope_cfg.get("human_prior_feature_map_key", "") or "").strip()
+        if not mask_key and not feature_map_key:
+            continue
+        return {
+            "scope": scope,
+            "mask_key": mask_key,
+            "feature_map_key": feature_map_key,
+            "train_only": bool(scope_cfg.get("human_prior_train_only", True)),
+            "anchor_view_only": bool(scope_cfg.get("human_prior_anchor_view_only", False)),
+        }
+    return fallback
+
+
+def build_human_prior_target_mask(sample, split, prior_target_spec):
+    reference_mask = stack_optional(sample, "point_masks", dtype=bool)
+    if reference_mask is None:
+        return None
+
+    batch = {"_loss_phase": str(split).lower()}
+    mask_key = str(prior_target_spec.get("mask_key", "") or "").strip()
+    feature_map_key = str(prior_target_spec.get("feature_map_key", "") or "").strip()
+    if mask_key:
+        mask_array = stack_optional(sample, mask_key, dtype=bool)
+        if mask_array is not None:
+            batch[mask_key] = torch.from_numpy(mask_array[None].astype(bool))
+        else:
+            mask_key = ""
+    if feature_map_key:
+        feature_array = stack_optional(sample, feature_map_key, dtype=np.float32)
+        if feature_array is not None:
+            batch[feature_map_key] = torch.from_numpy(feature_array[None].astype(np.float32))
+        else:
+            feature_map_key = ""
+
+    prior_mask, prior_feature_map = _build_human_prior_region_components(
+        batch=batch,
+        reference_mask=torch.from_numpy(reference_mask[None].astype(bool)),
+        human_prior_mask_key=mask_key or None,
+        human_prior_feature_map_key=feature_map_key or None,
+        human_prior_train_only=bool(prior_target_spec.get("train_only", True)),
+        human_prior_anchor_view_only=bool(prior_target_spec.get("anchor_view_only", False)),
+    )
+    prior_target_mask = _build_human_prior_target_mask(prior_mask, prior_feature_map)
+    if prior_target_mask is None:
+        return None
+    return prior_target_mask.squeeze(0).cpu().numpy().astype(bool)
+
+
+def summarize_prior_support(sample, prior_target_mask=None):
+    return {
+        "smpl_prior_masks": summarize_optional_mask(stack_optional(sample, "smpl_prior_masks", dtype=bool)),
+        "smpl_prior_feature_maps": summarize_optional_feature_map(
+            stack_optional(sample, "smpl_prior_feature_maps", dtype=np.float32)
+        ),
+        "human_prior_completion_masks": summarize_optional_mask(
+            stack_optional(sample, "human_prior_completion_masks", dtype=bool)
+        ),
+        "human_prior_completion_point_masks": summarize_optional_mask(
+            stack_optional(sample, "human_prior_completion_point_masks", dtype=bool)
+        ),
+        "human_prior_completion_depths": summarize_optional_depth_map(
+            stack_optional(sample, "human_prior_completion_depths", dtype=np.float32)
+        ),
+        "human_prior_target_mask": summarize_optional_mask(
+            None if prior_target_mask is None else np.asarray(prior_target_mask, dtype=bool)
+        ),
+        "head_hair_region_masks": summarize_optional_mask(
+            stack_optional(sample, "head_hair_region_masks", dtype=bool)
+        ),
+        "head_hair_detail_masks": summarize_optional_mask(
+            stack_optional(sample, "head_hair_detail_masks", dtype=bool)
+        ),
+    }
+
+
+def flatten_masked_point_cloud(point_maps, point_masks, color_maps):
+    point_maps = np.asarray(point_maps, dtype=np.float32)
+    point_masks = np.asarray(point_masks, dtype=bool)
+    color_maps = np.asarray(color_maps, dtype=np.uint8)
+    flat_points = point_maps.reshape(-1, 3)[point_masks.reshape(-1)]
+    flat_colors = color_maps.reshape(-1, 3)[point_masks.reshape(-1)]
+    return flat_points.astype(np.float32), flat_colors.astype(np.uint8)
+
+
+def downsample_point_cloud(points, colors, max_points=250000):
+    points = np.asarray(points, dtype=np.float32)
+    colors = np.asarray(colors, dtype=np.uint8)
+    if points.shape[0] <= int(max_points):
+        return points, colors
+    keep = np.linspace(0, points.shape[0] - 1, int(max_points), dtype=np.int64)
+    return points[keep], colors[keep]
+
+
+def build_completion_artifacts(sample, images):
+    base_world_points = stack_optional(sample, "world_points", dtype=np.float32)
+    base_point_masks = stack_optional(sample, "point_masks", dtype=bool)
+    completion_world_points = stack_optional(sample, "human_prior_completion_world_points", dtype=np.float32)
+    completion_point_masks = stack_optional(sample, "human_prior_completion_point_masks", dtype=bool)
+
+    empty_points = np.zeros((0, 3), dtype=np.float32)
+    empty_colors = np.zeros((0, 3), dtype=np.uint8)
+    if (
+        base_world_points is None
+        or base_point_masks is None
+        or completion_world_points is None
+        or completion_point_masks is None
+    ):
+        return {
+            "completion_point_masks": None,
+            "completed_point_masks": None,
+            "completion_points": empty_points,
+            "completion_colors": empty_colors,
+            "completed_points": empty_points,
+            "completed_colors": empty_colors,
+            "base_point_count": int(base_point_masks.sum()) if base_point_masks is not None else 0,
+            "completion_point_count": 0,
+            "completed_point_count": int(base_point_masks.sum()) if base_point_masks is not None else 0,
+            "added_point_count": 0,
+            "overlap_point_count": 0,
+        }
+
+    completion_points, completion_colors = flatten_masked_point_cloud(
+        completion_world_points,
+        completion_point_masks,
+        images,
+    )
+    completed_point_masks = base_point_masks | completion_point_masks
+    completed_world_points = np.where(base_point_masks[..., None], base_world_points, completion_world_points)
+    completed_points, completed_colors = flatten_masked_point_cloud(
+        completed_world_points,
+        completed_point_masks,
+        images,
+    )
+    added_point_masks = completed_point_masks & (~base_point_masks)
+    return {
+        "completion_point_masks": completion_point_masks,
+        "completed_point_masks": completed_point_masks,
+        "completion_points": completion_points,
+        "completion_colors": completion_colors,
+        "completed_points": completed_points,
+        "completed_colors": completed_colors,
+        "base_point_count": int(base_point_masks.sum()),
+        "completion_point_count": int(completion_point_masks.sum()),
+        "completed_point_count": int(completed_point_masks.sum()),
+        "added_point_count": int(added_point_masks.sum()),
+        "overlap_point_count": int((base_point_masks & completion_point_masks).sum()),
+    }
+
+
+def export_prior_artifacts(output_dir, sample, images, prior_target_mask=None, completion_artifacts=None):
+    optional_specs = (
+        ("smpl_prior_masks", "sample_smpl_prior_masks.png", "binary", bool),
+        ("smpl_prior_feature_maps", "sample_smpl_prior_feature_maps.png", "continuous", np.float32),
+        ("human_prior_completion_masks", "sample_human_prior_completion_masks.png", "binary", bool),
+        ("human_prior_completion_point_masks", "sample_human_prior_completion_point_masks.png", "binary", bool),
+        ("human_prior_completion_depths", "sample_human_prior_completion_depths.png", "continuous", np.float32),
+        ("head_hair_region_masks", "sample_head_hair_region_masks.png", "binary", bool),
+        ("head_hair_detail_masks", "sample_head_hair_detail_masks.png", "binary", bool),
+    )
+    for key, file_name, normalize_mode, dtype in optional_specs:
+        array = stack_optional(sample, key, dtype=dtype)
+        if array is not None:
+            save_scalar_mosaic(output_dir / file_name, array, normalize_mode=normalize_mode)
+    if prior_target_mask is not None:
+        save_scalar_mosaic(
+            output_dir / "sample_human_prior_target_mask.png",
+            np.asarray(prior_target_mask, dtype=bool),
+            normalize_mode="binary",
+        )
+    completion_artifacts = completion_artifacts or build_completion_artifacts(sample, images)
+    completion_points, completion_colors = downsample_point_cloud(
+        completion_artifacts["completion_points"],
+        completion_artifacts["completion_colors"],
+    )
+    completed_points, completed_colors = downsample_point_cloud(
+        completion_artifacts["completed_points"],
+        completion_artifacts["completed_colors"],
+    )
+    write_binary_ply(output_dir / "sample_human_prior_completion_world_points.ply", completion_points, completion_colors)
+    write_binary_ply(output_dir / "sample_completed_world_points.ply", completed_points, completed_colors)
+    camera_xyz = camera_centers_from_extrinsics(np.stack(sample["extrinsics"]).astype(np.float32))
+    render_point_cloud_views(
+        output_dir / "sample_human_prior_completion_world_points_views.png",
+        completion_artifacts["completion_points"],
+        completion_artifacts["completion_colors"],
+        title="Human Prior Completion Point Cloud",
+        camera_xyz=camera_xyz,
+    )
+    render_point_cloud_views(
+        output_dir / "sample_completed_world_points_views.png",
+        completion_artifacts["completed_points"],
+        completion_artifacts["completed_colors"],
+        title="Completed Point Cloud",
+        camera_xyz=camera_xyz,
+    )
+
+
+def build_case_package(output_dir, sample, prior_target_mask=None):
+    payload = {
+        "seq_name": np.asarray(str(sample["seq_name"])),
+        "ids": np.asarray(sample["ids"]),
+        "camera_names": np.asarray(sample.get("camera_names", []), dtype=object),
+        "images": np.stack(sample["images"]).astype(np.uint8),
+        "depths": np.stack(sample["depths"]).astype(np.float32),
+        "world_points": np.stack(sample["world_points"]).astype(np.float32),
+        "point_masks": np.stack(sample["point_masks"]).astype(bool),
+        "extrinsics": np.stack(sample["extrinsics"]).astype(np.float32),
+        "intrinsics": np.stack(sample["intrinsics"]).astype(np.float32),
+    }
+    for key, dtype in (
+        ("foreground_masks", bool),
+        ("depth_conf_maps", np.float32),
+        ("smpl_prior_masks", bool),
+        ("smpl_prior_feature_maps", np.float32),
+        ("human_prior_completion_masks", bool),
+        ("human_prior_completion_depths", np.float32),
+        ("human_prior_completion_world_points", np.float32),
+        ("human_prior_completion_point_masks", bool),
+        ("head_hair_region_masks", bool),
+        ("head_hair_detail_masks", bool),
+    ):
+        array = stack_optional(sample, key, dtype=dtype)
+        if array is not None:
+            payload[key] = array
+    if prior_target_mask is not None:
+        payload["human_prior_target_mask"] = np.asarray(prior_target_mask, dtype=bool)
+    package_path = output_dir / "sample_prior_case_package.npz"
+    np.savez_compressed(package_path, **payload)
+    return package_path
 
 
 def summarize_point_cloud(points, written_vertex_count):
@@ -354,9 +859,36 @@ def summarize_point_cloud(points, written_vertex_count):
     }
 
 
-def export_sample_artifacts(output_dir, images, depths, flat_points, flat_colors):
+def export_sample_artifacts(output_dir, images, depths, world_points, world_colors, extrinsics, intrinsics):
+    flat_points, flat_colors = downsample_point_cloud(world_points, world_colors, max_points=250000)
     write_binary_ply(output_dir / "sample_world_points.ply", flat_points, flat_colors)
     save_mosaic(output_dir / "sample_images.png", images)
+    camera_xyz = camera_centers_from_extrinsics(extrinsics)
+    render_point_cloud_views(
+        output_dir / "sample_world_points_views.png",
+        world_points,
+        world_colors,
+        title="Dataset World Points",
+        camera_xyz=camera_xyz,
+    )
+
+    depth_world_points = unproject_depth_map_to_world_points(depths, extrinsics, intrinsics)
+    depth_maps = np.asarray(depths, dtype=np.float32)
+    if depth_maps.ndim == 4:
+        depth_valid = np.isfinite(depth_maps[..., 0]) & (depth_maps[..., 0] > 0.0)
+    else:
+        depth_valid = np.isfinite(depth_maps) & (depth_maps > 0.0)
+    depth_flat_points = depth_world_points.reshape(-1, 3)[depth_valid.reshape(-1)]
+    depth_flat_colors = images.reshape(-1, 3)[depth_valid.reshape(-1)]
+    depth_ply_points, depth_ply_colors = downsample_point_cloud(depth_flat_points, depth_flat_colors, max_points=250000)
+    write_binary_ply(output_dir / "sample_depth_unproject_world_points.ply", depth_ply_points, depth_ply_colors)
+    render_point_cloud_views(
+        output_dir / "sample_depth_unproject_world_points_views.png",
+        depth_flat_points,
+        depth_flat_colors,
+        title="Depth Unprojected Point Cloud",
+        camera_xyz=camera_xyz,
+    )
 
     depth_vis = []
     for depth in depths:
@@ -370,7 +902,31 @@ def export_sample_artifacts(output_dir, images, depths, flat_points, flat_colors
     save_mosaic(output_dir / "sample_depths.png", [np.stack([d, d, d], axis=-1) for d in depth_vis])
 
 
-def build_sample_payload(args, dataset, sample, masks, pointcloud_stats, zju_dir, config_path, sample_index):
+def build_sample_payload(
+    args,
+    dataset,
+    sample,
+    masks,
+    pointcloud_stats,
+    zju_dir,
+    config_path,
+    sample_index,
+    prior_target_spec=None,
+    prior_target_mask=None,
+    completion_artifacts=None,
+):
+    prior_support = summarize_prior_support(sample, prior_target_mask=prior_target_mask)
+    target_mask_stats = prior_support["human_prior_target_mask"]
+    completion_artifacts = completion_artifacts or {
+        "base_point_count": int(masks.sum()),
+        "completion_point_count": 0,
+        "completed_point_count": int(masks.sum()),
+        "added_point_count": 0,
+        "overlap_point_count": 0,
+    }
+    base_point_count = int(completion_artifacts.get("base_point_count", int(masks.sum())))
+    added_point_count = int(completion_artifacts.get("added_point_count", 0))
+    added_ratio = float(added_point_count / max(base_point_count, 1))
     return {
         "config_path": str(config_path) if config_path is not None else "",
         "seed": int(args.seed),
@@ -424,6 +980,17 @@ def build_sample_payload(args, dataset, sample, masks, pointcloud_stats, zju_dir
         "zju_dir": str(zju_dir),
         "geom_subdir": args.geom_subdir,
         "seq_names": args.seq_names,
+        "human_prior_target_scope": str((prior_target_spec or {}).get("scope", "")),
+        "human_prior_target_mask_key": str((prior_target_spec or {}).get("mask_key", "")),
+        "human_prior_target_feature_map_key": str((prior_target_spec or {}).get("feature_map_key", "")),
+        "human_prior_target_mask_stats": target_mask_stats,
+        "prior_coverage_mean": float(target_mask_stats.get("coverage_mean", 0.0)) if target_mask_stats.get("present") else 0.0,
+        "completion_point_count": int(completion_artifacts.get("completion_point_count", 0)),
+        "completed_point_count": int(completion_artifacts.get("completed_point_count", base_point_count)),
+        "added_point_count": added_point_count,
+        "completion_overlap_point_count": int(completion_artifacts.get("overlap_point_count", 0)),
+        "added_ratio": added_ratio,
+        "prior_support": prior_support,
     }
 
 
@@ -476,12 +1043,36 @@ def write_sample_summary(output_dir, payload):
                 f"- selection_anchor_camera: `{payload['selection_anchor_camera']}`",
                 f"- available_candidate_view_count: `{payload['available_candidate_view_count']}`",
                 f"- available_candidate_camera_names: `{payload['available_candidate_camera_names']}`",
+                f"- human_prior_target_scope: `{payload['human_prior_target_scope']}`",
+                f"- human_prior_target_mask_key: `{payload['human_prior_target_mask_key']}`",
+                f"- human_prior_target_feature_map_key: `{payload['human_prior_target_feature_map_key']}`",
+                f"- prior_coverage_mean: `{payload['prior_coverage_mean']:.6f}`",
+                f"- completion_point_count: `{payload['completion_point_count']}`",
+                f"- completed_point_count: `{payload['completed_point_count']}`",
+                f"- added_point_count: `{payload['added_point_count']}`",
+                f"- completion_overlap_point_count: `{payload['completion_overlap_point_count']}`",
+                f"- added_ratio: `{payload['added_ratio']:.6f}`",
+                f"- human_prior_target_mask_stats: `{payload['human_prior_target_mask_stats']}`",
                 "",
                 "## Files",
                 "",
                 "- `sample_images.png`",
                 "- `sample_depths.png`",
                 "- `sample_world_points.ply`",
+                "- `sample_world_points_views.png`",
+                "- `sample_depth_unproject_world_points.ply`",
+                "- `sample_depth_unproject_world_points_views.png`",
+                "- `sample_smpl_prior_masks.png`",
+                "- `sample_smpl_prior_feature_maps.png`",
+                "- `sample_human_prior_completion_masks.png`",
+                "- `sample_human_prior_completion_point_masks.png`",
+                "- `sample_human_prior_completion_depths.png`",
+                "- `sample_human_prior_completion_world_points.ply`",
+                "- `sample_human_prior_completion_world_points_views.png`",
+                "- `sample_completed_world_points.ply`",
+                "- `sample_completed_world_points_views.png`",
+                "- `sample_human_prior_target_mask.png`",
+                "- `sample_prior_case_package.npz`",
             ]
         )
         + "\n",
@@ -497,6 +1088,20 @@ def build_aggregate_summary(args, config_path, zju_dir, payloads):
     extents = np.asarray([item["pointcloud_stats"]["extent"] for item in payloads], dtype=np.float64)
     radius_p95 = np.asarray(
         [item["pointcloud_stats"]["radius_percentiles"]["p95"] for item in payloads], dtype=np.float64
+    )
+    prior_coverages = np.asarray([item.get("prior_coverage_mean", 0.0) for item in payloads], dtype=np.float64)
+    completion_points = np.asarray([item.get("completion_point_count", 0) for item in payloads], dtype=np.float64)
+    completed_points = np.asarray([item.get("completed_point_count", 0) for item in payloads], dtype=np.float64)
+    added_points = np.asarray([item.get("added_point_count", 0) for item in payloads], dtype=np.float64)
+    added_ratios = np.asarray([item.get("added_ratio", 0.0) for item in payloads], dtype=np.float64)
+    target_mask_pixels = np.asarray(
+        [
+            item.get("human_prior_target_mask_stats", {}).get("pixel_count", 0)
+            if item.get("human_prior_target_mask_stats", {}).get("present")
+            else 0
+            for item in payloads
+        ],
+        dtype=np.float64,
     )
 
     anchor_histogram = {}
@@ -549,6 +1154,43 @@ def build_aggregate_summary(args, config_path, zju_dir, payloads):
             "min": float(radius_p95.min()),
             "max": float(radius_p95.max()),
         },
+        "prior_coverage": {
+            "mean": float(prior_coverages.mean()),
+            "median": float(np.median(prior_coverages)),
+            "min": float(prior_coverages.min()),
+            "max": float(prior_coverages.max()),
+        },
+        "completion_point_count": {
+            "mean": float(completion_points.mean()),
+            "median": float(np.median(completion_points)),
+            "min": int(completion_points.min()),
+            "max": int(completion_points.max()),
+        },
+        "completed_point_count": {
+            "mean": float(completed_points.mean()),
+            "median": float(np.median(completed_points)),
+            "min": int(completed_points.min()),
+            "max": int(completed_points.max()),
+        },
+        "added_point_count": {
+            "mean": float(added_points.mean()),
+            "median": float(np.median(added_points)),
+            "min": int(added_points.min()),
+            "max": int(added_points.max()),
+        },
+        "added_ratio": {
+            "mean": float(added_ratios.mean()),
+            "median": float(np.median(added_ratios)),
+            "min": float(added_ratios.min()),
+            "max": float(added_ratios.max()),
+        },
+        "human_prior_target_pixel_count": {
+            "mean": float(target_mask_pixels.mean()),
+            "median": float(np.median(target_mask_pixels)),
+            "min": int(target_mask_pixels.min()),
+            "max": int(target_mask_pixels.max()),
+        },
+        "samples_with_nonzero_completion": int(np.sum(completion_points > 0)),
         "selection_anchor_camera_histogram": anchor_histogram,
         "sample_seq_names": [str(item["sample_seq_name"]) for item in payloads],
     }
@@ -577,6 +1219,14 @@ def write_aggregate_summary(output_dir, aggregate):
                 f"- pointcloud_extent_median: `{aggregate['pointcloud_extent']['median']}`",
                 f"- pointcloud_radius_p95_mean: `{aggregate['pointcloud_radius_p95']['mean']:.6f}`",
                 f"- pointcloud_radius_p95_median: `{aggregate['pointcloud_radius_p95']['median']:.6f}`",
+                f"- prior_coverage_mean: `{aggregate['prior_coverage']['mean']:.6f}`",
+                f"- prior_coverage_median: `{aggregate['prior_coverage']['median']:.6f}`",
+                f"- completion_point_count_mean: `{aggregate['completion_point_count']['mean']:.2f}`",
+                f"- completed_point_count_mean: `{aggregate['completed_point_count']['mean']:.2f}`",
+                f"- added_point_count_mean: `{aggregate['added_point_count']['mean']:.2f}`",
+                f"- added_ratio_mean: `{aggregate['added_ratio']['mean']:.6f}`",
+                f"- human_prior_target_pixel_count_mean: `{aggregate['human_prior_target_pixel_count']['mean']:.2f}`",
+                f"- samples_with_nonzero_completion: `{aggregate['samples_with_nonzero_completion']}`",
                 f"- selection_anchor_camera_histogram: `{aggregate['selection_anchor_camera_histogram']}`",
                 "",
                 "## Files",
@@ -592,12 +1242,13 @@ def write_aggregate_summary(output_dir, aggregate):
 
 def main():
     args = parse_args()
-    config_path = apply_config_defaults(args)
+    config_path, cfg = apply_config_defaults(args)
     output_dir = Path(args.output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
     random.seed(int(args.seed))
     np.random.seed(int(args.seed))
     zju_dir = resolve_zju_dir(args.zju_dir, args.seq_names, args.geom_subdir)
+    prior_target_spec = resolve_human_prior_target_spec(cfg)
 
     common_conf = OmegaConf.create(
         {
@@ -634,6 +1285,10 @@ def main():
         supervised_view_quality_filter=args.supervised_view_quality_filter,
         conf_depth_view_quality_filter=args.conf_depth_view_quality_filter,
         min_depth_conf=args.min_depth_conf,
+        smpl_prior_pose_noise_prob=args.smpl_prior_pose_noise_prob,
+        smpl_prior_pose_noise_rot_deg=args.smpl_prior_pose_noise_rot_deg,
+        smpl_prior_pose_noise_trans_scale=args.smpl_prior_pose_noise_trans_scale,
+        smpl_prior_pose_noise_scale_std=args.smpl_prior_pose_noise_scale_std,
         len_train=-1,
         len_test=-1,
     )
@@ -656,15 +1311,12 @@ def main():
         depths = np.stack(sample["depths"]).astype(np.float32)
         world_points = np.stack(sample["world_points"]).astype(np.float32)
         masks = np.stack(sample["point_masks"]).astype(bool)
+        prior_target_mask = build_human_prior_target_mask(sample, args.split, prior_target_spec)
+        completion_artifacts = build_completion_artifacts(sample, images)
 
         flat_points_full = world_points.reshape(-1, 3)[masks.reshape(-1)]
         flat_colors_full = images.reshape(-1, 3)[masks.reshape(-1)]
-        flat_points = flat_points_full
-        flat_colors = flat_colors_full
-        if flat_points.shape[0] > 250000:
-            keep = np.linspace(0, flat_points.shape[0] - 1, 250000, dtype=np.int64)
-            flat_points = flat_points[keep]
-            flat_colors = flat_colors[keep]
+        flat_points, flat_colors = downsample_point_cloud(flat_points_full, flat_colors_full, max_points=250000)
 
         pointcloud_stats = summarize_point_cloud(flat_points_full, written_vertex_count=flat_points.shape[0])
         payload = build_sample_payload(
@@ -676,11 +1328,30 @@ def main():
             zju_dir=zju_dir,
             config_path=config_path,
             sample_index=sample_index,
+            prior_target_spec=prior_target_spec,
+            prior_target_mask=prior_target_mask,
+            completion_artifacts=completion_artifacts,
         )
         payloads.append(payload)
 
         if loop_idx == 0:
-            export_sample_artifacts(output_dir, images, depths, flat_points, flat_colors)
+            export_sample_artifacts(
+                output_dir,
+                images,
+                depths,
+                flat_points_full,
+                flat_colors_full,
+                np.stack(sample["extrinsics"]).astype(np.float32),
+                np.stack(sample["intrinsics"]).astype(np.float32),
+            )
+            export_prior_artifacts(
+                output_dir,
+                sample,
+                images,
+                prior_target_mask=prior_target_mask,
+                completion_artifacts=completion_artifacts,
+            )
+            build_case_package(output_dir, sample, prior_target_mask=prior_target_mask)
             write_sample_summary(output_dir, payload)
 
     (output_dir / "per_sample_summaries.json").write_text(

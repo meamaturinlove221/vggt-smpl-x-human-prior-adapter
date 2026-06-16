@@ -1,0 +1,20 @@
+{
+  "blockers": [],
+  "created_utc": "2026-05-08T21:47:38Z",
+  "research_only": true,
+  "source_reports": [
+    "D:\\vggt\\vggt-main\\reports\\20260508_v26_temporal_canonical_teacher.json",
+    "D:\\vggt\\vggt-main\\reports\\20260508_v29_normal_route_rescue.json"
+  ],
+  "status": "DONE_PASS",
+  "task": "v48_temporal_correction",
+  "temporal_normal_available": true,
+  "temporal_region_normal_support": {
+    "body": 59341,
+    "face": 2417,
+    "head": 4103,
+    "left_hand": 731,
+    "right_hand": 464
+  },
+  "v26_status": "DONE_PASS"
+}

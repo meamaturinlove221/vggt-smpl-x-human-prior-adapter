@@ -1,0 +1,17 @@
+defaults:
+  - 4k4d_prior_case_sparseproto_softmatte_selfgeom_r27_depth_point_normal_direct
+  - _self_
+
+exp_name: 4k4d_prior_case_sparseproto_softmatte_selfgeom_r27b_depth_point_normal_pushdepth
+
+# Stop-gradient ablation for r27:
+# - r27 detach_depth_normal=true pushes the point branch toward depth-derived
+#   local orientation.
+# - r27b detaches point-derived normals and pushes depth instead.
+# This stays local-only and answers which geometry branch can be safely moved.
+
+loss:
+  human_prior:
+    depth_point_normal:
+      detach_depth_normal: false
+      detach_point_normal: true

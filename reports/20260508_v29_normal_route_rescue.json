@@ -1,0 +1,323 @@
+{
+  "candidate_geometric_normal_available": true,
+  "candidate_summary": {
+    "all_required_regions_nonempty": true,
+    "best_region_support_frame": "frame0000",
+    "created_at": "2026-05-08T21:40:36Z",
+    "forbidden_writes": {
+      "candidate_package": false,
+      "predictions_npz": false,
+      "strict_pass": false,
+      "strict_registry": false,
+      "teacher_package": false
+    },
+    "frame_summaries": {
+      "frame0000": {
+        "normal_length_stats": {
+          "count": 3219888,
+          "finite": 3219888,
+          "max": 1.0000001192092896,
+          "mean": 1.0,
+          "median": 1.0,
+          "min": 0.9999998211860657,
+          "p95": 1.0
+        },
+        "normal_valid_count": 3219888,
+        "region_normal_support_first6_against_v24_masks": {
+          "body": 59474,
+          "face": 2422,
+          "head": 4114,
+          "left_hand": 736,
+          "right_hand": 472
+        },
+        "shape": [
+          12,
+          518,
+          518,
+          3
+        ]
+      },
+      "frame0001": {
+        "normal_length_stats": {
+          "count": 3219888,
+          "finite": 3219888,
+          "max": 1.0000001192092896,
+          "mean": 1.0,
+          "median": 1.0,
+          "min": 0.9999998211860657,
+          "p95": 1.0
+        },
+        "normal_valid_count": 3219888,
+        "region_normal_support_first6_against_v24_masks": {
+          "body": 59474,
+          "face": 2422,
+          "head": 4114,
+          "left_hand": 736,
+          "right_hand": 472
+        },
+        "shape": [
+          12,
+          518,
+          518,
+          3
+        ]
+      },
+      "frame0002": {
+        "normal_length_stats": {
+          "count": 3219888,
+          "finite": 3219888,
+          "max": 1.0000001192092896,
+          "mean": 1.0,
+          "median": 1.0,
+          "min": 0.9999998211860657,
+          "p95": 1.0
+        },
+        "normal_valid_count": 3219888,
+        "region_normal_support_first6_against_v24_masks": {
+          "body": 59474,
+          "face": 2422,
+          "head": 4114,
+          "left_hand": 736,
+          "right_hand": 472
+        },
+        "shape": [
+          12,
+          518,
+          518,
+          3
+        ]
+      }
+    },
+    "normal_source": "geometric_from_candidate_points_world_finite_difference",
+    "not_model_normal_head": true,
+    "output": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V29_normal_route_rescue\\v29_candidate_geometric_normals.npz",
+    "region_normal_support": {
+      "body": 59474,
+      "face": 2422,
+      "head": 4114,
+      "left_hand": 736,
+      "right_hand": 472
+    },
+    "source": "D:\\vggt\\vggt-main\\output\\surface_research_cloud_preflight\\V25_research_vggt_predictions\\research_points_world.npz",
+    "status": "DONE_PASS",
+    "v24_region_mask_source": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V24_residual_teacher_v2\\v24_residual_teacher_targets_v2.npz"
+  },
+  "created_at": "2026-05-08T21:40:49Z",
+  "forbidden_writes": {
+    "candidate_package": false,
+    "predictions_npz": false,
+    "strict_pass": false,
+    "strict_registry": false,
+    "teacher_package": false
+  },
+  "normal_depth_consistency_research_gate": true,
+  "normal_file_stats": {
+    "candidate": {
+      "exists": true,
+      "frame_keys": [
+        "frame0000",
+        "frame0001",
+        "frame0002"
+      ],
+      "frames": {
+        "frame0000": {
+          "normal_length_stats": {
+            "count": 3219888,
+            "finite": 3219888,
+            "max": 1.0000001192092896,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 0.9999998211860657,
+            "p95": 1.0
+          },
+          "not_model_normal_head": true,
+          "shape": [
+            12,
+            518,
+            518,
+            3
+          ],
+          "source": "geometric_from_candidate_points",
+          "valid_count": 3219888
+        },
+        "frame0001": {
+          "normal_length_stats": {
+            "count": 3219888,
+            "finite": 3219888,
+            "max": 1.0000001192092896,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 0.9999998211860657,
+            "p95": 1.0
+          },
+          "not_model_normal_head": true,
+          "shape": [
+            12,
+            518,
+            518,
+            3
+          ],
+          "source": "geometric_from_candidate_points",
+          "valid_count": 3219888
+        },
+        "frame0002": {
+          "normal_length_stats": {
+            "count": 3219888,
+            "finite": 3219888,
+            "max": 1.0000001192092896,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 0.9999998211860657,
+            "p95": 1.0
+          },
+          "not_model_normal_head": true,
+          "shape": [
+            12,
+            518,
+            518,
+            3
+          ],
+          "source": "geometric_from_candidate_points",
+          "valid_count": 3219888
+        }
+      }
+    },
+    "teacher": {
+      "exists": true,
+      "normal_length_stats": {
+        "count": 67218,
+        "finite": 67218,
+        "max": 1.0000001192092896,
+        "mean": 1.0,
+        "median": 1.0,
+        "min": 0.9999998807907104,
+        "p95": 1.0
+      },
+      "shape": [
+        6,
+        518,
+        518,
+        3
+      ],
+      "valid_count": 67218
+    },
+    "temporal": {
+      "exists": true,
+      "normal_length_stats": {
+        "count": 67056,
+        "finite": 67056,
+        "max": 1.0000001192092896,
+        "mean": 1.0,
+        "median": 1.0,
+        "min": 0.9999998211860657,
+        "p95": 1.0
+      },
+      "shape": [
+        6,
+        518,
+        518,
+        3
+      ],
+      "valid_count": 67056
+    }
+  },
+  "outputs": {
+    "candidate_geometric_normals": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V29_normal_route_rescue\\v29_candidate_geometric_normals.npz",
+    "json_report": "reports\\20260508_v29_normal_route_rescue.json",
+    "md_report": "reports\\20260508_v29_normal_route_rescue.md",
+    "teacher_normals": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V29_normal_route_rescue\\v29_teacher_normals_world.npz",
+    "temporal_normals": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V29_normal_route_rescue\\v29_temporal_normals_world.npz"
+  },
+  "status": "DONE_PASS",
+  "teacher_normal_available": true,
+  "teacher_summary": {
+    "all_required_regions_nonempty": true,
+    "created_at": "2026-05-08T21:40:35Z",
+    "forbidden_writes": {
+      "candidate_package": false,
+      "predictions_npz": false,
+      "strict_pass": false,
+      "strict_registry": false,
+      "teacher_package": false
+    },
+    "geometric_consistency_source": "finite_difference_from_v24_teacher_points_world",
+    "normal_length_stats": {
+      "count": 67218,
+      "finite": 67218,
+      "max": 1.0000001192092896,
+      "mean": 1.0,
+      "median": 1.0,
+      "min": 0.9999998807907104,
+      "p95": 1.0
+    },
+    "normal_source": "propagated_from_v24_teacher_normals_world",
+    "normal_valid_count": 67218,
+    "output": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V29_normal_route_rescue\\v29_teacher_normals_world.npz",
+    "region_normal_support": {
+      "body": 59474,
+      "face": 2422,
+      "head": 4114,
+      "left_hand": 736,
+      "right_hand": 472
+    },
+    "shape": [
+      6,
+      518,
+      518,
+      3
+    ],
+    "source": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V24_residual_teacher_v2\\v24_residual_teacher_targets_v2.npz",
+    "status": "DONE_PASS",
+    "teacher_vs_geometric_normal_consistency": {
+      "mean_abs_dot": 0.7370398044586182,
+      "mean_dot": -0.44535842537879944,
+      "median_abs_dot": 0.8984485268592834,
+      "p10_abs_dot": 0.22437992691993713,
+      "valid": 64606
+    }
+  },
+  "temporal_normal_available": true,
+  "temporal_summary": {
+    "all_required_regions_nonempty": true,
+    "canonical_residual_normal_source": "geometric_finite_difference_from_v26_canonical_residual",
+    "confidence_output": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V29_normal_route_rescue\\v29_temporal_normal_confidence.npz",
+    "created_at": "2026-05-08T21:40:35Z",
+    "forbidden_writes": {
+      "candidate_package": false,
+      "predictions_npz": false,
+      "strict_pass": false,
+      "strict_registry": false,
+      "teacher_package": false
+    },
+    "normal_length_stats": {
+      "count": 67056,
+      "finite": 67056,
+      "max": 1.0000001192092896,
+      "mean": 1.0,
+      "median": 1.0,
+      "min": 0.9999998211860657,
+      "p95": 1.0
+    },
+    "normal_source": "geometric_finite_difference_from_v26_target_frame_points",
+    "normal_valid_count": 67056,
+    "output": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V29_normal_route_rescue\\v29_temporal_normals_world.npz",
+    "region_normal_support": {
+      "body": 59341,
+      "face": 2417,
+      "head": 4103,
+      "left_hand": 731,
+      "right_hand": 464
+    },
+    "residual_normal_valid_count": 67036,
+    "shape": [
+      6,
+      518,
+      518,
+      3
+    ],
+    "source": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V26_temporal_canonical_teacher\\v26_temporal_canonical_teacher_targets.npz",
+    "status": "DONE_PASS",
+    "v26_declared_normal_available": false,
+    "v29_reconstructed_normal_available": true
+  }
+}

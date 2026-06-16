@@ -1,0 +1,16 @@
+{
+  "status": "DONE_PASS",
+  "blockers": [],
+  "checkpoint_path": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V31_teacher_supervised_candidate_train\\v31_candidate_research_checkpoint.npz",
+  "preview_path": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V31_teacher_supervised_candidate_train\\v31_real_teacher_real_prior_candidate_preview.npz",
+  "curve_path": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V31_teacher_supervised_candidate_train\\v31_training_curve.jsonl",
+  "curve_rows": 3,
+  "initial_loss": 1.0,
+  "final_loss": 0.44,
+  "real_wins_controls": {
+    "no_teacher_baseline": true,
+    "shuffle_prior_same_teacher": true,
+    "template_teacher_only": true,
+    "zero_prior_same_teacher": true
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "blockers": [],
+  "created_utc": "2026-05-08T21:47:38Z",
+  "has_60v_scene": true,
+  "has_gdrive_raw_4k4d_smc_triplet": true,
+  "region_6v_support_pass": {
+    "body": true,
+    "face": true,
+    "head": true,
+    "left_hand": true,
+    "right_hand": true
+  },
+  "research_only": true,
+  "source_report": "D:\\vggt\\vggt-main\\reports\\20260508_v35_60view_support_expansion.json",
+  "status": "DONE_PASS",
+  "task": "v47_60view_correction"
+}

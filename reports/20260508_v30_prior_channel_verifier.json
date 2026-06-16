@@ -1,0 +1,12 @@
+{
+  "base_hf_model_allowed_for_key_predictions": false,
+  "blockers": [],
+  "checkpoint_file_available_locally": false,
+  "checkpoint_recovery_mode": "V42_payload_restored_from_modal_volume",
+  "checkpoint_source": "remote_hf_constructed",
+  "code_supports_prior_adapter": true,
+  "human_prior_channels": 30,
+  "human_prior_summary_channels": 27,
+  "status": "DONE_PASS",
+  "usable_prior_enabled_checkpoint_exists": true
+}

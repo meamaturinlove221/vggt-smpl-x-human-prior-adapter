@@ -1,0 +1,57 @@
+defaults:
+  - 4k4d_prior_case_sparseproto_humancrop_depthnormal_coupled_r17_signed_xview_audit
+  - _self_
+
+exp_name: 4k4d_prior_case_sparseproto_humancrop_depthnormal_coupled_r18_pointbranch_signed_roi
+
+loss:
+  human_prior:
+    weight: 0.14
+    normal: null
+    point_normal: null
+    depth_normal:
+      consistency_weight: 0.07
+      orientation: oriented
+      flip_depth_normal: true
+      # Make predicted normal act as a fixed local surface-direction target.
+      # This is intentionally point/depth-targeted; it avoids spending the
+      # smoke budget on making only the normal head prettier.
+      normal_target_detach: true
+      valid_range: 0.96
+      min_depth: 0.0001
+      head_roi_weight: 2.5
+      face_roi_weight: 4.0
+      hairline_roi_weight: 4.0
+      ear_band_roi_weight: 2.5
+      boundary_boost: 2.0
+    depth_point:
+      consistency_weight: 0.12
+      xyz_weight: 0.60
+      z_weight: 0.90
+      valid_range: 0.96
+      min_depth: 0.0001
+      relative_scale: true
+      head_roi_weight: 2.5
+      face_roi_weight: 4.0
+      hairline_roi_weight: 4.0
+      ear_band_roi_weight: 2.5
+      boundary_boost: 2.0
+    cross_view:
+      consistency_weight: 0.14
+      depth_weight: 0.60
+      point_weight: 1.20
+      # Normal-only cross-view agreement was not enough in r16. Keep the next
+      # diagnostic focused on depth/point geometry so the logged point term is
+      # easier to interpret.
+      normal_weight: 0.0
+      valid_range: 0.96
+      stride: 8
+      max_pairs: 12
+      min_depth: 0.0001
+      orientation: unoriented
+      detach_projection: true
+      head_roi_weight: 2.5
+      face_roi_weight: 4.0
+      hairline_roi_weight: 4.0
+      ear_band_roi_weight: 2.5
+      boundary_boost: 2.0

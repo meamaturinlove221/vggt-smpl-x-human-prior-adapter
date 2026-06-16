@@ -1,0 +1,307 @@
+{
+  "report": "V403_agent_v50_artifact_search",
+  "generated_at_local": "2026-05-09T05:39:40.0416137+08:00",
+  "cwd": "D:\\vggt\\vggt-main",
+  "mode": "read-only artifact search",
+  "write_scope": [
+    "D:\\vggt\\vggt-main\\reports\\V403_agent_v50_artifact_search.json",
+    "D:\\vggt\\vggt-main\\reports\\V403_agent_v50_artifact_search.md"
+  ],
+  "constraints_observed": {
+    "deleted_anything": false,
+    "wrote_strict_registry_or_pass": false,
+    "downloaded_large_modal_files": false,
+    "downloaded_small_modal_json_or_manifests": false,
+    "modal_operations_used": [
+      "modal volume list",
+      "modal volume ls --json",
+      "modal app list"
+    ]
+  },
+  "search_roots": [
+    {"path": "D:\\vggt", "exists": true},
+    {"path": "F:\\vggt", "exists": true},
+    {"path": "G:\\项目备份", "exists": true},
+    {"path": "G:\\数据集", "exists": true},
+    {"path": "C:\\Users\\WINDOWS\\Desktop", "exists": true},
+    {"path": "C:\\Users\\WINDOWS\\Downloads", "exists": true},
+    {"path": "Modal volumes/apps", "exists": true}
+  ],
+  "primary_conclusion": {
+    "original_v50_v64_v138_filled_package_found": false,
+    "strict_registry_entry_v50_found": false,
+    "original_zip_artifacts_found": false,
+    "equivalent_or_rebuilt_artifacts_found": true,
+    "backup_prior_package_artifacts_found": true,
+    "modal_source_equivalent_artifacts_found": true,
+    "notes": [
+      "Current local V50/V64/V138 candidate directories exist as stubs or extracted skeletons, but their package_files folders have zero files.",
+      "The requested original zip names were not present in D:\\vggt\\vggt-main\\archive.",
+      "Rebuilt/equivalent V223 and V50R packages exist locally and are sourced from V42/V25/V16 evidence, not original V50 hashes.",
+      "Modal contains V42/V25/V16 source payloads and 4K4D inference outputs, but no literal V50/V64/V138 package directory was found in the listed Modal roots."
+    ]
+  },
+  "confirmed_absent_or_empty_original_targets": [
+    {
+      "path": "D:\\vggt\\vggt-main\\output\\frozen_candidates\\V50_smplx_native_candidate_pass",
+      "exists": true,
+      "type": "dir",
+      "direct_child_count": 1,
+      "recursive_file_count": 0,
+      "last_write_time": "2026-05-09T04:13:57.9540227+08:00"
+    },
+    {
+      "path": "D:\\vggt\\vggt-main\\output\\frozen_candidates\\V50_smplx_native_candidate_pass\\package_files",
+      "exists": true,
+      "type": "dir",
+      "direct_child_count": 0,
+      "recursive_file_count": 0,
+      "last_write_time": "2026-05-09T04:13:57.9782055+08:00"
+    },
+    {
+      "path": "D:\\vggt\\vggt-main\\archive\\V64_candidate_pass_bundle\\frozen_candidate\\package_files",
+      "exists": true,
+      "type": "dir",
+      "direct_child_count": 0,
+      "recursive_file_count": 0,
+      "last_write_time": "2026-05-09T04:13:50.1653409+08:00"
+    },
+    {
+      "path": "D:\\vggt\\vggt-main\\archive\\V138_candidate_pass_bundle_v3\\frozen_candidate\\package_files",
+      "exists": true,
+      "type": "dir",
+      "direct_child_count": 0,
+      "recursive_file_count": 0,
+      "last_write_time": "2026-05-09T04:13:50.1064248+08:00"
+    },
+    {
+      "path": "D:\\vggt\\vggt-main\\archive\\V64_candidate_pass_bundle.zip",
+      "exists": false
+    },
+    {
+      "path": "D:\\vggt\\vggt-main\\archive\\V138_candidate_pass_bundle_v3.zip",
+      "exists": false
+    },
+    {
+      "path": "D:\\vggt\\vggt-main\\archive\\package_files.zip",
+      "exists": false
+    },
+    {
+      "path": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V50_final_promotion_transaction\\strict_registry_entry_v50.json",
+      "exists": false
+    },
+    {
+      "path": "D:\\vggt\\vggt-main\\reports\\A_v50_v64_integrity_terminal.json",
+      "exists": false
+    }
+  ],
+  "local_equivalent_or_rebuilt_artifacts": [
+    {
+      "path": "D:\\vggt\\vggt-main\\output\\V223_rebuilt_candidate_package",
+      "type": "dir",
+      "status": "present",
+      "file_count": 16,
+      "source_evidence_family": ["V42_prior_enabled_predictions", "V25_research_vggt_predictions", "V16_smplx_native_prior_case"],
+      "important_files": [
+        {"path": "D:\\vggt\\vggt-main\\output\\V223_rebuilt_candidate_package\\manifest.json", "size_bytes": 24320},
+        {"path": "D:\\vggt\\vggt-main\\output\\V223_rebuilt_candidate_package\\package_files\\candidate_confidence_from_v42.npz", "size_bytes": 85602711},
+        {"path": "D:\\vggt\\vggt-main\\output\\V223_rebuilt_candidate_package\\package_files\\candidate_depths_from_v42.npz", "size_bytes": 30775206},
+        {"path": "D:\\vggt\\vggt-main\\output\\V223_rebuilt_candidate_package\\package_files\\candidate_normals_from_v42.npz", "size_bytes": 100071633},
+        {"path": "D:\\vggt\\vggt-main\\output\\V223_rebuilt_candidate_package\\package_files\\candidate_points_from_v42.npz", "size_bytes": 105107787},
+        {"path": "D:\\vggt\\vggt-main\\output\\V223_rebuilt_candidate_package\\package_files\\control_audit_from_v42.json", "size_bytes": 19263},
+        {"path": "D:\\vggt\\vggt-main\\output\\V223_rebuilt_candidate_package\\package_files\\prior_effect_from_v42.json", "size_bytes": 35089},
+        {"path": "D:\\vggt\\vggt-main\\output\\V223_rebuilt_candidate_package\\package_files\\v16_case_manifest.json", "size_bytes": 19245},
+        {"path": "D:\\vggt\\vggt-main\\output\\V223_rebuilt_candidate_package\\package_files\\v16_prior_inputs.npz", "size_bytes": 4029306},
+        {"path": "D:\\vggt\\vggt-main\\output\\V223_rebuilt_candidate_package\\package_files\\v16_prior_targets.npz", "size_bytes": 42090945},
+        {"path": "D:\\vggt\\vggt-main\\output\\V223_rebuilt_candidate_package\\package_files\\v25_baseline_depths.npz", "size_bytes": 30776642},
+        {"path": "D:\\vggt\\vggt-main\\output\\V223_rebuilt_candidate_package\\package_files\\v25_baseline_points.npz", "size_bytes": 105107011},
+        {"path": "D:\\vggt\\vggt-main\\output\\V223_rebuilt_candidate_package\\package_files\\v42_guard.json", "size_bytes": 573}
+      ]
+    },
+    {
+      "path": "D:\\vggt\\vggt-main\\archive\\V223_rebuilt_candidate_package.zip",
+      "type": "file",
+      "status": "present",
+      "size_bytes": 504782072,
+      "last_write_time": "2026-05-09T04:29:30.6224715+08:00"
+    },
+    {
+      "path": "D:\\vggt\\vggt-main\\output\\frozen_candidates\\V50R_rebuilt_after_artifact_loss",
+      "type": "dir",
+      "status": "present",
+      "file_count": 17,
+      "note": "Rebuilt candidate, not original V50.",
+      "important_files": [
+        {"path": "D:\\vggt\\vggt-main\\output\\frozen_candidates\\V50R_rebuilt_after_artifact_loss\\manifest.json", "size_bytes": 24395},
+        {"path": "D:\\vggt\\vggt-main\\output\\frozen_candidates\\V50R_rebuilt_after_artifact_loss\\hash_manifest.json", "size_bytes": 4158},
+        {"path": "D:\\vggt\\vggt-main\\output\\frozen_candidates\\V50R_rebuilt_after_artifact_loss\\package_files\\candidate_points_from_v42.npz", "size_bytes": 105107787},
+        {"path": "D:\\vggt\\vggt-main\\output\\frozen_candidates\\V50R_rebuilt_after_artifact_loss\\package_files\\candidate_normals_from_v42.npz", "size_bytes": 100071633}
+      ]
+    }
+  ],
+  "backup_or_prior_package_artifacts": [
+    {
+      "path": "G:\\项目备份\\vggt_cam_depth大文件索引\\output\\zju_vggt_geom_probe_smplprior_headhair_local_verify\\sample_prior_case_package.npz",
+      "type": "file",
+      "size_bytes": 2142322
+    },
+    {
+      "path": "G:\\项目备份\\vggt_cam_depth大文件索引\\output\\zju_vggt_geom_probe_smplprior_headhair_hd_views\\sample_prior_case_package.npz",
+      "type": "file",
+      "size_bytes": 2142322
+    },
+    {
+      "path": "G:\\项目备份\\vggt_cam_depth大文件索引\\output\\zju_vggt_geom_probe_smplprior_headhair_hd_views_23view\\sample_prior_case_package.npz",
+      "type": "file",
+      "size_bytes": 10819761
+    },
+    {
+      "path": "G:\\项目备份\\vggt_cam_depth大文件索引\\output\\probe_smplxvertexfusion_local\\sample_prior_case_package.npz",
+      "type": "file",
+      "size_bytes": 3459921
+    },
+    {
+      "path": "G:\\项目备份\\vggt_cam_depth大文件索引\\output\\teacher_fixed_visual_lift_benchmark\\advisor_ready_package.20260407",
+      "type": "dir",
+      "status": "present",
+      "notable_children_from_name_scan": [
+        "README.md",
+        "advisor_delivery_packet.json",
+        "advisor_delivery_packet.md",
+        "geometry\\region_audit_summary.json",
+        "geometry\\region_audit_summary.md",
+        "summary\\one_page_summary.json",
+        "visuals\\visual_packet.json"
+      ]
+    }
+  ],
+  "local_roots_negative_or_noise": [
+    {
+      "root": "F:\\vggt",
+      "result": "No original V50/V64/V138/package_files artifact found in the targeted name scan. Matches were non-target noise such as .venv5080 and unrelated 4K4D scripts/reports."
+    },
+    {
+      "root": "C:\\Users\\WINDOWS\\Desktop",
+      "result": "No relevant V50/V64/V138/package_files artifact found."
+    },
+    {
+      "root": "C:\\Users\\WINDOWS\\Downloads",
+      "result": "No relevant V50/V64/V138/package_files artifact found. Broad manifest scan matched unrelated mod_manifest.json files only."
+    },
+    {
+      "root": "G:\\数据集",
+      "result": "No V50/V64/V138 package artifact found. 4K4D dataset archives and metadata exist but are dataset inputs, not the requested candidate packages."
+    }
+  ],
+  "modal": {
+    "apps": {
+      "modal_app_list_result": "empty table; no running/recent apps shown by modal app list"
+    },
+    "volumes_listed": [
+      "vggt-lhm-cache",
+      "vggt-pshuman-official-cache",
+      "vggt-pifuhd-cache",
+      "vggt-4k4d-output",
+      "vggt-4k4d-data",
+      "vggt-code",
+      "vggt-out",
+      "vggt-zju-data"
+    ],
+    "literal_v50_v64_v138_dirs_found_in_listed_modal_paths": false,
+    "equivalent_source_payloads": [
+      {
+        "volume": "vggt-4k4d-output",
+        "path": "/surface_research_cloud_preflight/V42_prior_enabled_predictions",
+        "files": [
+          {"name": "research_summary.json", "size": "34.3 KiB"},
+          {"name": "research_prior_effect.json", "size": "34.3 KiB"},
+          {"name": "control_real_zero_shuffle_random_dropout.json", "size": "18.8 KiB"},
+          {"name": "v42_research_guard.json", "size": "573 B"},
+          {"name": "research_confidence.npz", "size": "81.6 MiB"},
+          {"name": "research_normals_geometric.npz", "size": "95.4 MiB"},
+          {"name": "research_points_world.npz", "size": "100.2 MiB"},
+          {"name": "research_depths.npz", "size": "29.3 MiB"}
+        ]
+      },
+      {
+        "volume": "vggt-4k4d-output",
+        "path": "/surface_research_cloud_preflight/V25_research_vggt_predictions",
+        "files": [
+          {"name": "research_summary.json", "size": "10.6 KiB"},
+          {"name": "research_report.md", "size": "690 B"},
+          {"name": "v25_research_guard.json", "size": "568 B"},
+          {"name": "research_confidence.npz", "size": "58.1 MiB"},
+          {"name": "research_points_world.npz", "size": "100.2 MiB"},
+          {"name": "research_normals.npz", "size": "725 B"},
+          {"name": "research_depths.npz", "size": "29.4 MiB"}
+        ]
+      },
+      {
+        "volume": "vggt-4k4d-output",
+        "path": "/surface_research_cloud_preflight/V16_smplx_native_prior_case",
+        "files": [
+          {"name": "case_manifest.json", "size": "18.8 KiB"},
+          {"name": "v15_smplx_native_prior_summary.json", "size": "2.9 KiB"},
+          {"name": "inputs.npz", "size": "3.8 MiB"},
+          {"name": "targets.npz", "size": "40.1 MiB"}
+        ]
+      }
+    ],
+    "modal_4k4d_inference_artifacts": [
+      {
+        "volume": "vggt-4k4d-output",
+        "path": "/vggt_4k4d_infer/0012_11_frame0000_20views",
+        "files": [
+          {"name": "summary.json", "size": "11.2 KiB"},
+          {"name": "predictions.npz", "size": "104.5 MiB"},
+          {"name": "previews", "type": "dir"},
+          {"name": "predictions_chunks_v2", "type": "dir"}
+        ]
+      },
+      {
+        "volume": "vggt-4k4d-output",
+        "path": "/vggt_4k4d_infer/0012_11_frame0000_fullviews",
+        "files": [
+          {"name": "summary.json", "size": "37.3 KiB"},
+          {"name": "predictions.npz", "size": "315.7 MiB"},
+          {"name": "pointcloud", "type": "dir"},
+          {"name": "pointcloud_depth_unprojection", "type": "dir"}
+        ]
+      },
+      {
+        "volume": "vggt-4k4d-output",
+        "path": "/vggt_4k4d_infer/0012_11_frame0000_60views_smplxsurfacepose_a10080_e2_r2",
+        "files": [
+          {"name": "summary.json", "size": "52.4 KiB"},
+          {"name": "predictions.npz", "size": "224.2 MiB"},
+          {"name": "previews", "type": "dir"}
+        ]
+      }
+    ],
+    "large_files_seen_not_downloaded": [
+      {"volume": "vggt-zju-data", "path": "/checkpoints/model.pt", "size": "4.7 GiB"},
+      {"volume": "vggt-lhm-cache", "path": "/LHM_prior_model.tar", "size": "17.5 GiB"},
+      {"volume": "vggt-4k4d-output", "path": "/vggt_4k4d_infer/0012_11_frame0000_fullviews/predictions.npz", "size": "315.7 MiB"},
+      {"volume": "vggt-4k4d-output", "path": "/vggt_4k4d_infer/0012_11_frame0000_60views_smplxsurfacepose_a10080_e2_r2/predictions.npz", "size": "224.2 MiB"}
+    ]
+  },
+  "supporting_existing_reports": [
+    {
+      "path": "D:\\vggt\\vggt-main\\reports\\V224_v50_frozen_candidate_recovery_plan.md",
+      "relevance": "Earlier local/limited-Modal check concluded original V50 was not found and V223 was the rebuild path."
+    },
+    {
+      "path": "D:\\vggt\\vggt-main\\reports\\V400_v50r_strict_promotion_transaction.md",
+      "relevance": "Earlier strict transaction report explicitly says V50R is rebuilt, not original V50, and no registry/pass/package was written."
+    },
+    {
+      "path": "D:\\vggt\\vggt-main\\reports\\V402_codex_session_v50_provenance_search.md",
+      "relevance": "Session-reference search naming the original V50/V64/V138 paths, used as breadcrumbs for current existence checks."
+    }
+  ],
+  "limitations": [
+    "One broad text-reference search over old reports/backups timed out after about 304 seconds; narrower path, directory, and Modal metadata checks were completed instead.",
+    "A targeted rg path scan reported access denied for D:\\vggt\\vggt-main\\output\\_tmp_tests\\vggt_cloud_gate_test_as1qepx4. This did not block the named V50/V64/V138/package_files checks.",
+    "Modal search was metadata/listing based only. No large Modal artifacts were downloaded."
+  ]
+}

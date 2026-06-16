@@ -52,7 +52,7 @@ function Get-RepoProcesses([string]$RepoRoot) {
             -and $_.Name -match "powershell|python|modal" `
             -and $_.CommandLine `
             -and $_.CommandLine -match $escapedRepo `
-            -and $_.CommandLine -notmatch "autopep8|isort|invoke_modal_zju_preflight\.ps1|run_zju_post_v9_residual_cluster_nightly\.py|run_zju_source_policy_rawpool_local_nightly\.py|run_zju_source_policy_rawpool_long_gate\.py|run_zju_source_policy_rawpool_overnight_watch\.py|run_zju_source_policy_rawpool_guard_daemon\.py|run_zju_source_policy_research_candidate\.py|arm_zju_source_policy_approved_problem\.py"
+            -and $_.CommandLine -notmatch "autopep8|isort|invoke_modal_zju_preflight\.ps1|run_zju_post_v9_residual_cluster_nightly\.py|run_zju_source_policy_rawpool_local_nightly\.py|run_zju_source_policy_rawpool_long_gate\.py|run_zju_source_policy_rawpool_overnight_watch\.py|run_zju_source_policy_rawpool_guard_daemon\.py|run_modal_zju_geometry_guard_daemon\.py|run_zju_source_policy_research_candidate\.py|arm_zju_source_policy_approved_problem\.py"
     } | Select-Object Name, ProcessId, ParentProcessId, CreationDate, CommandLine
 }
 

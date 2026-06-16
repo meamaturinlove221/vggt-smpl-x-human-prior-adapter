@@ -1,0 +1,82 @@
+{
+  "arrays": {
+    "research_confidence.npz": [
+      "normal_available",
+      "frame0000_depth_conf",
+      "frame0000_world_points_conf",
+      "frame0000_normal_conf",
+      "frame0001_depth_conf",
+      "frame0001_world_points_conf",
+      "frame0001_normal_conf",
+      "frame0002_depth_conf",
+      "frame0002_world_points_conf",
+      "frame0002_normal_conf",
+      "frame_keys"
+    ],
+    "research_depths.npz": [
+      "frame0000",
+      "frame0001",
+      "frame0002",
+      "frame_keys"
+    ],
+    "research_normals_geometric.npz": [
+      "normal_available",
+      "frame0000",
+      "frame0001",
+      "frame0002",
+      "frame_keys"
+    ],
+    "research_points_world.npz": [
+      "frame0000",
+      "frame0000_pose_enc",
+      "frame0000_extrinsic",
+      "frame0000_intrinsic",
+      "frame0001",
+      "frame0001_pose_enc",
+      "frame0001_extrinsic",
+      "frame0001_intrinsic",
+      "frame0002",
+      "frame0002_pose_enc",
+      "frame0002_extrinsic",
+      "frame0002_intrinsic",
+      "frame_keys"
+    ]
+  },
+  "blockers": [],
+  "no_package_registry_or_strict_pass": true,
+  "no_predictions_npz": true,
+  "payload_files": {
+    "control_real_zero_shuffle_random_dropout.json": {
+      "exists": true,
+      "path": "D:\\vggt\\vggt-main\\output\\surface_research_cloud_preflight\\V30_prior_enabled_predictions\\control_real_zero_shuffle_random_dropout.json",
+      "size": 19263
+    },
+    "research_confidence.npz": {
+      "exists": true,
+      "path": "D:\\vggt\\vggt-main\\output\\surface_research_cloud_preflight\\V30_prior_enabled_predictions\\research_confidence.npz",
+      "size": 85602711
+    },
+    "research_depths.npz": {
+      "exists": true,
+      "path": "D:\\vggt\\vggt-main\\output\\surface_research_cloud_preflight\\V30_prior_enabled_predictions\\research_depths.npz",
+      "size": 30775206
+    },
+    "research_normals_geometric.npz": {
+      "exists": true,
+      "path": "D:\\vggt\\vggt-main\\output\\surface_research_cloud_preflight\\V30_prior_enabled_predictions\\research_normals_geometric.npz",
+      "size": 100071633
+    },
+    "research_points_world.npz": {
+      "exists": true,
+      "path": "D:\\vggt\\vggt-main\\output\\surface_research_cloud_preflight\\V30_prior_enabled_predictions\\research_points_world.npz",
+      "size": 105107787
+    },
+    "research_prior_effect.json": {
+      "exists": true,
+      "path": "D:\\vggt\\vggt-main\\output\\surface_research_cloud_preflight\\V30_prior_enabled_predictions\\research_prior_effect.json",
+      "size": 35089
+    }
+  },
+  "root": "D:\\vggt\\vggt-main\\output\\surface_research_cloud_preflight\\V30_prior_enabled_predictions",
+  "status": "DONE_PASS"
+}

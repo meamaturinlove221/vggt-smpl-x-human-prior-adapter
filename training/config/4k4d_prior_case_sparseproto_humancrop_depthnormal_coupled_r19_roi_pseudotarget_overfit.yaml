@@ -1,0 +1,80 @@
+defaults:
+  - 4k4d_prior_case_sparseproto_humancrop_depthnormal_coupled_r18_pointbranch_signed_roi
+  - _self_
+
+exp_name: 4k4d_prior_case_sparseproto_humancrop_depthnormal_coupled_r19_roi_pseudotarget_overfit
+
+data:
+  train:
+    common_config:
+      repeat_batch: True
+      prior_pose_noise:
+        enabled: False
+  val:
+    common_config:
+      prior_pose_noise:
+        enabled: False
+
+loss:
+  depth:
+    weight: 1.25
+    gradient_loss_fn: grad
+    valid_range: 0.98
+    supervise_conf: true
+    head_roi_weight: 2.5
+    face_roi_weight: 5.0
+    hairline_roi_weight: 5.0
+    ear_band_roi_weight: 2.5
+    boundary_boost: 3.0
+  point:
+    weight: 1.75
+    gradient_loss_fn: normal
+    valid_range: 0.98
+    supervise_conf: true
+    head_roi_weight: 2.5
+    face_roi_weight: 5.0
+    hairline_roi_weight: 5.0
+    ear_band_roi_weight: 2.5
+    boundary_boost: 3.0
+  human_prior:
+    weight: 0.10
+    depth_normal:
+      consistency_weight: 0.05
+      orientation: oriented
+      flip_depth_normal: true
+      normal_target_detach: true
+      valid_range: 0.96
+      min_depth: 0.0001
+      head_roi_weight: 2.5
+      face_roi_weight: 5.0
+      hairline_roi_weight: 5.0
+      ear_band_roi_weight: 2.5
+      boundary_boost: 3.0
+    depth_point:
+      consistency_weight: 0.10
+      xyz_weight: 0.70
+      z_weight: 1.00
+      valid_range: 0.96
+      min_depth: 0.0001
+      relative_scale: true
+      head_roi_weight: 2.5
+      face_roi_weight: 5.0
+      hairline_roi_weight: 5.0
+      ear_band_roi_weight: 2.5
+      boundary_boost: 3.0
+    cross_view:
+      consistency_weight: 0.10
+      depth_weight: 0.50
+      point_weight: 1.00
+      normal_weight: 0.0
+      valid_range: 0.96
+      stride: 8
+      max_pairs: 12
+      min_depth: 0.0001
+      orientation: unoriented
+      detach_projection: true
+      head_roi_weight: 2.5
+      face_roi_weight: 5.0
+      hairline_roi_weight: 5.0
+      ear_band_roi_weight: 2.5
+      boundary_boost: 3.0

@@ -1,0 +1,168 @@
+{
+  "audit_readiness": {
+    "forbidden_formal_writes": false,
+    "has_12v_tmf_scene": true,
+    "has_60v_support_case": true,
+    "has_6v_dense_teacher_arrays": true,
+    "v23_surface_complete_regions": true
+  },
+  "blockers": [],
+  "created_utc": "2026-05-08T21:40:14Z",
+  "inputs": {
+    "case_root": "D:\\vggt\\vggt-main\\output\\training_cases\\0012_11_frame0000_6views_smplx_native_prior_v15",
+    "v23_dir": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V23_residual_surface_v2",
+    "v23_masks_npz": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V23_residual_surface_v2\\v23_repaired_region_evidence_masks.npz",
+    "v23_surface_npz": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V23_residual_surface_v2\\v23_residual_surface_v2_points.npz"
+  },
+  "metrics": {
+    "height": 518,
+    "residual_norm": {
+      "count": 67218,
+      "finite": 67218,
+      "max": 0.009395855478942394,
+      "mean": 0.0022218835074454546,
+      "median": 0.0019503328949213028,
+      "min": 7.087027915986255e-05,
+      "p95": 0.004618698265403509
+    },
+    "teacher_pixels": 67218,
+    "uncertainty": {
+      "count": 67218,
+      "finite": 67218,
+      "max": 0.37583422660827637,
+      "mean": 0.08900511264801025,
+      "median": 0.07801331579685211,
+      "min": 0.029999999329447746,
+      "p95": 0.18474793434143066
+    },
+    "view_count": 6,
+    "width": 518
+  },
+  "no_candidate_export": true,
+  "no_predictions_write": true,
+  "no_registry_write": true,
+  "no_teacher_export": true,
+  "outputs": {
+    "report_json": "reports\\20260508_v24_residual_teacher_v2.json",
+    "report_md": "reports\\20260508_v24_residual_teacher_v2.md",
+    "summary_json": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V24_residual_teacher_v2\\summary.json",
+    "targets_npz": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V24_residual_teacher_v2\\v24_residual_teacher_targets_v2.npz"
+  },
+  "region_coverage": {
+    "body": {
+      "per_view_pixels": [
+        10204,
+        13536,
+        7374,
+        8375,
+        10119,
+        9866
+      ],
+      "pixels": 59474,
+      "residual_norm": {
+        "count": 59474,
+        "finite": 59474,
+        "max": 0.003992401994764805,
+        "mean": 0.001958321314305067,
+        "median": 0.0018608944956213236,
+        "min": 7.087027915986255e-05,
+        "p95": 0.0032420125789940357
+      },
+      "sample_points": 59474,
+      "views_with_pixels": 6
+    },
+    "face": {
+      "per_view_pixels": [
+        253,
+        267,
+        518,
+        702,
+        390,
+        292
+      ],
+      "pixels": 2422,
+      "residual_norm": {
+        "count": 2422,
+        "finite": 2422,
+        "max": 0.005499664694070816,
+        "mean": 0.0036797290667891502,
+        "median": 0.0035359568428248167,
+        "min": 0.00025983003433793783,
+        "p95": 0.005187907721847296
+      },
+      "sample_points": 2422,
+      "views_with_pixels": 6
+    },
+    "head": {
+      "per_view_pixels": [
+        820,
+        824,
+        792,
+        432,
+        820,
+        426
+      ],
+      "pixels": 4114,
+      "residual_norm": {
+        "count": 4114,
+        "finite": 4114,
+        "max": 0.005199951585382223,
+        "mean": 0.0038778989110141993,
+        "median": 0.004341483116149902,
+        "min": 0.0003208424604963511,
+        "p95": 0.005139493383467197
+      },
+      "sample_points": 4114,
+      "views_with_pixels": 6
+    },
+    "left_hand": {
+      "per_view_pixels": [
+        28,
+        51,
+        424,
+        52,
+        47,
+        134
+      ],
+      "pixels": 736,
+      "residual_norm": {
+        "count": 736,
+        "finite": 736,
+        "max": 0.00923246145248413,
+        "mean": 0.0061115967109799385,
+        "median": 0.006500315852463245,
+        "min": 0.0008300970657728612,
+        "p95": 0.008692210540175438
+      },
+      "sample_points": 736,
+      "views_with_pixels": 6
+    },
+    "right_hand": {
+      "per_view_pixels": [
+        0,
+        0,
+        194,
+        233,
+        17,
+        28
+      ],
+      "pixels": 472,
+      "residual_norm": {
+        "count": 472,
+        "finite": 472,
+        "max": 0.009395855478942394,
+        "mean": 0.007451782003045082,
+        "median": 0.008328987285494804,
+        "min": 0.004051330033689737,
+        "p95": 0.009119796566665173
+      },
+      "sample_points": 472,
+      "views_with_pixels": 4
+    }
+  },
+  "research_only": true,
+  "status": "DONE_PASS",
+  "strict_candidate_passes": 0,
+  "strict_teacher_passes": 0,
+  "task": "v24_residual_teacher_distillation_case_v2"
+}

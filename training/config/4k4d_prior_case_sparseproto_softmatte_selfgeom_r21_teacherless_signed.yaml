@@ -1,0 +1,91 @@
+defaults:
+  - 4k4d_prior_case_sparseproto_humancrop_depthnormal_coupled_r20_point_to_point_xview
+  - _self_
+
+exp_name: 4k4d_prior_case_sparseproto_softmatte_selfgeom_r21_teacherless_signed
+
+# Local diagnostic only:
+# - uses the softmatte crop training case, which has no prior_normals in targets;
+# - keeps SMPL-X as prior_maps / ROI support only;
+# - makes point_normal truly self-supervised via teacher_weight: 0;
+# - keeps derived normal signs explicit instead of relying on abs/unoriented
+#   losses to hide convention problems.
+
+data:
+  train:
+    dataset:
+      dataset_configs:
+        - _target_: data.datasets.dna4k4d_pseudo.DNA4K4DPseudoDataset
+          split: train
+          len_train: 40
+          len_test: 4
+          case_roots:
+            - D:/vggt/vggt-main/output/training_cases/0012_11_frame0000_6views_preprocess_crop_softmatte_v2_b40
+  val:
+    dataset:
+      dataset_configs:
+        - _target_: data.datasets.dna4k4d_pseudo.DNA4K4DPseudoDataset
+          split: test
+          len_train: 40
+          len_test: 4
+          case_roots:
+            - D:/vggt/vggt-main/output/training_cases/0012_11_frame0000_6views_preprocess_crop_softmatte_v2_b40
+
+loss:
+  human_prior:
+    weight: 0.10
+    normal: null
+    point_normal:
+      teacher_weight: 0.0
+      consistency_weight: 0.10
+      orientation: oriented
+      flip_point_normal: true
+      normal_target_detach: true
+      valid_range: 0.96
+      supervise_conf: false
+      head_roi_weight: 2.5
+      face_roi_weight: 4.0
+      hairline_roi_weight: 4.0
+      ear_band_roi_weight: 2.5
+      boundary_boost: 2.0
+    depth_normal:
+      consistency_weight: 0.06
+      orientation: oriented
+      flip_depth_normal: true
+      normal_target_detach: true
+      valid_range: 0.96
+      min_depth: 0.0001
+      head_roi_weight: 2.5
+      face_roi_weight: 4.0
+      hairline_roi_weight: 4.0
+      ear_band_roi_weight: 2.5
+      boundary_boost: 2.0
+    depth_point:
+      consistency_weight: 0.08
+      xyz_weight: 0.50
+      z_weight: 0.80
+      valid_range: 0.96
+      min_depth: 0.0001
+      relative_scale: true
+      head_roi_weight: 2.5
+      face_roi_weight: 4.0
+      hairline_roi_weight: 4.0
+      ear_band_roi_weight: 2.5
+      boundary_boost: 2.0
+    cross_view:
+      consistency_weight: 0.10
+      depth_weight: 0.30
+      point_weight: 1.20
+      normal_weight: 0.0
+      point_projection_source: world_points
+      valid_range: 0.96
+      stride: 8
+      max_pairs: 12
+      min_depth: 0.0001
+      orientation: unoriented
+      detach_projection: true
+      head_roi_weight: 2.5
+      face_roi_weight: 4.0
+      hairline_roi_weight: 4.0
+      ear_band_roi_weight: 2.5
+      boundary_boost: 2.0

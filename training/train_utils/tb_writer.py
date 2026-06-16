@@ -10,7 +10,11 @@ import uuid
 from typing import Any, Dict, Optional, Union
 
 import torch
-from torch.utils.tensorboard import SummaryWriter
+
+try:
+    from torch.utils.tensorboard import SummaryWriter
+except ModuleNotFoundError:  # pragma: no cover - environment dependent
+    SummaryWriter = None
 
 from .distributed import get_machine_local_and_dist_rank
 
@@ -38,19 +42,23 @@ class TensorBoardLogger:
             summary_writer_method: SummaryWriter class or compatible alternative
             *args, **kwargs: Additional arguments passed to SummaryWriter
         """
-        self._writer: Optional[SummaryWriter] = None
+        self._writer: Optional[Any] = None
         _, self._rank = get_machine_local_and_dist_rank()
         self._path: str = path
         if self._rank == 0:
             logging.info(
                 f"TensorBoard SummaryWriter instantiated. Files will be stored in: {path}"
             )
-            self._writer = summary_writer_method(
-                log_dir=path,
-                *args,
-                filename_suffix=filename_suffix or str(uuid.uuid4()),
-                **kwargs,
-            )
+            writer_cls = summary_writer_method
+            if writer_cls is None:
+                logging.warning("tensorboard is not installed; TensorBoard logging is disabled.")
+            else:
+                self._writer = writer_cls(
+                    log_dir=path,
+                    *args,
+                    filename_suffix=filename_suffix or str(uuid.uuid4()),
+                    **kwargs,
+                )
         else:
             logging.debug(
                 f"Not logging on this process because rank {self._rank} != 0"

@@ -1,0 +1,64 @@
+{
+  "task": "V222_cleanup_report",
+  "created_utc": "2026-05-08T21:59:25Z",
+  "status": "PASS",
+  "policy": "Moved only low-risk temp/root scratch residues into archive quarantine. No V50R2 frozen candidate, package, registry, or final bundle was modified.",
+  "quarantine_dir": "D:\\vggt\\vggt-main\\archive\\quarantine\\V223_low_risk_residue",
+  "moved_count": 8,
+  "skipped_count": 0,
+  "moved": [
+    {
+      "source": "D:\\vggt\\vggt-main\\archive\\V223_recovery_cloud_evidence_bundle.zip",
+      "destination": "D:\\vggt\\vggt-main\\archive\\quarantine\\V223_low_risk_residue\\archive\\V223_recovery_cloud_evidence_bundle.zip"
+    },
+    {
+      "source": "D:\\vggt\\vggt-main\\output\\tmp_targetcam30_view0_scene",
+      "destination": "D:\\vggt\\vggt-main\\archive\\quarantine\\V223_low_risk_residue\\output\\tmp_targetcam30_view0_scene"
+    },
+    {
+      "source": "D:\\vggt\\vggt-main\\output\\tmp_6v_from60v_view0_scene",
+      "destination": "D:\\vggt\\vggt-main\\archive\\quarantine\\V223_low_risk_residue\\output\\tmp_6v_from60v_view0_scene"
+    },
+    {
+      "source": "D:\\vggt\\vggt-main\\output\\tmp_60v_teacher_view0_scene",
+      "destination": "D:\\vggt\\vggt-main\\archive\\quarantine\\V223_low_risk_residue\\output\\tmp_60v_teacher_view0_scene"
+    },
+    {
+      "source": "D:\\vggt\\vggt-main\\output\\_tmp_tests",
+      "destination": "D:\\vggt\\vggt-main\\archive\\quarantine\\V223_low_risk_residue\\output\\_tmp_tests"
+    },
+    {
+      "source": "D:\\vggt\\vggt-main\\tmp_glbr_fc4_eval.out",
+      "destination": "D:\\vggt\\vggt-main\\archive\\quarantine\\V223_low_risk_residue\\tmp_glbr_fc4_eval.out"
+    },
+    {
+      "source": "D:\\vggt\\vggt-main\\tmp_glbr_fc5_eval.out",
+      "destination": "D:\\vggt\\vggt-main\\archive\\quarantine\\V223_low_risk_residue\\tmp_glbr_fc5_eval.out"
+    },
+    {
+      "source": "D:\\vggt\\vggt-main\\tmp_probe_summary_20260329_020541.md",
+      "destination": "D:\\vggt\\vggt-main\\archive\\quarantine\\V223_low_risk_residue\\tmp_probe_summary_20260329_020541.md"
+    }
+  ],
+  "skipped": [],
+  "protected_checks": [
+    {
+      "path": "D:\\vggt\\vggt-main\\output\\frozen_candidates\\V50R2_rebuilt_from_sessions_gdrive_modal",
+      "exists": true,
+      "is_dir": true,
+      "size": null
+    },
+    {
+      "path": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V50_final_promotion_transaction",
+      "exists": true,
+      "is_dir": true,
+      "size": null
+    },
+    {
+      "path": "D:\\vggt\\vggt-main\\archive\\V223_V50R2_mentor_final_bundle.zip",
+      "exists": true,
+      "is_dir": false,
+      "size": 360975097
+    }
+  ]
+}

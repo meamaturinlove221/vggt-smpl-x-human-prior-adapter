@@ -1,0 +1,89 @@
+# V402 Codex Session V50 Provenance Search
+
+- Session files scanned: 439
+- Hits: 454
+- Patch hits: 30
+- Command hits: 149
+- Output hits: 156
+
+## Top Path References
+- reports\\20260509_v50_final_promotion_transaction.json count=14
+- \vggt\\vggt-main\\output\\surface_research_preflight_local\\V50_final_promotion_transaction\\strict_registry_entry_v50.json\ count=14
+- tools\\v49_package_dry_run.py count=11
+- reports\\20260509_v49_package_dry_run.json count=11
+- tools\\v50_final_promotion_transaction.py count=10
+- output/surface_research_preflight_local/V44_strict_visual_pre_promotion_gate/visual_review_codex_pass.json\ count=10
+- D:/vggt/vggt-main/reports/20260509_v50_final_promotion_transaction.md)\n- count=9
+- tools\\v50_final_promotion_transaction.py\ count=9
+- tools\\v44_v50_common.py count=9
+- \vggt\\vggt-main\\output\\frozen_candidates\\V50_smplx_native_candidate_pass\\package_files\\candidate_files__candidate_points.npz\ count=8
+- \vggt\\vggt-main\\archive\\V64_candidate_pass_bundle.zip\ count=8
+- \vggt\\vggt-main\\output\\surface_research_preflight_local\\V50_final_promotion_transaction\\candidate_package_v50\\manifest.json\ count=7
+- D:/vggt/vggt-main/reports/20260509_v49_package_dry_run.md)\n- count=6
+- D:/vggt/vggt-main/reports/20260509_v44_v50_completion_audit.md)\n\nCompletion count=6
+- \vggt\\vggt-main\\output\\surface_research_preflight_local\\V49_package_dry_run\\registry_entry_dryrun.json\ count=6
+- tools\\v50_final_promotion_transaction.py; count=6
+- output\\surface_research_preflight_local\\V44_strict_visual_pre_promotion_gate\\visual_review_codex_pass.json\ count=6
+- tools/v50_final_promotion_transaction.py\n count=6
+- \vggt\\vggt-main\\output\\frozen_candidates\\V50_smplx_native_candidate_pass\\package_files\\candidate_files__candidate_normals.npz\ count=6
+- \vggt\\vggt-main\\output\\frozen_candidates\\V50_smplx_native_candidate_pass\\package_files\\candidate_files__hand_patch.npz\ count=6
+- \vggt\\vggt-main\\output\\frozen_candidates\\V50_smplx_native_candidate_pass\\package_files\\candidate_files__head_face_patch.npz\ count=6
+- \vggt\\vggt-main\\reports\\A_v50_v64_integrity_terminal.json\ count=6
+- reports\\20260509_v44_v50_completion_audit.json count=6
+- reports/20260509_v42_v50_dependency_audit.json](D:/vggt/vggt-main/reports/20260509_v42_v50_dependency_audit.json)\n- count=5
+- reports/20260509_v42_v50_dependency_audit.md](D:/vggt/vggt-main/reports/20260509_v42_v50_dependency_audit.md)\n\nChanged count=5
+- tools/v44_v50_common.py](D:/vggt/vggt-main/tools/v44_v50_common.py)\n- count=5
+- tools/v49_package_dry_run.py](D:/vggt/vggt-main/tools/v49_package_dry_run.py)\n- count=5
+- tools/v50_final_promotion_transaction.py](D:/vggt/vggt-main/tools/v50_final_promotion_transaction.py)\n- count=5
+- reports/20260509_v50_final_promotion_transaction.json\ count=5
+- \vggt\\vggt-main\\output\\surface_research_preflight_local\\V50_final_promotion_transaction\\candidate_package_v50\ count=5
+- \vggt\\vggt-main\\output\\surface_research_preflight_local\\V49_package_dry_run\\candidate_package_dryrun\\manifest_dryrun.json\ count=5
+- \vggt\vggt-main\tools\v50_final_promotion_transaction.py count=5
+- output\\surface_research_preflight_local\\V50_final_promotion_transaction\\candidate_package_v50\\manifest.json count=5
+- output\\frozen_candidates\\V50_smplx_native_candidate_pass count=5
+- \vggt\\vggt-main\\output\\frozen_candidates\\V50_smplx_native_candidate_pass\ count=5
+- output\\frozen_candidates\\V50_smplx_native_candidate_pass\\package_files count=5
+- \vggt\\vggt-main\\archive\\V138_candidate_pass_bundle_v3.zip count=5
+- \vggt\\vggt-main\\output\\frozen_candidates\\V50_smplx_native_candidate_pass\\manifest.json count=5
+- reports\\20260509_v42_v50_dependency_audit.json count=5
+- \vggt\\vggt-main\\archive\\V64_candidate_pass_bundle.zip count=5
+- tools\\v49_package_dry_run.py\ count=4
+- output\\surface_research_preflight_local\\V50_final_promotion_transaction\\strict_registry_entry_v50.json count=4
+- output\\frozen_candidates\\V50_smplx_native_candidate_pass\\hash_manifest.json count=4
+- archive\\V64_candidate_pass_bundle count=4
+- \vggt\\vggt-main\\archive\\package_files.zip\ count=4
+- archive\\V138_candidate_pass_bundle_v3\\V121_v62_v120_supplement_bundle\\visual_board_v135 count=4
+- \vggt\\vggt-main\\output\\frozen_candidates\\V50_smplx_native_candidate_pass\\manifest.json\ count=4
+- output/frozen_candidates/V50_smplx_native_candidate_pass` count=4
+- output/frozen_candidates/V50_smplx_native_candidate_pass/manifest.json`、`strict_registry_entry_v50.json`，以及 count=4
+- tools/v50_final_promotion_transaction.py` count=4
+- reports\\20260509_v50_final_promotion_transaction.json\ count=4
+- \vggt\\vggt-main\\reports\\20260509_v49_package_dry_run.json\ count=3
+- \vggt\\vggt-main\\output\\surface_research_preflight_local\\V49_package_dry_run\\summary.json\ count=3
+- \vggt\\vggt-main\\reports\\20260509_v50_final_promotion_transaction.json\ count=3
+- \vggt\\vggt-main\\output\\surface_research_preflight_local\\V50_final_promotion_transaction\\summary.json\ count=3
+- reports/20260509_v49_package_dry_run.json\ count=3
+- reports/20260509_v44_v50_completion_audit.json\ count=3
+- \vggt\vggt-main\tools\v37_v50_completion_audit.py count=3
+- \vggt\vggt-main\tools\v44_v50_completion_audit.py count=3
+- \vggt\\vggt-main\\output\\surface_research_preflight_local\\V49_package_dry_run\\teacher_package_dryrun\\manifest_dryrun.json\ count=3
+- tools/v50_final_promotion_transaction.py\n\ count=3
+- D:/vggt/vggt-main/output/surface_research_preflight_local/V50_final_promotion_transaction/strict_registry_entry_v50.json)\n- count=3
+- D:/vggt/vggt-main/output/surface_research_preflight_local/V50_final_promotion_transaction/candidate_package_v50)\n- count=3
+- D:/vggt/vggt-main/output/surface_research_preflight_local/V50_final_promotion_transaction/candidate_package_v50/manifest.json)\n- count=3
+- D:/vggt/vggt-main/reports/20260509_v37_v50_completion_audit.md)\n- count=3
+- D:/vggt/vggt-main/output/surface_research_preflight_local/V44_strict_visual_pre_promotion_gate/visual_review_codex_pass.json)\n- count=3
+- \vggt\\vggt-main\\output\\frozen_candidates\\V50_smplx_native_candidate_pass\\package_files\\candidate_files__temporal_teacher.npz\ count=3
+- D:/vggt/vggt-main/output/frozen_candidates/V50_smplx_native_candidate_pass)\n count=3
+- D:/vggt/vggt-main/output/frozen_candidates/V50_smplx_native_candidate_pass/hash_manifest.json)\n\n- count=3
+- D:/vggt/vggt-main/output/frozen_candidates/V50_smplx_native_candidate_pass)\n- count=3
+- D:/vggt/vggt-main/archive/V64_candidate_pass_bundle)\n- count=3
+- D:/vggt/vggt-main/reports/V64_H_mentor_QA.md)\n- count=3
+- D:/vggt/vggt-main/archive/V64_candidate_pass_bundle)\n\n最终状态已刷新：\n\n- count=3
+- \vggt\\vggt-main\\archive\\V64_candidate_pass_bundle.zip`，约 count=3
+- \vggt\\vggt-main\\archive\\V64_candidate_pass_bundle`，约 count=3
+- \vggt\\vggt-main\\output\\frozen_candidates\\V50_smplx_native_candidate_pass`，约 count=3
+- \vggt\\vggt-main\\output\\frozen_candidates\\V64_replay_stress`\n- count=3
+- \vggt\\vggt-main\\reports\\V64_*`\n- count=3
+- \vggt\\vggt-main\\reports\\20260509_v37_v50_*`\n- count=3
+- \vggt\\vggt-main\\reports\\20260509_v44_v50_*`\n- count=3

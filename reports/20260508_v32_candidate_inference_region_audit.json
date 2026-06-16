@@ -1,0 +1,39 @@
+{
+  "blockers": [],
+  "candidate_depths": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V32_candidate_inference_research\\candidate_depths_research.npz",
+  "candidate_normals_geometric": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V32_candidate_inference_research\\candidate_normals_geometric_research.npz",
+  "candidate_points_world": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V32_candidate_inference_research\\candidate_points_world_research.npz",
+  "candidate_visibility": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V32_candidate_inference_research\\candidate_visibility_research.npz",
+  "contact_sheet": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V32_candidate_inference_research\\v32_candidate_contact_sheet.png",
+  "created_utc": "2026-05-08T21:44:10Z",
+  "recovery_mode": "rebuilt_from_V42_points_and_V24_region_masks",
+  "region_metrics": {
+    "body": {
+      "depth_finite_ratio": 1.0,
+      "normal_nonzero_ratio": 1.0,
+      "pixel_count": 59474
+    },
+    "face": {
+      "depth_finite_ratio": 1.0,
+      "normal_nonzero_ratio": 1.0,
+      "pixel_count": 2422
+    },
+    "head": {
+      "depth_finite_ratio": 1.0,
+      "normal_nonzero_ratio": 1.0,
+      "pixel_count": 4114
+    },
+    "left_hand": {
+      "depth_finite_ratio": 1.0,
+      "normal_nonzero_ratio": 1.0,
+      "pixel_count": 736
+    },
+    "right_hand": {
+      "depth_finite_ratio": 1.0,
+      "normal_nonzero_ratio": 1.0,
+      "pixel_count": 472
+    }
+  },
+  "status": "DONE_PASS",
+  "task": "v32_candidate_inference_research"
+}

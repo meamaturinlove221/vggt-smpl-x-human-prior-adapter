@@ -1,0 +1,283 @@
+{
+  "blockers": [],
+  "created_utc": "2026-05-08T21:39:44Z",
+  "decision": "V23 repaired the V17 zero head/face sampling bug by building per-region evidence from V16 ROI maps intersected with V15 raw silhouette support. The resulting research surface has nonempty body/head/face/left_hand/right_hand evidence and samples.",
+  "inputs": {
+    "case_root": "D:\\vggt\\vggt-main\\output\\training_cases\\0012_11_frame0000_6views_smplx_native_prior_v15",
+    "roi_npz": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V16_smplx_native_region_roi_builder\\v16_smplx_native_region_roi_maps.npz",
+    "sapiens_normal_npz": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V15_S_sapiens_normal_convention_solver\\v15_sapiens_normals_best_camera_convention.npz"
+  },
+  "metrics": {
+    "applied_residual_norm": {
+      "count": 67218,
+      "finite": 67218,
+      "max": 0.009395855478942394,
+      "mean": 0.0022218835074454546,
+      "median": 0.0019503328949213028,
+      "min": 7.087027915986255e-05,
+      "p90": 0.003499652026221156,
+      "p95": 0.004618698265403509
+    },
+    "applied_to_raw_residual_ratio": {
+      "count": 67218,
+      "finite": 67218,
+      "max": 5.466190338134766,
+      "mean": 0.2617293894290924,
+      "median": 0.1982269585132599,
+      "min": 0.0005496583180502057,
+      "p90": 0.5199298858642578,
+      "p95": 0.7279735803604126
+    },
+    "evidence_pixels": 67218,
+    "height": 518,
+    "max_applied_residual_m": 0.009395855478942394,
+    "mean_applied_residual_m": 0.0022218835074454546,
+    "normal_metrics": {
+      "prior_normal_length": {
+        "count": 67218,
+        "finite": 67218,
+        "max": 1.0000001192092896,
+        "mean": 1.0,
+        "median": 1.0,
+        "min": 0.9999998807907104,
+        "p90": 1.0,
+        "p95": 1.0
+      },
+      "prior_vs_sapiens": {
+        "pixels": 0
+      },
+      "sapiens_available": false,
+      "sapiens_matched_view_count": 0,
+      "sapiens_valid_pixels_after_resize": 0
+    },
+    "raw_residual_norm": {
+      "count": 67218,
+      "finite": 67218,
+      "max": 2.098579168319702,
+      "mean": 0.1357744038105011,
+      "median": 0.010299044661223888,
+      "min": 0.0002708408865146339,
+      "p90": 0.8924629092216492,
+      "p95": 0.9748967885971069
+    },
+    "region_metrics": {
+      "body": {
+        "applied_residual_norm": {
+          "count": 59474,
+          "finite": 59474,
+          "max": 0.003992401994764805,
+          "mean": 0.001958321314305067,
+          "median": 0.0018608944956213236,
+          "min": 7.087027915986255e-05,
+          "p90": 0.0029379550833255053,
+          "p95": 0.0032420125789940357
+        },
+        "clip_limit_m": 0.025,
+        "native_visible_overlap_pixels": 25046,
+        "normal_relief_m": 0.0015,
+        "per_view_pixels": [
+          10204,
+          13536,
+          7374,
+          8375,
+          10119,
+          9866
+        ],
+        "pixels": 59474,
+        "raw_residual_norm": {
+          "count": 59474,
+          "finite": 59474,
+          "max": 1.9875284433364868,
+          "mean": 0.12561164796352386,
+          "median": 0.009240888059139252,
+          "min": 0.0002708408865146339,
+          "p90": 0.8928248286247253,
+          "p95": 0.9753486514091492
+        },
+        "raw_silhouette_overlap_pixels": 67218,
+        "sampled_points": 59474,
+        "source": "v16_roi_intersect_v15_raw_silhouette_support_exclusive",
+        "weak_weight": 0.1
+      },
+      "face": {
+        "applied_residual_norm": {
+          "count": 2422,
+          "finite": 2422,
+          "max": 0.005499664694070816,
+          "mean": 0.0036797290667891502,
+          "median": 0.0035359568428248167,
+          "min": 0.00025983003433793783,
+          "p90": 0.005072374828159809,
+          "p95": 0.005187907721847296
+        },
+        "clip_limit_m": 0.015,
+        "native_visible_overlap_pixels": 0,
+        "normal_relief_m": 0.0025,
+        "per_view_pixels": [
+          253,
+          267,
+          518,
+          702,
+          390,
+          292
+        ],
+        "pixels": 2422,
+        "raw_residual_norm": {
+          "count": 2422,
+          "finite": 2422,
+          "max": 1.7806674242019653,
+          "mean": 0.18980033695697784,
+          "median": 0.017634667456150055,
+          "min": 0.004409632179886103,
+          "p90": 0.8182662129402161,
+          "p95": 0.8351148962974548
+        },
+        "raw_silhouette_overlap_pixels": 2422,
+        "sampled_points": 2422,
+        "source": "v16_roi_intersect_v15_raw_silhouette_support_exclusive",
+        "weak_weight": 0.2
+      },
+      "head": {
+        "applied_residual_norm": {
+          "count": 4114,
+          "finite": 4114,
+          "max": 0.005199951585382223,
+          "mean": 0.0038778989110141993,
+          "median": 0.004341483116149902,
+          "min": 0.0003208424604963511,
+          "p90": 0.0050811609253287315,
+          "p95": 0.005139493383467197
+        },
+        "clip_limit_m": 0.02,
+        "native_visible_overlap_pixels": 0,
+        "normal_relief_m": 0.002,
+        "per_view_pixels": [
+          820,
+          824,
+          792,
+          432,
+          820,
+          426
+        ],
+        "pixels": 4114,
+        "raw_residual_norm": {
+          "count": 4114,
+          "finite": 4114,
+          "max": 2.098579168319702,
+          "mean": 0.22453714907169342,
+          "median": 0.02705181948840618,
+          "min": 0.004079262726008892,
+          "p90": 0.9179903864860535,
+          "p95": 1.285469889640808
+        },
+        "raw_silhouette_overlap_pixels": 6536,
+        "sampled_points": 4114,
+        "source": "v16_roi_intersect_v15_raw_silhouette_support_exclusive",
+        "weak_weight": 0.16
+      },
+      "left_hand": {
+        "applied_residual_norm": {
+          "count": 736,
+          "finite": 736,
+          "max": 0.00923246145248413,
+          "mean": 0.0061115967109799385,
+          "median": 0.006500315852463245,
+          "min": 0.0008300970657728612,
+          "p90": 0.008505619131028652,
+          "p95": 0.008692210540175438
+        },
+        "clip_limit_m": 0.03,
+        "native_visible_overlap_pixels": 614,
+        "normal_relief_m": 0.0022,
+        "per_view_pixels": [
+          28,
+          51,
+          424,
+          52,
+          47,
+          134
+        ],
+        "pixels": 736,
+        "raw_residual_norm": {
+          "count": 736,
+          "finite": 736,
+          "max": 1.5849899053573608,
+          "mean": 0.15346136689186096,
+          "median": 0.037230368703603745,
+          "min": 0.0009314806084148586,
+          "p90": 0.9035946726799011,
+          "p95": 0.93911212682724
+        },
+        "raw_silhouette_overlap_pixels": 736,
+        "sampled_points": 736,
+        "source": "v16_roi_intersect_v15_raw_silhouette_support_exclusive",
+        "weak_weight": 0.24
+      },
+      "right_hand": {
+        "applied_residual_norm": {
+          "count": 472,
+          "finite": 472,
+          "max": 0.009395855478942394,
+          "mean": 0.007451782003045082,
+          "median": 0.008328987285494804,
+          "min": 0.004051330033689737,
+          "p90": 0.008937792852520943,
+          "p95": 0.009119796566665173
+        },
+        "clip_limit_m": 0.03,
+        "native_visible_overlap_pixels": 130,
+        "normal_relief_m": 0.0022,
+        "per_view_pixels": [
+          0,
+          0,
+          194,
+          233,
+          17,
+          28
+        ],
+        "pixels": 472,
+        "raw_residual_norm": {
+          "count": 472,
+          "finite": 472,
+          "max": 1.6186877489089966,
+          "mean": 0.3378547728061676,
+          "median": 0.06364038586616516,
+          "min": 0.01120837777853012,
+          "p90": 1.059145212173462,
+          "p95": 1.3858059644699097
+        },
+        "raw_silhouette_overlap_pixels": 485,
+        "sampled_points": 472,
+        "source": "v16_roi_intersect_v15_raw_silhouette_support_exclusive",
+        "weak_weight": 0.24
+      }
+    },
+    "sampled_points": 67218,
+    "view_count": 6,
+    "width": 518
+  },
+  "no_candidate_export": true,
+  "no_flame": true,
+  "no_hairgs": true,
+  "no_mano": true,
+  "no_package_write": true,
+  "no_predictions_write": true,
+  "no_registry_write": true,
+  "no_strict_pass_claim": true,
+  "no_teacher_export": true,
+  "outputs": {
+    "mask_npz": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V23_residual_surface_v2\\v23_repaired_region_evidence_masks.npz",
+    "mask_summary_json": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V23_residual_surface_v2\\v23_repaired_region_evidence_masks_summary.json",
+    "prior_sample_ply": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V23_residual_surface_v2\\v23_prior_region_sample_points.ply",
+    "residual_surface_npz": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V23_residual_surface_v2\\v23_residual_surface_v2_points.npz",
+    "residual_surface_ply": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V23_residual_surface_v2\\v23_residual_surface_v2_points.ply",
+    "summary_json": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V23_residual_surface_v2\\summary.json"
+  },
+  "research_only": true,
+  "route_token": "DONE_PASS",
+  "smplx_native_only": true,
+  "status": "DONE_PASS",
+  "strict_candidate_passes": 0,
+  "strict_teacher_passes": 0,
+  "task": "v23_residual_surface_v2"
+}

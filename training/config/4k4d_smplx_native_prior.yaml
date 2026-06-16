@@ -1,0 +1,216 @@
+defaults:
+  - 4k4d_prior_case
+  - _self_
+
+exp_name: 4k4d_smplx_native_prior_v15
+
+# Local design/smoke config. Build these roots with:
+# tools/v15_build_smplx_vggt_prior_case.py --template-case-root <case> --output-dir <root>
+smplx_native_case_roots:
+  - D:/vggt/vggt-main/output/training_cases/0012_11_frame0000_6views_smplx_native_prior_v15
+
+num_workers: 0
+max_img_per_gpu: 6
+limit_train_batches: 4
+limit_val_batches: 1
+max_epochs: 1
+
+distributed:
+  backend: single
+  find_unused_parameters: False
+
+data:
+  train:
+    common_config:
+      fix_img_num: 6
+      img_nums: [6, 6]
+      repeat_batch: False
+      prior_pose_noise:
+        enabled: True
+        prob: 0.35
+        cam_xyz_std: 0.006
+        cam_xyz_global_std: 0.003
+        scale_std: 0.006
+        normal_std: 0.02
+        visibility_dropout: 0.03
+        spatial_shift_std_px: 0.75
+        max_spatial_shift_px: 2
+    dataset:
+      dataset_configs:
+        - _target_: data.datasets.dna4k4d_pseudo.DNA4K4DPseudoDataset
+          split: train
+          len_train: 16
+          len_test: 4
+          case_roots: ${smplx_native_case_roots}
+  val:
+    common_config:
+      fix_img_num: 6
+      img_nums: [6, 6]
+      repeat_batch: False
+      prior_pose_noise:
+        enabled: False
+    dataset:
+      dataset_configs:
+        - _target_: data.datasets.dna4k4d_pseudo.DNA4K4DPseudoDataset
+          split: test
+          len_train: 16
+          len_test: 4
+          case_roots: ${smplx_native_case_roots}
+
+logging:
+  log_dir: output/local_training_results/${exp_name}/logs
+  scalar_keys_to_log:
+    train:
+      keys_to_log:
+        - loss_objective
+        - loss_camera
+        - loss_conf_depth
+        - loss_reg_depth
+        - loss_grad_depth
+        - loss_conf_point
+        - loss_reg_point
+        - loss_grad_point
+        - loss_human_prior
+        - loss_prior_depth
+        - loss_prior_depth_conf
+        - loss_prior_depth_reg
+        - loss_prior_depth_grad
+        - loss_prior_point
+        - loss_prior_point_conf
+        - loss_prior_point_reg
+        - loss_prior_point_grad
+        - loss_prior_normal
+        - loss_prior_normal_conf
+        - loss_prior_normal_reg
+        - loss_prior_depth_point
+        - loss_prior_depth_point_consistency
+        - loss_prior_smplx_body_depth
+        - loss_prior_smplx_body_point
+        - loss_prior_smplx_body_weak
+        - loss_prior_smplx_hand_depth
+        - loss_prior_smplx_hand_point
+        - loss_prior_smplx_hand_weak
+        - loss_prior_smplx_weak_anchor
+        - loss_smplx_native_missing_key_count
+    val:
+      keys_to_log:
+        - loss_objective
+        - loss_camera
+        - loss_conf_depth
+        - loss_reg_depth
+        - loss_grad_depth
+        - loss_conf_point
+        - loss_reg_point
+        - loss_grad_point
+        - loss_human_prior
+        - loss_prior_depth
+        - loss_prior_depth_conf
+        - loss_prior_depth_reg
+        - loss_prior_depth_grad
+        - loss_prior_point
+        - loss_prior_point_conf
+        - loss_prior_point_reg
+        - loss_prior_point_grad
+        - loss_prior_normal
+        - loss_prior_normal_conf
+        - loss_prior_normal_reg
+        - loss_prior_depth_point
+        - loss_prior_depth_point_consistency
+        - loss_prior_smplx_body_depth
+        - loss_prior_smplx_body_point
+        - loss_prior_smplx_body_weak
+        - loss_prior_smplx_hand_depth
+        - loss_prior_smplx_hand_point
+        - loss_prior_smplx_hand_weak
+        - loss_prior_smplx_weak_anchor
+        - loss_smplx_native_missing_key_count
+
+checkpoint:
+  enabled: False
+  save_dir: output/local_training_results/${exp_name}/ckpts
+  save_optimizer_state: False
+  resume_checkpoint_path: null
+  strict: False
+
+loss:
+  _target_: loss_smplx_native_prior.SMPLXNativePriorLoss
+  native_prior:
+    use_default_human_prior: False
+    strict_required_keys: False
+    required_batch_keys:
+      - prior_maps
+      - prior_mask
+      - prior_depths
+      - prior_points
+      - smplx_body_anchor_mask
+    required_prediction_keys:
+      - depth
+      - world_points
+  camera:
+    weight: 5.0
+    loss_type: l1
+  depth:
+    weight: 1.0
+    gradient_loss_fn: grad
+    valid_range: 0.98
+  point:
+    weight: 1.0
+    gradient_loss_fn: normal
+    valid_range: 0.98
+  human_prior:
+    weight: 0.10
+    depth:
+      gamma: 1.0
+      alpha: 0.0
+      gradient_loss_fn: null
+      valid_range: 0.96
+      supervise_conf: false
+    point:
+      gamma: 1.0
+      alpha: 0.0
+      gradient_loss_fn: null
+      valid_range: 0.96
+      supervise_conf: false
+    normal:
+      gamma: 1.0
+      alpha: 0.0
+      valid_range: 0.96
+      supervise_conf: false
+      boundary_boost: 1.25
+    depth_point:
+      consistency_weight: 0.05
+      relative_scale: true
+      valid_range: 0.96
+    smplx_weak_anchor:
+      body_weight: 0.25
+      hand_weight: 0.50
+      depth_loss_weight: 0.25
+      point_loss_weight: 0.50
+      gamma: 1.0
+      alpha: 0.0
+      valid_range: 0.96
+      min_pixels: 64
+      supervise_conf: false
+      use_separate_hand_masks: true
+      exclude_head_roi: true
+      exclude_face_roi: true
+      exclude_hairline_roi: true
+      exclude_ear_band_roi: true
+  track: null
+
+optim:
+  optimizer:
+    lr: 5e-6
+    weight_decay: 0.05
+  frozen_module_names: []
+
+model:
+  human_prior_channels: 29
+  human_prior_summary_channels: 27
+  human_prior_hidden_dim: 128
+  human_prior_gate_init: 0.0
+  human_prior_multi_scale_factors: [1, 2, 4]
+  human_prior_enable_input_fusion: True
+  human_prior_enable_frame_fusion: True
+  human_prior_enable_global_fusion: True
+  human_prior_enable_summary_fusion: True

@@ -1,0 +1,103 @@
+defaults:
+  - 4k4d_prior_case_sparseproto_humancrop_depthnormal_coupled_r20_point_to_point_xview
+  - _self_
+
+exp_name: 4k4d_prior_case_sparseproto_headshoulder_teacher_target_r66_headonly_geomprobe
+
+max_img_per_gpu: 6
+num_workers: 0
+limit_train_batches: 32
+limit_val_batches: 1
+max_epochs: 1
+
+distributed:
+  backend: single
+
+data:
+  train:
+    common_config:
+      fix_img_num: 6
+      img_nums: [6, 6]
+      repeat_batch: False
+      prior_pose_noise:
+        enabled: False
+    dataset:
+      _target_: data.composed_dataset.ComposedDataset
+      dataset_configs:
+        - _target_: data.datasets.dna4k4d_pseudo.DNA4K4DPseudoDataset
+          split: train
+          len_train: 64
+          len_test: 4
+          case_roots:
+            - D:/vggt/vggt-main/output/training_cases/0012_11_frame0000_6views_sparseproto_headshoulder_teacher_target_r65
+  val:
+    common_config:
+      fix_img_num: 6
+      img_nums: [6, 6]
+      repeat_batch: False
+      prior_pose_noise:
+        enabled: False
+    dataset:
+      _target_: data.composed_dataset.ComposedDataset
+      dataset_configs:
+        - _target_: data.datasets.dna4k4d_pseudo.DNA4K4DPseudoDataset
+          split: test
+          len_train: 64
+          len_test: 4
+          case_roots:
+            - D:/vggt/vggt-main/output/training_cases/0012_11_frame0000_6views_sparseproto_headshoulder_teacher_target_r65
+
+checkpoint:
+  save_dir: output/local_training_results/r66_teacher_target_headonly_geomprobe/ckpts
+  save_freq: 1
+  save_optimizer_state: False
+  resume_checkpoint_path: D:/vggt/vggt-main/output/modal_training_results/20260429_normal_r20_point_to_point_xview_smoke20_from_ckpt4/inference_model.pt
+  strict: False
+
+optim:
+  frozen_module_names:
+    - aggregator
+    - camera_head
+    - normal_head
+  optimizer:
+    lr: 2.0e-6
+
+loss:
+  depth:
+    weight: 1.0
+    supervise_conf: false
+    gradient_loss_fn: null
+    valid_range: 0.98
+    head_roi_weight: 2.5
+    face_roi_weight: 5.0
+    hairline_roi_weight: 4.5
+    ear_band_roi_weight: 2.5
+    boundary_boost: 2.0
+  point:
+    weight: 1.0
+    supervise_conf: false
+    gradient_loss_fn: null
+    valid_range: 0.98
+    head_roi_weight: 2.5
+    face_roi_weight: 5.0
+    hairline_roi_weight: 4.5
+    ear_band_roi_weight: 2.5
+    boundary_boost: 2.0
+  human_prior:
+    weight: 0.0
+    depth:
+      loss_weight: 0.0
+      supervise_conf: false
+    point:
+      loss_weight: 0.0
+      supervise_conf: false
+    point_normal:
+      teacher_weight: 0.0
+      consistency_weight: 0.0
+      supervise_conf: false
+    depth_normal:
+      consistency_weight: 0.0
+    depth_point:
+      consistency_weight: 0.0
+    cross_view:
+      consistency_weight: 0.0

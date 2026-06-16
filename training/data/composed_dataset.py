@@ -127,6 +127,46 @@ class ComposedDataset(Dataset, ABC):
         foreground_masks = None
         if "foreground_masks" in batch and batch["foreground_masks"] is not None:
             foreground_masks = torch.from_numpy(np.stack(batch["foreground_masks"]).astype(bool))
+        smpl_prior_masks = None
+        if "smpl_prior_masks" in batch and batch["smpl_prior_masks"] is not None:
+            smpl_prior_masks = torch.from_numpy(np.stack(batch["smpl_prior_masks"]).astype(bool))
+        smpl_prior_feature_maps = None
+        if "smpl_prior_feature_maps" in batch and batch["smpl_prior_feature_maps"] is not None:
+            smpl_prior_feature_maps = torch.from_numpy(np.stack(batch["smpl_prior_feature_maps"]).astype(np.float32))
+        smpl_vertex_feature_maps = None
+        if "smpl_vertex_feature_maps" in batch and batch["smpl_vertex_feature_maps"] is not None:
+            smpl_vertex_feature_maps = torch.from_numpy(
+                np.stack(batch["smpl_vertex_feature_maps"]).astype(np.float32)
+            )
+        smpl_summary_tokens = None
+        if "smpl_summary_tokens" in batch and batch["smpl_summary_tokens"] is not None:
+            smpl_summary_tokens = torch.from_numpy(np.asarray(batch["smpl_summary_tokens"], dtype=np.float32))
+        human_prior_completion_masks = None
+        if "human_prior_completion_masks" in batch and batch["human_prior_completion_masks"] is not None:
+            human_prior_completion_masks = torch.from_numpy(
+                np.stack(batch["human_prior_completion_masks"]).astype(bool)
+            )
+        human_prior_completion_depths = None
+        if "human_prior_completion_depths" in batch and batch["human_prior_completion_depths"] is not None:
+            human_prior_completion_depths = torch.from_numpy(
+                np.stack(batch["human_prior_completion_depths"]).astype(np.float32)
+            )
+        human_prior_completion_world_points = None
+        if "human_prior_completion_world_points" in batch and batch["human_prior_completion_world_points"] is not None:
+            human_prior_completion_world_points = torch.from_numpy(
+                np.stack(batch["human_prior_completion_world_points"]).astype(np.float32)
+            )
+        human_prior_completion_point_masks = None
+        if "human_prior_completion_point_masks" in batch and batch["human_prior_completion_point_masks"] is not None:
+            human_prior_completion_point_masks = torch.from_numpy(
+                np.stack(batch["human_prior_completion_point_masks"]).astype(bool)
+            )
+        head_hair_region_masks = None
+        if "head_hair_region_masks" in batch and batch["head_hair_region_masks"] is not None:
+            head_hair_region_masks = torch.from_numpy(np.stack(batch["head_hair_region_masks"]).astype(bool))
+        head_hair_detail_masks = None
+        if "head_hair_detail_masks" in batch and batch["head_hair_detail_masks"] is not None:
+            head_hair_detail_masks = torch.from_numpy(np.stack(batch["head_hair_detail_masks"]).astype(bool))
 
 
         # --- Apply Color Augmentation (training mode only) ---
@@ -158,6 +198,26 @@ class ComposedDataset(Dataset, ABC):
             sample["depth_conf_maps"] = depth_conf_maps
         if foreground_masks is not None:
             sample["foreground_masks"] = foreground_masks
+        if smpl_prior_masks is not None:
+            sample["smpl_prior_masks"] = smpl_prior_masks
+        if smpl_prior_feature_maps is not None:
+            sample["smpl_prior_feature_maps"] = smpl_prior_feature_maps
+        if smpl_vertex_feature_maps is not None:
+            sample["smpl_vertex_feature_maps"] = smpl_vertex_feature_maps
+        if smpl_summary_tokens is not None:
+            sample["smpl_summary_tokens"] = smpl_summary_tokens
+        if human_prior_completion_masks is not None:
+            sample["human_prior_completion_masks"] = human_prior_completion_masks
+        if human_prior_completion_depths is not None:
+            sample["human_prior_completion_depths"] = human_prior_completion_depths
+        if human_prior_completion_world_points is not None:
+            sample["human_prior_completion_world_points"] = human_prior_completion_world_points
+        if human_prior_completion_point_masks is not None:
+            sample["human_prior_completion_point_masks"] = human_prior_completion_point_masks
+        if head_hair_region_masks is not None:
+            sample["head_hair_region_masks"] = head_hair_region_masks
+        if head_hair_detail_masks is not None:
+            sample["head_hair_detail_masks"] = head_hair_detail_masks
         if "selection_anchor_camera" in batch:
             anchor_camera = batch["selection_anchor_camera"]
             sample["selection_anchor_camera"] = "" if anchor_camera is None else str(anchor_camera)
@@ -189,6 +249,33 @@ class ComposedDataset(Dataset, ABC):
             sample["selection_sample_manifest_label"] = str(
                 batch.get("selection_sample_manifest_label") or ""
             )
+
+        # Preserve optional SMPL-X-native prior supervision fields.  Earlier
+        # configs referenced these keys in SMPLXNativePriorLoss, but the
+        # composed dataset only forwarded a smaller ZJU-style subset, so the
+        # losses could silently route through missing-key/zero branches.
+        for optional_key in (
+            "prior_maps",
+            "prior_mask",
+            "prior_depths",
+            "prior_points",
+            "prior_normals",
+            "teacher_mask",
+            "smplx_bodyhand_anchor_mask",
+            "smplx_body_anchor_mask",
+            "smplx_hand_anchor_mask",
+            "smplx_left_hand_anchor_mask",
+            "smplx_right_hand_anchor_mask",
+            "smplx_native_visible_mask",
+        ):
+            if optional_key in batch and batch[optional_key] is not None:
+                arr = np.stack(batch[optional_key])
+                if arr.dtype == np.bool_:
+                    sample[optional_key] = torch.from_numpy(arr.astype(bool))
+                elif np.issubdtype(arr.dtype, np.number):
+                    sample[optional_key] = torch.from_numpy(arr.astype(np.float32))
+                else:
+                    sample[optional_key] = arr
 
         # --- Track Processing (if enabled) ---
         if self.load_track:
