@@ -1,0 +1,31 @@
+{
+  "task": "V502_v50r2_panel_visual_audit",
+  "status": "V502_V50R2_PANEL_AUDIT_COMPLETE_VISUAL_FLOOR_PASS_CONTINUE_NOT_PROMOTED",
+  "created_at": "2026-06-02T19:38:33.984522Z",
+  "repo": "D:\\vggt\\vggt-canonical-surfel-adapter",
+  "input_v501_decision": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5010000000000000000000_v50r2_visual_floor_decision.json",
+  "source_visual_floor_png": "D:\\vggt\\vggt-main\\output\\mentor_report_v50r2\\v223_view_consistent_pointcloud\\images\\V223_V50R2_full_body_pointcloud_v42_consistent.png",
+  "audit_csv": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5020000000000000000000_v50r2_panel_audit.csv",
+  "annotated_board": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V5020000000000000000000_v50r2_panel_annotated.png",
+  "gates": {
+    "all_six_panels_present": true,
+    "body_readability_floor_pass": true,
+    "head_hair_floor_pass": true,
+    "torso_clothing_floor_pass": true,
+    "arm_hand_endpoint_floor_pass": true,
+    "leg_foot_floor_pass": true,
+    "rgb_realism_floor_pass": true,
+    "view_consistency_floor_pass": true,
+    "face_policy_honest": true,
+    "face_detail_claim_allowed": false,
+    "full_scene_final_ready": false,
+    "not_promoted": true
+  },
+  "face_policy": {
+    "back_views": "head/hair contour only",
+    "side_views": "side profile / jaw-side / hairline region only",
+    "front_oblique": "face region shape only; no eyes/nose/mouth fine detail claim"
+  },
+  "decision": "V50R2 passes as the human morphology visual floor across the six requested panels. It remains ROI/white-background reference evidence, not final full-scene student output. Continue to V503 student-vs-V50R2 regression audit.",
+  "blockers": []
+}

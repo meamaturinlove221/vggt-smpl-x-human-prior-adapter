@@ -1,0 +1,58 @@
+{
+  "task": "V504_v50r2_teacher_bank_builder",
+  "status": "V504_V50R2_TEACHER_BANK_READY_CONTINUE_NOT_PROMOTED",
+  "created_at": "2026-06-02T19:42:53.785391Z",
+  "repo": "D:\\vggt\\vggt-canonical-surfel-adapter",
+  "input_v503_decision": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5030000000000000000000_regression_decision.json",
+  "teacher_bank_npz": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V5040000000000000000000_v50r2_teacher_bank\\v50r2_teacher_bank.npz",
+  "teacher_bank_sha256": "8664b671b27ad2006b6aebee61ede17bbb397626224e1102e3c3d4196cf87883",
+  "teacher_only": true,
+  "training_allowed": true,
+  "evaluation_allowed": true,
+  "final_inference_allowed": false,
+  "copy_forbidden": true,
+  "v50r2_modified": false,
+  "regions": [
+    "face_region",
+    "full_body_visible",
+    "hand_arm",
+    "head_hair",
+    "leg_foot_proxy",
+    "torso_clothing_proxy"
+  ],
+  "cameras": [
+    "cam00",
+    "cam01",
+    "cam06",
+    "cam11",
+    "cam16",
+    "cam21"
+  ],
+  "source_package_files": {
+    "candidate_files__candidate_normals.npz": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V50_final_promotion_transaction\\candidate_package_v50r2\\package_files\\candidate_files__candidate_normals.npz",
+    "candidate_files__candidate_points.npz": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V50_final_promotion_transaction\\candidate_package_v50r2\\package_files\\candidate_files__candidate_points.npz",
+    "candidate_files__hand_patch.npz": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V50_final_promotion_transaction\\candidate_package_v50r2\\package_files\\candidate_files__hand_patch.npz",
+    "candidate_files__head_face_patch.npz": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V50_final_promotion_transaction\\candidate_package_v50r2\\package_files\\candidate_files__head_face_patch.npz",
+    "candidate_files__temporal_teacher.npz": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V50_final_promotion_transaction\\candidate_package_v50r2\\package_files\\candidate_files__temporal_teacher.npz",
+    "candidate_files__visual_review.json": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V50_final_promotion_transaction\\candidate_package_v50r2\\package_files\\candidate_files__visual_review.json",
+    "v42_prior_enabled_payload__control_audit.json": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V50_final_promotion_transaction\\candidate_package_v50r2\\package_files\\v42_prior_enabled_payload__control_audit.json",
+    "v42_prior_enabled_payload__research_confidence.npz": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V50_final_promotion_transaction\\candidate_package_v50r2\\package_files\\v42_prior_enabled_payload__research_confidence.npz",
+    "v42_prior_enabled_payload__research_depths.npz": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V50_final_promotion_transaction\\candidate_package_v50r2\\package_files\\v42_prior_enabled_payload__research_depths.npz",
+    "v42_prior_enabled_payload__research_normals_geometric.npz": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V50_final_promotion_transaction\\candidate_package_v50r2\\package_files\\v42_prior_enabled_payload__research_normals_geometric.npz",
+    "v42_prior_enabled_payload__research_points_world.npz": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V50_final_promotion_transaction\\candidate_package_v50r2\\package_files\\v42_prior_enabled_payload__research_points_world.npz",
+    "v42_prior_enabled_payload__research_prior_effect.json": "D:\\vggt\\vggt-main\\output\\surface_research_preflight_local\\V50_final_promotion_transaction\\candidate_package_v50r2\\package_files\\v42_prior_enabled_payload__research_prior_effect.json"
+  },
+  "decision": "Teacher bank is built from V50R2/V42 geometry, normals, RGB observations, masks, head/face, and hand regions. It is not final output and must be blocked from final inference.",
+  "metadata_json": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V5040000000000000000000_v50r2_teacher_bank\\metadata.json",
+  "manifest_csv": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5040000000000000000000_teacher_bank_manifest.csv",
+  "regions_board": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V5040000000000000000000_teacher_bank_regions.png",
+  "gates": {
+    "teacher_bank_npz_readable": true,
+    "all_six_cameras_present": true,
+    "region_manifest_written": true,
+    "teacher_only_policy_written": true,
+    "final_inference_allowed": false,
+    "not_promoted": true
+  },
+  "blockers": []
+}

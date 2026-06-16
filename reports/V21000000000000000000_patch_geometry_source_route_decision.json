@@ -1,0 +1,28 @@
+{
+  "created_at": "2026-05-29T02:05:00Z",
+  "status": "V210_PATCH_GEOMETRY_SOURCE_ROUTE_REQUIRED",
+  "mentor_ready": false,
+  "external_hard_block": false,
+  "previous_checkpoint": "V209_FORCED_EDIT_BUDGET_SELECTION_FAIL_CLOSED_CONTINUE",
+  "v209_runtime": {
+    "device": "NVIDIA A10G",
+    "steps": 300,
+    "max_points": 8192
+  },
+  "v209_result": {
+    "connected_infill_points": {
+      "0012_11_frame001": 4335,
+      "0013_01_frame001": 3037,
+      "0021_03_frame001": 5865,
+      "current_v895_0021_03": 5654
+    },
+    "combined_gate_failed_cases": 4,
+    "same_topology_or_shuffled_stronger": true,
+    "mentor_visual_pass": false
+  },
+  "root_cause": "Forcing proposal-supported edit budget adds points but not coherent patch morphology. The next route must reconstruct patch-local geometry sources and targets instead of selecting more points from the same weak candidate pool.",
+  "next_route": "V210 patch-geometry source/target reconstruction with patch-local decoder, continuity constraints, and full mentor visual gate.",
+  "no_agent_rule": "No agents or subagents launched.",
+  "face_detail_claim_allowed": false,
+  "allowed_face_claim": "head/face contour and hair region only"
+}

@@ -1,0 +1,13 @@
+{
+  "created_at": "2026-05-27T17:53:18+00:00",
+  "weighted_pick_replace_true": true,
+  "config_specific_weights": true,
+  "config_specific_rgb_operations": true,
+  "detail_bonus_present": true,
+  "control_penalty_present": true,
+  "score_prediction_reads_config": true,
+  "source_label_auxiliary_only_claim_unproven_by_code": true,
+  "v120_final_claim_invalidated": true,
+  "enter_v150_fair_metric_rebuild": true,
+  "procedural_densifier_not_used_as_final_model_improvement": true
+}

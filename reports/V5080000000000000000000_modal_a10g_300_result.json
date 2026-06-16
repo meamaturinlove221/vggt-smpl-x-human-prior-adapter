@@ -1,0 +1,32 @@
+{
+  "task": "V508_modal_a10g_300_checkpoint_result",
+  "status": "V508_MODAL_A10G_300_CHECKPOINT_PASS_TARGET_MATRIX_INCOMPLETE_NOT_PROMOTED",
+  "created_at": "2026-06-02T20:11:26+00:00",
+  "modal_run_url": "https://modal.com/apps/shimakaze22333/main/ap-XiscZD9Iz1DEn124YnfdlO",
+  "gpu": "A10G",
+  "steps": 300,
+  "max_samples": 256,
+  "seed": 508,
+  "returncode": 0,
+  "downloaded_to": "D:\\vggt\\vggt-canonical-surfel-adapter\\_modal_download\\V508_300",
+  "synced_to_local_reports": true,
+  "synced_to_local_output": true,
+  "completed_checkpoint": 300,
+  "pending_checkpoints": [
+    600,
+    1000,
+    2000,
+    4000
+  ],
+  "pending_gpu_targets": [
+    "A100"
+  ],
+  "interpretation": "A10G 300-step checkpoint executed and was synced back locally. This is progress beyond smoke, but it is not the full V508 target matrix and cannot unlock V509/V512 mentor readiness by itself.",
+  "gates": {
+    "modal_a10g_300_pass": true,
+    "target_checkpoints_complete": false,
+    "modal_a100_target_complete": false,
+    "teacher_copy_diagnostic_required": true,
+    "not_promoted": true
+  }
+}

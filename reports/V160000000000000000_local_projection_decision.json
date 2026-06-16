@@ -1,0 +1,9 @@
+{
+  "created_at": "2026-05-27T17:53:45+00:00",
+  "local_closeup_real_pass": true,
+  "local_detail_non_regression_pass": true,
+  "visible_local_improvement_cases": 4,
+  "visible_local_improvement_pass": true,
+  "facial_detail_overclaim": false,
+  "allowed_head_claim": "head/face contour and hair region only; no facial details claimed."
+}

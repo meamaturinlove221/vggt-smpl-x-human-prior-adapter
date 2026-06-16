@@ -1,0 +1,24 @@
+{
+  "created_at": "2026-05-28T18:37:15+00:00",
+  "status": "V10300_VOLUME_GEOMETRY_METRICS_COMPLETE_FAIL_CLOSED",
+  "metrics_csv": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V10300000000000000000_volume_geometry_metrics.csv",
+  "board": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V10300000000000000000_volume_metric_visual_board.png",
+  "true_stronger_than_controls": false,
+  "failures": [
+    {
+      "case": "0012_11_frame001",
+      "control": "shuffled",
+      "control_thickness": 0.42806587854574085,
+      "true_or_candidate_thickness": 0.3891489795520121
+    },
+    {
+      "case": "0013_01_frame001",
+      "control": "shuffled",
+      "control_thickness": 0.38996626924074734,
+      "true_or_candidate_thickness": 0.33215459282226123
+    }
+  ],
+  "mentor_ready": false,
+  "external_hard_block": false,
+  "note": "Thickness/volume metrics are auxiliary; visual gate is still required."
+}

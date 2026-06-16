@@ -1,0 +1,5 @@
+case,target_npz,visible_lock_ratio,part_local_target_ratio,part_local_target_points,head_hair_target_points,shoulder_neck_target_points,clothing_torso_target_points,arm_hand_target_points,leg_foot_target_points
+0012_11_frame001,D:\vggt\vggt-canonical-surfel-adapter\output\V20410000000000000000_part_local_targets\0012_11_frame001\part_local_targets.npz,0.52,0.044316666666666664,2659,0,0,2659,0,0
+0013_01_frame001,D:\vggt\vggt-canonical-surfel-adapter\output\V20410000000000000000_part_local_targets\0013_01_frame001\part_local_targets.npz,0.52,0.020316666666666667,1219,0,1219,201,0,0
+0021_03_frame001,D:\vggt\vggt-canonical-surfel-adapter\output\V20410000000000000000_part_local_targets\0021_03_frame001\part_local_targets.npz,0.31055,0.026116666666666667,1567,0,0,1567,0,0
+current_v895_0021_03,D:\vggt\vggt-canonical-surfel-adapter\output\V20410000000000000000_part_local_targets\current_v895_0021_03\part_local_targets.npz,0.3178,0.0259,1554,0,0,1554,0,0

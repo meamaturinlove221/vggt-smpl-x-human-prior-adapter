@@ -1,0 +1,11 @@
+{
+  "created_at": "2026-05-27T19:45:01+00:00",
+  "status": "proposed_not_executed",
+  "model": "models/v400_true_3d_morphology_detail_adapter.py",
+  "tool": "tools/v400_true_3d_morphology_generation.py",
+  "requires": [
+    "fresh V410 true 3D morphology outputs",
+    "real environment source",
+    "3D local closeups"
+  ]
+}

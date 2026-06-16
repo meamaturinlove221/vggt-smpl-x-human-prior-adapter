@@ -1,0 +1,109 @@
+{
+  "created_at": "2026-05-26T18:10:14+00:00",
+  "rows": [
+    {
+      "case_id": "current_v895_0021_03",
+      "token_shape": [
+        1,
+        2,
+        21,
+        64
+      ],
+      "world_points_shape": [
+        1,
+        2,
+        56,
+        56,
+        3
+      ],
+      "sparse_prior_shape": [
+        1,
+        2,
+        16,
+        32
+      ],
+      "patch_start_idx": 5,
+      "token_delta_l2": 1.4551942348480225,
+      "token_delta_mean_abs": 0.020108424127101898
+    },
+    {
+      "case_id": "0021_03_frame001",
+      "token_shape": [
+        1,
+        2,
+        21,
+        64
+      ],
+      "world_points_shape": [
+        1,
+        2,
+        56,
+        56,
+        3
+      ],
+      "sparse_prior_shape": [
+        1,
+        2,
+        16,
+        32
+      ],
+      "patch_start_idx": 5,
+      "token_delta_l2": 1.4215927124023438,
+      "token_delta_mean_abs": 0.021066654473543167
+    },
+    {
+      "case_id": "0012_11_frame001",
+      "token_shape": [
+        1,
+        2,
+        21,
+        64
+      ],
+      "world_points_shape": [
+        1,
+        2,
+        56,
+        56,
+        3
+      ],
+      "sparse_prior_shape": [
+        1,
+        2,
+        16,
+        32
+      ],
+      "patch_start_idx": 5,
+      "token_delta_l2": 1.2572541236877441,
+      "token_delta_mean_abs": 0.01912003755569458
+    },
+    {
+      "case_id": "0013_01_frame001",
+      "token_shape": [
+        1,
+        2,
+        21,
+        64
+      ],
+      "world_points_shape": [
+        1,
+        2,
+        56,
+        56,
+        3
+      ],
+      "sparse_prior_shape": [
+        1,
+        2,
+        16,
+        32
+      ],
+      "patch_start_idx": 5,
+      "token_delta_l2": 1.2696596384048462,
+      "token_delta_mean_abs": 0.019694749265909195
+    }
+  ],
+  "decision": {
+    "pass": true,
+    "reason": "real VGGT/Aggregator executed with SMPL sparse prior tokens and non-zero token delta"
+  }
+}

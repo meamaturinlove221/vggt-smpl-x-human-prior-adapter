@@ -1,0 +1,34 @@
+{
+  "created_at": "2026-05-28T22:22:06+00:00",
+  "status": "V18900_NONFALLBACK_VISIBLE_ANCHOR_FAIL_CLOSED_CONTINUE",
+  "mentor_ready": false,
+  "external_hard_block": false,
+  "v188_assets_restored": true,
+  "modal_a10_run_confirmed": true,
+  "feature_bank_fallback_used": false,
+  "feature_bank_fallback_flags": [
+    "false"
+  ],
+  "true_combined_fail_v4_cases": [
+    "0012_11_frame001",
+    "0021_03_frame001",
+    "current_v895_0021_03"
+  ],
+  "close_or_better_controls": [
+    "0012_11_frame001::part_coverage_canonical_surfel_true",
+    "0013_01_frame001::part_coverage_canonical_surfel_true",
+    "0021_03_frame001::part_coverage_canonical_surfel_true",
+    "current_v895_0021_03::part_coverage_canonical_surfel_true"
+  ],
+  "shell_coverage_loss_inactive_cases": [
+    "0012_11_frame001",
+    "0013_01_frame001",
+    "0021_03_frame001",
+    "current_v895_0021_03"
+  ],
+  "advisor_board": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V18700000000000000000_visible_anchor_board.png",
+  "turntable_cross_section_board": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V18700000000000000000_visible_anchor_turntable_cross_section.png",
+  "prediction_count": 4,
+  "route_decision": "Continue to V189/V190 anchored pose-frame occupancy repair. Do not tune viewer/thickness/fallback; assets are restored and failure is model/representation-level.",
+  "summary": "Restored V950/V536/V161/V140 assets allow a non-fallback Modal A10 V187 run, but the output remains fail-closed: full-scene visuals are torn/tilted clouds and hard controls remain close."
+}

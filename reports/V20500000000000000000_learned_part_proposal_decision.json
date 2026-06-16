@@ -1,0 +1,10 @@
+{
+  "created_at": "2026-05-29T00:39:09+00:00",
+  "status": "V205_LEARNED_PART_PROPOSAL_READY_FOR_STUDENT_TRAINING",
+  "mentor_ready": false,
+  "external_hard_block": false,
+  "failures": [],
+  "manifest": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V20500000000000000000_learned_part_proposal_manifest.csv",
+  "preview": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V20500000000000000000_learned_part_proposal_preview.png",
+  "summary": "V205 builds proposal rankings around V20410 safety anchors. It is diagnostic-only until a student trained on these proposals beats baseline and controls in mentor visuals."
+}

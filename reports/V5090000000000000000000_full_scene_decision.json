@@ -1,0 +1,23 @@
+{
+  "task": "V509_full_scene_insertion_gate",
+  "status": "V509_FULL_SCENE_INSERTION_V523_VISUAL_AND_CONTROLS_PASS_NOT_PROMOTED",
+  "created_at": "2026-06-02T22:42:37.671718Z",
+  "repo": "D:\\vggt\\vggt-canonical-surfel-adapter",
+  "latest_candidate": "V523_observation_anchor_control_part_binding_repair",
+  "full_scene_student_board": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V5230000000000000000000_human_main_full_scene.png",
+  "same_scene_controls_board": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V5230000000000000000000_same_scene_controls.png",
+  "input_v523": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5230000000000000000000_observation_anchor_control_part_binding_decision.json",
+  "gates": {
+    "model_owned_full_scene_candidate_ready": true,
+    "full_scene_student_inserted": true,
+    "partial_environment_visible": true,
+    "manual_visual_body_readable": true,
+    "same_scene_controls_generated_as_pass_evidence": true,
+    "v523_no_teacher_copy": true,
+    "v523_true_beats_legacy_controls": true,
+    "visible_anchor_not_counted_as_baseline_win": true,
+    "mentor_visual_gate_pass": true,
+    "not_promoted": true
+  },
+  "decision": "V523 restores readable full-scene human visuals and uses previous VGGT/student artifacts for same-scene control separation. Visible anchor is treated as nonregression guard, not as a baseline win."
+}

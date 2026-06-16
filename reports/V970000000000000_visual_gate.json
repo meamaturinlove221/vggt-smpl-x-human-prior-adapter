@@ -1,0 +1,148 @@
+{
+  "created_at": "2026-05-26T18:39:38+00:00",
+  "boards": {
+    "same_scene_controls": "boards\\V970000000000000_same_scene_controls_board.png",
+    "advisor_main": "boards\\V970000000000000_real_vggt_advisor_main_board.png",
+    "cloudcompare_style": "boards\\V970000000000000_cloudcompare_style_board.png"
+  },
+  "scene_rows": [
+    {
+      "case_id": "current_v895_0021_03",
+      "human_points": 1434,
+      "environment_points": 2500,
+      "human_screen_area_ratio": 0.25539207458496094,
+      "vertical_span": 0.8472186923027039,
+      "horizontal_span": 1.4414286613464355,
+      "human_main_pass": false,
+      "environment_visible_pass": true,
+      "full_scene_rgb_pointcloud_pass": true,
+      "config": "real_vggt_baseline_only"
+    },
+    {
+      "case_id": "current_v895_0021_03",
+      "human_points": 3872,
+      "environment_points": 2500,
+      "human_screen_area_ratio": 0.2754451632499695,
+      "vertical_span": 0.9020312428474426,
+      "horizontal_span": 1.4601411819458008,
+      "human_main_pass": true,
+      "environment_visible_pass": true,
+      "full_scene_rgb_pointcloud_pass": true,
+      "config": "real_vggt_smpl_feature_true_full"
+    },
+    {
+      "case_id": "current_v895_0021_03",
+      "human_points": 2048,
+      "environment_points": 2500,
+      "human_screen_area_ratio": 0.2626531720161438,
+      "vertical_span": 0.8730987310409546,
+      "horizontal_span": 1.4384692907333374,
+      "human_main_pass": false,
+      "environment_visible_pass": true,
+      "full_scene_rgb_pointcloud_pass": true,
+      "config": "real_vggt_no_smpl_feature"
+    },
+    {
+      "case_id": "current_v895_0021_03",
+      "human_points": 2656,
+      "environment_points": 2500,
+      "human_screen_area_ratio": 0.3066345453262329,
+      "vertical_span": 0.9336630702018738,
+      "horizontal_span": 1.5704069137573242,
+      "human_main_pass": true,
+      "environment_visible_pass": true,
+      "full_scene_rgb_pointcloud_pass": true,
+      "config": "real_vggt_random_smpl_feature"
+    },
+    {
+      "case_id": "current_v895_0021_03",
+      "human_points": 3872,
+      "environment_points": 2500,
+      "human_screen_area_ratio": 0.2747350037097931,
+      "vertical_span": 0.8988134860992432,
+      "horizontal_span": 1.4615905284881592,
+      "human_main_pass": true,
+      "environment_visible_pass": true,
+      "full_scene_rgb_pointcloud_pass": true,
+      "config": "same_topology_no_semantic"
+    },
+    {
+      "case_id": "current_v895_0021_03",
+      "human_points": 3887,
+      "environment_points": 2500,
+      "human_screen_area_ratio": 0.283016175031662,
+      "vertical_span": 0.9105728268623352,
+      "horizontal_span": 1.4862021207809448,
+      "human_main_pass": true,
+      "environment_visible_pass": true,
+      "full_scene_rgb_pointcloud_pass": true,
+      "config": "posthoc_surfel_only"
+    },
+    {
+      "case_id": "current_v895_0021_03",
+      "human_points": 3409,
+      "environment_points": 2500,
+      "human_screen_area_ratio": 0.26996535062789917,
+      "vertical_span": 0.8894591331481934,
+      "horizontal_span": 1.4513204097747803,
+      "human_main_pass": true,
+      "environment_visible_pass": true,
+      "full_scene_rgb_pointcloud_pass": true,
+      "config": "tiny_v330_synthetic_token_control"
+    },
+    {
+      "case_id": "current_v895_0021_03",
+      "human_points": 3872,
+      "environment_points": 2500,
+      "human_screen_area_ratio": 0.2754451632499695,
+      "vertical_span": 0.9020312428474426,
+      "horizontal_span": 1.4601411819458008,
+      "human_main_pass": true,
+      "environment_visible_pass": true,
+      "full_scene_rgb_pointcloud_pass": true,
+      "config": "real_vggt_smpl_feature_true_full"
+    },
+    {
+      "case_id": "0021_03_frame001",
+      "human_points": 3854,
+      "environment_points": 2500,
+      "human_screen_area_ratio": 0.2764945328235626,
+      "vertical_span": 0.9103859663009644,
+      "horizontal_span": 1.4680724143981934,
+      "human_main_pass": true,
+      "environment_visible_pass": true,
+      "full_scene_rgb_pointcloud_pass": true,
+      "config": "real_vggt_smpl_feature_true_full"
+    },
+    {
+      "case_id": "0012_11_frame001",
+      "human_points": 4014,
+      "environment_points": 2500,
+      "human_screen_area_ratio": 0.1411162167787552,
+      "vertical_span": 0.5230683088302612,
+      "horizontal_span": 1.652684211730957,
+      "human_main_pass": true,
+      "environment_visible_pass": true,
+      "full_scene_rgb_pointcloud_pass": true,
+      "config": "real_vggt_smpl_feature_true_full"
+    },
+    {
+      "case_id": "0013_01_frame001",
+      "human_points": 4025,
+      "environment_points": 2500,
+      "human_screen_area_ratio": 0.12961801886558533,
+      "vertical_span": 0.47988975048065186,
+      "horizontal_span": 1.6507617235183716,
+      "human_main_pass": true,
+      "environment_visible_pass": true,
+      "full_scene_rgb_pointcloud_pass": true,
+      "config": "real_vggt_smpl_feature_true_full"
+    }
+  ],
+  "decision": {
+    "full_scene_rgb_pointcloud_pass": true,
+    "human_main_pass": true,
+    "partial_environment_pass": true,
+    "true_visibly_better_than_baseline_proxy": true
+  }
+}

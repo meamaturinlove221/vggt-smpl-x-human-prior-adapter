@@ -1,0 +1,67 @@
+{
+  "task": "V505_teacher_student_firewall_smoke",
+  "status": "V505_FIREWALL_SMOKE_PASS_CONTINUE_NOT_PROMOTED",
+  "created_at": "2026-06-02T19:44:20.559633Z",
+  "teacher_bank": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V5040000000000000000000_v50r2_teacher_bank\\v50r2_teacher_bank.npz",
+  "known_leak_candidate": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V5050000000000000000000_teacher_student_firewall_smoke\\known_teacher_copy_candidate.npz",
+  "safe_noncopy_candidate": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V5050000000000000000000_teacher_student_firewall_smoke\\safe_noncopy_candidate.npz",
+  "known_leak_result": {
+    "teacher_bank": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V5040000000000000000000_v50r2_teacher_bank\\v50r2_teacher_bank.npz",
+    "candidate_npz": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V5050000000000000000000_teacher_student_firewall_smoke\\known_teacher_copy_candidate.npz",
+    "leak_detected": true,
+    "hit_count": 2,
+    "hits": [
+      {
+        "candidate_key": "predicted_points",
+        "teacher_key": "points",
+        "type": "teacher_point_exact_or_near_copy",
+        "shape": [
+          6,
+          518,
+          518,
+          3
+        ]
+      },
+      {
+        "candidate_key": "predicted_rgb",
+        "teacher_key": "rgb",
+        "type": "teacher_rgb_exact_copy",
+        "shape": [
+          6,
+          518,
+          518,
+          3
+        ]
+      }
+    ],
+    "metadata_flags": [
+      "metadata_forbidden_token:source:teacher_points_inference",
+      "metadata_forbidden_token:source:copy_teacher"
+    ],
+    "policy": {
+      "teacher_points_in_final_inference_allowed": false,
+      "teacher_rgb_in_final_inference_allowed": false,
+      "teacher_mask_as_student_ownership_allowed": false
+    }
+  },
+  "safe_noncopy_result": {
+    "teacher_bank": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V5040000000000000000000_v50r2_teacher_bank\\v50r2_teacher_bank.npz",
+    "candidate_npz": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V5050000000000000000000_teacher_student_firewall_smoke\\safe_noncopy_candidate.npz",
+    "leak_detected": false,
+    "hit_count": 0,
+    "hits": [],
+    "metadata_flags": [],
+    "policy": {
+      "teacher_points_in_final_inference_allowed": false,
+      "teacher_rgb_in_final_inference_allowed": false,
+      "teacher_mask_as_student_ownership_allowed": false
+    }
+  },
+  "gates": {
+    "known_teacher_copy_detected": true,
+    "safe_noncopy_not_flagged": true,
+    "final_inference_allowed": false,
+    "not_promoted": true
+  },
+  "decision": "Firewall smoke proves direct teacher point/RGB copy detection only. Continue to V506; do not treat this as mentor visual success."
+}

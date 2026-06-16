@@ -1,0 +1,17 @@
+{
+  "goal_file_path": "D:\\vggt\\vggt-canonical-surfel-adapter\\docs\\goals\\V300100000000000000_V900000000000000000_true_3d_morphology_detail_goal.md",
+  "sha256": "8aa9099244ed4d410435eb9b316ac6d1bbffa6206cc2135b634137443aea36d6",
+  "line_count": 805,
+  "created_at": "2026-05-28T02:21:47.3583992+08:00",
+  "repo": "D:\\vggt\\vggt-canonical-surfel-adapter",
+  "source_feature_adapter_repo": "D:\\vggt\\vggt-feature-adapter",
+  "source_scene_context_repo": "D:\\vggt\\vggt-scene-context-evidence",
+  "evidence_root": "D:\\vggt\\vggt-main\\local_report_auxiliary\\V600_quality_rebuild",
+  "previous_status": "V300000000000000000_PHOTOMETRIC_GEOMETRY_VISUAL_TRUTH_MENTOR_READY_NOT_PROMOTED",
+  "final_allowed_states": [
+    "V900000000000000000_TRUE_3D_MORPHOLOGY_DETAIL_MENTOR_READY_NOT_PROMOTED",
+    "V900000000000000000_TRUE_EXTERNAL_HARD_BLOCK_REQUIRES_USER_ACTION"
+  ],
+  "no_agent_rule": true,
+  "summary": "True 3D morphology route that downgrades V300, rejects projection-only and copied-prediction rescoring, and routes to fail-closed V900 if mentor 3D evidence is not sufficient."
+}

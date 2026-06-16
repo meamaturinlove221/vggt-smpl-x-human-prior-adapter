@@ -1,0 +1,59 @@
+{
+  "created_at": "2026-05-28T20:35:35+00:00",
+  "status": "V17900_COLLISION_AWARE_REPAIR_FAIL_CLOSED_CONTINUE",
+  "mentor_ready": false,
+  "external_hard_block": false,
+  "failures": [
+    {
+      "case": "0012_11_frame001",
+      "reason": "true_combined_fail_v3",
+      "true_score": 0.6670728487878183
+    },
+    {
+      "case": "0012_11_frame001",
+      "reason": "control_or_source_close_or_better",
+      "control": "multishell_topology_decoder_true",
+      "true_score": 0.6670728487878183,
+      "control_score": 0.7192548705983721
+    },
+    {
+      "case": "0013_01_frame001",
+      "reason": "true_combined_fail_v3",
+      "true_score": 0.6767648944699451
+    },
+    {
+      "case": "0013_01_frame001",
+      "reason": "control_or_source_close_or_better",
+      "control": "multishell_topology_decoder_true",
+      "true_score": 0.6767648944699451,
+      "control_score": 0.6649565983916601
+    },
+    {
+      "case": "0021_03_frame001",
+      "reason": "true_combined_fail_v3",
+      "true_score": 0.7313154429139231
+    },
+    {
+      "case": "0021_03_frame001",
+      "reason": "control_or_source_close_or_better",
+      "control": "multishell_topology_decoder_true",
+      "true_score": 0.7313154429139231,
+      "control_score": 0.7138912716044792
+    },
+    {
+      "case": "current_v895_0021_03",
+      "reason": "true_combined_fail_v3",
+      "true_score": 0.7273787290878536
+    },
+    {
+      "case": "current_v895_0021_03",
+      "reason": "control_or_source_close_or_better",
+      "control": "multishell_topology_decoder_true",
+      "true_score": 0.7273787290878536,
+      "control_score": 0.7149913447330427
+    }
+  ],
+  "score_csv": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V17900000000000000000_collision_aware_scores.csv",
+  "board": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V17900000000000000000_collision_aware_board.png",
+  "summary": "V179 applies a small collision-aware part separation to the V173 model-owned output. It remains fail-closed unless it improves v3 without harming mentor visuals."
+}

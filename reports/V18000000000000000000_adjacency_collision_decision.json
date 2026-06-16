@@ -1,0 +1,80 @@
+{
+  "created_at": "2026-05-28T20:42:35+00:00",
+  "status": "V18000_ADJACENCY_AWARE_COLLISION_METRIC_FAIL_CLOSED_CONTINUE",
+  "mentor_ready": false,
+  "external_hard_block": false,
+  "failures": [
+    {
+      "case": "0012_11_frame001",
+      "reason": "v173_true_combined_fail_v4",
+      "true_score": 0.5846076049204307
+    },
+    {
+      "case": "0012_11_frame001",
+      "reason": "invalid_distant_overlap_too_high",
+      "penalty": 0.8333357110997598
+    },
+    {
+      "case": "0012_11_frame001",
+      "reason": "control_or_diagnostic_close_or_better_v4",
+      "control": "collision_aware_topology_true",
+      "true_score": 0.5846076049204307,
+      "control_score": 0.5692652762203881
+    },
+    {
+      "case": "0013_01_frame001",
+      "reason": "v173_true_combined_fail_v4",
+      "true_score": 0.544892742417425
+    },
+    {
+      "case": "0013_01_frame001",
+      "reason": "invalid_distant_overlap_too_high",
+      "penalty": 0.840860016778363
+    },
+    {
+      "case": "0013_01_frame001",
+      "reason": "control_or_diagnostic_close_or_better_v4",
+      "control": "collision_aware_topology_true",
+      "true_score": 0.544892742417425,
+      "control_score": 0.5627476987675144
+    },
+    {
+      "case": "0021_03_frame001",
+      "reason": "v173_true_combined_fail_v4",
+      "true_score": 0.5822993673704515
+    },
+    {
+      "case": "0021_03_frame001",
+      "reason": "invalid_distant_overlap_too_high",
+      "penalty": 0.8877949950715547
+    },
+    {
+      "case": "0021_03_frame001",
+      "reason": "control_or_diagnostic_close_or_better_v4",
+      "control": "collision_aware_topology_true",
+      "true_score": 0.5822993673704515,
+      "control_score": 0.5929236336956603
+    },
+    {
+      "case": "current_v895_0021_03",
+      "reason": "v173_true_combined_fail_v4",
+      "true_score": 0.584506210107214
+    },
+    {
+      "case": "current_v895_0021_03",
+      "reason": "invalid_distant_overlap_too_high",
+      "penalty": 0.8770391421381327
+    },
+    {
+      "case": "current_v895_0021_03",
+      "reason": "control_or_diagnostic_close_or_better_v4",
+      "control": "collision_aware_topology_true",
+      "true_score": 0.584506210107214,
+      "control_score": 0.5920277268077987
+    }
+  ],
+  "score_csv": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V18000000000000000000_adjacency_collision_metric_v4_scores.csv",
+  "pair_audit_csv": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V18000000000000000000_adjacency_collision_pair_audit.csv",
+  "board": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V18000000000000000000_adjacency_collision_metric_v4_board.png",
+  "summary": "V180 makes collision analysis adjacency-aware. It distinguishes valid neighboring body contact from invalid distant part overlap, but remains a diagnostic metric and cannot replace mentor visual evidence."
+}

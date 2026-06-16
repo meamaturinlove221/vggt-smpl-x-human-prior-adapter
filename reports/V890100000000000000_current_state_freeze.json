@@ -1,0 +1,7 @@
+{
+  "created_at": "2026-05-27T20:24:04+00:00",
+  "previous_status": "V900000000000000000_TRUE_EXTERNAL_HARD_BLOCK_REQUIRES_USER_ACTION",
+  "v870_candidate_only": true,
+  "v880_candidate_only": true,
+  "next_route": "V910 real per-case residual candidate"
+}

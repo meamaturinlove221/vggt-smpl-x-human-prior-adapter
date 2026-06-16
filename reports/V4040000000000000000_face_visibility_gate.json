@@ -1,0 +1,64 @@
+{
+  "created_at": "2026-05-28T11:54:36+00:00",
+  "status": "FACE_VISIBILITY_GATE_DONE_NO_FACIAL_DETAIL_CLAIM",
+  "board": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V4040000000000000000_face_visibility_source_board.png",
+  "metrics": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V4040000000000000000_face_visibility_metrics.csv",
+  "face_pursuit_case_count": 0,
+  "facial_detail_claim_allowed": false,
+  "allowed_claim": "head/face contour and hair region only",
+  "rows": [
+    {
+      "case": "current_v895_0021_03",
+      "head_projected_points": 5093,
+      "uv_source": "smpl_feature_bank_projection_uv_camera00",
+      "head_uv_inside_ratio": 0.0,
+      "head_crop_contrast_area": 0.0,
+      "bbox": "0,0,0,0",
+      "source_view_face_visible": false,
+      "source_view_visibility_reason": "top_dark=True;middle_contrast=True",
+      "face_pursuit_allowed": false,
+      "facial_detail_claim_allowed": false,
+      "allowed_claim": "head/face contour and hair region only"
+    },
+    {
+      "case": "0021_03_frame001",
+      "head_projected_points": 5093,
+      "uv_source": "smpl_feature_bank_projection_uv_camera00",
+      "head_uv_inside_ratio": 0.0,
+      "head_crop_contrast_area": 0.0,
+      "bbox": "0,0,0,0",
+      "source_view_face_visible": false,
+      "source_view_visibility_reason": "top_dark=True;middle_contrast=True",
+      "face_pursuit_allowed": false,
+      "facial_detail_claim_allowed": false,
+      "allowed_claim": "head/face contour and hair region only"
+    },
+    {
+      "case": "0012_11_frame001",
+      "head_projected_points": 5093,
+      "uv_source": "smpl_feature_bank_projection_uv_camera00",
+      "head_uv_inside_ratio": 0.0,
+      "head_crop_contrast_area": 0.0,
+      "bbox": "0,0,0,0",
+      "source_view_face_visible": false,
+      "source_view_visibility_reason": "top_dark=True;middle_contrast=True",
+      "face_pursuit_allowed": false,
+      "facial_detail_claim_allowed": false,
+      "allowed_claim": "head/face contour and hair region only"
+    },
+    {
+      "case": "0013_01_frame001",
+      "head_projected_points": 5093,
+      "uv_source": "smpl_feature_bank_projection_uv_camera00",
+      "head_uv_inside_ratio": 0.0,
+      "head_crop_contrast_area": 0.0,
+      "bbox": "0,0,0,0",
+      "source_view_face_visible": false,
+      "source_view_visibility_reason": "top_dark=True;middle_contrast=True",
+      "face_pursuit_allowed": false,
+      "facial_detail_claim_allowed": false,
+      "allowed_claim": "head/face contour and hair region only"
+    }
+  ],
+  "next_action": "Only cases with face_pursuit_allowed may enter a face ROI target-building route; no case may claim facial detail without explicit 3D landmark evidence."
+}

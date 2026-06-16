@@ -1,0 +1,5 @@
+case,output,human_points,weak_volume_ratio,multi_layer_missing_ratio,no_change_ratio,face_detail_claim_allowed,allowed_face_claim
+0012_11_frame001,D:\vggt\vggt-canonical-surfel-adapter\output\V10400000000000000000_weak_volume_regions\0012_11_frame001\weak_volume_regions.npz,60000,0.14671666666666666,0.06668333333333333,0.7,False,head/face contour and hair region only
+0013_01_frame001,D:\vggt\vggt-canonical-surfel-adapter\output\V10400000000000000000_weak_volume_regions\0013_01_frame001\weak_volume_regions.npz,60000,0.15696666666666667,0.05243333333333333,0.7,False,head/face contour and hair region only
+0021_03_frame001,D:\vggt\vggt-canonical-surfel-adapter\output\V10400000000000000000_weak_volume_regions\0021_03_frame001\weak_volume_regions.npz,60000,0.16286666666666666,0.07063333333333334,0.7,False,head/face contour and hair region only
+current_v895_0021_03,D:\vggt\vggt-canonical-surfel-adapter\output\V10400000000000000000_weak_volume_regions\current_v895_0021_03\weak_volume_regions.npz,60000,0.1614,0.06578333333333333,0.7,False,head/face contour and hair region only

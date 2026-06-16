@@ -1,0 +1,363 @@
+{
+  "created_at": "2026-05-29T01:39:27+00:00",
+  "status": "V208_EDIT_BUDGET_DECODER_FAIL_CLOSED_CONTINUE",
+  "mentor_ready": false,
+  "external_hard_block": false,
+  "failures": [
+    {
+      "case": "0012_11_frame001",
+      "reason": "true_combined_fail_v4",
+      "true_score": 0.473301786961207
+    },
+    {
+      "case": "0012_11_frame001",
+      "reason": "control_or_prior_close_or_better_v4",
+      "control": "learned_part_proposal_student_true",
+      "true_score": 0.473301786961207,
+      "control_score": 0.4732050328178099
+    },
+    {
+      "case": "0012_11_frame001",
+      "reason": "control_or_prior_close_or_better_v4",
+      "control": "part_local_target_student_true",
+      "true_score": 0.473301786961207,
+      "control_score": 0.47224711266803776
+    },
+    {
+      "case": "0012_11_frame001",
+      "reason": "control_or_prior_close_or_better_v4",
+      "control": "part_specific_nonregression_infill_true",
+      "true_score": 0.473301786961207,
+      "control_score": 0.47007476663723957
+    },
+    {
+      "case": "0012_11_frame001",
+      "reason": "control_or_prior_close_or_better_v4",
+      "control": "visible_nonregression_connected_infill_true",
+      "true_score": 0.473301786961207,
+      "control_score": 0.4947691593968072
+    },
+    {
+      "case": "0012_11_frame001",
+      "reason": "control_or_prior_close_or_better_v4",
+      "control": "visible_surface_preserving_infill_true",
+      "true_score": 0.473301786961207,
+      "control_score": 0.633747900754873
+    },
+    {
+      "case": "0012_11_frame001",
+      "reason": "control_or_prior_close_or_better_v4",
+      "control": "upright_pose_frame_true",
+      "true_score": 0.473301786961207,
+      "control_score": 0.6734632948560965
+    },
+    {
+      "case": "0012_11_frame001",
+      "reason": "control_or_prior_close_or_better_v4",
+      "control": "pose_frame_occupancy_true",
+      "true_score": 0.473301786961207,
+      "control_score": 0.6756439549105919
+    },
+    {
+      "case": "0012_11_frame001",
+      "reason": "control_or_prior_close_or_better_v4",
+      "control": "visible_anchor_canonical_surfel_true",
+      "true_score": 0.473301786961207,
+      "control_score": 0.6647455685595988
+    },
+    {
+      "case": "0012_11_frame001",
+      "reason": "control_or_prior_close_or_better_v4",
+      "control": "part_coverage_canonical_surfel_true",
+      "true_score": 0.473301786961207,
+      "control_score": 0.6567868053664776
+    },
+    {
+      "case": "0012_11_frame001",
+      "reason": "control_or_prior_close_or_better_v4",
+      "control": "real_vggt_baseline_only",
+      "true_score": 0.473301786961207,
+      "control_score": 0.4709819833342096
+    },
+    {
+      "case": "0012_11_frame001",
+      "reason": "control_or_prior_close_or_better_v4",
+      "control": "same_topology_no_semantic",
+      "true_score": 0.473301786961207,
+      "control_score": 0.6153839052366847
+    },
+    {
+      "case": "0012_11_frame001",
+      "reason": "control_or_prior_close_or_better_v4",
+      "control": "shuffled_smpl_feature",
+      "true_score": 0.473301786961207,
+      "control_score": 0.5938432340771223
+    },
+    {
+      "case": "0013_01_frame001",
+      "reason": "true_combined_fail_v4",
+      "true_score": 0.4714077105822974
+    },
+    {
+      "case": "0013_01_frame001",
+      "reason": "control_or_prior_close_or_better_v4",
+      "control": "learned_part_proposal_student_true",
+      "true_score": 0.4714077105822974,
+      "control_score": 0.4711602859985706
+    },
+    {
+      "case": "0013_01_frame001",
+      "reason": "control_or_prior_close_or_better_v4",
+      "control": "part_local_target_student_true",
+      "true_score": 0.4714077105822974,
+      "control_score": 0.47525571541226763
+    },
+    {
+      "case": "0013_01_frame001",
+      "reason": "control_or_prior_close_or_better_v4",
+      "control": "visible_surface_preserving_infill_true",
+      "true_score": 0.4714077105822974,
+      "control_score": 0.6189950823843378
+    },
+    {
+      "case": "0013_01_frame001",
+      "reason": "control_or_prior_close_or_better_v4",
+      "control": "upright_pose_frame_true",
+      "true_score": 0.4714077105822974,
+      "control_score": 0.6863436112656551
+    },
+    {
+      "case": "0013_01_frame001",
+      "reason": "control_or_prior_close_or_better_v4",
+      "control": "pose_frame_occupancy_true",
+      "true_score": 0.4714077105822974,
+      "control_score": 0.6863329407863001
+    },
+    {
+      "case": "0013_01_frame001",
+      "reason": "control_or_prior_close_or_better_v4",
+      "control": "visible_anchor_canonical_surfel_true",
+      "true_score": 0.4714077105822974,
+      "control_score": 0.6789896214402974
+    },
+    {
+      "case": "0013_01_frame001",
+      "reason": "control_or_prior_close_or_better_v4",
+      "control": "part_coverage_canonical_surfel_true",
+      "true_score": 0.4714077105822974,
+      "control_score": 0.7047716360083482
+    },
+    {
+      "case": "0013_01_frame001",
+      "reason": "control_or_prior_close_or_better_v4",
+      "control": "real_vggt_baseline_only",
+      "true_score": 0.4714077105822974,
+      "control_score": 0.46562437160631065
+    },
+    {
+      "case": "0013_01_frame001",
+      "reason": "control_or_prior_close_or_better_v4",
+      "control": "same_topology_no_semantic",
+      "true_score": 0.4714077105822974,
+      "control_score": 0.6592843267754295
+    },
+    {
+      "case": "0013_01_frame001",
+      "reason": "control_or_prior_close_or_better_v4",
+      "control": "shuffled_smpl_feature",
+      "true_score": 0.4714077105822974,
+      "control_score": 0.6300139009014754
+    },
+    {
+      "case": "0021_03_frame001",
+      "reason": "true_combined_fail_v4",
+      "true_score": 0.48201562647328333
+    },
+    {
+      "case": "0021_03_frame001",
+      "reason": "control_or_prior_close_or_better_v4",
+      "control": "learned_part_proposal_student_true",
+      "true_score": 0.48201562647328333,
+      "control_score": 0.4819904330043446
+    },
+    {
+      "case": "0021_03_frame001",
+      "reason": "control_or_prior_close_or_better_v4",
+      "control": "part_local_target_student_true",
+      "true_score": 0.48201562647328333,
+      "control_score": 0.46968743159017207
+    },
+    {
+      "case": "0021_03_frame001",
+      "reason": "control_or_prior_close_or_better_v4",
+      "control": "part_specific_nonregression_infill_true",
+      "true_score": 0.48201562647328333,
+      "control_score": 0.4799671857835228
+    },
+    {
+      "case": "0021_03_frame001",
+      "reason": "control_or_prior_close_or_better_v4",
+      "control": "visible_nonregression_connected_infill_true",
+      "true_score": 0.48201562647328333,
+      "control_score": 0.5078297119158562
+    },
+    {
+      "case": "0021_03_frame001",
+      "reason": "control_or_prior_close_or_better_v4",
+      "control": "visible_surface_preserving_infill_true",
+      "true_score": 0.48201562647328333,
+      "control_score": 0.5362180951297044
+    },
+    {
+      "case": "0021_03_frame001",
+      "reason": "control_or_prior_close_or_better_v4",
+      "control": "upright_pose_frame_true",
+      "true_score": 0.48201562647328333,
+      "control_score": 0.7064918225762686
+    },
+    {
+      "case": "0021_03_frame001",
+      "reason": "control_or_prior_close_or_better_v4",
+      "control": "pose_frame_occupancy_true",
+      "true_score": 0.48201562647328333,
+      "control_score": 0.7041508758475435
+    },
+    {
+      "case": "0021_03_frame001",
+      "reason": "control_or_prior_close_or_better_v4",
+      "control": "visible_anchor_canonical_surfel_true",
+      "true_score": 0.48201562647328333,
+      "control_score": 0.6832466481269006
+    },
+    {
+      "case": "0021_03_frame001",
+      "reason": "control_or_prior_close_or_better_v4",
+      "control": "part_coverage_canonical_surfel_true",
+      "true_score": 0.48201562647328333,
+      "control_score": 0.6717279473056045
+    },
+    {
+      "case": "0021_03_frame001",
+      "reason": "control_or_prior_close_or_better_v4",
+      "control": "real_vggt_baseline_only",
+      "true_score": 0.48201562647328333,
+      "control_score": 0.47359822102507754
+    },
+    {
+      "case": "0021_03_frame001",
+      "reason": "control_or_prior_close_or_better_v4",
+      "control": "same_topology_no_semantic",
+      "true_score": 0.48201562647328333,
+      "control_score": 0.604824275322546
+    },
+    {
+      "case": "0021_03_frame001",
+      "reason": "control_or_prior_close_or_better_v4",
+      "control": "shuffled_smpl_feature",
+      "true_score": 0.48201562647328333,
+      "control_score": 0.5823420907821404
+    },
+    {
+      "case": "current_v895_0021_03",
+      "reason": "true_combined_fail_v4",
+      "true_score": 0.4745424870165351
+    },
+    {
+      "case": "current_v895_0021_03",
+      "reason": "control_or_prior_close_or_better_v4",
+      "control": "learned_part_proposal_student_true",
+      "true_score": 0.4745424870165351,
+      "control_score": 0.4745186885175313
+    },
+    {
+      "case": "current_v895_0021_03",
+      "reason": "control_or_prior_close_or_better_v4",
+      "control": "part_local_target_student_true",
+      "true_score": 0.4745424870165351,
+      "control_score": 0.48574245645788783
+    },
+    {
+      "case": "current_v895_0021_03",
+      "reason": "control_or_prior_close_or_better_v4",
+      "control": "part_specific_nonregression_infill_true",
+      "true_score": 0.4745424870165351,
+      "control_score": 0.48669934467185433
+    },
+    {
+      "case": "current_v895_0021_03",
+      "reason": "control_or_prior_close_or_better_v4",
+      "control": "visible_nonregression_connected_infill_true",
+      "true_score": 0.4745424870165351,
+      "control_score": 0.49430964615906375
+    },
+    {
+      "case": "current_v895_0021_03",
+      "reason": "control_or_prior_close_or_better_v4",
+      "control": "moderate_offset_surface_completion_true",
+      "true_score": 0.4745424870165351,
+      "control_score": 0.4569491229472419
+    },
+    {
+      "case": "current_v895_0021_03",
+      "reason": "control_or_prior_close_or_better_v4",
+      "control": "visible_surface_preserving_infill_true",
+      "true_score": 0.4745424870165351,
+      "control_score": 0.523412872923795
+    },
+    {
+      "case": "current_v895_0021_03",
+      "reason": "control_or_prior_close_or_better_v4",
+      "control": "upright_pose_frame_true",
+      "true_score": 0.4745424870165351,
+      "control_score": 0.6706251154966253
+    },
+    {
+      "case": "current_v895_0021_03",
+      "reason": "control_or_prior_close_or_better_v4",
+      "control": "pose_frame_occupancy_true",
+      "true_score": 0.4745424870165351,
+      "control_score": 0.6708203409716613
+    },
+    {
+      "case": "current_v895_0021_03",
+      "reason": "control_or_prior_close_or_better_v4",
+      "control": "visible_anchor_canonical_surfel_true",
+      "true_score": 0.4745424870165351,
+      "control_score": 0.6477541137406838
+    },
+    {
+      "case": "current_v895_0021_03",
+      "reason": "control_or_prior_close_or_better_v4",
+      "control": "part_coverage_canonical_surfel_true",
+      "true_score": 0.4745424870165351,
+      "control_score": 0.6766571516208613
+    },
+    {
+      "case": "current_v895_0021_03",
+      "reason": "control_or_prior_close_or_better_v4",
+      "control": "real_vggt_baseline_only",
+      "true_score": 0.4745424870165351,
+      "control_score": 0.4711326194691607
+    },
+    {
+      "case": "current_v895_0021_03",
+      "reason": "control_or_prior_close_or_better_v4",
+      "control": "same_topology_no_semantic",
+      "true_score": 0.4745424870165351,
+      "control_score": 0.5989292121029335
+    },
+    {
+      "case": "current_v895_0021_03",
+      "reason": "control_or_prior_close_or_better_v4",
+      "control": "shuffled_smpl_feature",
+      "true_score": 0.4745424870165351,
+      "control_score": 0.5758237553078625
+    }
+  ],
+  "score_csv": "/workspace/repo/reports/V20800000000000000000_edit_budget_decoder_scores.csv",
+  "board": "/workspace/repo/boards/V20800000000000000000_edit_budget_decoder_board.png",
+  "turntable_cross_section": "/workspace/repo/boards/V20800000000000000000_edit_budget_decoder_turntable_cross_section.png",
+  "face_detail_claim_allowed": false,
+  "allowed_face_claim": "head/face contour and hair region only",
+  "summary": "V208 adds explicit edit-budget and connectivity heads on top of V207 proposal conditioning. It remains fail-closed unless full-scene mentor visuals and hard controls pass."
+}

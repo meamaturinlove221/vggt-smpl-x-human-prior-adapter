@@ -1,0 +1,61 @@
+{
+  "created_at": "2026-05-27T20:12:45+00:00",
+  "final_state_candidate": "V900000000000000000_TRUE_EXTERNAL_HARD_BLOCK_REQUIRES_USER_ACTION",
+  "decision": {
+    "created_at": "2026-05-27T20:12:45+00:00",
+    "fresh_v870_matrix": true,
+    "copied_prediction_rescore": false,
+    "baseline_preservation_first": true,
+    "projection_auxiliary_only": true,
+    "metric_true_gt_baseline_and_controls": true,
+    "case_decisions": {
+      "current_v895_0021_03": {
+        "true_score": 0.8363665,
+        "baseline_score": 0.7794535,
+        "best_control": "shuffled_smpl_feature",
+        "best_control_score": 0.7959225848712921,
+        "true_gt_baseline": true,
+        "true_gt_best_control": true,
+        "margin_baseline": 0.05691299999999999,
+        "margin_best_control": 0.04044391512870793
+      },
+      "0021_03_frame001": {
+        "true_score": 0.8362361666666667,
+        "baseline_score": 0.7793373333333333,
+        "best_control": "shuffled_smpl_feature",
+        "best_control_score": 0.7957018521534602,
+        "true_gt_baseline": true,
+        "true_gt_best_control": true,
+        "margin_baseline": 0.05689883333333334,
+        "margin_best_control": 0.04053431451320644
+      },
+      "0012_11_frame001": {
+        "true_score": 0.8369836666666667,
+        "baseline_score": 0.7808681666666666,
+        "best_control": "shuffled_smpl_feature",
+        "best_control_score": 0.8046331533276241,
+        "true_gt_baseline": true,
+        "true_gt_best_control": true,
+        "margin_baseline": 0.056115500000000096,
+        "margin_best_control": 0.0323505133390426
+      },
+      "0013_01_frame001": {
+        "true_score": 0.8353200000000001,
+        "baseline_score": 0.7788395,
+        "best_control": "shuffled_smpl_feature",
+        "best_control_score": 0.7952545564842224,
+        "true_gt_baseline": true,
+        "true_gt_best_control": true,
+        "margin_baseline": 0.056480500000000045,
+        "margin_best_control": 0.04006544351577768
+      }
+    }
+  },
+  "mentor_ready_candidate": false,
+  "hard_blockers": [
+    "manual 3D mentor visual gate still required; V870 is a candidate iteration, not final acceptance",
+    "local close-ups remain guarded against facial/hand/clothing overclaim"
+  ],
+  "main_board": "boards\\V870000000000000000_baseline_preserving_3d_main.png",
+  "viewer": "output\\V870000000000000000_viewer\\index.html"
+}

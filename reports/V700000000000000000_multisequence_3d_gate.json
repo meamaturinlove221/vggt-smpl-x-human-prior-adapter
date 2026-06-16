@@ -1,0 +1,8 @@
+{
+  "created_at": "2026-05-27T19:51:45+00:00",
+  "pass": false,
+  "diagnostic_board": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V700000000000000000_multisequence_3d_morphology_summary.png",
+  "cases_retained": 4,
+  "strong_3d_visual_pass_cases": 0,
+  "reason": "No fresh V410/V860 multisequence morphology matrix passed; board is diagnostic only."
+}

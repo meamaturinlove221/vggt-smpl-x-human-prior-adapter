@@ -1,0 +1,11 @@
+{
+  "created_at": "2026-05-29T02:10:18+00:00",
+  "status": "V210_PATCH_GEOMETRY_SOURCE_READY_FOR_PATCH_DECODER",
+  "mentor_ready": false,
+  "external_hard_block": false,
+  "failures": [],
+  "manifest": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V21000000000000000000_patch_geometry_source_manifest.csv",
+  "patches": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V21000000000000000000_patch_geometry_source_patches.csv",
+  "preview": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V21000000000000000000_patch_geometry_source_preview.png",
+  "summary": "V210 builds explicit local patch geometry sources from V205 proposals and baseline/SMPL body parts. It is a route input, not mentor-ready evidence."
+}

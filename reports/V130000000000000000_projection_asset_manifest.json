@@ -1,0 +1,77 @@
+{
+  "created_at": "2026-05-27T17:53:18+00:00",
+  "assets": [
+    {
+      "case": "current_v895_0021_03",
+      "sequence": "0021_03",
+      "frame": 2,
+      "rgb": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V130000000000000000_projection_assets\\current_v895_0021_03\\camera00_rgb_518.png",
+      "mask": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V130000000000000000_projection_assets\\current_v895_0021_03\\camera00_mask_518.png",
+      "edge": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V130000000000000000_projection_assets\\current_v895_0021_03\\camera00_mask_edge_518.png",
+      "camera_K_source": "G:\\数据集\\datasets\\data_used_in_4K4D\\annotations\\0021_03_annots.smc::Camera_Parameter/00/K",
+      "camera_RT_source": "G:\\数据集\\datasets\\data_used_in_4K4D\\annotations\\0021_03_annots.smc::Camera_Parameter/00/RT",
+      "rgb_mask_from_original_smc": true,
+      "roi_bbox_518": [
+        202,
+        152,
+        433,
+        424
+      ],
+      "mask_coverage_518": 0.07255407641508027
+    },
+    {
+      "case": "0021_03_frame001",
+      "sequence": "0021_03",
+      "frame": 1,
+      "rgb": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V130000000000000000_projection_assets\\0021_03_frame001\\camera00_rgb_518.png",
+      "mask": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V130000000000000000_projection_assets\\0021_03_frame001\\camera00_mask_518.png",
+      "edge": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V130000000000000000_projection_assets\\0021_03_frame001\\camera00_mask_edge_518.png",
+      "camera_K_source": "G:\\数据集\\datasets\\data_used_in_4K4D\\annotations\\0021_03_annots.smc::Camera_Parameter/00/K",
+      "camera_RT_source": "G:\\数据集\\datasets\\data_used_in_4K4D\\annotations\\0021_03_annots.smc::Camera_Parameter/00/RT",
+      "rgb_mask_from_original_smc": true,
+      "roi_bbox_518": [
+        202,
+        152,
+        434,
+        424
+      ],
+      "mask_coverage_518": 0.07310192155752002
+    },
+    {
+      "case": "0012_11_frame001",
+      "sequence": "0012_11",
+      "frame": 1,
+      "rgb": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V130000000000000000_projection_assets\\0012_11_frame001\\camera00_rgb_518.png",
+      "mask": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V130000000000000000_projection_assets\\0012_11_frame001\\camera00_mask_518.png",
+      "edge": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V130000000000000000_projection_assets\\0012_11_frame001\\camera00_mask_edge_518.png",
+      "camera_K_source": "G:\\数据集\\datasets\\data_used_in_4K4D\\annotations\\0012_11_annots.smc::Camera_Parameter/00/K",
+      "camera_RT_source": "G:\\数据集\\datasets\\data_used_in_4K4D\\annotations\\0012_11_annots.smc::Camera_Parameter/00/RT",
+      "rgb_mask_from_original_smc": true,
+      "roi_bbox_518": [
+        223,
+        138,
+        345,
+        394
+      ],
+      "mask_coverage_518": 0.05115457432059749
+    },
+    {
+      "case": "0013_01_frame001",
+      "sequence": "0013_01",
+      "frame": 1,
+      "rgb": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V130000000000000000_projection_assets\\0013_01_frame001\\camera00_rgb_518.png",
+      "mask": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V130000000000000000_projection_assets\\0013_01_frame001\\camera00_mask_518.png",
+      "edge": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V130000000000000000_projection_assets\\0013_01_frame001\\camera00_mask_edge_518.png",
+      "camera_K_source": "G:\\数据集\\datasets\\data_used_in_4K4D\\annotations\\0013_01_annots.smc::Camera_Parameter/00/K",
+      "camera_RT_source": "G:\\数据集\\datasets\\data_used_in_4K4D\\annotations\\0013_01_annots.smc::Camera_Parameter/00/RT",
+      "rgb_mask_from_original_smc": true,
+      "roi_bbox_518": [
+        200,
+        139,
+        322,
+        398
+      ],
+      "mask_coverage_518": 0.05588393136655685
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "created_at": "2026-05-27T19:45:01+00:00",
+  "zip_summary": {
+    "bundle_count": 23,
+    "all_zip_clean": true,
+    "total_entries": 1193
+  },
+  "final_audit_report_consistency_pass": false,
+  "projection_only_evidence_detected": true,
+  "fake_or_insufficient_local_closeup_detected": true,
+  "v190_copied_prediction_rescore_detected": true,
+  "decision": "fail_closed"
+}

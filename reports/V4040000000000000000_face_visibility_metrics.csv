@@ -1,0 +1,5 @@
+case,head_projected_points,uv_source,head_uv_inside_ratio,head_crop_contrast_area,bbox,source_view_face_visible,source_view_visibility_reason,face_pursuit_allowed,facial_detail_claim_allowed,allowed_claim
+current_v895_0021_03,5093,smpl_feature_bank_projection_uv_camera00,0.0,0.0,"0,0,0,0",False,top_dark=True;middle_contrast=True,False,False,head/face contour and hair region only
+0021_03_frame001,5093,smpl_feature_bank_projection_uv_camera00,0.0,0.0,"0,0,0,0",False,top_dark=True;middle_contrast=True,False,False,head/face contour and hair region only
+0012_11_frame001,5093,smpl_feature_bank_projection_uv_camera00,0.0,0.0,"0,0,0,0",False,top_dark=True;middle_contrast=True,False,False,head/face contour and hair region only
+0013_01_frame001,5093,smpl_feature_bank_projection_uv_camera00,0.0,0.0,"0,0,0,0",False,top_dark=True;middle_contrast=True,False,False,head/face contour and hair region only

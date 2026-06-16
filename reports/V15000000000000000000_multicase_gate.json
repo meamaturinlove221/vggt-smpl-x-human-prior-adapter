@@ -1,0 +1,16 @@
+{
+  "created_at": "2026-05-28T20:07:17+00:00",
+  "status": "V15000_MULTICASE_MENTOR_GATE_FAIL_CLOSED_CONTINUE",
+  "mentor_ready": false,
+  "external_hard_block": false,
+  "case_count": 4,
+  "anti_billboard_visual_pass_cases": 0,
+  "true_better_than_baseline_cases": 3,
+  "controls_separated_cases": 0,
+  "local_3d_morphology_improvement_cases": 0,
+  "no_facial_detail_overclaim": true,
+  "board": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V15000000000000000000_multicase_anti_billboard_summary.png",
+  "failure_reason": "Required counts are not met; V137/V138/V140 remain fail-closed.",
+  "v143_status": "V14300_LOCAL_3D_MORPHOLOGY_FAIL_CLOSED_CONTINUE",
+  "v144_status": "V14400_ENVIRONMENT_GATE_PASS_AS_AUXILIARY"
+}

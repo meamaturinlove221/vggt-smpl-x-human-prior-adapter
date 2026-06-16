@@ -1,0 +1,34 @@
+{
+  "promotion_claim": false,
+  "rows": [
+    {
+      "heldout_max_l2": 0.38125213980674744,
+      "heldout_mean_l2": 0.2749858498573303,
+      "heldout_status": "DIAGNOSTIC_ONLY",
+      "region": "head_face",
+      "split": "leave_one_view_feature_center"
+    },
+    {
+      "heldout_max_l2": 0.434948593378067,
+      "heldout_mean_l2": 0.26832056045532227,
+      "heldout_status": "DIAGNOSTIC_ONLY",
+      "region": "hairline",
+      "split": "leave_one_view_feature_center"
+    },
+    {
+      "heldout_max_l2": 0.46418851613998413,
+      "heldout_mean_l2": 0.38683021068573,
+      "heldout_status": "DIAGNOSTIC_ONLY",
+      "region": "left_hand",
+      "split": "leave_one_view_feature_center"
+    },
+    {
+      "heldout_max_l2": 0.5273246169090271,
+      "heldout_mean_l2": 0.2928953766822815,
+      "heldout_status": "DIAGNOSTIC_ONLY",
+      "region": "right_hand",
+      "split": "leave_one_view_feature_center"
+    }
+  ],
+  "status": "V761000_HELDOUT_VIEW_EVAL"
+}

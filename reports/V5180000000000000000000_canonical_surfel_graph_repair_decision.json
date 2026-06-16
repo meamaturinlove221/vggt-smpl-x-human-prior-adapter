@@ -1,0 +1,61 @@
+{
+  "task": "V518_canonical_surfel_graph_repair_smoke",
+  "status": "V518_CANONICAL_SURFEL_GRAPH_REPRESENTATION_REPAIR_SMOKE_COMPLETE_NOT_PROMOTED",
+  "created_at": "2026-06-02T21:58:58.214126Z",
+  "repo": "D:\\vggt\\vggt-canonical-surfel-adapter",
+  "route_file": "D:\\vggt\\vggt-canonical-surfel-adapter\\docs\\goals\\V5180000000000000000000_auto_evolved_canonical_surfel_graph_repair_route.md",
+  "candidate_npz": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V5180000000000000000000_canonical_surfel_graph_repair\\v518_canonical_surfel_graph_candidate.npz",
+  "true_full_scene_ply": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V5180000000000000000000_canonical_surfel_graph_repair\\v518_true_full_scene_rgb.ply",
+  "controls": {
+    "no_smpl_graph": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V5180000000000000000000_canonical_surfel_graph_repair\\v518_no_smpl_graph_full_scene_rgb.ply",
+    "weak_semantic": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V5180000000000000000000_canonical_surfel_graph_repair\\v518_weak_semantic_full_scene_rgb.ply",
+    "vggt_visible_baseline": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V5180000000000000000000_canonical_surfel_graph_repair\\v518_vggt_visible_baseline_full_scene_rgb.ply"
+  },
+  "boards": {
+    "main": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V5180000000000000000000_canonical_surfel_graph_repair_board.png",
+    "controls": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V5180000000000000000000_canonical_surfel_graph_controls.png"
+  },
+  "metrics_csv": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5180000000000000000000_canonical_surfel_graph_repair_metrics.csv",
+  "teacher_copy_check": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5180000000000000000000_teacher_copy_check.json",
+  "input_policy": {
+    "vggt_observation_input": true,
+    "canonical_smplx_graph_representation": true,
+    "v50r2_used_at_inference": false,
+    "v50r2_used_for_visual_floor_reference_only": true,
+    "kinect_depth_used_at_inference": false
+  },
+  "gates": {
+    "representation_switch_executed": true,
+    "canonical_graph_body_parts_present": true,
+    "partial_environment_visible": true,
+    "no_teacher_copy": true,
+    "same_scene_controls_generated": true,
+    "accepted_for_v509": false,
+    "manual_visual_gate_pass": false,
+    "mentor_ready": false,
+    "not_promoted": true,
+    "auto_evolve_required": true
+  },
+  "metrics": {
+    "status": "V518_CANONICAL_SURFEL_GRAPH_REPRESENTATION_REPAIR_SMOKE_COMPLETE_NOT_PROMOTED",
+    "human_point_count": 24894,
+    "environment_point_count": 9000,
+    "environment_ratio": 0.2655337227827934,
+    "human_span_x": 0.11287034302949905,
+    "human_span_y": 0.2893728017807007,
+    "human_span_z": 0.032226741313934326,
+    "human_thickness_ratio": 0.11136755347251892,
+    "body_part_count": 8,
+    "no_teacher_copy": true,
+    "model_owned_student_output": true,
+    "mentor_ready": false,
+    "accepted_for_v509": false
+  },
+  "decision": "V518 executes the required representation switch after V517 visual failure. It is a smoke/repair candidate only: train and adjudicate V519 before any V509/V512 pass claim.",
+  "artifact_hashes": {
+    "candidate_npz": "a6ee160944b9c0432481790bb708c41b9c83ec64e6b8bcbf14a05bd1b906bb7a",
+    "main_board": "dcebe77fac3ff4a5adccd6bbe27354569a21d2e3fa2b6e9700604dd056e12940",
+    "controls_board": "bbe68737e95c23f43b49fe2b09bbc0da08903a7ac3b66323abbf38e7c3095b19",
+    "route_file": "41ff5de1d180f1a5bccc34fd591e40069b95dd036f681b2a21ee66e223757243"
+  }
+}

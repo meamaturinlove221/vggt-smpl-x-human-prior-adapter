@@ -1,0 +1,14 @@
+{
+  "created_at": "2026-05-27T19:44:59+00:00",
+  "all_ok": false,
+  "error_count": 5,
+  "mentor_ready": false,
+  "failed_requirements": [
+    "V300 final/audit/report consistency failed in uploaded pack",
+    "3D main board lacks convincing full-scene environment",
+    "local close-ups are not sufficient 3D detail proof",
+    "V190 matrix is copied-prediction rescoring, not a new 3D morphology student run",
+    "projection metrics cannot replace mentor 3D morphology gate"
+  ],
+  "allowed_as_checkpoint": true
+}

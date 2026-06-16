@@ -1,0 +1,7 @@
+{
+  "goal_file_path": "D:\\vggt\\vggt-feature-adapter\\docs\\goals\\V6010000000_V9000000000_formal_gpu_matrix_goal.md",
+  "sha256": "e0170ab217eb8a6ccd9e14f63bf004f81d1050a6c25a8d86a604b941fa4dfae1",
+  "line_count": 605,
+  "created_at": "2026-05-22T17:54:10.3777320+08:00",
+  "summary": "V601-V900 formal GPU full-view matrix execution goal: audit V560 artifacts, implement and run a formal 8x5 GPU matrix, validate region/normal/structure metrics, repair up to five cycles, then produce advisor report, upload-safe bundles, omitted manifest, cleanup, and one allowed V900 final state without agents."
+}

@@ -1,0 +1,176 @@
+{
+  "task": "V519_canonical_surfel_graph_training_adjudication",
+  "status": "V519_CANONICAL_SURFEL_GRAPH_TRAINED_CANDIDATE_READY_FOR_V509_REVIEW_NOT_PROMOTED",
+  "created_at": "2026-06-02T22:13:18.155293Z",
+  "repo": "D:\\vggt\\vggt-canonical-surfel-adapter",
+  "checkpoint": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V5190000000000000000000_canonical_surfel_graph_training\\checkpoint_240.pt",
+  "candidate_npz": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V5190000000000000000000_canonical_surfel_graph_training\\v519_canonical_surfel_graph_student_candidate.npz",
+  "true_full_scene_ply": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V5190000000000000000000_canonical_surfel_graph_training\\v519_true_full_scene_rgb.ply",
+  "controls": {
+    "vggt_visible_baseline": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V5190000000000000000000_canonical_surfel_graph_training\\v519_vggt_visible_baseline_full_scene_rgb.ply",
+    "no_smpl_graph": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V5190000000000000000000_canonical_surfel_graph_training\\v519_no_smpl_graph_full_scene_rgb.ply",
+    "weak_semantic": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V5190000000000000000000_canonical_surfel_graph_training\\v519_weak_semantic_full_scene_rgb.ply",
+    "shuffled_semantic": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V5190000000000000000000_canonical_surfel_graph_training\\v519_shuffled_semantic_full_scene_rgb.ply",
+    "smpl_graph_only": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V5190000000000000000000_canonical_surfel_graph_training\\v519_smpl_graph_only_full_scene_rgb.ply"
+  },
+  "boards": {
+    "main": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V5190000000000000000000_human_main_full_scene.png",
+    "controls": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V5190000000000000000000_same_scene_controls.png",
+    "local_fidelity": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V5190000000000000000000_local_fidelity_vs_v50r2.png",
+    "anti_2d": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V5190000000000000000000_turntable_side_depth_cross_section.png"
+  },
+  "metrics_csv": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5190000000000000000000_canonical_surfel_graph_training_metrics.csv",
+  "teacher_copy_check": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5190000000000000000000_teacher_copy_check.json",
+  "input_policy": {
+    "vggt_observation_input": true,
+    "canonical_smplx_surfel_graph": true,
+    "v50r2_used_for_loss_only": true,
+    "v50r2_used_at_inference": false,
+    "kinect_depth_used_at_inference": false
+  },
+  "gates": {
+    "teacher_copy_diagnostic_pass": true,
+    "same_scene_controls_generated": true,
+    "true_beats_required_controls": true,
+    "human_main_proxy_pass": true,
+    "anti_2d_proxy_pass": true,
+    "accepted_for_v509": true,
+    "manual_visual_gate_pass": false,
+    "mentor_ready": false,
+    "not_promoted": true,
+    "auto_evolve_required": false
+  },
+  "metrics": {
+    "status": "V519_CANONICAL_SURFEL_GRAPH_TRAINED_CANDIDATE_READY_FOR_V509_REVIEW_NOT_PROMOTED",
+    "steps": 240,
+    "checkpoint": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V5190000000000000000000_canonical_surfel_graph_training\\checkpoint_240.pt",
+    "human_point_count": 27648,
+    "environment_point_count": 9000,
+    "environment_ratio": 0.2455795677799607,
+    "human_span_x": 0.15003111958503723,
+    "human_span_y": 0.348219096660614,
+    "human_span_z": 0.3826138377189636,
+    "human_thickness_ratio": 0.3921215236186981,
+    "body_part_count": 8,
+    "true_to_v50r2_nn_mean": 0.011351853689260463,
+    "vggt_visible_baseline_to_v50r2_nn_mean": 0.027690401031961742,
+    "no_smpl_graph_to_v50r2_nn_mean": 0.0668117952468052,
+    "weak_semantic_to_v50r2_nn_mean": 0.04749509793477451,
+    "shuffled_semantic_to_v50r2_nn_mean": 0.04540662491254417,
+    "smpl_graph_only_to_v50r2_nn_mean": 0.021833831059221456,
+    "true_beats_vggt_visible_baseline": true,
+    "true_beats_no_smpl_graph": true,
+    "true_beats_weak_semantic": true,
+    "true_beats_shuffled_semantic": true,
+    "true_beats_smpl_graph_only": true,
+    "true_beats_required_controls": true,
+    "head_to_v50r2_nn_mean": 0.12242776797737014,
+    "torso_to_v50r2_nn_mean": 0.02036039514861092,
+    "hand_to_v50r2_nn_mean": 0.05011143258833211,
+    "leg_to_v50r2_nn_mean": 0.1721740308176585,
+    "anti_2d_proxy_pass": true,
+    "human_main_proxy_pass": true,
+    "no_teacher_copy": true,
+    "accepted_for_v509": true,
+    "mentor_ready": false,
+    "history_last_loss": 0.10100143402814865
+  },
+  "loss_history": [
+    {
+      "step": 1.0,
+      "loss": 0.20994126796722412,
+      "chamfer": 0.15326696634292603,
+      "rgb": 0.14649802446365356,
+      "margin": 0.012000000104308128,
+      "anti_sheet": 0.0
+    },
+    {
+      "step": 24.0,
+      "loss": 0.12267128378152847,
+      "chamfer": 0.07172465324401855,
+      "rgb": 0.10646554827690125,
+      "margin": 0.0028388111386448145,
+      "anti_sheet": 0.0
+    },
+    {
+      "step": 48.0,
+      "loss": 0.10515130311250687,
+      "chamfer": 0.0571322925388813,
+      "rgb": 0.0999932736158371,
+      "margin": 0.001881718053482473,
+      "anti_sheet": 0.0
+    },
+    {
+      "step": 72.0,
+      "loss": 0.10873021930456161,
+      "chamfer": 0.060557782649993896,
+      "rgb": 0.10109886527061462,
+      "margin": 0.0022054407745599747,
+      "anti_sheet": 0.0
+    },
+    {
+      "step": 96.0,
+      "loss": 0.10432799160480499,
+      "chamfer": 0.0537109412252903,
+      "rgb": 0.10839570313692093,
+      "margin": 0.0018359244568273425,
+      "anti_sheet": 0.0
+    },
+    {
+      "step": 120.0,
+      "loss": 0.10450868308544159,
+      "chamfer": 0.053685761988162994,
+      "rgb": 0.10851024091243744,
+      "margin": 0.0017012562602758408,
+      "anti_sheet": 0.0
+    },
+    {
+      "step": 144.0,
+      "loss": 0.09918198734521866,
+      "chamfer": 0.04792463779449463,
+      "rgb": 0.11051533371210098,
+      "margin": 0.0014756718883290887,
+      "anti_sheet": 0.0
+    },
+    {
+      "step": 168.0,
+      "loss": 0.10282887518405914,
+      "chamfer": 0.05240756273269653,
+      "rgb": 0.10681219398975372,
+      "margin": 0.00154974649194628,
+      "anti_sheet": 0.0
+    },
+    {
+      "step": 192.0,
+      "loss": 0.10222309827804565,
+      "chamfer": 0.0513555109500885,
+      "rgb": 0.10757606476545334,
+      "margin": 0.00164898787625134,
+      "anti_sheet": 0.0
+    },
+    {
+      "step": 216.0,
+      "loss": 0.0982435792684555,
+      "chamfer": 0.04827909171581268,
+      "rgb": 0.10384617000818253,
+      "margin": 0.0018872962100431323,
+      "anti_sheet": 0.0
+    },
+    {
+      "step": 240.0,
+      "loss": 0.10100143402814865,
+      "chamfer": 0.04987192153930664,
+      "rgb": 0.10736723244190216,
+      "margin": 0.0019298115512356162,
+      "anti_sheet": 0.0
+    }
+  ],
+  "decision": "V519 trained a canonical SMPL-X surfel graph student with V50R2 used only as loss/eval. It may feed V509 only if automatic controls and proxy visual gates pass; V512 manual mentor visual gate remains required.",
+  "artifact_hashes": {
+    "candidate_npz": "65267ced4a928026cd768835db1074bcbd1a7c61e27fcc6c85b7fb93f130e3b7",
+    "main_board": "b2e8bed86d9672c0adf0224cd81195f735a11f89ce6f54751d5eebe1ab59aab6",
+    "controls_board": "de14aa46cb85acefa9dab35eeaa08825ed8d31c2f209c92d82f6fa33d706f2b6",
+    "local_board": "21cd27ada1e08aab822671e14df18542c9a2dc83600cf1d71ec38525672554d0",
+    "anti2d_board": "a2da5464d99c40d2c13bc075baa2c4928869688cfbfc7ef3700398143828c321"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "created_at": "2026-05-28T22:08:32+00:00",
+  "status": "V18800_ASSETS_RESTORED_FOR_NON_FALLBACK_V187",
+  "mentor_ready": false,
+  "external_hard_block": false,
+  "four_case_v950_v536_ok": true,
+  "failures": [],
+  "manifest": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V18800000000000000000_restored_asset_manifest.csv",
+  "note": "Restored assets are training inputs only. They do not prove mentor readiness."
+}

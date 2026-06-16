@@ -1,0 +1,74 @@
+{
+  "task": "V512_manual_mentor_visual_gate",
+  "status": "V512_MANUAL_MENTOR_GATE_V523_PASS_ADVISOR_PACK_REQUIRED_NOT_PROMOTED",
+  "created_at": "2026-06-02T22:42:37.671718Z",
+  "repo": "D:\\vggt\\vggt-canonical-surfel-adapter",
+  "gate_rows": [
+    {
+      "gate": "full_scene_main",
+      "pass": true,
+      "reason": "V523 board is full-scene, human-main, RGB, and environment-visible"
+    },
+    {
+      "gate": "true_greater_than_vggt_baseline",
+      "pass": true,
+      "reason": "V523 beats previous VGGT/student baseline artifacts; visible anchor is not counted as a beaten baseline"
+    },
+    {
+      "gate": "true_greater_than_hard_controls",
+      "pass": true,
+      "reason": "V523 beats V517 no-SMPL and V520 shuffled/SMPL-graph controls in same-scene comparison"
+    },
+    {
+      "gate": "student_close_to_v50r2_floor",
+      "pass": true,
+      "reason": "V523 preserves V521/V50R2-like human readability and V50R2 floor comparison"
+    },
+    {
+      "gate": "no_teacher_copy",
+      "pass": true,
+      "reason": "V523 teacher-copy detector reports no direct V50R2/teacher copy"
+    },
+    {
+      "gate": "local_fidelity_complete",
+      "pass": true,
+      "reason": "Visibility-aware local fidelity passes for head/torso/arm/leg in their best visible views"
+    },
+    {
+      "gate": "face_policy_honest",
+      "pass": true,
+      "reason": "No fine facial detail is claimed; face/head policy remains contour/region-only"
+    },
+    {
+      "gate": "environment_visible",
+      "pass": true,
+      "reason": "V523 keeps partial real VGGT environment in every full-scene panel"
+    },
+    {
+      "gate": "anti_2d_pass",
+      "pass": true,
+      "reason": "V523 side/depth proxy passes"
+    }
+  ],
+  "annotated_board": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V5120000000000000000000_manual_gate_annotated.png",
+  "source_decisions": {
+    "v509": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5090000000000000000000_full_scene_decision.json",
+    "v510": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5100000000000000000000_local_fidelity_decision.json",
+    "v511": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5110000000000000000000_anti_2d_decision.json",
+    "v523": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5230000000000000000000_observation_anchor_control_part_binding_decision.json"
+  },
+  "gates": {
+    "manual_mentor_gate_pass": true,
+    "full_scene_main_pass": true,
+    "same_scene_controls_pass": true,
+    "student_close_to_v50r2_floor": true,
+    "no_teacher_copy": true,
+    "local_fidelity_complete": true,
+    "face_policy_honest": true,
+    "environment_visible_with_student": true,
+    "anti_2d_pass": true,
+    "advisor_pack_required": true,
+    "not_promoted": true
+  },
+  "decision": "V523 passes the manual mentor visual gate for advisor-pack assembly only. It is still not promoted and still requires viewer/report/bundle artifact packaging before final goal completion."
+}

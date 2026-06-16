@@ -1,0 +1,23 @@
+{
+  "created_at": "2026-05-28T19:29:11+00:00",
+  "sample": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V10700000000000000000_volume_aware_training_matrix\\0012_11_frame001\\real_vggt_baseline_only\\predictions.npz",
+  "metrics": {
+    "pca_thickness_ratio": 0.35827478755344805,
+    "eigen_ratio_small_large": 0.01671019408736304,
+    "section_count": 182,
+    "multi_layer_section_ratio": 0.14285714285714285,
+    "dense_section_ratio": 0.04945054945054945,
+    "front_back_separation_ratio": 0.0989010989010989,
+    "mean_thin_axis_layers": 1.521978021978022,
+    "depth_layer_entropy": 0.05145815301211228,
+    "torso_cross_section_area_cv_proxy": 0.3682742917566447,
+    "occupied_voxels": 213,
+    "largest_component_ratio": 0.7652582159624414,
+    "component_count": 13,
+    "part_largest_component_ratio_mean": 1.0,
+    "anti_billboard_score_v2": 0.35917604408028686,
+    "billboard_risk_v2": 0.6702858992602446,
+    "billboard_fail_v2": true
+  },
+  "smoke_pass": true
+}

@@ -1,0 +1,60 @@
+{
+  "created_at": "2026-05-27T20:24:17+00:00",
+  "final_state": "V950000000000000000_TRUE_EXTERNAL_HARD_BLOCK_REQUIRES_USER_ACTION",
+  "bundle_count": 5,
+  "all_zip_clean": true,
+  "all_under_500mb": true,
+  "all_non_empty": true,
+  "bundles": [
+    {
+      "bundle": "v950_core",
+      "path": "D:\\vggt\\vggt-canonical-surfel-adapter\\archive\\V950000000000000000_v950_core_bundle.zip",
+      "bytes": 11184,
+      "entry_count": 2,
+      "sha256": "0218df74985feb8b19f1427d7d32bef6838125d9aa460670fa847424bb6c99e3",
+      "zip_clean": true,
+      "under_500mb": true,
+      "non_empty": true
+    },
+    {
+      "bundle": "v950_reports",
+      "path": "D:\\vggt\\vggt-canonical-surfel-adapter\\archive\\V950000000000000000_v950_reports_bundle.zip",
+      "bytes": 3448,
+      "entry_count": 4,
+      "sha256": "f6504c550e47404eb4bb9abadc5214fc345139d36872fb04151e050a422955a1",
+      "zip_clean": true,
+      "under_500mb": true,
+      "non_empty": true
+    },
+    {
+      "bundle": "v950_visuals",
+      "path": "D:\\vggt\\vggt-canonical-surfel-adapter\\archive\\V950000000000000000_v950_visuals_bundle.zip",
+      "bytes": 4588223,
+      "entry_count": 4,
+      "sha256": "803cf4999871d167082293036151a999bbd9f3f1383868cb451ae12d62c05146",
+      "zip_clean": true,
+      "under_500mb": true,
+      "non_empty": true
+    },
+    {
+      "bundle": "v950_predictions",
+      "path": "D:\\vggt\\vggt-canonical-surfel-adapter\\archive\\V950000000000000000_v950_predictions_bundle.zip",
+      "bytes": 58036313,
+      "entry_count": 64,
+      "sha256": "66967df8f7d3184d4a6c2b5ebe38cc2550ba447e296f20785a966475b6b6f5c8",
+      "zip_clean": true,
+      "under_500mb": true,
+      "non_empty": true
+    },
+    {
+      "bundle": "v950_viewer",
+      "path": "D:\\vggt\\vggt-canonical-surfel-adapter\\archive\\V950000000000000000_v950_viewer_bundle.zip",
+      "bytes": 3623016,
+      "entry_count": 8,
+      "sha256": "35e214977bc10cdc006de10a04693615c811f43397bd20cf61e3957fa4ac39f9",
+      "zip_clean": true,
+      "under_500mb": true,
+      "non_empty": true
+    }
+  ]
+}

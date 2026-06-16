@@ -1,0 +1,2 @@
+status,human_point_count,environment_point_count,environment_ratio,human_span_x,human_span_y,human_span_z,human_thickness_ratio,body_part_count,no_teacher_copy,model_owned_student_output,mentor_ready,accepted_for_v509
+V518_CANONICAL_SURFEL_GRAPH_REPRESENTATION_REPAIR_SMOKE_COMPLETE_NOT_PROMOTED,24894,9000,0.2655337227827934,0.11287034302949905,0.2893728017807007,0.032226741313934326,0.11136755347251892,8,True,True,False,False

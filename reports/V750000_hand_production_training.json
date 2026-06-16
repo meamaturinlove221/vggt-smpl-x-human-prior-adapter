@@ -1,0 +1,154 @@
+{
+  "preserved_count": 0,
+  "record_count": 2,
+  "records": [
+    {
+      "changed_pixels": 99,
+      "classification": "HAND_REGRESSION",
+      "crop_id": 15,
+      "feature_dim": 15,
+      "grad_nonzero": true,
+      "hidden_dim": 192,
+      "identity_l2": 0.0,
+      "loss_end": 0.020626870915293694,
+      "loss_start": 0.031802669167518616,
+      "lr": 0.012,
+      "max_delta": 0.0018,
+      "mse_after_point": 3.2361642752221087e-06,
+      "mse_before_point": 2.5307913542604865e-09,
+      "normal_identity_l2": 2.5823858607054717e-08,
+      "normal_status": {
+        "max_norm": 1.0000001192092896,
+        "mean_norm": 1.0,
+        "min_norm": 0.9999998807907104,
+        "nonzero_ratio_gt_1e_4": 1.0
+      },
+      "npz": "D:\\vggt\\vggt-main\\local_report_auxiliary\\V600_quality_rebuild\\output\\V701000_V900000_production_live_highres\\V730000_adapter_only_training\\left_hand_v3_c15_NOT_CANDIDATE.npz",
+      "outside_roi_changed": 0,
+      "payload_key": "left_hand_v3_c15",
+      "region": "left_hand",
+      "steps": 180,
+      "synthetic_fit_drop": -1277.7163468747256,
+      "target_roi_changed": 99,
+      "trace": [
+        {
+          "grad_norm": 0.0023248306824825704,
+          "loss": 0.031802669167518616,
+          "loss_depth": 6.266189789272403e-10,
+          "loss_normal": 0.12231794744729996,
+          "loss_point": 2.5307913542604865e-09,
+          "step": 0
+        },
+        {
+          "grad_norm": 0.0,
+          "loss": 0.020626870915293694,
+          "loss_depth": 3.253197291996912e-06,
+          "loss_normal": 0.07931748777627945,
+          "loss_point": 3.2361642752221087e-06,
+          "step": 60
+        },
+        {
+          "grad_norm": 0.0,
+          "loss": 0.020626870915293694,
+          "loss_depth": 3.253197291996912e-06,
+          "loss_normal": 0.07931748777627945,
+          "loss_point": 3.2361642752221087e-06,
+          "step": 120
+        },
+        {
+          "grad_norm": 0.0,
+          "loss": 0.020626870915293694,
+          "loss_depth": 3.253197291996912e-06,
+          "loss_normal": 0.07931748777627945,
+          "loss_point": 3.2361642752221087e-06,
+          "step": 179
+        }
+      ],
+      "v629_delta": {
+        "full_body_quality": 1.7378727594774546e-05,
+        "hairline_quality": 0.0,
+        "head_face_quality": 0.0,
+        "left_hand_quality": -3.826538721718453e-05,
+        "local_detail_quality": 0.00011047355333948516,
+        "mean_quality": 9.495774904877408e-05,
+        "right_hand_quality": 0.0005906331539153875
+      },
+      "view": 3
+    },
+    {
+      "changed_pixels": 374,
+      "classification": "HAND_TRUE_GAIN",
+      "crop_id": 21,
+      "feature_dim": 15,
+      "grad_nonzero": true,
+      "hidden_dim": 192,
+      "identity_l2": 0.0,
+      "loss_end": 0.0203058160841465,
+      "loss_start": 0.031447697430849075,
+      "lr": 0.012,
+      "max_delta": 0.0018,
+      "mse_after_point": 3.447976041570655e-06,
+      "mse_before_point": 1.0318559873212507e-07,
+      "normal_identity_l2": 2.5823858607054717e-08,
+      "normal_status": {
+        "max_norm": 1.0000001192092896,
+        "mean_norm": 1.0,
+        "min_norm": 0.9999998807907104,
+        "nonzero_ratio_gt_1e_4": 1.0
+      },
+      "npz": "D:\\vggt\\vggt-main\\local_report_auxiliary\\V600_quality_rebuild\\output\\V701000_V900000_production_live_highres\\V730000_adapter_only_training\\right_hand_v3_c21_NOT_CANDIDATE.npz",
+      "outside_roi_changed": 0,
+      "payload_key": "right_hand_v3_c21",
+      "region": "right_hand",
+      "steps": 180,
+      "synthetic_fit_drop": -32.415283566089215,
+      "target_roi_changed": 374,
+      "trace": [
+        {
+          "grad_norm": 0.0024479551939293742,
+          "loss": 0.031447697430849075,
+          "loss_depth": 3.148938532149259e-08,
+          "loss_normal": 0.12095225602388382,
+          "loss_point": 1.0318559873212507e-07,
+          "step": 0
+        },
+        {
+          "grad_norm": 0.0,
+          "loss": 0.0203058160841465,
+          "loss_depth": 3.212683395759086e-06,
+          "loss_normal": 0.0780818909406662,
+          "loss_point": 3.447976041570655e-06,
+          "step": 60
+        },
+        {
+          "grad_norm": 0.0,
+          "loss": 0.0203058160841465,
+          "loss_depth": 3.212683395759086e-06,
+          "loss_normal": 0.0780818909406662,
+          "loss_point": 3.447976041570655e-06,
+          "step": 120
+        },
+        {
+          "grad_norm": 0.0,
+          "loss": 0.0203058160841465,
+          "loss_depth": 3.212683395759086e-06,
+          "loss_normal": 0.0780818909406662,
+          "loss_point": 3.447976041570655e-06,
+          "step": 179
+        }
+      ],
+      "v629_delta": {
+        "full_body_quality": 1.2011528014888029e-05,
+        "hairline_quality": 0.0,
+        "head_face_quality": 0.0,
+        "left_hand_quality": 0.0,
+        "local_detail_quality": 0.00011039058367401378,
+        "mean_quality": 9.399407439758534e-05,
+        "right_hand_quality": 0.000551952918370624
+      },
+      "view": 3
+    }
+  ],
+  "status": "V750000_HAND_PRODUCTION_TRAINING",
+  "true_gain_count": 1
+}

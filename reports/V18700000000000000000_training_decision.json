@@ -1,0 +1,66 @@
+{
+  "created_at": "2026-05-28T22:16:06+00:00",
+  "status": "V18700_VISIBLE_ANCHOR_CANONICAL_SURFEL_FAIL_CLOSED_CONTINUE",
+  "mentor_ready": false,
+  "external_hard_block": false,
+  "cases": [
+    "0012_11_frame001",
+    "0013_01_frame001",
+    "0021_03_frame001",
+    "current_v895_0021_03"
+  ],
+  "failures": [
+    {
+      "case": "0012_11_frame001",
+      "reason": "true_combined_fail_v4",
+      "true_score": 0.6647455685595987
+    },
+    {
+      "case": "0012_11_frame001",
+      "reason": "control_or_prior_close_or_better_v4",
+      "control": "part_coverage_canonical_surfel_true",
+      "true_score": 0.6647455685595987,
+      "control_score": 0.6567868053664776
+    },
+    {
+      "case": "0013_01_frame001",
+      "reason": "control_or_prior_close_or_better_v4",
+      "control": "part_coverage_canonical_surfel_true",
+      "true_score": 0.6789896214402975,
+      "control_score": 0.7047716360083482
+    },
+    {
+      "case": "0021_03_frame001",
+      "reason": "true_combined_fail_v4",
+      "true_score": 0.6832466481269005
+    },
+    {
+      "case": "0021_03_frame001",
+      "reason": "control_or_prior_close_or_better_v4",
+      "control": "part_coverage_canonical_surfel_true",
+      "true_score": 0.6832466481269005,
+      "control_score": 0.6717279473056045
+    },
+    {
+      "case": "current_v895_0021_03",
+      "reason": "true_combined_fail_v4",
+      "true_score": 0.6477541137406838
+    },
+    {
+      "case": "current_v895_0021_03",
+      "reason": "control_or_prior_close_or_better_v4",
+      "control": "part_coverage_canonical_surfel_true",
+      "true_score": 0.6477541137406838,
+      "control_score": 0.6766571516208613
+    }
+  ],
+  "score_csv": "/workspace/repo/reports/V18700000000000000000_visible_anchor_scores.csv",
+  "board": "/workspace/repo/boards/V18700000000000000000_visible_anchor_board.png",
+  "turntable_cross_section": "/workspace/repo/boards/V18700000000000000000_visible_anchor_turntable_cross_section.png",
+  "face_detail_claim_allowed": false,
+  "allowed_face_claim": "head/face contour and hair region only",
+  "v185_diagnosis": "V185 reduced some distant overlap but decoded only partial semantic coverage (part_presence around 0.5).",
+  "v186_diagnosis": "V186 repaired part coverage but produced a floating topology-volume cloud due to weak visible anchoring.",
+  "feature_bank_fallback_note": "If local V950 feature bank is absent, V187 uses V186 model-owned predictions as diagnostic surfel support. This cannot be final mentor evidence by itself.",
+  "summary": "V187 adds visible-anchor affinity, floating-occupancy penalties, and anchor-constrained per-part decode. It remains fail-closed unless full-scene mentor visuals and hard controls pass."
+}

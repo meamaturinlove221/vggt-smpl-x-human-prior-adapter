@@ -1,0 +1,4 @@
+case,region,crop,true_region_points,facial_detail_claimed
+current_v895_0021_03,head_hair,"[265, 140, 420, 271]",3500,False
+current_v895_0021_03,hand_arm,"[190, 200, 443, 436]",2500,False
+current_v895_0021_03,clothing,"[239, 198, 402, 377]",2000,False

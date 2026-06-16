@@ -1,0 +1,271 @@
+{
+  "all_regions_pass": true,
+  "attempt_id": 0,
+  "config": {
+    "feature_mode": "raw",
+    "hidden": 64,
+    "lr": 0.02,
+    "max_delta": 0.0012,
+    "max_points": 900,
+    "steps": 90
+  },
+  "failed_regions": [],
+  "rows": [
+    {
+      "attempt_id": 0,
+      "canary_pass": true,
+      "changed_pixels": 900,
+      "crop_id": 4,
+      "feature_dim": 15,
+      "feature_mode": "raw",
+      "grad_nonzero": true,
+      "hidden_dim": 64,
+      "identity_l2": 0.0,
+      "loss_end": 1.9000522044620993e-08,
+      "loss_start": 5.1579181814531694e-08,
+      "lr": 0.02,
+      "max_delta": 0.0012,
+      "mse_after_point": 1.7412999042676347e-08,
+      "mse_before_point": 4.8300694999170446e-08,
+      "normal_identity_l2": 2.5823858607054717e-08,
+      "normal_status": {
+        "max_norm": 1.0000001192092896,
+        "mean_norm": 1.0,
+        "min_norm": 0.9999998807907104,
+        "nonzero_ratio_gt_1e_4": 1.0
+      },
+      "outside_roi_changed": 0,
+      "region": "head_face",
+      "steps": 90,
+      "synthetic_fit_drop": 0.6394876089676265,
+      "target_roi_changed": 900,
+      "trace": [
+        {
+          "grad_norm": 3.816967808489835e-08,
+          "loss": 5.1579181814531694e-08,
+          "loss_depth": 3.278485749547144e-08,
+          "loss_normal": 0.0,
+          "loss_point": 4.8300694999170446e-08,
+          "step": 0
+        },
+        {
+          "grad_norm": 3.9061077261592914e-08,
+          "loss": 2.828598688608963e-08,
+          "loss_depth": 3.173566298642072e-08,
+          "loss_normal": 0.0,
+          "loss_point": 2.511242058744756e-08,
+          "step": 30
+        },
+        {
+          "grad_norm": 2.660294945444619e-08,
+          "loss": 2.278919097875587e-08,
+          "loss_depth": 2.5712882489870026e-08,
+          "loss_normal": 0.0,
+          "loss_point": 2.021790201922613e-08,
+          "step": 60
+        },
+        {
+          "grad_norm": 1.6198440366821387e-08,
+          "loss": 1.9000522044620993e-08,
+          "loss_depth": 1.520506742735961e-08,
+          "loss_normal": 0.0,
+          "loss_point": 1.74800156571564e-08,
+          "step": 89
+        }
+      ],
+      "view": 4
+    },
+    {
+      "attempt_id": 0,
+      "canary_pass": true,
+      "changed_pixels": 900,
+      "crop_id": 10,
+      "feature_dim": 15,
+      "feature_mode": "raw",
+      "grad_nonzero": true,
+      "hidden_dim": 64,
+      "identity_l2": 0.0,
+      "loss_end": 1.826664863813221e-08,
+      "loss_start": 5.413030379486372e-08,
+      "lr": 0.02,
+      "max_delta": 0.0012,
+      "mse_after_point": 1.6756075638113543e-08,
+      "mse_before_point": 5.1326566108400584e-08,
+      "normal_identity_l2": 2.5823858607054717e-08,
+      "normal_status": {
+        "max_norm": 1.0000001192092896,
+        "mean_norm": 1.0,
+        "min_norm": 0.9999998807907104,
+        "nonzero_ratio_gt_1e_4": 1.0
+      },
+      "outside_roi_changed": 0,
+      "region": "hairline",
+      "steps": 90,
+      "synthetic_fit_drop": 0.6735399051881812,
+      "target_roi_changed": 900,
+      "trace": [
+        {
+          "grad_norm": 4.849962209618752e-08,
+          "loss": 5.413030379486372e-08,
+          "loss_depth": 2.803737864098821e-08,
+          "loss_normal": 0.0,
+          "loss_point": 5.1326566108400584e-08,
+          "step": 0
+        },
+        {
+          "grad_norm": 9.605307993432177e-08,
+          "loss": 2.6620091020390646e-08,
+          "loss_depth": 2.476561533626409e-08,
+          "loss_normal": 0.0,
+          "loss_point": 2.4143529842035605e-08,
+          "step": 30
+        },
+        {
+          "grad_norm": 2.1025126362150814e-08,
+          "loss": 2.1467277733222545e-08,
+          "loss_depth": 1.7799136386997816e-08,
+          "loss_normal": 0.0,
+          "loss_point": 1.9687364627429815e-08,
+          "step": 60
+        },
+        {
+          "grad_norm": 2.1664208760263648e-08,
+          "loss": 1.826664863813221e-08,
+          "loss_depth": 1.3547761135157543e-08,
+          "loss_normal": 0.0,
+          "loss_point": 1.6911872791069982e-08,
+          "step": 89
+        }
+      ],
+      "view": 4
+    },
+    {
+      "attempt_id": 0,
+      "canary_pass": true,
+      "changed_pixels": 99,
+      "crop_id": 15,
+      "feature_dim": 15,
+      "feature_mode": "raw",
+      "grad_nonzero": true,
+      "hidden_dim": 64,
+      "identity_l2": 0.0,
+      "loss_end": 2.2458639392652913e-09,
+      "loss_start": 4.493488603429796e-08,
+      "lr": 0.02,
+      "max_delta": 0.0012,
+      "mse_after_point": 1.7261275742086468e-09,
+      "mse_before_point": 4.4111040153893555e-08,
+      "normal_identity_l2": 2.5823858607054717e-08,
+      "normal_status": {
+        "max_norm": 1.0000001192092896,
+        "mean_norm": 1.0,
+        "min_norm": 0.9999998807907104,
+        "nonzero_ratio_gt_1e_4": 1.0
+      },
+      "outside_roi_changed": 0,
+      "region": "left_hand",
+      "steps": 90,
+      "synthetic_fit_drop": 0.9608685814665314,
+      "target_roi_changed": 99,
+      "trace": [
+        {
+          "grad_norm": 3.838861317717601e-08,
+          "loss": 4.493488603429796e-08,
+          "loss_depth": 8.23845347497354e-09,
+          "loss_normal": 0.0,
+          "loss_point": 4.4111040153893555e-08,
+          "step": 0
+        },
+        {
+          "grad_norm": 9.059764094487832e-08,
+          "loss": 1.6236004540814974e-08,
+          "loss_depth": 6.821704090498315e-09,
+          "loss_normal": 0.0,
+          "loss_point": 1.5553833776493775e-08,
+          "step": 30
+        },
+        {
+          "grad_norm": 2.3239555169141113e-08,
+          "loss": 3.270312021186328e-09,
+          "loss_depth": 5.908136202492642e-09,
+          "loss_normal": 0.0,
+          "loss_point": 2.6794984009370637e-09,
+          "step": 60
+        },
+        {
+          "grad_norm": 6.96365155816725e-09,
+          "loss": 2.2458639392652913e-09,
+          "loss_depth": 5.057115171069881e-09,
+          "loss_normal": 0.0,
+          "loss_point": 1.7401523555449216e-09,
+          "step": 89
+        }
+      ],
+      "view": 3
+    },
+    {
+      "attempt_id": 0,
+      "canary_pass": true,
+      "changed_pixels": 374,
+      "crop_id": 21,
+      "feature_dim": 15,
+      "feature_mode": "raw",
+      "grad_nonzero": true,
+      "hidden_dim": 64,
+      "identity_l2": 0.0,
+      "loss_end": 1.1133474586699776e-08,
+      "loss_start": 5.3208307093655094e-08,
+      "lr": 0.02,
+      "max_delta": 0.0012,
+      "mse_after_point": 9.37395849831546e-09,
+      "mse_before_point": 5.1327663896927334e-08,
+      "normal_identity_l2": 2.5823858607054717e-08,
+      "normal_status": {
+        "max_norm": 1.0000001192092896,
+        "mean_norm": 1.0,
+        "min_norm": 0.9999998807907104,
+        "nonzero_ratio_gt_1e_4": 1.0
+      },
+      "outside_roi_changed": 0,
+      "region": "right_hand",
+      "steps": 90,
+      "synthetic_fit_drop": 0.8173702485829163,
+      "target_roi_changed": 374,
+      "trace": [
+        {
+          "grad_norm": 4.434134126540812e-08,
+          "loss": 5.3208307093655094e-08,
+          "loss_depth": 1.880644617813232e-08,
+          "loss_normal": 0.0,
+          "loss_point": 5.1327663896927334e-08,
+          "step": 0
+        },
+        {
+          "grad_norm": 3.9390892186963455e-08,
+          "loss": 2.262068932168404e-08,
+          "loss_depth": 1.7398757989894875e-08,
+          "loss_normal": 0.0,
+          "loss_point": 2.0880813522694552e-08,
+          "step": 30
+        },
+        {
+          "grad_norm": 2.952011013412914e-08,
+          "loss": 1.866481191825642e-08,
+          "loss_depth": 1.6741152464305742e-08,
+          "loss_normal": 0.0,
+          "loss_point": 1.699069684946153e-08,
+          "step": 60
+        },
+        {
+          "grad_norm": 3.3021492096274585e-08,
+          "loss": 1.1133474586699776e-08,
+          "loss_depth": 1.43150051812313e-08,
+          "loss_normal": 0.0,
+          "loss_point": 9.701974335030172e-09,
+          "step": 89
+        }
+      ],
+      "view": 3
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "created_at": "2026-05-27T20:24:13+00:00",
+  "main_board": "boards\\V920000000000000000_advisor_3d_main.png",
+  "metric_gate": true,
+  "mentor_visual_pass": false,
+  "blockers": [
+    "manual mentor 3D visual pass not satisfied by automation alone"
+  ]
+}

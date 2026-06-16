@@ -1,0 +1,18 @@
+{
+  "covers_required_regions": true,
+  "crop_count": 4,
+  "input_assets": {
+    "V11700": "D:\\vggt\\vggt-main\\local_report_auxiliary\\V600_quality_rebuild\\remote_pull\\V11700_gap_reduction_branch_520\\predictions.npz",
+    "feature_bank": "D:\\vggt\\vggt-main\\local_report_auxiliary\\V600_quality_rebuild\\output\\V171000_V220000_human_feature_route\\V173000_human_feature_bank.npz",
+    "proxy": "D:\\vggt\\vggt-main\\local_report_auxiliary\\V600_quality_rebuild\\output\\V321000_V350000_2d_semantic_proxy_route\\V321000_2d_semantic_proxy_maps.npz",
+    "training_case": "D:\\vggt\\vggt-main\\output\\training_cases\\0012_11_frame0000_6views_smplx_native_prior_v15"
+  },
+  "inventory_count": 24,
+  "regions": [
+    "hairline",
+    "head_face",
+    "left_hand",
+    "right_hand"
+  ],
+  "status": "V720000_PRODUCTION_CROP_DATALOADER"
+}

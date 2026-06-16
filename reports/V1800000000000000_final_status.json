@@ -1,0 +1,10 @@
+{
+  "created_at": "2026-05-26T18:39:43+00:00",
+  "status": "V1800000000000000_REAL_VGGT_SMPL_FEATURE_DETAIL_MENTOR_READY_NOT_PROMOTED",
+  "all_pass": true,
+  "failed_gates": [],
+  "no_agent_subagent": true,
+  "no_promotion": true,
+  "no_registry": true,
+  "active_candidate": "V11700_gap_reduction_branch_520"
+}

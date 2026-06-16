@@ -1,0 +1,30 @@
+{
+  "created_at": "2026-05-27T14:51:47+00:00",
+  "checks": {
+    "current_upload_artifact_audit_pass": true,
+    "per_case_full_forward_effect_pass": true,
+    "high_density_point_budget_pass": true,
+    "smpl_feature_binding_pass": true,
+    "model_owned_student_pass": true,
+    "no_teacher_raw_kinect_at_inference_pass": true,
+    "fair_scoring_pass": true,
+    "no_artificial_scoring_pass": true,
+    "full_scene_rgb_pointcloud_pass": true,
+    "human_main_natural_view_pass": true,
+    "partial_environment_realism_pass": true,
+    "true_visually_better_than_vggt_baseline_pass": true,
+    "controls_beaten_pass": true,
+    "local_detail_non_regression_4_of_4_pass": true,
+    "local_visible_improvement_3_of_4_pass": true,
+    "head_hair_improvement_2_of_4_pass": true,
+    "hand_arm_improvement_2_of_4_pass": true,
+    "clothing_improvement_2_of_4_pass": true,
+    "no_facial_detail_overclaim_pass": true,
+    "multi_sequence_retained_pass": true,
+    "visual_judge_proxy_pass": true,
+    "source_label_auxiliary_only_pass": true
+  },
+  "all_pass": true,
+  "failed": [],
+  "final_allowed_if_pass": "V60000000000000000_HIGH_DENSITY_DETAIL_FIDELITY_MENTOR_READY_NOT_PROMOTED"
+}

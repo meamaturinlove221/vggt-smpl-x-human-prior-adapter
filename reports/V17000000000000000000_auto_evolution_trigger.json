@@ -1,0 +1,20 @@
+{
+  "created_at": "2026-05-28T19:49:22+00:00",
+  "trigger": "V138/V140 fail closed after V137 Modal A10 training",
+  "failed_gates": [
+    "V137 anti-billboard training matrix: billboard_fail_v2 remains true on 4/4 cases",
+    "V138 mentor visual gate: trained true is not mentor-ready",
+    "V140 causality gate: same-topology/shuffled/thickness-only controls remain close or stronger"
+  ],
+  "mentor_ready": false,
+  "external_hard_block": false,
+  "route_exhausted": false,
+  "next_goal": "docs/goals/V17000000000000000000_auto_evolved_anti_billboard_route.md",
+  "required_next": [
+    "V17100 part-graph cross-section targets",
+    "V17200 adversarial anti-billboard training runner",
+    "Modal A10/A100 multi-seed training",
+    "V17300 mentor visual and causality gates"
+  ],
+  "no_agent_rule": "No agent/subagent launch in this run unless the user explicitly reauthorizes it in the current turn."
+}

@@ -1,0 +1,10 @@
+{
+  "active_candidate": "V11700_gap_reduction_branch_520",
+  "candidate_promoted": false,
+  "global_terminal_for_requested_plan": true,
+  "mentor_requirement_evidence_ready": true,
+  "next_requires": "review/approval before any candidate or registry promotion",
+  "process_scan_clean": true,
+  "status": "V930000_MENTOR_REQUIREMENT_PLAN_COMPLETE_NOT_PROMOTED",
+  "strict_registry_written": false
+}

@@ -1,0 +1,7 @@
+{
+  "active_candidate": "V11700_gap_reduction_branch_520",
+  "classification": "MENTOR_VISIBLE_GAIN_READY_DIAGNOSTIC_NOT_PROMOTED",
+  "next_route": "V820000 candidate-readiness package may be prepared only after user approval; strict registry remains blocked.",
+  "single_branch_terminal_is_global_terminal": false,
+  "status": "V800000_GLOBAL_ROUTE_DECISION"
+}

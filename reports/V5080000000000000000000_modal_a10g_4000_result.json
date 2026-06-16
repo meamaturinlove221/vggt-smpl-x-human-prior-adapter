@@ -1,0 +1,42 @@
+{
+  "task": "V508_modal_a10g_4000_checkpoint_result",
+  "status": "V508_MODAL_A10G_4000_CHECKPOINT_PASS_A10G_TARGET_COMPLETE_A100_PENDING_NOT_PROMOTED",
+  "created_at": "2026-06-02T20:52:59+00:00",
+  "modal_run_url": "https://modal.com/apps/shimakaze22333/main/ap-TKwHX4cqyV8H2zZ7D6GR7U",
+  "gpu": "A10G",
+  "steps": 4000,
+  "max_samples": 256,
+  "seed": 508,
+  "returncode": 0,
+  "downloaded_to": "D:\\vggt\\vggt-canonical-surfel-adapter\\_modal_download\\V508_4000",
+  "synced_to_local_reports": true,
+  "synced_to_local_output": true,
+  "completed_checkpoints": [
+    300,
+    600,
+    1000,
+    2000,
+    4000
+  ],
+  "pending_checkpoints": [],
+  "pending_gpu_targets": [
+    "A100"
+  ],
+  "checkpoint_snapshot_count": 45,
+  "seed_metric_snapshot": {
+    "v50r2_distilled_true_final_total_loss": 0.05000101402401924,
+    "vggt_baseline_final_total_loss": 0.05061914771795273,
+    "no_smpl_final_total_loss": 0.05082550644874573,
+    "observation_only_final_total_loss": 0.04975910484790802,
+    "visible_only_final_total_loss": 0.049461521208286285,
+    "teacher_copy_diagnostic_pass": true
+  },
+  "interpretation": "A10G 4000-step checkpoint executed, downloaded, and synced back locally. This completes the A10G checkpoint sequence for V508, but A100 remains incomplete and visual mentor gates still require accepted model-owned full-scene output.",
+  "gates": {
+    "modal_a10g_4000_pass": true,
+    "a10g_checkpoints_complete": true,
+    "modal_a100_target_complete": false,
+    "teacher_copy_diagnostic_required": true,
+    "not_promoted": true
+  }
+}

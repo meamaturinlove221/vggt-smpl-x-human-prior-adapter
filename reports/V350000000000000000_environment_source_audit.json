@@ -1,0 +1,7 @@
+{
+  "created_at": "2026-05-27T19:45:01+00:00",
+  "real_vggt_environment_source_proven": false,
+  "procedural_or_uv_background_risk": true,
+  "environment_gate_pass": false,
+  "decision": "rebuild_environment_from_real_vggt_or_scene_context_points"
+}

@@ -1,0 +1,22 @@
+{
+  "created_at": "2026-05-28T02:21:47+08:00",
+  "previous_status": "V300000000000000000_PHOTOMETRIC_GEOMETRY_VISUAL_TRUTH_MENTOR_READY_NOT_PROMOTED",
+  "freeze_state": "checkpoint",
+  "reason_summary": [
+    "Uploaded pack and repository narrative disagree on the V300 final status.",
+    "3D main board still reads as a sideways point-cloud body with weak environment context.",
+    "Local close-ups are projection-assisted crops rather than true 3D close-up evidence.",
+    "The current route still leans on projection scores and rescoring logic more than mentor-visible morphology."
+  ],
+  "evidence_inputs": [
+    "archive/V290000000000000000_reports_bundle.zip: V300 final_status, requirement audit, completion audit",
+    "boards/V140000000000000000_3d_human_scene_board.png",
+    "boards/V160000000000000000_head_hair_projection_closeup.png",
+    "boards/V160000000000000000_hand_arm_projection_closeup.png",
+    "boards/V160000000000000000_clothing_projection_closeup.png",
+    "reports/V300000000000000000_final_status.json",
+    "reports/V300000000000000000_requirement_by_requirement_audit.json",
+    "reports/V300000000000000000_completion_audit.json"
+  ],
+  "next_core": "true_3d_morphology_detail"
+}

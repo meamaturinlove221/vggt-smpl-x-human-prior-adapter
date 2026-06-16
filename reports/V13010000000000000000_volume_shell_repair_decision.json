@@ -1,0 +1,25 @@
+{
+  "created_at": "2026-05-28T18:44:09+00:00",
+  "status": "V13010_VOLUME_SHELL_REPAIR_FAIL_CLOSED_CONTINUE",
+  "failures": [
+    {
+      "case": "0013_01_frame001",
+      "repair_thickness": 0.4157545251880602,
+      "real_vggt_baseline_only_thickness": 0.33215459282226123,
+      "shuffled_smpl_feature_thickness": 0.38996626924074734,
+      "thickness_only_control_thickness": 0.4223742724754062,
+      "same_topology_no_semantic_thickness": 0.13344995876017693,
+      "fail_control_count": 1,
+      "fail_controls_json": "{\"thickness_only_control\": 0.4223742724754062}"
+    }
+  ],
+  "boards": {
+    "controls": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V13010000000000000000_volume_shell_repair_controls.png",
+    "side_depth": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V13010000000000000000_volume_shell_repair_side_depth.png"
+  },
+  "mentor_ready": false,
+  "external_hard_block": false,
+  "face_detail_claim_allowed": false,
+  "allowed_face_claim": "head/face contour and hair region only",
+  "note": "Even if shell thickness improves, mentor-ready still requires visual separation and local 3D morphology pass."
+}

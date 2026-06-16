@@ -1,0 +1,50 @@
+{
+  "created_at": "2026-05-26T17:55:45+00:00",
+  "repo": "D:\\vggt\\vggt-canonical-surfel-adapter",
+  "previous_status": "V900000000000000_SMPL_FEATURE_BOUND_HUMAN_SCENE_POINTCLOUD_MENTOR_READY_NOT_PROMOTED",
+  "previous_hard_gate_pass": true,
+  "downgraded_to_checkpoint": true,
+  "downgrade_reasons": [
+    "V340 final run used TinyV330-style local model and scene_tokens generated from anchor/rgb/mask random projection.",
+    "V340 did not execute full real VGGT.forward or real Aggregator tokens from current images as final evidence.",
+    "V350 boards are preserved, but local face/head/hair/hand/clothing detail remains a risk and must be defended against real VGGT baseline.",
+    "Strong topology/posthoc/template controls require a stricter real-token control firewall."
+  ],
+  "v410_gate_preserved": {
+    "created_at": "2026-05-26T17:19:22+00:00",
+    "hard_gate_pass": true,
+    "final_checks": {
+      "smpl_feature_binding_pass": true,
+      "model_owned_student_pass": true,
+      "full_scene_rgb_pointcloud_pass": true,
+      "human_main_pass": true,
+      "environment_context_pass": true,
+      "face_head_hair_non_regression_pass": true,
+      "hand_arm_non_regression_pass": true,
+      "clothing_boundary_non_regression_pass": true,
+      "true_better_than_vggt_baseline_pass": true,
+      "controls_weaker_pass": true,
+      "teacher_leakage_pass": true,
+      "source_label_auxiliary_only_pass": true,
+      "detail_gate_pass": true
+    },
+    "failed_checks": [],
+    "main_boards": {
+      "advisor_main": "boards\\V350000000000000_advisor_main_rgb_pointcloud.png",
+      "same_scene_controls": "boards\\V350000000000000_same_scene_baseline_true_controls.png",
+      "cloudcompare_style": "boards\\V350000000000000_cloudcompare_style_board.png"
+    },
+    "detail_boards": {
+      "head_face_hair": "boards\\V360000000000000_head_face_hair_detail_board.png",
+      "hand_arm": "boards\\V360000000000000_hand_arm_detail_board.png",
+      "clothing_boundary": "boards\\V360000000000000_clothing_boundary_board.png"
+    },
+    "control_board": "boards\\V370000000000000_controls_visual_board.png",
+    "multisequence_board": "boards\\V400000000000000_multisequence_main_summary.png",
+    "scene_output_dir": "output\\V350000000000000_smpl_feature_bound_scene",
+    "allowed_next": "V500_report_package"
+  },
+  "v340_rows": 48,
+  "tiny_v330_or_synthetic_token_risk": true,
+  "no_agent_rule": "No agents/subagents launched."
+}

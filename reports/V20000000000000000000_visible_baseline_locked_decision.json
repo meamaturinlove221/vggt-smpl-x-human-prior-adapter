@@ -1,0 +1,258 @@
+{
+  "created_at": "2026-05-28T23:21:10+00:00",
+  "status": "V20000_VISIBLE_BASELINE_LOCKED_FAIL_CLOSED_CONTINUE",
+  "mentor_ready": false,
+  "external_hard_block": false,
+  "failures": [
+    {
+      "case": "0012_11_frame001",
+      "reason": "true_combined_fail_v4",
+      "true_score": 0.45233392732746225
+    },
+    {
+      "case": "0012_11_frame001",
+      "reason": "control_or_prior_close_or_better_v4",
+      "control": "visible_surface_preserving_infill_true",
+      "true_score": 0.45233392732746225,
+      "control_score": 0.633747900754873
+    },
+    {
+      "case": "0012_11_frame001",
+      "reason": "control_or_prior_close_or_better_v4",
+      "control": "upright_pose_frame_true",
+      "true_score": 0.45233392732746225,
+      "control_score": 0.6734632948560968
+    },
+    {
+      "case": "0012_11_frame001",
+      "reason": "control_or_prior_close_or_better_v4",
+      "control": "pose_frame_occupancy_true",
+      "true_score": 0.45233392732746225,
+      "control_score": 0.6756439549105919
+    },
+    {
+      "case": "0012_11_frame001",
+      "reason": "control_or_prior_close_or_better_v4",
+      "control": "visible_anchor_canonical_surfel_true",
+      "true_score": 0.45233392732746225,
+      "control_score": 0.6647455685595987
+    },
+    {
+      "case": "0012_11_frame001",
+      "reason": "control_or_prior_close_or_better_v4",
+      "control": "part_coverage_canonical_surfel_true",
+      "true_score": 0.45233392732746225,
+      "control_score": 0.6567868053664778
+    },
+    {
+      "case": "0012_11_frame001",
+      "reason": "control_or_prior_close_or_better_v4",
+      "control": "real_vggt_baseline_only",
+      "true_score": 0.45233392732746225,
+      "control_score": 0.4709819833342097
+    },
+    {
+      "case": "0012_11_frame001",
+      "reason": "control_or_prior_close_or_better_v4",
+      "control": "same_topology_no_semantic",
+      "true_score": 0.45233392732746225,
+      "control_score": 0.6153839052366847
+    },
+    {
+      "case": "0012_11_frame001",
+      "reason": "control_or_prior_close_or_better_v4",
+      "control": "shuffled_smpl_feature",
+      "true_score": 0.45233392732746225,
+      "control_score": 0.5938432340771227
+    },
+    {
+      "case": "0013_01_frame001",
+      "reason": "true_combined_fail_v4",
+      "true_score": 0.36350063557867435
+    },
+    {
+      "case": "0013_01_frame001",
+      "reason": "control_or_prior_close_or_better_v4",
+      "control": "visible_surface_preserving_infill_true",
+      "true_score": 0.36350063557867435,
+      "control_score": 0.6189950823843376
+    },
+    {
+      "case": "0013_01_frame001",
+      "reason": "control_or_prior_close_or_better_v4",
+      "control": "upright_pose_frame_true",
+      "true_score": 0.36350063557867435,
+      "control_score": 0.686343611265655
+    },
+    {
+      "case": "0013_01_frame001",
+      "reason": "control_or_prior_close_or_better_v4",
+      "control": "pose_frame_occupancy_true",
+      "true_score": 0.36350063557867435,
+      "control_score": 0.6863329407863002
+    },
+    {
+      "case": "0013_01_frame001",
+      "reason": "control_or_prior_close_or_better_v4",
+      "control": "visible_anchor_canonical_surfel_true",
+      "true_score": 0.36350063557867435,
+      "control_score": 0.6789896214402975
+    },
+    {
+      "case": "0013_01_frame001",
+      "reason": "control_or_prior_close_or_better_v4",
+      "control": "part_coverage_canonical_surfel_true",
+      "true_score": 0.36350063557867435,
+      "control_score": 0.7047716360083482
+    },
+    {
+      "case": "0013_01_frame001",
+      "reason": "control_or_prior_close_or_better_v4",
+      "control": "real_vggt_baseline_only",
+      "true_score": 0.36350063557867435,
+      "control_score": 0.46562437160631054
+    },
+    {
+      "case": "0013_01_frame001",
+      "reason": "control_or_prior_close_or_better_v4",
+      "control": "same_topology_no_semantic",
+      "true_score": 0.36350063557867435,
+      "control_score": 0.6592843267754295
+    },
+    {
+      "case": "0013_01_frame001",
+      "reason": "control_or_prior_close_or_better_v4",
+      "control": "shuffled_smpl_feature",
+      "true_score": 0.36350063557867435,
+      "control_score": 0.6300139009014754
+    },
+    {
+      "case": "0021_03_frame001",
+      "reason": "true_combined_fail_v4",
+      "true_score": 0.45194365305294315
+    },
+    {
+      "case": "0021_03_frame001",
+      "reason": "control_or_prior_close_or_better_v4",
+      "control": "visible_surface_preserving_infill_true",
+      "true_score": 0.45194365305294315,
+      "control_score": 0.5362180951297058
+    },
+    {
+      "case": "0021_03_frame001",
+      "reason": "control_or_prior_close_or_better_v4",
+      "control": "upright_pose_frame_true",
+      "true_score": 0.45194365305294315,
+      "control_score": 0.7064918225762687
+    },
+    {
+      "case": "0021_03_frame001",
+      "reason": "control_or_prior_close_or_better_v4",
+      "control": "pose_frame_occupancy_true",
+      "true_score": 0.45194365305294315,
+      "control_score": 0.7041508758475439
+    },
+    {
+      "case": "0021_03_frame001",
+      "reason": "control_or_prior_close_or_better_v4",
+      "control": "visible_anchor_canonical_surfel_true",
+      "true_score": 0.45194365305294315,
+      "control_score": 0.6832466481269006
+    },
+    {
+      "case": "0021_03_frame001",
+      "reason": "control_or_prior_close_or_better_v4",
+      "control": "part_coverage_canonical_surfel_true",
+      "true_score": 0.45194365305294315,
+      "control_score": 0.6717279473056041
+    },
+    {
+      "case": "0021_03_frame001",
+      "reason": "control_or_prior_close_or_better_v4",
+      "control": "real_vggt_baseline_only",
+      "true_score": 0.45194365305294315,
+      "control_score": 0.473598221025077
+    },
+    {
+      "case": "0021_03_frame001",
+      "reason": "control_or_prior_close_or_better_v4",
+      "control": "same_topology_no_semantic",
+      "true_score": 0.45194365305294315,
+      "control_score": 0.6048242753225461
+    },
+    {
+      "case": "0021_03_frame001",
+      "reason": "control_or_prior_close_or_better_v4",
+      "control": "shuffled_smpl_feature",
+      "true_score": 0.45194365305294315,
+      "control_score": 0.5823420907821397
+    },
+    {
+      "case": "current_v895_0021_03",
+      "reason": "true_combined_fail_v4",
+      "true_score": 0.45214082766138963
+    },
+    {
+      "case": "current_v895_0021_03",
+      "reason": "control_or_prior_close_or_better_v4",
+      "control": "visible_surface_preserving_infill_true",
+      "true_score": 0.45214082766138963,
+      "control_score": 0.5234128729237953
+    },
+    {
+      "case": "current_v895_0021_03",
+      "reason": "control_or_prior_close_or_better_v4",
+      "control": "upright_pose_frame_true",
+      "true_score": 0.45214082766138963,
+      "control_score": 0.6706251154966255
+    },
+    {
+      "case": "current_v895_0021_03",
+      "reason": "control_or_prior_close_or_better_v4",
+      "control": "pose_frame_occupancy_true",
+      "true_score": 0.45214082766138963,
+      "control_score": 0.6708203409716615
+    },
+    {
+      "case": "current_v895_0021_03",
+      "reason": "control_or_prior_close_or_better_v4",
+      "control": "visible_anchor_canonical_surfel_true",
+      "true_score": 0.45214082766138963,
+      "control_score": 0.6477541137406841
+    },
+    {
+      "case": "current_v895_0021_03",
+      "reason": "control_or_prior_close_or_better_v4",
+      "control": "part_coverage_canonical_surfel_true",
+      "true_score": 0.45214082766138963,
+      "control_score": 0.6766571516208615
+    },
+    {
+      "case": "current_v895_0021_03",
+      "reason": "control_or_prior_close_or_better_v4",
+      "control": "real_vggt_baseline_only",
+      "true_score": 0.45214082766138963,
+      "control_score": 0.4711326194691602
+    },
+    {
+      "case": "current_v895_0021_03",
+      "reason": "control_or_prior_close_or_better_v4",
+      "control": "same_topology_no_semantic",
+      "true_score": 0.45214082766138963,
+      "control_score": 0.6111958787696002
+    },
+    {
+      "case": "current_v895_0021_03",
+      "reason": "control_or_prior_close_or_better_v4",
+      "control": "shuffled_smpl_feature",
+      "true_score": 0.45214082766138963,
+      "control_score": 0.5758237553078631
+    }
+  ],
+  "score_csv": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V20000000000000000000_visible_baseline_locked_scores.csv",
+  "board": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V20000000000000000000_visible_baseline_locked_board.png",
+  "turntable_cross_section": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V20000000000000000000_visible_baseline_locked_turntable_cross_section.png",
+  "face_detail_claim_allowed": false,
+  "allowed_face_claim": "head/face contour and hair region only",
+  "summary": "V200 locks the mentor-readable VGGT visible baseline surface and adds only small weak-region infill. It is a non-regression test, not a mentor-ready shortcut."
+}

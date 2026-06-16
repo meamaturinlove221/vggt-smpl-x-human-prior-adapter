@@ -1,0 +1,134 @@
+{
+  "task": "V515_observation_bound_repair_training",
+  "status": "V515_OBSERVATION_BOUND_REPAIR_TRAIN_SUBSET_FAIL_CONTINUE_REPAIR_NOT_PROMOTED",
+  "created_at": "2026-06-02T21:33:33.168777Z",
+  "repo": "D:\\vggt\\vggt-canonical-surfel-adapter",
+  "source_checkpoint": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V5080000000000000000000_v50r2_distillation_matrix\\v50r2_distilled_true\\checkpoint_4000.pt",
+  "output_checkpoint": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V5150000000000000000000_observation_bound_repair_training\\checkpoint_240.pt",
+  "metrics_csv": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5150000000000000000000_observation_bound_repair_metrics.csv",
+  "board": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V5150000000000000000000_observation_bound_repair_board.png",
+  "train_subset_true_full_scene_ply": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V5150000000000000000000_observation_bound_repair_training\\v515_train_subset_true_full_scene_rgb.ply",
+  "train_subset_baseline_full_scene_ply": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V5150000000000000000000_observation_bound_repair_training\\v515_train_subset_baseline_full_scene_rgb.ply",
+  "input_policy": {
+    "vggt_observation_input": true,
+    "v50r2_used_for_loss_only": true,
+    "v50r2_used_at_inference": false,
+    "kinect_depth_used_at_inference": false,
+    "requires_v514_full_adjudication_before_v509": true
+  },
+  "gates": {
+    "train_subset_true_improves_vggt_baseline": false,
+    "train_subset_true_improves_no_smpl": false,
+    "train_subset_true_improves_shuffled_semantic": true,
+    "accepted_for_v509": false,
+    "mentor_ready": false,
+    "not_promoted": true
+  },
+  "loss_history": [
+    {
+      "step": 1,
+      "loss": 0.0005639102892018855,
+      "true_target": 0.00028870708774775267,
+      "rgb_target": 0.0002743299992289394,
+      "margin": 0.0003112013509962708,
+      "preserve": 1.1793511475843843e-05
+    },
+    {
+      "step": 24,
+      "loss": 0.00010472522262716666,
+      "true_target": 1.4133872809907189e-06,
+      "rgb_target": 0.00026244850596413016,
+      "margin": 2.246885560452938e-05,
+      "preserve": 1.102137829889216e-07
+    },
+    {
+      "step": 48,
+      "loss": 0.00010174942144658417,
+      "true_target": 3.1036307746035163e-07,
+      "rgb_target": 0.000259706808719784,
+      "margin": 2.0954688807250932e-05,
+      "preserve": 3.216480237711039e-08
+    },
+    {
+      "step": 72,
+      "loss": 0.00010135921911569312,
+      "true_target": 1.6545575931559142e-07,
+      "rgb_target": 0.0002580815344117582,
+      "margin": 2.1642368665197864e-05,
+      "preserve": 2.2025997026275945e-08
+    },
+    {
+      "step": 96,
+      "loss": 0.000100992365332786,
+      "true_target": 1.2185321907054458e-07,
+      "rgb_target": 0.00025646062567830086,
+      "margin": 2.2145663024275564e-05,
+      "preserve": 1.823087281138669e-08
+    },
+    {
+      "step": 120,
+      "loss": 0.00010041191126219928,
+      "true_target": 9.702014835966111e-08,
+      "rgb_target": 0.0002549645723775029,
+      "margin": 2.209236117778346e-05,
+      "preserve": 1.5556581800524327e-08
+    },
+    {
+      "step": 144,
+      "loss": 9.998299356084317e-05,
+      "true_target": 7.865619977565075e-08,
+      "rgb_target": 0.0002539317647460848,
+      "margin": 2.2002150217304006e-05,
+      "preserve": 1.3579916746664367e-08
+    },
+    {
+      "step": 168,
+      "loss": 9.972686530090868e-05,
+      "true_target": 6.561849374975282e-08,
+      "rgb_target": 0.0002531579229980707,
+      "margin": 2.2063970391172916e-05,
+      "preserve": 1.1987809855895648e-08
+    },
+    {
+      "step": 192,
+      "loss": 9.953028347808868e-05,
+      "true_target": 5.844317030323509e-08,
+      "rgb_target": 0.00025240101967938244,
+      "margin": 2.221897739218548e-05,
+      "preserve": 1.100293367528593e-08
+    },
+    {
+      "step": 216,
+      "loss": 9.92802670225501e-05,
+      "true_target": 5.572948325038851e-08,
+      "rgb_target": 0.0002515361411496997,
+      "margin": 2.2330981664708816e-05,
+      "preserve": 1.0700813568575995e-08
+    },
+    {
+      "step": 240,
+      "loss": 9.89161926554516e-05,
+      "true_target": 5.698139204923791e-08,
+      "rgb_target": 0.00025043991627171636,
+      "margin": 2.236633372376673e-05,
+      "preserve": 1.1035540481429962e-08
+    }
+  ],
+  "metrics": {
+    "status": "V515_OBSERVATION_BOUND_REPAIR_TRAIN_SUBSET_FAIL_CONTINUE_REPAIR_NOT_PROMOTED",
+    "steps": 240,
+    "max_samples_per_view": 768,
+    "source_checkpoint": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V5080000000000000000000_v50r2_distillation_matrix\\v50r2_distilled_true\\checkpoint_4000.pt",
+    "output_checkpoint": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V5150000000000000000000_observation_bound_repair_training\\checkpoint_240.pt",
+    "true_to_v50r2_nn_mean": 0.030572986230254173,
+    "baseline_to_v50r2_nn_mean": 0.02895737998187542,
+    "no_smpl_to_v50r2_nn_mean": 0.0289676021784544,
+    "shuffled_to_v50r2_nn_mean": 0.0310819149017334,
+    "true_improves_baseline": false,
+    "true_improves_no_smpl": false,
+    "true_improves_shuffled": true,
+    "teacher_weight_count": 4608,
+    "history_last_loss": 9.89161926554516e-05
+  },
+  "decision": "This is a repair checkpoint on observation-bound inputs. It may only feed V514 full adjudication; it is not a mentor-ready output and is not promoted."
+}

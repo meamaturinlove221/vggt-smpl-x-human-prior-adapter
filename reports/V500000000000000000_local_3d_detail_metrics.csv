@@ -1,0 +1,4 @@
+region,true_3d_closeup_real,projection_only_or_broad_crop,facial_detail_visible,allowed_claim,hand_shape_visible,clothing_boundary_visible
+head_hair,False,True,False,head/hair contour only,,
+hand_arm,False,True,,arm/endpoint contour only,False,
+clothing,False,True,,torso/clothing region only,,False

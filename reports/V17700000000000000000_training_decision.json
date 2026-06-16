@@ -1,0 +1,117 @@
+{
+  "created_at": "2026-05-28T20:28:39+00:00",
+  "status": "V17700_FRONT_BACK_OCCUPANCY_FAIL_CLOSED_CONTINUE",
+  "mentor_ready": false,
+  "external_hard_block": false,
+  "cases": [
+    "0012_11_frame001",
+    "0013_01_frame001",
+    "0021_03_frame001",
+    "current_v895_0021_03"
+  ],
+  "training_manifest_rows": 4,
+  "failures": [
+    {
+      "case": "0012_11_frame001",
+      "reason": "true_billboard_fail_v2",
+      "true_score": 0.4325053014268771
+    },
+    {
+      "case": "0012_11_frame001",
+      "reason": "control_close_or_better_v2",
+      "control": "same_topology_no_semantic",
+      "true_score": 0.4325053014268771,
+      "control_score": 0.5611661329441532
+    },
+    {
+      "case": "0012_11_frame001",
+      "reason": "control_close_or_better_v2",
+      "control": "shuffled_smpl_feature",
+      "true_score": 0.4325053014268771,
+      "control_score": 0.516107901549784
+    },
+    {
+      "case": "0012_11_frame001",
+      "reason": "control_close_or_better_v2",
+      "control": "thickness_only_control",
+      "true_score": 0.4325053014268771,
+      "control_score": 0.4206352872892399
+    },
+    {
+      "case": "0013_01_frame001",
+      "reason": "true_billboard_fail_v2",
+      "true_score": 0.3747992708703273
+    },
+    {
+      "case": "0013_01_frame001",
+      "reason": "control_close_or_better_v2",
+      "control": "same_topology_no_semantic",
+      "true_score": 0.3747992708703273,
+      "control_score": 0.6438028617027225
+    },
+    {
+      "case": "0013_01_frame001",
+      "reason": "control_close_or_better_v2",
+      "control": "shuffled_smpl_feature",
+      "true_score": 0.3747992708703273,
+      "control_score": 0.5869365525898298
+    },
+    {
+      "case": "0013_01_frame001",
+      "reason": "control_close_or_better_v2",
+      "control": "thickness_only_control",
+      "true_score": 0.3747992708703273,
+      "control_score": 0.409978807837689
+    },
+    {
+      "case": "0021_03_frame001",
+      "reason": "true_billboard_fail_v2",
+      "true_score": 0.49890146611280933
+    },
+    {
+      "case": "0021_03_frame001",
+      "reason": "control_close_or_better_v2",
+      "control": "same_topology_no_semantic",
+      "true_score": 0.49890146611280933,
+      "control_score": 0.5310976227401354
+    },
+    {
+      "case": "0021_03_frame001",
+      "reason": "control_close_or_better_v2",
+      "control": "shuffled_smpl_feature",
+      "true_score": 0.49890146611280933,
+      "control_score": 0.49714181251643375
+    },
+    {
+      "case": "current_v895_0021_03",
+      "reason": "true_billboard_fail_v2",
+      "true_score": 0.46203569314904364
+    },
+    {
+      "case": "current_v895_0021_03",
+      "reason": "control_close_or_better_v2",
+      "control": "same_topology_no_semantic",
+      "true_score": 0.46203569314904364,
+      "control_score": 0.5255679127685777
+    },
+    {
+      "case": "current_v895_0021_03",
+      "reason": "control_close_or_better_v2",
+      "control": "shuffled_smpl_feature",
+      "true_score": 0.46203569314904364,
+      "control_score": 0.4812033043458536
+    },
+    {
+      "case": "current_v895_0021_03",
+      "reason": "control_close_or_better_v2",
+      "control": "thickness_only_control",
+      "true_score": 0.46203569314904364,
+      "control_score": 0.45120029299058684
+    }
+  ],
+  "board": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V17700000000000000000_front_back_occupancy_board.png",
+  "turntable_cross_section": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V17700000000000000000_turntable_cross_section.png",
+  "face_detail_claim_allowed": false,
+  "allowed_face_claim": "head/face contour and hair region only",
+  "summary": "V177 explicitly targets thin-axis front/back occupancy. It remains fail-closed unless front/back separation, hard controls, and visual boards pass."
+}

@@ -1,0 +1,22 @@
+{
+  "created_at": "2026-05-28T21:08:26+00:00",
+  "status": "V18400_PART_PAIR_DECODER_FAIL_CLOSED_ROUTE_TO_CANONICAL_SURFEL_GRAPH_OCCUPANCY",
+  "mentor_ready": false,
+  "external_hard_block": false,
+  "v183_status": "V18300_PART_PAIR_EXCLUSION_TRAINING_FAIL_CLOSED_CONTINUE",
+  "root_cause": [
+    "Point-anchor shell decoding keeps inheriting billboard geometry from the visible RGB/VGGT sheet.",
+    "Part-pair exclusion heads improve selected scores but do not create stable whole-body topology.",
+    "The full-scene board still shows torn multi-layer sheets instead of a coherent human volume.",
+    "The route needs a canonical SMPL-X surfel/graph occupancy support, not another point-anchor loss term."
+  ],
+  "must_preserve": [
+    "real VGGT full-forward / world points / RGB / confidence",
+    "SMPL-X feature binding",
+    "no raw Kinect or teacher points at inference",
+    "full-scene RGB point cloud with visible environment as mentor main evidence",
+    "face-invisible claim guard"
+  ],
+  "next_route": "V18450 canonical SMPL-X surfel graph occupancy decoder",
+  "summary": "V183 was a real Modal A10 training attempt but still failed the anti-billboard mentor gate. Continue with canonical surfel/graph occupancy rather than point-anchor shell decoding."
+}

@@ -1,0 +1,12 @@
+{
+  "created_at": "2026-05-29T00:58:00+00:00",
+  "status": "V207_PROPOSAL_CONDITIONED_DECODER_ROUTE_REQUIRED",
+  "mentor_ready": false,
+  "external_hard_block": false,
+  "previous_checkpoint": "V206_LEARNED_PART_PROPOSAL_STUDENT_FAIL_CLOSED_CONTINUE",
+  "root_cause": "V206 applies proposal information after decoding, so the decoder still collapses to baseline-near output and selects almost no effective infill in most cases.",
+  "next_route": "Condition occupancy and residual decoding directly on proposal score, visible lock, seed target, body part, and weak score.",
+  "no_agent_rule": "No agents or subagents launched.",
+  "face_detail_claim_allowed": false,
+  "allowed_face_claim": "head/face contour and hair region only"
+}

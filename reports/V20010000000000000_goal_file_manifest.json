@@ -1,0 +1,17 @@
+{
+  "goal_file_path": "D:\\vggt\\vggt-canonical-surfel-adapter\\docs\\goals\\V20010000000000000_V60000000000000000_high_density_detail_fidelity_goal.md",
+  "sha256": "c0601c96fcd79e9b6a739bb8d2aaf8b35e1959484fb66b41e903b8d879838904",
+  "line_count": 762,
+  "created_at": "2026-05-27T14:22:41+00:00",
+  "repo": "D:\\vggt\\vggt-canonical-surfel-adapter",
+  "source_feature_adapter_repo": "D:\\vggt\\vggt-feature-adapter",
+  "source_scene_context_repo": "D:\\vggt\\vggt-scene-context-evidence",
+  "evidence_root": "D:\\vggt\\vggt-main\\local_report_auxiliary\\V600_quality_rebuild",
+  "previous_status": "V20000000000000000_FULL_FORWARD_VISUAL_TRUTH_MENTOR_READY_NOT_PROMOTED downgraded to checkpoint",
+  "final_allowed_states": [
+    "V60000000000000000_HIGH_DENSITY_DETAIL_FIDELITY_MENTOR_READY_NOT_PROMOTED",
+    "V60000000000000000_TRUE_EXTERNAL_HARD_BLOCK_REQUIRES_USER_ACTION"
+  ],
+  "no_agent_rule": "This round strictly forbids agents/subagents; AGENTS.md is a repository instruction file only, not permission to launch agents.",
+  "summary": "Downgrade V200 to checkpoint and require per-case full-forward effect, high-density 30k/60k human-scene RGB point clouds, detail fidelity, visible environment, hard controls, Yuque-style report, bundles, cleanup, and no promotion."
+}

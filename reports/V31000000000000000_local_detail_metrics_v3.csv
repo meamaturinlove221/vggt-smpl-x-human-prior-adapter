@@ -1,0 +1,5 @@
+actual_visible_improvement,baseline_active,baseline_rgb_variance,case_id,clothing_improvement,edge_score_delta,facial_detail_overclaim_forbidden,hand_arm_improvement,head_hair_improvement,non_regression_pass,rgb_variance_delta,true_active,true_rgb_variance
+True,30000,0.053050484508275986,current_v895_0021_03,True,0.03,True,True,True,True,0.020027857273817062,60000,0.07307834178209305
+True,30000,0.05529142543673515,0021_03_frame001,False,0.03,True,True,True,True,0.019017275422811508,60000,0.07430870085954666
+True,30000,0.026949448511004448,0012_11_frame001,True,0.03,True,False,True,True,0.008250230923295021,60000,0.03519967943429947
+True,30000,0.029758097603917122,0013_01_frame001,True,0.03,True,True,False,True,0.011233756318688393,60000,0.040991853922605515

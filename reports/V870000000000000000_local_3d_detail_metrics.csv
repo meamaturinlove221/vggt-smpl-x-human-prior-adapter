@@ -1,0 +1,4 @@
+case,region,crop,true_region_points,facial_detail_claimed,allowed_claim
+current_v895_0021_03,head_hair,"[268, 141, 412, 263]",4000,False,head/face contour and hair region only
+current_v895_0021_03,hand_arm,"[192, 201, 441, 433]",3000,False,3D local contour evidence only unless hand/clothing shape is visually explicit
+current_v895_0021_03,clothing,"[240, 195, 399, 374]",3000,False,3D local contour evidence only unless hand/clothing shape is visually explicit

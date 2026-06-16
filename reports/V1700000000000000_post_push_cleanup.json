@@ -1,0 +1,65 @@
+{
+  "created_at": "2026-05-26T18:39:41+00:00",
+  "repo_path": "D:\\vggt\\vggt-canonical-surfel-adapter",
+  "branch": {
+    "args": [
+      "git",
+      "branch",
+      "--show-current"
+    ],
+    "returncode": 0,
+    "stdout": "codex/canonical-smplx-surfel-adapter",
+    "stderr": ""
+  },
+  "git_status": {
+    "args": [
+      "git",
+      "status",
+      "--short"
+    ],
+    "returncode": 0,
+    "stdout": "iagram.md\n?? reports/V950000000000000_forward_gradient_smoke.json\n?? reports/V9500000000000_coordinate_transport_defense.json\n?? reports/V960000000000000_seed_metrics.csv\n?? reports/V960000000000000_training_manifest.csv\n?? reports/V960000000000000_training_manifest.json\n?? reports/V9600000000000_teacher_student_leakage_defense.json\n?? reports/V9600000000000_template_overfit_audit.json\n?? reports/V970000000000000_visual_gate.json\n?? reports/V9700000000000_environment_preservation_decision.json\n?? reports/V9700000000000_environment_preservation_defense.csv\n?? reports/V980000000000000_local_detail_decision.json\n?? reports/V980000000000000_local_detail_metrics.csv\n?? reports/V9800000000000_cross_frame_eval.csv\n?? reports/V9800000000000_cross_frame_smc_asset_inventory.json\n?? reports/V9800000000000_cross_frame_smc_decision.json\n?? reports/V990000000000000_claim_boundary.json\n?? reports/V990000000000000_control_firewall_v2.csv\n?? reports/V9900000000000_allowed_claim_statement.md\n?? reports/V9900000000000_claim_router.json\n?? tools/V100_V150_detail_preserving_finalizer.py\n?? tools/V12500000000000_multisequence_surfel_runner.py\n?? tools/V150100_V172_baseline_superiority_audit.py\n?? tools/V1800_completion_audit.py\n?? tools/V180_V190_incremental_scaffold_smoke.py\n?? tools/V210_V270_incremental_gate_package.py\n?? tools/V280_V300_baseline_superior_finalizer.py\n?? tools/V30010000000000_cross_sequence_surfel_artifact_builder.py\n?? tools/V300100_V320_smpl_feature_reanchor_audit.py\n?? tools/V30030000000000_cross_sequence_visual_gate.py\n?? tools/V330_smpl_feature_bound_smoke.py\n?? tools/V350_V410_smpl_feature_bound_gate_package.py\n?? tools/V42010000000000_level5_defense_controller.py\n?? tools/V43000000000000_third_sequence_artifact_builder.py\n?? tools/V45000000000000_third_sequence_visual_gate.py\n?? tools/V45100000000000_advisor_human_main_fix.py\n?? tools/V47000000000000_level5_claim_router.py\n?? tools/V500_V900_smpl_feature_bound_finalizer.py\n?? tools/V600_V800_level5_report_package_final.py\n?? tools/V80010000000000_detail_preserving_bootstrap.py\n?? tools/V802_V803_detail_inventory.py\n?? tools/V810_V812_detail_preserving_controller.py\n?? tools/V850_V880_detail_gate_package.py\n?? tools/V900100_V920_real_vggt_audit.py\n?? tools/V930_V940_real_vggt_token_and_smpl_features.py\n?? tools/V950_real_vggt_smpl_adapter_smoke.py\n?? tools/V970_V1800_real_vggt_smpl_finalizer.py\n?? tools/v161000000000000_repair_detail_regions.py\n?? tools/v7001000000000_v12000000000000_canonical_surfel_controller.py\n?? tools/v7600000000000_train_surfel_adapter.py\n?? tools/v8000000000000_auto_repair_surfel_alignment_controls.py\n?? tools/v8700000000000_rgb_pointcloud_visual_diagnosis.py\n?? tools/v8720000000000_coordinate_transport_claim_router.py\n?? tools/v8770000000000_v890_auto_repair_controller.py\n?? tools/v8800000000000_mentor_visual_gate_audit.py\n?? tools/v8820000000000_human_main_crop_composer.py\n?? tools/v8830000000000_camera_consistent_rgb_repair.py\n?? tools/v8840000000000_dense_posed_surfel_repair.py\n?? tools/v8841000000000_surfel_coverage_root_cause_audit.py\n?? tools/v8850000000000_build_dense_surfel_training_targets.py\n?? tools/v8851000000000_dense_full_body_student_rebuild.py\n?? tools/v8860000000000_coordinate_bridge_hard_gate.py\n?? tools/v8870000000000_rgb_visibility_repair.py\n?? tools/v8880000000000_controls_and_claims_split.py\n?? tools/v8890000000000_same_scene_advisor_board_rebuild.py\n?? tools/v8900000000000_final_decision_checkpoint.py\n?? tools/v8920000000000_modal_dense_scene_board_and_claims.py\n?? tools/v8930000000000_semantic_control_failure_audit.py\n?? tools/v8950000000000_contrastive_scene_board_and_decision.py\n?? tools/v8960000000000_advisor_report_viewer.py\n?? tools/v8970000000000_package_cleanup_final.py\n?? tools/v9001000000000_v12000000000000_advisor_defense_hardening.py\n?? training/losses/v181000000000000_incremental_completion_losses.py\n?? training/losses/v750_surfel_morphology_losses.py\n?? training/losses/v811_detail_preserving_losses.py\n?? viewer/",
+    "stderr": ""
+  },
+  "v50_diff": {
+    "args": [
+      "git",
+      "diff",
+      "--",
+      "V50",
+      "V50R2",
+      "reports/V50",
+      "reports/V50R2"
+    ],
+    "returncode": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  "modal_apps": {
+    "args": [
+      "modal",
+      "app",
+      "list"
+    ],
+    "returncode": 0,
+    "stdout": "Apps                               \n+------------------------------------------------------------------------------\n| App ID                    | Description  | State   | Tasks | Created at   | S\n|---------------------------+--------------+---------+-------+--------------+--\n| ap-DwD2Ztba1n9suKcKZUcLtJ | vggt-v960-r�� | stopped | 0     | 2026-05-27   | 2\n|                           |              |         |       | 02:22        | 0\n|                           |              |         |       | �й���׼ʱ�� |  \n| ap-vhvLPNW92GZHExOPS9SnVi | vggt-v960-r�� | stopped | 0     | 2026-05-27   | 2\n|                           |              |         |       | 02:25        | 0\n|                           |              |         |       | �й���׼ʱ�� |  \n| ap-4v5sNZSFy7xSXa3XHTXKmC | vggt-v960-r�� | stopped | 0     | 2026-05-27   | 2\n|                           |              |         |       | 02:23        | 0\n|                           |              |         |       | �й���׼ʱ�� |  \n| ap-Ebs65XwSihSX3bZFBt9Qhz | vggt-v340-s�� | stopped | 0     | 2026-05-27   | 2\n|                           |              |         |       | 01:09        | 0\n|                           |              |         |       | �й���׼ʱ�� |  \n| ap-xNaxJeTaMn7Aj5zQeSj8U1 | vggt-v340-s�� | stopped | 0     | 2026-05-27   | 2\n|                           |              |         |       | 01:05        | 0\n|                           |              |         |       | �й���׼ʱ�� |  \n| ap-0av8txQtn1WrkelXZK1yLP | vggt-v340-s�� | stopped | 0     | 2026-05-27   | 2\n|                           |              |         |       | 01:04        | 0\n|                           |              |         |       | �й���׼ʱ�� |  \n+------------------------------------------------------------------------------",
+    "stderr": ""
+  },
+  "python_modal_processes": {
+    "args": [
+      "powershell",
+      "-NoProfile",
+      "-Command",
+      "Get-Process python,modal -ErrorAction SilentlyContinue | Select-Object ProcessName,Id,CPU,StartTime,Path | ConvertTo-Json -Compress"
+    ],
+    "returncode": 1,
+    "stdout": "[{\"ProcessName\":\"python\",\"Id\":5136,\"CPU\":2.09375,\"StartTime\":\"\\/Date(1779725506999)\\/\",\"Path\":\"c:\\\\Users\\\\WINDOWS\\\\AppData\\\\Local\\\\Python\\\\pythoncore-3.14-64\\\\python.exe\"},{\"ProcessName\":\"python\",\"Id\":19248,\"CPU\":3.1875,\"StartTime\":\"\\/Date(1779820777948)\\/\",\"Path\":\"D:\\\\anaconda\\\\python.exe\"}]",
+    "stderr": ""
+  },
+  "active_candidate": "V11700_gap_reduction_branch_520",
+  "source_repos_touched_by_this_script": false,
+  "agents_or_subagents_launched": false,
+  "promotion_performed": false,
+  "registry_modified": false,
+  "v50_v50r2_modified_by_this_script": false
+}

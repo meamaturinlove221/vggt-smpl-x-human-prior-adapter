@@ -1,0 +1,10 @@
+{
+  "created_at": "2026-05-27T14:51:46+00:00",
+  "model": "models/v260_high_density_detail_fidelity_adapter.py",
+  "verified_full_forward_token_path": true,
+  "smpl_feature_encoder_v5": true,
+  "detail_densification_head": true,
+  "control_safe_decoder": true,
+  "environment_branch": true,
+  "source_label_auxiliary_only": true
+}

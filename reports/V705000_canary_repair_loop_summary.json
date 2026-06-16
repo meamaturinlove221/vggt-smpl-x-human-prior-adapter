@@ -1,0 +1,21 @@
+{
+  "attempt_count": 1,
+  "attempts": [
+    {
+      "all_regions_pass": true,
+      "attempt_id": 0,
+      "config": {
+        "feature_mode": "raw",
+        "hidden": 64,
+        "lr": 0.02,
+        "max_delta": 0.0012,
+        "max_points": 900,
+        "steps": 90
+      },
+      "failed_regions": []
+    }
+  ],
+  "cannot_return_on_first_failure": true,
+  "status": "V705000_CANARY_REPAIR_LOOP",
+  "success": true
+}

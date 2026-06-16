@@ -1,0 +1,33 @@
+{
+  "created_at": "2026-05-28T19:42:11+00:00",
+  "smoke": {
+    "case": "0012_11_frame001",
+    "selected_points": 2048,
+    "student_xyz_shape": [
+      1,
+      2048,
+      3
+    ],
+    "cross_section_occupancy_shape": [
+      1,
+      2048,
+      8
+    ],
+    "shell_offsets_mean": 0.025627752766013145,
+    "losses": {
+      "total": 0.33802053332328796,
+      "baseline_preservation_loss": 0.0,
+      "weak_region_repair_loss": 0.0005761514184996486,
+      "cross_section_occupancy_loss": 0.7044198513031006,
+      "front_back_side_shell_separation_loss": 0.0,
+      "part_graph_continuity_loss": 0.6925751566886902,
+      "environment_preservation_loss": 0.0,
+      "projection_auxiliary_loss": 0.0
+    },
+    "grad_norm_positive": true,
+    "teacher_points_used_at_inference": false,
+    "raw_kinect_depth_used_at_inference": false,
+    "mentor_ready": false
+  },
+  "mentor_ready": false
+}

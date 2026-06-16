@@ -1,0 +1,32 @@
+{
+  "task": "V513_auto_evolution_after_v512",
+  "status": "V513_AUTO_EVOLUTION_V523_GATE_PASS_V525_ADVISOR_PACK_REQUIRED_NOT_PROMOTED",
+  "created_at": "2026-06-02T22:42:37.671718Z",
+  "repo": "D:\\vggt\\vggt-canonical-surfel-adapter",
+  "trigger": "V512_MANUAL_MENTOR_GATE_V523_PASS_ADVISOR_PACK_REQUIRED_NOT_PROMOTED",
+  "route_file": "D:\\vggt\\vggt-canonical-surfel-adapter\\docs\\goals\\V5250000000000000000000_advisor_pack_viewer_report_bundle_route.md",
+  "executed_steps": [
+    {
+      "name": "V523 observation-anchor control/part-binding repair",
+      "result": "V523_OBSERVATION_ANCHOR_REPAIR_FAIL_CLOSED_CONTINUE_MODEL_REPAIR_NOT_PROMOTED",
+      "evidence": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5230000000000000000000_observation_anchor_control_part_binding_decision.json",
+      "main_decision": "legacy controls pass; visibility-aware local gate required"
+    },
+    {
+      "name": "V524 visibility-aware gate router",
+      "result": "V524_VISIBILITY_AWARE_GATE_ROUTER_PASS_ADVISOR_PACK_REQUIRED_NOT_PROMOTED",
+      "evidence": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5240000000000000000000_visibility_aware_gate_router_decision.json"
+    }
+  ],
+  "pending_steps": [
+    "V525 advisor report, viewer, bundle, manifest, artifact audit"
+  ],
+  "gates": {
+    "auto_evolution_executed_not_route_only": true,
+    "v523_visual_gate_pass": true,
+    "mentor_ready": false,
+    "external_hard_block": false,
+    "not_promoted": true
+  },
+  "decision": "Continue to V525 advisor-pack assembly; do not claim final goal complete until viewer/report/bundle artifacts and audits exist."
+}

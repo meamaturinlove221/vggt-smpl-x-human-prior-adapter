@@ -1,0 +1,26 @@
+{
+  "task": "V900_final_status",
+  "status": "V9000000000000000000000_V50R2_DISTILLED_HUMAN_SCENE_POINTCLOUD_READY_NOT_PROMOTED",
+  "created_at": "2026-06-02T22:47:12.777257Z",
+  "repo": "D:\\vggt\\vggt-canonical-surfel-adapter",
+  "manual_gate_status": "V512_MANUAL_MENTOR_GATE_V523_PASS_ADVISOR_PACK_REQUIRED_NOT_PROMOTED",
+  "advisor_report": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5250000000000000000000_v50r2_visual_floor_advisor_report.md",
+  "viewer": "D:\\vggt\\vggt-canonical-surfel-adapter\\viewers\\V5250000000000000000000_v50r2_visual_floor_viewer.html",
+  "bundle": "D:\\vggt\\vggt-canonical-surfel-adapter\\bundles\\V5250000000000000000000_v50r2_visual_floor_advisor_pack.zip",
+  "manifest": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5250000000000000000000_bundle_manifest.json",
+  "audit": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5250000000000000000000_artifact_audit.json",
+  "policy": {
+    "not_promoted": true,
+    "registry_modified": false,
+    "v50_v50r2_modified": false,
+    "active_candidate_replaced": false,
+    "v50r2_reference_only": true
+  },
+  "artifact_hashes": {
+    "advisor_report": "9d4de4f398ad553b5d9b474fca9092ab018911956d3a25479fd818c8a9c13cc7",
+    "viewer": "233f714e19c4c6d4ff0051e9f933f4920c73fc1656551b2974e04aaeedd6aa9e",
+    "bundle": "6c869ae646f0dcc3ae955fb2d299f8d0a4f812980444f9d5c6ec778ca225f52e",
+    "manifest": "5e38bff58a076624ed2f53154bf16cf7849ec9bcffe773817095dbe0a74dce4c",
+    "audit": "bafb9519d1bfd1c5e834cdc2ee13561c594a40e8ebcd893c0c4f0f44b8a6c22d"
+  }
+}

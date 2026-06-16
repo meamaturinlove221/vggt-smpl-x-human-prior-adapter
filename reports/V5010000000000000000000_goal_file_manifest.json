@@ -1,0 +1,60 @@
+{
+  "goal_file_path": "D:\\vggt\\vggt-canonical-surfel-adapter\\docs\\goals\\V5010000000000000000000_V9000000000000000000000_v50r2_visual_floor_observation_distillation_goal.md",
+  "sha256": "31d3676628dbc54e62d7d0d7a7f47da4b866569cee261915b830d487250108a2",
+  "line_count": 246,
+  "created_at": "2026-06-02T19:31:28.2127150Z",
+  "repo": "D:\\vggt\\vggt-canonical-surfel-adapter",
+  "branch": "codex/volume-aware-3d-morphology",
+  "previous_status": {
+    "status": "V9100000000000000000000_ADVISOR_HUMAN_MAIN_SCENE_POINTCLOUD_READY_NOT_PROMOTED",
+    "used_as": "previous_status_only",
+    "superseded_by": "V501-V900 V50R2 visual floor observation-distillation reroute",
+    "not_final_for_this_goal": true
+  },
+  "final_allowed_states": [
+    "V9000000000000000000000_V50R2_DISTILLED_HUMAN_SCENE_POINTCLOUD_READY_NOT_PROMOTED",
+    "V9000000000000000000000_TRUE_EXTERNAL_HARD_BLOCK_REQUIRES_USER_ACTION"
+  ],
+  "teacher_student_policy": {
+    "v50r2_allowed_roles": [
+      "visual_floor",
+      "teacher",
+      "reference",
+      "training_loss",
+      "evaluation",
+      "report_reference"
+    ],
+    "final_inference_forbidden_inputs": [
+      "V50R2 teacher points",
+      "V50R2 teacher RGB crop",
+      "Kinect depth",
+      "RGB-D raw depth",
+      "teacher point fusion",
+      "direct fusion geometry"
+    ],
+    "final_output_requirement": "model-owned VGGT+SMPL-X student inserted into full-scene VGGT environment"
+  },
+  "visual_floor_policy": {
+    "visual_floor": "V50R2 multi-view human morphology visual floor",
+    "cameras": [
+      "cam00",
+      "cam01",
+      "cam06",
+      "cam11",
+      "cam16",
+      "cam21"
+    ],
+    "nonregression_rule": "A candidate cannot pass mentor-ready if the human ROI is visibly worse than V50R2 in body readability, RGB realism, continuity, head/hair, torso/clothing, arm/hand, leg/foot, speckle/hole, or view consistency.",
+    "v50r2_final_replacement_allowed": false
+  },
+  "no_promotion_rule": {
+    "promotion": false,
+    "registry": false,
+    "modify_v50_or_v50r2": false,
+    "active_candidate_replacement": false,
+    "git_add_dot": false,
+    "unauthorized_commit_push": false,
+    "active_candidate": "V11700_gap_reduction_branch_520"
+  },
+  "summary": "Persisted the V501-V900 V50R2 visual-floor observation-distillation goal exactly as the new route anchor. The prior V910 ready status is only historical previous_status; this run must rebuild evidence around V50R2 as visual regression guard and teacher/reference while preserving model-owned full-scene final output."
+}

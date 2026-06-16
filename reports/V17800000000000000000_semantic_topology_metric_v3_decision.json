@@ -1,0 +1,31 @@
+{
+  "created_at": "2026-05-28T20:31:08+00:00",
+  "status": "V17800_SEMANTIC_TOPOLOGY_METRIC_V3_FAIL_CLOSED_CONTINUE",
+  "mentor_ready": false,
+  "external_hard_block": false,
+  "failures": [
+    {
+      "case": "0012_11_frame001",
+      "reason": "true_combined_fail_v3",
+      "true_score": 0.7192548705983721
+    },
+    {
+      "case": "0013_01_frame001",
+      "reason": "true_combined_fail_v3",
+      "true_score": 0.6649565983916601
+    },
+    {
+      "case": "0021_03_frame001",
+      "reason": "true_combined_fail_v3",
+      "true_score": 0.7138912716044792
+    },
+    {
+      "case": "current_v895_0021_03",
+      "reason": "true_combined_fail_v3",
+      "true_score": 0.7149913447330427
+    }
+  ],
+  "score_csv": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V17800000000000000000_semantic_topology_metric_v3_scores.csv",
+  "board": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V17800000000000000000_semantic_topology_metric_v3_board.png",
+  "summary": "Metric v3 adds semantic topology validity to avoid rewarding semantically invalid same-topology/shuffled geometry. It remains auxiliary and cannot replace mentor visual gates."
+}

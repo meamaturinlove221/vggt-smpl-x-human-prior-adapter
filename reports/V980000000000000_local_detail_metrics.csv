@@ -1,0 +1,13 @@
+case_id,region,baseline_active_region_points,true_active_region_points,density_ratio_true_over_baseline,rgb_variance_ratio_true_over_baseline,non_regression_pass,improvement_pass
+current_v895_0021_03,head_face_hair,192,501,2.609375,6.133247992012485,True,True
+0021_03_frame001,head_face_hair,189,500,2.6455026455026456,4.930896684241179,True,True
+0012_11_frame001,head_face_hair,0,572,572.0,547477050.78125,True,True
+0013_01_frame001,head_face_hair,0,635,635.0,318259948.73046875,True,True
+current_v895_0021_03,hand_arm,305,972,3.1868852459016392,1.1291879556773488,True,True
+0021_03_frame001,hand_arm,291,957,3.288659793814433,1.1475412427639256,True,True
+0012_11_frame001,hand_arm,0,1002,1002.0,2393878173.828125,True,True
+0013_01_frame001,hand_arm,0,950,950.0,2436632812.5,True,True
+current_v895_0021_03,clothing_boundary,156,341,2.1858974358974357,1.7955030603241389,True,True
+0021_03_frame001,clothing_boundary,165,343,2.0787878787878786,1.8085104337574955,True,True
+0012_11_frame001,clothing_boundary,0,366,366.0,473455932.6171875,True,True
+0013_01_frame001,clothing_boundary,0,276,276.0,2112897460.9375,True,True

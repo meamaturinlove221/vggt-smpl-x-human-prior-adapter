@@ -1,0 +1,21 @@
+{
+  "created_at": "2026-05-27T17:53:18+00:00",
+  "full_forward_outputs_present": true,
+  "world_points_shape": [
+    1,
+    1,
+    518,
+    518,
+    3
+  ],
+  "smpl_world_points": 32000,
+  "real_rgb_mask_shape": [
+    518,
+    518,
+    3
+  ],
+  "projection_fields_present": true,
+  "sparse_prior_grad_mean": 1.2041353329550475e-05,
+  "output_effect_l1": 0.05797449126839638,
+  "pass": true
+}

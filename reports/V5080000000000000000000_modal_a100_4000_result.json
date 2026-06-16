@@ -1,0 +1,44 @@
+{
+  "task": "V508_modal_a100_4000_checkpoint_result",
+  "status": "V508_MODAL_A100_4000_CHECKPOINT_PASS_A10G_A100_TARGET_COMPLETE_NOT_PROMOTED",
+  "created_at": "2026-06-02T21:14:35+00:00",
+  "modal_run_url": "https://modal.com/apps/shimakaze22333/main/ap-puxSDXK9SGHj4CsQMsILC5",
+  "gpu_requested": "A100",
+  "wrapper_returned_gpu_label": "A10G",
+  "wrapper_gpu_label_note": "This run was launched with VGGT_MODAL_V508_GPU=A100. The pre-patch wrapper returned the remote environment default label, so the return payload says A10G even though the Modal function decorator used the local A100 request.",
+  "steps": 4000,
+  "max_samples": 256,
+  "seed": 508,
+  "returncode": 0,
+  "downloaded_to": "D:\\vggt\\vggt-canonical-surfel-adapter\\_modal_download\\V508_A100_4000",
+  "synced_to_local_reports": true,
+  "synced_to_local_output": true,
+  "completed_checkpoints": [
+    300,
+    600,
+    1000,
+    2000,
+    4000
+  ],
+  "pending_checkpoints": [],
+  "pending_gpu_targets": [],
+  "checkpoint_snapshot_count": 45,
+  "seed_metric_snapshot": {
+    "v50r2_distilled_true_final_total_loss": 0.05000101402401924,
+    "vggt_baseline_final_total_loss": 0.05061914771795273,
+    "no_smpl_final_total_loss": 0.05082550644874573,
+    "observation_only_final_total_loss": 0.04975910484790802,
+    "visible_only_final_total_loss": 0.049461521208286285,
+    "teacher_copy_diagnostic_pass": true
+  },
+  "interpretation": "A100 4000-step run completed, downloaded, and synced back locally. The A10G and A100 checkpoint matrices are now executed, but this remains training/evaluation evidence only; no mentor-ready full-scene student is promoted.",
+  "gates": {
+    "modal_a100_4000_pass": true,
+    "a10g_checkpoints_complete": true,
+    "a100_checkpoints_complete": true,
+    "target_matrix_complete": true,
+    "teacher_copy_diagnostic_required": true,
+    "mentor_visual_gate_pass": false,
+    "not_promoted": true
+  }
+}

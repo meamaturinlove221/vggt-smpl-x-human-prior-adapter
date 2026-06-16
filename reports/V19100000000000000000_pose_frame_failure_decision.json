@@ -1,0 +1,91 @@
+{
+  "created_at": "2026-05-28T22:34:21+00:00",
+  "status": "V19100_POSE_FRAME_FAILURE_AUDIT_FAIL_CLOSED_CONTINUE",
+  "mentor_ready": false,
+  "external_hard_block": false,
+  "failures": [
+    {
+      "case": "all",
+      "reason": "v190_mentor_visual_fail_closed",
+      "v190_status": "V19000_POSE_FRAME_OCCUPANCY_FAIL_CLOSED_CONTINUE",
+      "v190_failure_count": 11
+    }
+  ],
+  "v190_failures": [
+    {
+      "case": "0012_11_frame001",
+      "reason": "true_combined_fail_v4",
+      "true_score": 0.6756439549105919
+    },
+    {
+      "case": "0012_11_frame001",
+      "reason": "control_or_prior_close_or_better_v4",
+      "control": "visible_anchor_canonical_surfel_true",
+      "true_score": 0.6756439549105919,
+      "control_score": 0.6647455685595987
+    },
+    {
+      "case": "0012_11_frame001",
+      "reason": "control_or_prior_close_or_better_v4",
+      "control": "part_coverage_canonical_surfel_true",
+      "true_score": 0.6756439549105919,
+      "control_score": 0.6567868053664776
+    },
+    {
+      "case": "0013_01_frame001",
+      "reason": "control_or_prior_close_or_better_v4",
+      "control": "visible_anchor_canonical_surfel_true",
+      "true_score": 0.6863329407863001,
+      "control_score": 0.6789896214402975
+    },
+    {
+      "case": "0013_01_frame001",
+      "reason": "control_or_prior_close_or_better_v4",
+      "control": "part_coverage_canonical_surfel_true",
+      "true_score": 0.6863329407863001,
+      "control_score": 0.7047716360083482
+    },
+    {
+      "case": "0013_01_frame001",
+      "reason": "control_or_prior_close_or_better_v4",
+      "control": "same_topology_no_semantic",
+      "true_score": 0.6863329407863001,
+      "control_score": 0.6592843267754295
+    },
+    {
+      "case": "0021_03_frame001",
+      "reason": "true_combined_fail_v4",
+      "true_score": 0.7041508758475435
+    },
+    {
+      "case": "0021_03_frame001",
+      "reason": "control_or_prior_close_or_better_v4",
+      "control": "visible_anchor_canonical_surfel_true",
+      "true_score": 0.7041508758475435,
+      "control_score": 0.6832466481269005
+    },
+    {
+      "case": "current_v895_0021_03",
+      "reason": "true_combined_fail_v4",
+      "true_score": 0.6708203409716615
+    },
+    {
+      "case": "current_v895_0021_03",
+      "reason": "control_or_prior_close_or_better_v4",
+      "control": "visible_anchor_canonical_surfel_true",
+      "true_score": 0.6708203409716615,
+      "control_score": 0.6477541137406838
+    },
+    {
+      "case": "current_v895_0021_03",
+      "reason": "control_or_prior_close_or_better_v4",
+      "control": "part_coverage_canonical_surfel_true",
+      "true_score": 0.6708203409716615,
+      "control_score": 0.6766571516208613
+    }
+  ],
+  "audit_csv": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V19100000000000000000_pose_frame_failure_audit.csv",
+  "v190_board": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V19000000000000000000_pose_frame_board.png",
+  "v190_turntable": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V19000000000000000000_pose_frame_turntable_cross_section.png",
+  "summary": "V190 improves some topology-volume metrics, but visual evidence remains a tilted/torn cloud. V950 posed/world frames are close enough that missing assets or gross coordinate mismatch are not the main cause; the next repair must enforce upright posed-frame body layout and full-scene mentor view."
+}

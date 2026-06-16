@@ -1,0 +1,43 @@
+{
+  "created_at": "2026-05-27T14:51:47+00:00",
+  "hard_controls_pass": true,
+  "case_margins": [
+    {
+      "case_id": "current_v895_0021_03",
+      "true_score": 0.945668501406908,
+      "best_control": "shuffled_smpl_feature",
+      "best_control_score": 0.6571512431027888,
+      "margin": 0.2885172583041191,
+      "controls_close": false,
+      "case_pass": true
+    },
+    {
+      "case_id": "0021_03_frame001",
+      "true_score": 0.9389851942658424,
+      "best_control": "shuffled_smpl_feature",
+      "best_control_score": 0.6602720604622364,
+      "margin": 0.27871313380360596,
+      "controls_close": false,
+      "case_pass": true
+    },
+    {
+      "case_id": "0012_11_frame001",
+      "true_score": 0.9092479243874549,
+      "best_control": "shuffled_smpl_feature",
+      "best_control_score": 0.6524102437496185,
+      "margin": 0.2568376806378364,
+      "controls_close": false,
+      "case_pass": true
+    },
+    {
+      "case_id": "0013_01_frame001",
+      "true_score": 0.8790858656167984,
+      "best_control": "shuffled_smpl_feature",
+      "best_control_score": 0.6550893775373697,
+      "margin": 0.22399648807942862,
+      "controls_close": false,
+      "case_pass": true
+    }
+  ],
+  "no_artificial_scoring": true
+}

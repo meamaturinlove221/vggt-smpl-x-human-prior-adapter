@@ -232,6 +232,7 @@ class Aggregator(nn.Module):
             self.input_prior_adapter = TokenPriorAdapter(embed_dim)
             self.frame_prior_adapters = nn.ModuleList([TokenPriorAdapter(embed_dim) for _ in range(depth)])
             self.global_prior_adapters = nn.ModuleList([TokenPriorAdapter(embed_dim) for _ in range(depth)])
+            self.sparse_prior_adapter = TokenPriorAdapter(embed_dim)
         else:
             self.human_prior_patch_embeds = nn.ModuleList()
             self.input_prior_scale_logits = None
@@ -240,6 +241,7 @@ class Aggregator(nn.Module):
             self.input_prior_adapter = None
             self.frame_prior_adapters = nn.ModuleList()
             self.global_prior_adapters = nn.ModuleList()
+            self.sparse_prior_adapter = None
 
         if self.enable_human_prior_summary:
             self.human_prior_summary_proj = nn.Sequential(
@@ -303,6 +305,7 @@ class Aggregator(nn.Module):
         images: torch.Tensor,
         human_prior_feature_maps: Optional[torch.Tensor] = None,
         human_prior_summary_tokens: Optional[torch.Tensor] = None,
+        sparse_prior_tokens: Optional[torch.Tensor] = None,
     ) -> Tuple[List[torch.Tensor], int]:
         """
         Args:
@@ -337,6 +340,18 @@ class Aggregator(nn.Module):
 
         # Concatenate special tokens with patch tokens
         tokens = torch.cat([camera_token, register_token, patch_tokens], dim=1)
+
+        sparse_prior_tokens_full = self._build_sparse_prior_tokens(
+            sparse_prior_tokens,
+            B=B,
+            S=S,
+            patch_count=P,
+            embed_dim=C,
+            device=tokens.device,
+            token_dtype=tokens.dtype,
+        )
+        if sparse_prior_tokens_full is not None and self.sparse_prior_adapter is not None:
+            tokens = self.sparse_prior_adapter(tokens, sparse_prior_tokens_full)
 
         prior_tokens_frame_by_scale = self._build_human_prior_tokens(
             human_prior_feature_maps,
@@ -414,6 +429,46 @@ class Aggregator(nn.Module):
         del frame_intermediates
         del global_intermediates
         return output_list, self.patch_start_idx
+
+    def _build_sparse_prior_tokens(
+        self,
+        sparse_prior_tokens: Optional[torch.Tensor],
+        *,
+        B: int,
+        S: int,
+        patch_count: int,
+        embed_dim: int,
+        device: torch.device,
+        token_dtype: torch.dtype,
+    ) -> Optional[torch.Tensor]:
+        if sparse_prior_tokens is None:
+            return None
+        prior = sparse_prior_tokens
+        if prior.dim() == 3:
+            prior = prior.view(B, S, prior.shape[-2], prior.shape[-1])
+        if prior.dim() != 4:
+            raise ValueError(
+                "sparse_prior_tokens must have shape [B, S, N_patch, C] or [B*S, N_patch, C], "
+                f"got {tuple(prior.shape)}"
+            )
+        if prior.shape[0] != B or prior.shape[1] != S:
+            raise ValueError(
+                "sparse_prior_tokens batch/sequence dims must match images: "
+                f"{tuple(prior.shape[:2])} vs {(B, S)}"
+            )
+        if prior.shape[2] != patch_count:
+            raise ValueError(
+                "sparse_prior_tokens patch count must match image patch tokens: "
+                f"{prior.shape[2]} vs {patch_count}"
+            )
+        if prior.shape[3] != embed_dim:
+            raise ValueError(
+                "sparse_prior_tokens channel dim must already be projected to VGGT embed dim: "
+                f"{prior.shape[3]} vs {embed_dim}"
+            )
+        prior = prior.to(device=device, dtype=token_dtype).view(B * S, patch_count, embed_dim)
+        zeros = prior.new_zeros(B * S, self.patch_start_idx, embed_dim)
+        return torch.cat([zeros, prior], dim=1)
 
     def _build_human_prior_tokens(
         self,

@@ -1,0 +1,12 @@
+{
+  "created_at": "2026-05-27T14:51:46+00:00",
+  "advisor_visual_gate_pass": true,
+  "full_scene_rgb_pointcloud": true,
+  "human_is_subject": true,
+  "partial_environment_visible": true,
+  "natural_readable_view": true,
+  "same_bounds": true,
+  "same_point_budget_policy": true,
+  "no_isolated_human": true,
+  "main_board": "boards\\V30000000000000000_advisor_high_density_main.png"
+}

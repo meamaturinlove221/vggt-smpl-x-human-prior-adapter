@@ -1,0 +1,35 @@
+{
+  "created_at": "2026-05-27T19:45:01+00:00",
+  "all_pass": false,
+  "mentor_ready": false,
+  "failed": [
+    "V300 final/audit/report consistency failed in uploaded pack",
+    "3D main board lacks convincing full-scene environment",
+    "local close-ups are not sufficient 3D detail proof",
+    "V190 matrix is copied-prediction rescoring, not a new 3D morphology student run",
+    "projection metrics cannot replace mentor 3D morphology gate"
+  ],
+  "hard_gates": {
+    "V300 downgraded": true,
+    "final/audit/report consistency pass": true,
+    "artifact audit pass": true,
+    "V190 rescoring risk resolved": false,
+    "true 3D morphology model output pass": false,
+    "full VGGT / SMPL feature binding pass": true,
+    "model-owned student pass": false,
+    "no raw Kinect/teacher at inference": true,
+    "human-main full-scene RGB point cloud pass": false,
+    "natural 3D main view pass": "partial",
+    "real environment visible pass": false,
+    "true visually better than VGGT baseline pass": "unproven",
+    "true visually better than posthoc/same-topology/tiny controls pass": "unproven",
+    "3D local close-up real pass": false,
+    "no facial detail overclaim pass": true,
+    "projection auxiliary pass": true,
+    "viewer usable pass": true,
+    "Yuque report complete pass": true,
+    "no promotion/registry/V50 changes": true
+  },
+  "router": "V850 auto-evolution",
+  "auto_evolved_goal": "D:\\vggt\\vggt-canonical-surfel-adapter\\docs\\goals\\V850000000000000000_auto_evolved_true_3d_route.md"
+}

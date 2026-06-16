@@ -1,0 +1,14 @@
+{
+  "created_at": "2026-05-27T17:53:18+00:00",
+  "bundle_count": 13,
+  "total_entries": 99,
+  "npz_entries_seen": 38,
+  "png_entries_seen": 9,
+  "json_entries_seen": 8,
+  "csv_entries_seen": 3,
+  "html_entries_seen": 1,
+  "zip_clean_all": true,
+  "projection_evidence_existed_before_v130": false,
+  "v120_self_claim_only_disallowed": true,
+  "fake_local_or_diagnostic_evidence_final_disallowed": true
+}

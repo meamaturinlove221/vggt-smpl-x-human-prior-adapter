@@ -1,0 +1,15 @@
+{
+  "task": "V520_teacher_copy_check",
+  "created_at": "2026-06-02T22:18:04.210843Z",
+  "teacher_bank": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V5040000000000000000000_v50r2_teacher_bank\\v50r2_teacher_bank.npz",
+  "candidate_npz": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V5200000000000000000000_pose_aligned_surfel_graph_repair\\v520_pose_aligned_surfel_graph_candidate.npz",
+  "leak_detected": false,
+  "hit_count": 0,
+  "hits": [],
+  "metadata_flags": [],
+  "policy": {
+    "teacher_points_in_final_inference_allowed": false,
+    "teacher_rgb_in_final_inference_allowed": false,
+    "teacher_mask_as_student_ownership_allowed": false
+  }
+}

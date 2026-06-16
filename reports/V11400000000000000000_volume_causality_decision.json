@@ -1,0 +1,50 @@
+{
+  "created_at": "2026-05-28T18:40:11+00:00",
+  "status": "V114_VOLUME_CAUSALITY_FAIL_CLOSED",
+  "failures": [
+    {
+      "case": "0012_11_frame001",
+      "reason": "control_thickness_not_weaker",
+      "control": "shuffled_smpl_feature",
+      "control_thickness": 0.42806587854574085,
+      "true_thickness": 0.3913522772678415
+    },
+    {
+      "case": "0012_11_frame001",
+      "reason": "control_thickness_not_weaker",
+      "control": "thickness_only_control",
+      "control_thickness": 0.4339680957310146,
+      "true_thickness": 0.3913522772678415
+    },
+    {
+      "case": "0013_01_frame001",
+      "reason": "control_thickness_not_weaker",
+      "control": "shuffled_smpl_feature",
+      "control_thickness": 0.38996626924074734,
+      "true_thickness": 0.36550690712575656
+    },
+    {
+      "case": "0013_01_frame001",
+      "reason": "control_thickness_not_weaker",
+      "control": "thickness_only_control",
+      "control_thickness": 0.42237429793943804,
+      "true_thickness": 0.36550690712575656
+    },
+    {
+      "case": "0021_03_frame001",
+      "reason": "control_thickness_not_weaker",
+      "control": "thickness_only_control",
+      "control_thickness": 0.388595188919319,
+      "true_thickness": 0.36557795814858585
+    },
+    {
+      "case": "current_v895_0021_03",
+      "reason": "control_thickness_not_weaker",
+      "control": "thickness_only_control",
+      "control_thickness": 0.3885777230627287,
+      "true_thickness": 0.36503654447154427
+    }
+  ],
+  "mentor_ready": false,
+  "external_hard_block": false
+}

@@ -1,0 +1,43 @@
+{
+  "created_at": "2026-05-27T17:53:45+00:00",
+  "environment_realism_v5_pass": true,
+  "rows": [
+    {
+      "case": "current_v895_0021_03",
+      "human_points": 60000,
+      "environment_points": 24000,
+      "human_ratio": 0.7142857142857143,
+      "environment_from_prediction": true,
+      "same_environment_budget": true,
+      "human_ratio_55_75": true
+    },
+    {
+      "case": "0021_03_frame001",
+      "human_points": 60000,
+      "environment_points": 24000,
+      "human_ratio": 0.7142857142857143,
+      "environment_from_prediction": true,
+      "same_environment_budget": true,
+      "human_ratio_55_75": true
+    },
+    {
+      "case": "0012_11_frame001",
+      "human_points": 60000,
+      "environment_points": 24000,
+      "human_ratio": 0.7142857142857143,
+      "environment_from_prediction": true,
+      "same_environment_budget": true,
+      "human_ratio_55_75": true
+    },
+    {
+      "case": "0013_01_frame001",
+      "human_points": 60000,
+      "environment_points": 24000,
+      "human_ratio": 0.7142857142857143,
+      "environment_from_prediction": true,
+      "same_environment_budget": true,
+      "human_ratio_55_75": true
+    }
+  ],
+  "boundary": "Environment points come from the current model-owned prediction scene context and are verified by same budget and full-scene boards; no procedural floor/back plane is introduced in V120100."
+}

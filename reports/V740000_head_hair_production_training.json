@@ -1,0 +1,153 @@
+{
+  "record_count": 2,
+  "records": [
+    {
+      "changed_pixels": 1500,
+      "classification": "HEAD_HAIR_TOO_WEAK",
+      "crop_id": 4,
+      "feature_dim": 15,
+      "grad_nonzero": true,
+      "hidden_dim": 192,
+      "identity_l2": 0.0,
+      "loss_end": 0.026666343212127686,
+      "loss_start": 0.03911171481013298,
+      "lr": 0.012,
+      "max_delta": 0.0018,
+      "mse_after_point": 3.720872882695403e-06,
+      "mse_before_point": 3.445789218403661e-07,
+      "normal_identity_l2": 2.5823858607054717e-08,
+      "normal_status": {
+        "max_norm": 1.0000001192092896,
+        "mean_norm": 1.0,
+        "min_norm": 0.9999998807907104,
+        "nonzero_ratio_gt_1e_4": 1.0
+      },
+      "npz": "D:\\vggt\\vggt-main\\local_report_auxiliary\\V600_quality_rebuild\\output\\V701000_V900000_production_live_highres\\V730000_adapter_only_training\\head_face_v4_c4_NOT_CANDIDATE.npz",
+      "outside_roi_changed": 0,
+      "payload_key": "head_face_v4_c4",
+      "region": "head_face",
+      "steps": 180,
+      "synthetic_fit_drop": -9.79831831506856,
+      "target_roi_changed": 1500,
+      "trace": [
+        {
+          "grad_norm": 0.0025064561050385237,
+          "loss": 0.03911171481013298,
+          "loss_depth": 2.80538415609044e-07,
+          "loss_normal": 0.15042799711227417,
+          "loss_point": 3.445789218403661e-07,
+          "step": 0
+        },
+        {
+          "grad_norm": 0.0,
+          "loss": 0.026666343212127686,
+          "loss_depth": 3.36407128997962e-06,
+          "loss_normal": 0.10254421830177307,
+          "loss_point": 3.720872882695403e-06,
+          "step": 60
+        },
+        {
+          "grad_norm": 0.0,
+          "loss": 0.026666343212127686,
+          "loss_depth": 3.36407128997962e-06,
+          "loss_normal": 0.10254421830177307,
+          "loss_point": 3.720872882695403e-06,
+          "step": 120
+        },
+        {
+          "grad_norm": 0.0,
+          "loss": 0.026666343212127686,
+          "loss_depth": 3.36407128997962e-06,
+          "loss_normal": 0.10254421830177307,
+          "loss_point": 3.720872882695403e-06,
+          "step": 179
+        }
+      ],
+      "v629_delta": {
+        "full_body_quality": 8.52576891581247e-05,
+        "hairline_quality": 0.0003565855820975017,
+        "head_face_quality": 0.0004273725549380769,
+        "left_hand_quality": 0.0,
+        "local_detail_quality": 0.00024226613839450906,
+        "mean_quality": 0.00021609806352185235,
+        "right_hand_quality": 0.0
+      },
+      "view": 4
+    },
+    {
+      "changed_pixels": 1418,
+      "classification": "HAIRLINE_REGRESSION",
+      "crop_id": 10,
+      "feature_dim": 15,
+      "grad_nonzero": true,
+      "hidden_dim": 192,
+      "identity_l2": 0.0,
+      "loss_end": 0.025053469464182854,
+      "loss_start": 0.037084538489580154,
+      "lr": 0.012,
+      "max_delta": 0.0018,
+      "mse_after_point": 3.4683594094531145e-06,
+      "mse_before_point": 4.082356497292494e-07,
+      "normal_identity_l2": 2.5823858607054717e-08,
+      "normal_status": {
+        "max_norm": 1.0000001192092896,
+        "mean_norm": 1.0,
+        "min_norm": 0.9999998807907104,
+        "nonzero_ratio_gt_1e_4": 1.0
+      },
+      "npz": "D:\\vggt\\vggt-main\\local_report_auxiliary\\V600_quality_rebuild\\output\\V701000_V900000_production_live_highres\\V730000_adapter_only_training\\hairline_v4_c10_NOT_CANDIDATE.npz",
+      "outside_roi_changed": 0,
+      "payload_key": "hairline_v4_c10",
+      "region": "hairline",
+      "steps": 180,
+      "synthetic_fit_drop": -7.495973861551299,
+      "target_roi_changed": 1418,
+      "trace": [
+        {
+          "grad_norm": 0.00258257903624326,
+          "loss": 0.037084538489580154,
+          "loss_depth": 3.5553711086322437e-07,
+          "loss_normal": 0.14263084530830383,
+          "loss_point": 4.082356497292494e-07,
+          "step": 0
+        },
+        {
+          "grad_norm": 0.0,
+          "loss": 0.025053469464182854,
+          "loss_depth": 3.3958724543481367e-06,
+          "loss_normal": 0.09634179621934891,
+          "loss_point": 3.4683594094531145e-06,
+          "step": 60
+        },
+        {
+          "grad_norm": 0.0,
+          "loss": 0.025053469464182854,
+          "loss_depth": 3.3958724543481367e-06,
+          "loss_normal": 0.09634179621934891,
+          "loss_point": 3.4683594094531145e-06,
+          "step": 120
+        },
+        {
+          "grad_norm": 0.0,
+          "loss": 0.025053469464182854,
+          "loss_depth": 3.3958724543481367e-06,
+          "loss_normal": 0.09634179621934891,
+          "loss_point": 3.4683594094531145e-06,
+          "step": 179
+        }
+      ],
+      "v629_delta": {
+        "full_body_quality": -2.4402936299794398e-05,
+        "hairline_quality": -6.3705444336426e-06,
+        "head_face_quality": 5.776435136795044e-05,
+        "left_hand_quality": 0.0,
+        "local_detail_quality": 2.1831631660362838e-05,
+        "mean_quality": 1.4125870333780988e-05,
+        "right_hand_quality": 0.0
+      },
+      "view": 4
+    }
+  ],
+  "status": "V740000_HEAD_HAIR_PRODUCTION_TRAINING",
+  "true_gain_count": 0
+}

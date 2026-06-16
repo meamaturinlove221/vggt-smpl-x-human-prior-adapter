@@ -1,0 +1,22 @@
+{
+  "created_at": "2026-05-28T19:43:46+00:00",
+  "modal_app_url": "https://modal.com/apps/shimakaze22333/main/ap-RJHMUPq47vua3ZbCaauvSE",
+  "returncode": 0,
+  "remote_status": "V13700_DONE",
+  "remote_device": "cuda",
+  "steps": 3,
+  "max_points": 512,
+  "copied": [
+    "reports/V13700000000000000000_training_manifest.csv",
+    "reports/V13700000000000000000_seed_metrics.csv",
+    "reports/V13700000000000000000_training_decision.json",
+    "reports/V13700000000000000000_runtime_environment.json",
+    "reports/V13700000000000000000_failed_jobs.json",
+    "boards/V13700000000000000000_training_matrix_turntable.png",
+    "boards/V13700000000000000000_training_matrix_cross_section.png",
+    "output/V13700000000000000000_anti_billboard_training_matrix"
+  ],
+  "mentor_ready": false,
+  "external_hard_block": false,
+  "note": "This is a Modal A10G/CUDA wiring smoke only. It proves remote execution and output-copy wiring, not mentor visual readiness."
+}

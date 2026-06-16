@@ -1,0 +1,2 @@
+case_count,config_count,created_at,modal_a10_a100,no_artificial_score_scaling,no_cpu_final,no_raw_kinect_at_inference,no_teacher_points_at_inference,per_case_full_forward_effect,rows,same_environment_point_budget,same_human_point_budget
+4,10,2026-05-27T14:51:46+00:00,True,True,True,True,True,True,40,True,True

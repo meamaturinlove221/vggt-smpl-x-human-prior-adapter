@@ -1,0 +1,7 @@
+﻿{
+    "goal_file_path":  "D:\\vggt\\vggt-feature-adapter\\docs\\goals\\V120100000000_V200000000000_paper_grade_camera_bound_surface_backend_goal.md",
+    "sha256":  "f7d5bdf830e41fff532a423e1bb8ce6aa4ef68cccf3892ceda0353ca10af06de",
+    "line_count":  748,
+    "created_at":  "2026-05-23T15:36:23.5918018Z",
+    "summary":  "V120100000000-V200000000000 paper-grade camera-bound surface backend: artifact reconciliation, cross-SMC sanity, learned residual normal, part specialists, differentiable camera-bound losses, paper-grade matrix/visuals/report/packages."
+}

@@ -1,0 +1,22 @@
+{
+  "created_at": "2026-05-28T11:59:36+00:00",
+  "status": "V405_BODY_MORPHOLOGY_FAIL_CLOSED",
+  "board": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V4050000000000000000_body_morphology_controls_board.png",
+  "metrics": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V4050000000000000000_body_morphology_metrics.csv",
+  "metric_true_gt_baseline_from_previous_v160": true,
+  "mentor_visual_pass": false,
+  "true_visually_better_than_baseline": false,
+  "true_visually_better_than_controls": false,
+  "stripe_artifact_true": 2.6863999366760254,
+  "stripe_artifact_baseline": 1.9168000221252441,
+  "facial_detail_target_applicable": false,
+  "face_detail_claim_allowed": false,
+  "allowed_face_claim": "head/face contour and hair region only",
+  "visual_fail_reasons": [
+    "true residual adds unnatural vertical/limb ghost structures above the body",
+    "same-topology and shuffled controls remain visually close or worse in ways that undermine true-specific claim",
+    "baseline/tiny preserve a more natural back-view human silhouette than true in current board",
+    "face is not visible in source view; only head/hair contour claims are allowed"
+  ],
+  "next_action": "Reject current residual output as mentor evidence. Repair representation/target to avoid ghost limbs and stripe artifacts; optimize body silhouette/head-hair contour/hand-arm/clothing boundary under same-scene controls."
+}

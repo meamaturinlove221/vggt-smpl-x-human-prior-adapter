@@ -1,0 +1,30 @@
+{
+  "created_at": "2026-05-26T17:22:21+00:00",
+  "final_status": "V900000000000000_SMPL_FEATURE_BOUND_HUMAN_SCENE_POINTCLOUD_MENTOR_READY_NOT_PROMOTED",
+  "hard_gate_pass": true,
+  "checks": {
+    "goal_file_exists": true,
+    "v300_downgraded": true,
+    "v330_smoke_pass": true,
+    "v340_modal_matrix_exists": true,
+    "v410_gate_pass": true,
+    "v500_report_exists": true,
+    "bundle_integrity_pass": true,
+    "cleanup_exists": true,
+    "no_promotion_no_registry_no_v50_change": true,
+    "no_agent_subagent": true
+  },
+  "mentor_main_board": "boards/V350000000000000_advisor_main_rgb_pointcloud.png",
+  "same_scene_controls_board": "boards/V350000000000000_same_scene_baseline_true_controls.png",
+  "multisequence_board": "boards/V400000000000000_multisequence_main_summary.png",
+  "report": "reports/V500000000000000_smpl_feature_bound_advisor_report.md",
+  "bundle_manifest": "reports/V550000000000000_upload_manifest_sidecar.json",
+  "cleanup": "reports/V580000000000000_post_push_cleanup.json",
+  "allowed_final_states": [
+    "V900000000000000_SMPL_FEATURE_BOUND_HUMAN_SCENE_POINTCLOUD_MENTOR_READY_NOT_PROMOTED",
+    "V900000000000000_TRUE_EXTERNAL_HARD_BLOCK_REQUIRES_USER_ACTION"
+  ],
+  "promotion": false,
+  "registry": false,
+  "active_candidate": "V11700_gap_reduction_branch_520"
+}

@@ -1,0 +1,7 @@
+{
+  "goal_file_path": "D:\\vggt\\vggt-feature-adapter\\docs\\goals\\V30010000000_V90000000000_camera_bound_semantic_transport_goal.md",
+  "sha256": "6e660c51a99b12f3cdee3517206a5299e8d44e94b69d595599df7e8d6bf96911",
+  "line_count": 894,
+  "created_at": "2026-05-23T08:34:50.471687+00:00",
+  "summary": "Camera-bound semantic transport auto-evolution route: all-SMC matching, Sim3/SE3 coordinate binding search, camera-bound matrix, and only mentor-ready or coordinate-exhausted hard-block final return."
+}

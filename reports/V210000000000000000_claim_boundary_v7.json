@@ -1,0 +1,33 @@
+{
+  "created_at": "2026-05-27T17:53:45+00:00",
+  "hard_controls_v7_pass": true,
+  "same_budget_same_projection_same_view": true,
+  "source_label_auxiliary_only": true,
+  "best_controls": {
+    "current_v895_0021_03": {
+      "true_score": 0.8108778814809662,
+      "best_control": "real_vggt_baseline_only",
+      "best_control_score": 0.6677494656273409,
+      "margin": 0.14312841585362523
+    },
+    "0021_03_frame001": {
+      "true_score": 0.8105602568322443,
+      "best_control": "real_vggt_baseline_only",
+      "best_control_score": 0.6692345219999104,
+      "margin": 0.1413257348323339
+    },
+    "0012_11_frame001": {
+      "true_score": 0.8136324252958264,
+      "best_control": "same_topology_no_semantic",
+      "best_control_score": 0.6902634607285703,
+      "margin": 0.1233689645672561
+    },
+    "0013_01_frame001": {
+      "true_score": 0.800527594493516,
+      "best_control": "same_topology_no_semantic",
+      "best_control_score": 0.6925596632053131,
+      "margin": 0.10796793128820281
+    }
+  },
+  "claim": "Photometric geometry route improves projected mask/RGB/edge consistency over the current baseline/control set under config-neutral scoring."
+}

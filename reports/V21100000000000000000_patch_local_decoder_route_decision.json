@@ -1,0 +1,17 @@
+{
+  "created_at": "2026-05-29T02:11:00Z",
+  "status": "V211_PATCH_LOCAL_DECODER_ROUTE_REQUIRED",
+  "mentor_ready": false,
+  "external_hard_block": false,
+  "previous_checkpoint": "V210_PATCH_GEOMETRY_SOURCE_READY_FOR_PATCH_DECODER",
+  "v210_inputs": {
+    "manifest": "reports/V21000000000000000000_patch_geometry_source_manifest.csv",
+    "patches": "reports/V21000000000000000000_patch_geometry_source_patches.csv",
+    "preview": "boards/V21000000000000000000_patch_geometry_source_preview.png"
+  },
+  "root_cause": "Patch sources are available, but no patch-local geometry decoder has yet emitted coherent local surfaces for the mentor full-scene point cloud.",
+  "next_route": "V211 patch-local geometry decoder with local patch point emission, continuity loss, same-scene controls, and mentor visual gate.",
+  "no_agent_rule": "No agents or subagents launched.",
+  "face_detail_claim_allowed": false,
+  "allowed_face_claim": "head/face contour and hair region only"
+}

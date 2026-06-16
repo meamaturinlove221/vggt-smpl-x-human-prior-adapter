@@ -1,0 +1,32 @@
+{
+  "created_at": "2026-05-28T20:25:00+00:00",
+  "status": "V17600_FRONT_BACK_OCCUPANCY_ROUTE_REQUIRED",
+  "mentor_ready": false,
+  "external_hard_block": false,
+  "best_current_candidate": "V17300000000000000000_multishell_topology_decoder_true",
+  "best_current_candidate_status": "checkpoint_fail_closed",
+  "v173_summary": {
+    "modal_device": "NVIDIA A10",
+    "steps": 300,
+    "max_points": 8192,
+    "beats_baseline_cases": 4,
+    "beats_hard_controls_cases": 3,
+    "remaining_control_failure_case": "0013_01_frame001",
+    "billboard_fail_v2_cases": 4
+  },
+  "v175_summary": {
+    "status": "failed_countercheck",
+    "reason": "Layer-balanced shell selection did not solve front/back occupancy and weakened the strongest V173 scores."
+  },
+  "root_cause": "Front/back occupancy is not explicitly learned or selected; multi-layer and thickness can improve while the thin-axis extreme layers remain weak or control-dominated.",
+  "required_next": [
+    "front/back layer assignment head",
+    "thin-axis extreme-bin occupancy loss",
+    "budget sampler that preserves front and back layers per part",
+    "in-batch same-topology and shuffled separation with 0013_01 focus",
+    "visual checkpoint selection using full-scene and turntable boards"
+  ],
+  "face_detail_claim_allowed": false,
+  "allowed_face_claim": "head/face contour and hair region only",
+  "no_agent_subagent_launched": true
+}

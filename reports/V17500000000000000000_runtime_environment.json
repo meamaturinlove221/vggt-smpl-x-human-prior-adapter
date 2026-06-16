@@ -1,0 +1,9 @@
+{
+  "created_at": "2026-05-28T20:23:40+00:00",
+  "torch_cuda_available": true,
+  "selected_device": "cpu",
+  "cuda_error": "CUDA error: no kernel image is available for execution on the device\nSearch for `cudaErrorNoKernelImageForDevice' in https://docs.nvidia.com/cuda/cuda-runtime-api/group__CUDART__TYPES.html for more information.\nCUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.\nFor debugging consider passing CUDA_LAUNCH_BLOCKING=1\nCompile with `TORCH_USE_CUDA_DSA` to enable device-side assertions.\n",
+  "modal_required_for_final": true,
+  "steps": 80,
+  "max_points": 4096
+}

@@ -1,0 +1,282 @@
+{
+  "created_at": "2026-05-28T23:19:17+00:00",
+  "status": "V19800_SOURCE_UPRIGHT_RENDER_AUDIT_FAIL_CLOSED_CONTINUE",
+  "mentor_ready": false,
+  "external_hard_block": false,
+  "source_upright_board": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V19800000000000000000_source_upright_full_scene_board.png",
+  "metric_csv": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V19800000000000000000_source_upright_metric_audit.csv",
+  "failures": [
+    {
+      "case": "0012_11_frame001",
+      "reason": "v197_true_combined_fail_v4",
+      "true_score": 0.4020193146308524
+    },
+    {
+      "case": "0012_11_frame001",
+      "reason": "control_or_prior_close_or_better_after_upright_render_audit",
+      "control": "real_vggt_baseline_only",
+      "true_score": 0.4020193146308524,
+      "control_score": 0.4709819833342097
+    },
+    {
+      "case": "0012_11_frame001",
+      "reason": "control_or_prior_close_or_better_after_upright_render_audit",
+      "control": "visible_surface_preserving_infill_true",
+      "true_score": 0.4020193146308524,
+      "control_score": 0.633747900754873
+    },
+    {
+      "case": "0012_11_frame001",
+      "reason": "control_or_prior_close_or_better_after_upright_render_audit",
+      "control": "same_topology_no_semantic",
+      "true_score": 0.4020193146308524,
+      "control_score": 0.6153839052366847
+    },
+    {
+      "case": "0012_11_frame001",
+      "reason": "control_or_prior_close_or_better_after_upright_render_audit",
+      "control": "shuffled_smpl_feature",
+      "true_score": 0.4020193146308524,
+      "control_score": 0.5938432340771227
+    },
+    {
+      "case": "0013_01_frame001",
+      "reason": "v197_true_combined_fail_v4",
+      "true_score": 0.4115871739291772
+    },
+    {
+      "case": "0013_01_frame001",
+      "reason": "control_or_prior_close_or_better_after_upright_render_audit",
+      "control": "real_vggt_baseline_only",
+      "true_score": 0.4115871739291772,
+      "control_score": 0.46562437160631054
+    },
+    {
+      "case": "0013_01_frame001",
+      "reason": "control_or_prior_close_or_better_after_upright_render_audit",
+      "control": "visible_surface_preserving_infill_true",
+      "true_score": 0.4115871739291772,
+      "control_score": 0.6189950823843376
+    },
+    {
+      "case": "0013_01_frame001",
+      "reason": "control_or_prior_close_or_better_after_upright_render_audit",
+      "control": "same_topology_no_semantic",
+      "true_score": 0.4115871739291772,
+      "control_score": 0.6592843267754295
+    },
+    {
+      "case": "0013_01_frame001",
+      "reason": "control_or_prior_close_or_better_after_upright_render_audit",
+      "control": "shuffled_smpl_feature",
+      "true_score": 0.4115871739291772,
+      "control_score": 0.6300139009014754
+    },
+    {
+      "case": "0021_03_frame001",
+      "reason": "v197_true_combined_fail_v4",
+      "true_score": 0.46049569776899235
+    },
+    {
+      "case": "0021_03_frame001",
+      "reason": "control_or_prior_close_or_better_after_upright_render_audit",
+      "control": "real_vggt_baseline_only",
+      "true_score": 0.46049569776899235,
+      "control_score": 0.473598221025077
+    },
+    {
+      "case": "0021_03_frame001",
+      "reason": "control_or_prior_close_or_better_after_upright_render_audit",
+      "control": "visible_surface_preserving_infill_true",
+      "true_score": 0.46049569776899235,
+      "control_score": 0.5362180951297058
+    },
+    {
+      "case": "0021_03_frame001",
+      "reason": "control_or_prior_close_or_better_after_upright_render_audit",
+      "control": "same_topology_no_semantic",
+      "true_score": 0.46049569776899235,
+      "control_score": 0.6048242753225461
+    },
+    {
+      "case": "0021_03_frame001",
+      "reason": "control_or_prior_close_or_better_after_upright_render_audit",
+      "control": "shuffled_smpl_feature",
+      "true_score": 0.46049569776899235,
+      "control_score": 0.5823420907821397
+    },
+    {
+      "case": "current_v895_0021_03",
+      "reason": "v197_true_combined_fail_v4",
+      "true_score": 0.4569491229472439
+    },
+    {
+      "case": "current_v895_0021_03",
+      "reason": "control_or_prior_close_or_better_after_upright_render_audit",
+      "control": "real_vggt_baseline_only",
+      "true_score": 0.4569491229472439,
+      "control_score": 0.4711326194691602
+    },
+    {
+      "case": "current_v895_0021_03",
+      "reason": "control_or_prior_close_or_better_after_upright_render_audit",
+      "control": "visible_surface_preserving_infill_true",
+      "true_score": 0.4569491229472439,
+      "control_score": 0.5234128729237953
+    },
+    {
+      "case": "current_v895_0021_03",
+      "reason": "control_or_prior_close_or_better_after_upright_render_audit",
+      "control": "same_topology_no_semantic",
+      "true_score": 0.4569491229472439,
+      "control_score": 0.6111958787696002
+    },
+    {
+      "case": "current_v895_0021_03",
+      "reason": "control_or_prior_close_or_better_after_upright_render_audit",
+      "control": "shuffled_smpl_feature",
+      "true_score": 0.4569491229472439,
+      "control_score": 0.5758237553078631
+    }
+  ],
+  "transform_info_first_case": {
+    "real_vggt_baseline_only": {
+      "long_axis": [
+        0.10706477060777919,
+        0.9876109220959387,
+        -0.11472489464590757
+      ],
+      "right_axis": [
+        0.9765098109642039,
+        -0.08275053112499188,
+        0.19894958831117654
+      ],
+      "up_axis": [
+        0.10706477060777912,
+        0.987610922095938,
+        -0.11472489464590749
+      ],
+      "depth_axis": [
+        -0.18699124039740078,
+        0.13333047721861158,
+        0.9732714214746567
+      ],
+      "eigenvalues_desc": [
+        0.019759065205011007,
+        0.0026967706262179896,
+        0.0003616339150195119
+      ]
+    },
+    "moderate_offset_surface_completion_true": {
+      "long_axis": [
+        0.08520215487677446,
+        0.9927749242128626,
+        -0.0844898967835755
+      ],
+      "right_axis": [
+        0.9785837662442031,
+        -0.06743212958496944,
+        0.1944909261198236
+      ],
+      "up_axis": [
+        0.08520215487677446,
+        0.9927749242128626,
+        -0.0844898967835755
+      ],
+      "depth_axis": [
+        -0.1873883807701666,
+        0.0992514874134438,
+        0.9772587871175956
+      ],
+      "eigenvalues_desc": [
+        0.01100879841225405,
+        0.003119038806497332,
+        3.279922968032074e-05
+      ]
+    },
+    "visible_surface_preserving_infill_true": {
+      "long_axis": [
+        0.04086969054954198,
+        0.9989059654475305,
+        -0.02272752929207278
+      ],
+      "right_axis": [
+        0.9813345866488965,
+        -0.035852000638351395,
+        0.18893666424722086
+      ],
+      "up_axis": [
+        0.04086969054954198,
+        0.9989059654475305,
+        -0.02272752929207278
+      ],
+      "depth_axis": [
+        -0.18791513361361847,
+        0.03002509356463355,
+        0.9817262328752404
+      ],
+      "eigenvalues_desc": [
+        0.011068232847188166,
+        0.0031400990844941213,
+        0.00017426087484951944
+      ]
+    },
+    "same_topology_no_semantic": {
+      "long_axis": [
+        -0.03141560466821196,
+        0.9993968750292362,
+        0.014796822805141413
+      ],
+      "right_axis": [
+        0.9816704080204997,
+        0.02806737157335753,
+        0.18850844190600288
+      ],
+      "up_axis": [
+        -0.03141560466821198,
+        0.9993968750292368,
+        0.014796822805141422
+      ],
+      "depth_axis": [
+        -0.18797943983371268,
+        -0.020447709768069804,
+        0.9819600915337876
+      ],
+      "eigenvalues_desc": [
+        0.020961808386008085,
+        0.0029357423310362725,
+        0.0001879639948594592
+      ]
+    },
+    "shuffled_smpl_feature": {
+      "long_axis": [
+        0.06097294720465227,
+        0.9960545013757522,
+        -0.06448046214382751
+      ],
+      "right_axis": [
+        0.9803278125772411,
+        -0.047610216613470036,
+        0.19154802834156234
+      ],
+      "up_axis": [
+        0.060972947204652225,
+        0.9960545013757516,
+        -0.06448046214382747
+      ],
+      "depth_axis": [
+        -0.18772234708925897,
+        0.07489123822665329,
+        0.9793628657653805
+      ],
+      "eigenvalues_desc": [
+        0.0211235369397597,
+        0.003033791281791514,
+        0.0004911476112837453
+      ]
+    }
+  },
+  "face_detail_claim_allowed": false,
+  "allowed_face_claim": "head/face contour and hair region only",
+  "summary": "V198 fixes the mentor-board orientation for visual audit only. It does not override V196/V197 fail-closed geometry and hard-control decisions."
+}

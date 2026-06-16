@@ -1,0 +1,12 @@
+{
+  "created_at": "2026-05-29T00:35:00+00:00",
+  "status": "V205_LEARNED_PART_PROPOSAL_ROUTE_REQUIRED",
+  "mentor_ready": false,
+  "external_hard_block": false,
+  "previous_checkpoint": "V20420_PART_LOCAL_TARGET_STUDENT_FAIL_CLOSED_CONTINUE",
+  "root_cause": "Fixed part-local target masks and strong preservation prevent contamination but also make the candidate too conservative and baseline-near.",
+  "next_route": "Learn part-local proposal scores with non-regression ranking, using V20410 targets as safety anchors rather than the complete edit set.",
+  "no_agent_rule": "No agents or subagents launched.",
+  "face_detail_claim_allowed": false,
+  "allowed_face_claim": "head/face contour and hair region only"
+}

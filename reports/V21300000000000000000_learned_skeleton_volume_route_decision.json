@@ -1,0 +1,18 @@
+{
+  "created_at": "2026-05-29T02:30:00Z",
+  "status": "V213_LEARNED_SKELETON_VOLUME_ROUTE_REQUIRED",
+  "mentor_ready": false,
+  "external_hard_block": false,
+  "previous_checkpoint": "V212_PATCH_SKELETON_VOLUME_FAIL_CLOSED_CONTINUE",
+  "v212_result": {
+    "combined_gate_failed_cases": 4,
+    "same_topology_or_shuffled_stronger": true,
+    "mentor_visual_pass": false,
+    "best_improvement_note": "0021/current improve over patch-local decoder but remain below hard controls"
+  },
+  "root_cause": "Deterministic skeleton tubes add structure but are not learned, image-supported, or semantically discriminative enough to beat same-topology/shuffled controls.",
+  "next_route": "V213 learned skeleton-volume decoder with VGGT/SMPL edge conditioning, semantic edge consistency loss, and hard-control firewall.",
+  "no_agent_rule": "No agents or subagents launched.",
+  "face_detail_claim_allowed": false,
+  "allowed_face_claim": "head/face contour and hair region only"
+}

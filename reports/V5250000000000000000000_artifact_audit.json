@@ -1,0 +1,79 @@
+{
+  "task": "V525_artifact_audit",
+  "status": "V525_ARTIFACT_AUDIT_PASS_FINAL_READY_NOT_PROMOTED",
+  "created_at": "2026-06-02T22:47:12.778741Z",
+  "repo": "D:\\vggt\\vggt-canonical-surfel-adapter",
+  "advisor_report": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5250000000000000000000_v50r2_visual_floor_advisor_report.md",
+  "viewer": "D:\\vggt\\vggt-canonical-surfel-adapter\\viewers\\V5250000000000000000000_v50r2_visual_floor_viewer.html",
+  "bundle": "D:\\vggt\\vggt-canonical-surfel-adapter\\bundles\\V5250000000000000000000_v50r2_visual_floor_advisor_pack.zip",
+  "bundle_sha256": "6c869ae646f0dcc3ae955fb2d299f8d0a4f812980444f9d5c6ec778ca225f52e",
+  "manifest": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5250000000000000000000_bundle_manifest.json",
+  "manifest_file_count": 34,
+  "zip_test_ok": true,
+  "viewer_probe": {
+    "path": "D:\\vggt\\vggt-canonical-surfel-adapter\\viewers\\V5250000000000000000000_v50r2_visual_floor_viewer.html",
+    "reference_count": 16,
+    "missing": [],
+    "all_references_exist": true
+  },
+  "ply_probe": {
+    "path": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V5230000000000000000000_observation_anchor_control_part_binding_repair\\v523_cam21_true_full_scene_rgb.ply",
+    "readable": true,
+    "vertex_count": 31000
+  },
+  "npz_probe": {
+    "path": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V5230000000000000000000_observation_anchor_control_part_binding_repair\\v523_observation_anchor_control_part_binding_candidate.npz",
+    "readable": true,
+    "keys": [
+      "full_scene_points",
+      "full_scene_rgb",
+      "view_index",
+      "is_human",
+      "model_owned_student_output",
+      "vggt_observation_input",
+      "smpl_part_binding_input",
+      "visible_anchor_guarded_residual",
+      "no_teacher_points_inference",
+      "no_v50r2_inference",
+      "no_kinect_depth_inference",
+      "final_inference_allowed",
+      "source"
+    ],
+    "shapes": {
+      "full_scene_points": [
+        185246,
+        3
+      ],
+      "full_scene_rgb": [
+        185246,
+        3
+      ],
+      "view_index": [
+        185246
+      ],
+      "is_human": [
+        185246
+      ],
+      "model_owned_student_output": [],
+      "vggt_observation_input": [],
+      "smpl_part_binding_input": [],
+      "visible_anchor_guarded_residual": []
+    }
+  },
+  "teacher_copy_leak_detected": false,
+  "v50_v50r2_diff": [],
+  "manual_gate_status": "V512_MANUAL_MENTOR_GATE_V523_PASS_ADVISOR_PACK_REQUIRED_NOT_PROMOTED",
+  "final_status": "V9000000000000000000000_V50R2_DISTILLED_HUMAN_SCENE_POINTCLOUD_READY_NOT_PROMOTED",
+  "gates": {
+    "report_exists": true,
+    "viewer_exists": true,
+    "bundle_exists": true,
+    "bundle_zip_clean": true,
+    "viewer_references_exist": true,
+    "ply_readable": true,
+    "npz_readable": true,
+    "manual_gate_pass": true,
+    "no_v50_v50r2_diff": true,
+    "not_promoted": true
+  }
+}

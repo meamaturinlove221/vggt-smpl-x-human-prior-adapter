@@ -1,0 +1,16 @@
+case,region,config,point_count,thin_ratio
+0012_11_frame001,head_hair_contour,baseline,25013,0.051518620750977726
+0012_11_frame001,head_hair_contour,true,19502,0.10274088225511493
+0012_11_frame001,head_hair_contour,same_topology_no_semantic,13600,0.1301551972102998
+0012_11_frame001,shoulder_neck,baseline,25166,0.035587834433545754
+0012_11_frame001,shoulder_neck,true,15213,0.033097488894243354
+0012_11_frame001,shoulder_neck,same_topology_no_semantic,18226,0.1400526256183994
+0012_11_frame001,hand_arm_endpoint,baseline,60000,0.12926791592411105
+0012_11_frame001,hand_arm_endpoint,true,21600,0.20907176859752158
+0012_11_frame001,hand_arm_endpoint,same_topology_no_semantic,58728,0.08215067231482612
+0012_11_frame001,clothing_boundary,baseline,22873,0.03037912052595168
+0012_11_frame001,clothing_boundary,true,13773,0.019494177280451556
+0012_11_frame001,clothing_boundary,same_topology_no_semantic,11470,0.09737440587701171
+0012_11_frame001,leg_foot,baseline,19856,0.4441442166284515
+0012_11_frame001,leg_foot,true,14800,0.5114745930089102
+0012_11_frame001,leg_foot,same_topology_no_semantic,18558,0.11532373771067218

@@ -1,0 +1,14 @@
+{
+  "created_at": "2026-05-28T23:24:56+00:00",
+  "status": "V20100_VISIBLE_SURFACE_NONREGRESSION_ROUTE_READY_CONTINUE",
+  "mentor_ready": false,
+  "external_hard_block": false,
+  "input_failures": [],
+  "v196_result": "sparse completion became cleaner but weaker than baseline/controls",
+  "v197_result": "moderate offset selection was nearly visually identical to V196 and still failed controls",
+  "v198_result": "source-upright render made baseline mentor-readable but did not change geometry gate",
+  "v200_result": "visible baseline lock reduced noise but damaged visible leg/foot continuity and still lost to baseline/controls",
+  "next_required_route": "train visible-surface non-regression plus connected weak-region infill; stop selection-only postprocessing",
+  "face_detail_claim_allowed": false,
+  "allowed_face_claim": "head/face contour and hair region only"
+}

@@ -1,0 +1,14 @@
+{
+  "default_disabled": true,
+  "files": {
+    "branch_module": "D:\\vggt\\vggt-live-highres-crop\\vggt\\models\\highres_crop_geometry.py",
+    "smoke": "D:\\vggt\\vggt-live-highres-crop\\tools\\smoke_highres_crop_geometry_branch.py",
+    "vggt_forward": "D:\\vggt\\vggt-live-highres-crop\\vggt\\models\\vggt.py"
+  },
+  "forward_path_integrated": true,
+  "implementation_level": "production worktree module and VGGT.forward hook; training route below uses this production module on true-6 crop assets",
+  "status": "V702000_PRODUCTION_SCAFFOLD_CODE_AUDIT",
+  "supports_point_depth_normal": true,
+  "trainable_parameters_present": true,
+  "worktree": "D:\\vggt\\vggt-live-highres-crop"
+}

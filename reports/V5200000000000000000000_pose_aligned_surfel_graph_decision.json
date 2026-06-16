@@ -1,0 +1,171 @@
+{
+  "task": "V520_pose_aligned_surfel_graph_repair",
+  "status": "V520_POSE_ALIGNED_SURFEL_GRAPH_CANDIDATE_READY_FOR_V509_REVIEW_NOT_PROMOTED",
+  "created_at": "2026-06-02T22:18:05.117265Z",
+  "repo": "D:\\vggt\\vggt-canonical-surfel-adapter",
+  "checkpoint": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V5200000000000000000000_pose_aligned_surfel_graph_repair\\checkpoint_320.pt",
+  "candidate_npz": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V5200000000000000000000_pose_aligned_surfel_graph_repair\\v520_pose_aligned_surfel_graph_candidate.npz",
+  "true_full_scene_ply": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V5200000000000000000000_pose_aligned_surfel_graph_repair\\v520_true_full_scene_rgb.ply",
+  "controls": {
+    "vggt_visible_baseline": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V5200000000000000000000_pose_aligned_surfel_graph_repair\\v520_vggt_visible_baseline_full_scene_rgb.ply",
+    "no_smpl_graph": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V5200000000000000000000_pose_aligned_surfel_graph_repair\\v520_no_smpl_graph_full_scene_rgb.ply",
+    "weak_semantic": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V5200000000000000000000_pose_aligned_surfel_graph_repair\\v520_weak_semantic_full_scene_rgb.ply",
+    "shuffled_semantic": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V5200000000000000000000_pose_aligned_surfel_graph_repair\\v520_shuffled_semantic_full_scene_rgb.ply",
+    "smpl_graph_only": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V5200000000000000000000_pose_aligned_surfel_graph_repair\\v520_smpl_graph_only_full_scene_rgb.ply"
+  },
+  "boards": {
+    "main": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V5200000000000000000000_human_main_full_scene.png",
+    "controls": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V5200000000000000000000_same_scene_controls.png",
+    "anti_2d": "D:\\vggt\\vggt-canonical-surfel-adapter\\boards\\V5200000000000000000000_turntable_side_depth_cross_section.png"
+  },
+  "metrics_csv": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5200000000000000000000_pose_aligned_surfel_graph_metrics.csv",
+  "teacher_copy_check": "D:\\vggt\\vggt-canonical-surfel-adapter\\reports\\V5200000000000000000000_teacher_copy_check.json",
+  "input_policy": {
+    "vggt_observation_input": true,
+    "canonical_smplx_surfel_graph": true,
+    "pose_axis_alignment_head": true,
+    "v50r2_used_for_loss_only": true,
+    "v50r2_used_at_inference": false,
+    "kinect_depth_used_at_inference": false
+  },
+  "gates": {
+    "teacher_copy_diagnostic_pass": true,
+    "same_scene_controls_generated": true,
+    "true_beats_required_controls": true,
+    "human_main_proxy_pass": true,
+    "anti_2d_proxy_pass": true,
+    "accepted_for_v509": true,
+    "manual_visual_gate_pass": false,
+    "mentor_ready": false,
+    "not_promoted": true,
+    "auto_evolve_required": false
+  },
+  "metrics": {
+    "status": "V520_POSE_ALIGNED_SURFEL_GRAPH_CANDIDATE_READY_FOR_V509_REVIEW_NOT_PROMOTED",
+    "steps": 320,
+    "checkpoint": "D:\\vggt\\vggt-canonical-surfel-adapter\\output\\V5200000000000000000000_pose_aligned_surfel_graph_repair\\checkpoint_320.pt",
+    "human_point_count": 27648,
+    "environment_point_count": 9000,
+    "environment_ratio": 0.2455795677799607,
+    "human_span_x": 0.2985573709011078,
+    "human_span_y": 0.3343762755393982,
+    "human_span_z": 0.47274768352508545,
+    "human_thickness_ratio": 0.6315364241600037,
+    "body_part_count": 8,
+    "true_to_v50r2_nn_mean": 0.010236616054123562,
+    "vggt_visible_baseline_to_v50r2_nn_mean": 0.029411703854027457,
+    "no_smpl_graph_to_v50r2_nn_mean": 0.07101972424132014,
+    "weak_semantic_to_v50r2_nn_mean": 0.05032958899552445,
+    "shuffled_semantic_to_v50r2_nn_mean": 0.048728188330437294,
+    "smpl_graph_only_to_v50r2_nn_mean": 0.023927386807095042,
+    "true_beats_vggt_visible_baseline": true,
+    "true_beats_no_smpl_graph": true,
+    "true_beats_weak_semantic": true,
+    "true_beats_shuffled_semantic": true,
+    "true_beats_smpl_graph_only": true,
+    "true_beats_required_controls": true,
+    "anti_2d_proxy_pass": true,
+    "human_main_proxy_pass": true,
+    "no_teacher_copy": true,
+    "accepted_for_v509": true,
+    "mentor_ready": false,
+    "history_last_loss": 0.08126186579465866
+  },
+  "loss_history": [
+    {
+      "step": 1.0,
+      "loss": 0.21635004878044128,
+      "chamfer": 0.1574757993221283,
+      "rgb": 0.1527835875749588,
+      "margin": 0.011999998241662979,
+      "anti_sheet": 0.0
+    },
+    {
+      "step": 32.0,
+      "loss": 0.11076026409864426,
+      "chamfer": 0.06613270938396454,
+      "rgb": 0.10077895224094391,
+      "margin": 0.0031803755555301905,
+      "anti_sheet": 0.0
+    },
+    {
+      "step": 64.0,
+      "loss": 0.10302980244159698,
+      "chamfer": 0.05644417554140091,
+      "rgb": 0.10576967895030975,
+      "margin": 0.003008544445037842,
+      "anti_sheet": 0.0
+    },
+    {
+      "step": 96.0,
+      "loss": 0.09117794781923294,
+      "chamfer": 0.044851385056972504,
+      "rgb": 0.10358912497758865,
+      "margin": 0.0024796780198812485,
+      "anti_sheet": 0.0
+    },
+    {
+      "step": 128.0,
+      "loss": 0.08934596180915833,
+      "chamfer": 0.04250825196504593,
+      "rgb": 0.10486216098070145,
+      "margin": 0.0013210447505116463,
+      "anti_sheet": 0.0
+    },
+    {
+      "step": 160.0,
+      "loss": 0.08651376515626907,
+      "chamfer": 0.03720053285360336,
+      "rgb": 0.10828297585248947,
+      "margin": 0.0029168545734137297,
+      "anti_sheet": 0.0
+    },
+    {
+      "step": 192.0,
+      "loss": 0.08775317668914795,
+      "chamfer": 0.03951115906238556,
+      "rgb": 0.10453435033559799,
+      "margin": 0.002627243520691991,
+      "anti_sheet": 0.0
+    },
+    {
+      "step": 224.0,
+      "loss": 0.08067282289266586,
+      "chamfer": 0.032995011657476425,
+      "rgb": 0.10236204415559769,
+      "margin": 0.002329370006918907,
+      "anti_sheet": 0.0
+    },
+    {
+      "step": 256.0,
+      "loss": 0.08237168937921524,
+      "chamfer": 0.033513143658638,
+      "rgb": 0.10596684366464615,
+      "margin": 0.0012908317148685455,
+      "anti_sheet": 0.0
+    },
+    {
+      "step": 288.0,
+      "loss": 0.08133305609226227,
+      "chamfer": 0.03284092992544174,
+      "rgb": 0.10572058707475662,
+      "margin": 0.001028511207550764,
+      "anti_sheet": 0.0
+    },
+    {
+      "step": 320.0,
+      "loss": 0.08126186579465866,
+      "chamfer": 0.033379700034856796,
+      "rgb": 0.10157684981822968,
+      "margin": 0.0018301589880138636,
+      "anti_sheet": 0.0
+    }
+  ],
+  "decision": "V520 adds learned pose/axis alignment to V519. It remains not promoted and still requires V512 manual visual gate.",
+  "artifact_hashes": {
+    "candidate_npz": "36e3c530c73cae82b2df4f7a90dac95065d98d9bbd1537196ad6ac3cb2ebb244",
+    "main_board": "3b0706dafbb2a5aad7f14faf142e19341188028e9c42061d124989f6cd737083",
+    "controls_board": "1c5c92ef72a7584f7b53c822f0b1326ace44ceecfb4c2d0371ca3ea1c001f421",
+    "anti2d_board": "777a23da3f1c248fa52b71ca715eee25bb29f93f164fcc9229b820d5385377d4"
+  }
+}

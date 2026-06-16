@@ -1,0 +1,18 @@
+{
+  "normal_all_zero_after_repair": false,
+  "normal_was_all_zero_or_unusable": true,
+  "original_normal_status": {
+    "max_norm": 0.0,
+    "mean_norm": 0.0,
+    "min_norm": 0.0,
+    "nonzero_ratio_gt_1e_4": 0.0
+  },
+  "repair_action": "use geometric normal from point map as baseline normal and train production crop_delta_normal residual",
+  "repaired_base_normal_status": {
+    "max_norm": 1.0000001192092896,
+    "mean_norm": 1.0,
+    "min_norm": 0.9999998211860657,
+    "nonzero_ratio_gt_1e_4": 1.0
+  },
+  "status": "V710000_NORMAL_BRANCH_REPAIR"
+}
